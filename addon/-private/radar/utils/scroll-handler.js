@@ -1,4 +1,5 @@
 import scheduler from '../../scheduler';
+import SUPPORTS_PASSIVE from './supports-passive';
 
 const DEFAULT_ARRAY_SIZE = 10;
 const UNDEFINED_VALUE = Object.create(null);
@@ -10,10 +11,13 @@ export class ScrollHandler {
     this.length = 0;
     this.handlers = new Array(DEFAULT_ARRAY_SIZE);
     this.isPolling = false;
+    this.isUsingPassive = SUPPORTS_PASSIVE;
   }
 
   addElementHandler(element, handler) {
     let index = this.elements.indexOf(element);
+    let handlers;
+    let cache;
 
     if (index === -1) {
       index = this.length++;
@@ -24,15 +28,30 @@ export class ScrollHandler {
         this.handlers.length = this.maxLength;
       }
 
-      this.elements[index] = element;
-      this.handlers[index] =  { top: UNDEFINED_VALUE, left: UNDEFINED_VALUE, handlers: [handler] };
-    } else {
-      let handlers = this.handlers[index].handlers;
+      handlers = [handler];
 
+      this.elements[index] = element;
+      cache = this.handlers[index] =  {
+        top: UNDEFINED_VALUE,
+        left: UNDEFINED_VALUE,
+        handlers,
+        passiveHandler: SUPPORTS_PASSIVE ? function() {
+          let top = element.top;
+          let left = element.left;
+          for (let j = 0; j < handlers.length; j++) {
+            handlers[j]({ top, left });
+          }
+        } : UNDEFINED_VALUE
+      };
+    } else {
+      cache = this.handlers[index];
+      handlers = cache.handlers;
       handlers.push(handler);
     }
 
-    if (!this.isPolling) {
+    if (this.isUsingPassive && handlers.length === 1) {
+      element.addEventListener('scroll', cache.passiveHandler, { capture: true, passive: true });
+    } else if (!this.isPolling) {
       this.poll();
     }
   }
@@ -106,11 +125,19 @@ export class ScrollHandler {
 const instance = new ScrollHandler();
 
 export function addScrollHandler(element, handler) {
-  instance.addElementHandler(element, handler);
+  if (SUPPORTS_PASSIVE) {
+
+  } else {
+    instance.addElementHandler(element, handler);
+  }
 }
 
 export function removeScrollHandler(element, handler) {
-  instance.removeElementHandler(element, handler);
+  if (SUPPORTS_PASSIVE) {
+
+  } else {
+    instance.removeElementHandler(element, handler);
+  }
 }
 
 export default instance;

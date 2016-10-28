@@ -307,7 +307,7 @@ const VerticalCollection = Component.extend({
    * @private
    */
   _updateChildStates() {
-    if (this._isFirstRender) {;
+    if (this._isFirstRender) {
 
       this._initialRenderCount -= 1;
       this._tracker._activeCount += 1;
