@@ -8,9 +8,9 @@ module.exports = function(environment) {
 
   let ENV = {
     modulePrefix: 'dummy',
-    podModulePrefix: 'dummy/screens',
+    podModulePrefix: 'dummy/routes',
     environment,
-    rootURL: 'smoke-and-mirrors',
+    // rootURL: './vertical-collection/',
     locationType: 'hash',
     EmberENV: {
       FEATURES: {},

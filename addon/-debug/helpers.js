@@ -15,8 +15,17 @@ export function debug() {
   Logger.debug(...arguments);
 }
 
-export function assert() {
-  emberAssert(...arguments);
+export function debugOnError(msg, conditional) {
+  if (!conditional) {
+    console.error(msg);
+    debugger;
+  }
+}
+
+export function assert(msg, conditional) {
+  if (!conditional) {
+    throw new Error(msg);
+  }
 }
 
 export function warn() {

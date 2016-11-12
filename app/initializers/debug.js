@@ -1,6 +1,6 @@
-import 'smoke-and-mirrors/-debug';
+import 'vertical-collection/-debug';
 
 export default {
-  name: 'smoke-and-mirrors-debug',
+  name: 'vertical-collection-debug',
   initialize() {}
 };

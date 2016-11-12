@@ -1,8 +1,7 @@
 /**!
   Visualization Classes for debugging the vertical-collection
   */
-
-.sm_visualization-wrapper {
+.vertical-collection-visual-debugger {
   height: 100%;
   position: fixed;
   z-index: 1000;
@@ -12,51 +11,52 @@
   align-items: center;
   justify-content: left;
   background: rgba(50, 50, 50, 1);
-  width: 75px;
+  width: 150px;
 }
 
-.sm_visualization-container {
-  -moz-transform: scale(.1);
-  zoom: 10%;
+.vertical-collection-visual-debugger .vc_visualization-container {
+  -moz-transform: scale(.2);
+  zoom: 20%;
   left: 0;
   position: relative;
   width: 250px;
 }
 
-.sm_visualization-telescope {
+.vertical-collection-visual-debugger .vc_visualization-telescope {
   position: absolute;
   width: 750px;
   background: rgba(100, 230, 100, 0.65);
 }
 
-.sm_visualization-skyline {
+.vertical-collection-visual-debugger .vc_visualization-skyline {
   position: absolute;
   width: 750px;
   background: rgba(255, 255, 255, .15);
 }
 
-.sm_visualization-visible {
+.vertical-collection-visual-debugger .vc_visualization-visible {
   position: absolute;
   background: rgba(100, 230, 100, 0.4);
   width: 750px;
 }
 
-.sm_visualization-satellite {
+.vertical-collection-visual-debugger .vc_visualization-satellite {
   position: absolute;
   box-sizing: border-box;
   border: 1px dotted #bbb;
   border-top: 0px;
   color: #fff;
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 8px;
+  line-height: 10px;
   width: 250px;
 }
 
-.sm_visualization-satellite {
+.vertical-collection-visual-debugger .vc_visualization-satellite {
   border-top: 1px;
 }
 
-.sm_visualization-mirror {
+.vertical-collection-visual-debugger .vc_visualization-mirror {
   position: absolute;
   background: rgba(100, 250, 100, 0.5);
   box-sizing: border-box;
@@ -64,17 +64,18 @@
   border-top: 0px;
   color: #fff;
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 8px;
+  line-height: 10px;
   width: 250px;
 }
-.sm_visualization-mirror[viewState="culled"] {
+.vertical-collection-visual-debugger .vc_visualization-mirror[viewState="culled"] {
   background: rgba(100, 250, 100, 0.25);
 }
-.sm_visualization-mirror[viewState="culled"][hasErrors=true] {
+.vertical-collection-visual-debugger .vc_visualization-mirror[viewState="culled"][hasErrors=true] {
   background: rgba(255, 50, 50, 0.5);
 }
 
-.sm_visualization-screen {
+.vertical-collection-visual-debugger .vc_visualization-screen {
   position: absolute;
   background: transparent;
   box-sizing: content-box;
@@ -83,15 +84,15 @@
   width: 750px;
 }
 
-.sm_visualization-mirror[hasErrors=true] {
+.vertical-collection-visual-debugger .vc_visualization-mirror[hasErrors=true] {
   background: rgba(255, 50, 50, 1);
 }
 
-.sm_visualization-satellite[viewState="culled"] {
+.vertical-collection-visual-debugger .vc_visualization-satellite[viewState="culled"] {
   background: transparent;
 }
 
-.sm_visualization-satellite[viewState="visible"] {
+.vertical-collection-visual-debugger .vc_visualization-satellite[viewState="visible"] {
   background: rgba(230, 100, 230, 0.6);
 }
 

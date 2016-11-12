@@ -1,1 +1,1 @@
-export { default } from 'smoke-and-mirrors/components/vertical-collection/component';
+export { default } from 'vertical-collection/components/vertical-collection/component';

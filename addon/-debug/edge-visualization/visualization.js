@@ -1,6 +1,6 @@
 /* global document */
-import Geography from '../../-private/radar/models/geography';
-import Container from '../../-private/radar/models/container';
+import Geography from '../../-private/data-view/geography';
+import Container from '../../-private/data-view/container';
 
 const SYS_WIDTH = 250;
 
@@ -12,36 +12,34 @@ export default class Visualization {
     this._trackedItems = component._tracker;
     this.satellites = [];
     this.cache = [];
-    this.setupViewport();
-    this.render();
   }
 
   setupViewport() {
     this.wrapper = document.createElement('div');
-    this.wrapper.className = 'sm_visualization-wrapper';
+    this.wrapper.className = 'vertical-collection-visual-debugger';
 
     this.container = document.createElement('div');
-    this.container.className = 'sm_visualization-container';
+    this.container.className = 'vc_visualization-container';
     this.wrapper.appendChild(this.container);
 
     this.sky = document.createElement('div');
-    this.sky.className = 'sm_visualization-skyline';
+    this.sky.className = 'vc_visualization-skyline';
     this.container.appendChild(this.sky);
 
     this.telescope = document.createElement('div');
-    this.telescope.className = 'sm_visualization-telescope';
+    this.telescope.className = 'vc_visualization-telescope';
     this.container.appendChild(this.telescope);
 
     this.visAbove = document.createElement('div');
-    this.visAbove.className = 'sm_visualization-visible';
+    this.visAbove.className = 'vc_visualization-visible';
     this.container.appendChild(this.visAbove);
 
     this.visBelow = document.createElement('div');
-    this.visBelow.className = 'sm_visualization-visible';
+    this.visBelow.className = 'vc_visualization-visible';
     this.container.appendChild(this.visBelow);
 
     this.screen = document.createElement('div');
-    this.screen.className = 'sm_visualization-screen';
+    this.screen.className = 'vc_visualization-screen';
     this.container.appendChild(this.screen);
 
     document.body.appendChild(this.wrapper);
@@ -135,13 +133,13 @@ export default class Visualization {
       satellite = this.cache.pop();
     } else {
       satellite = document.createElement('div');
-      satellite.className = 'sm_visualization-satellite';
+      satellite.className = 'vc_visualization-satellite';
     }
     if (satellite.mirrorSatellite) {
       mirror = satellite.mirrorSatellite;
     } else {
       mirror = document.createElement('div');
-      mirror.className = 'sm_visualization-mirror';
+      mirror.className = 'vc_visualization-mirror';
       mirror.siblingSatellite = satellite;
       satellite.mirrorSatellite = mirror;
     }

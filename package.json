@@ -1,7 +1,7 @@
 {
-  "name": "smoke-and-mirrors",
+  "name": "vertical-collection",
   "version": "0.5.5",
-  "description": "Ambitious infinite-scroll and rendering for ambitious applications.",
+  "description": "infinite-scroll, done right. done.",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -12,12 +12,12 @@
     "suave": "jscs addon app tests --fix",
     "test": "ember try:each"
   },
-  "repository": "https://github.com/runspired/smoke-and-mirrors.git",
+  "repository": "https://github.com/html-next/vertical-collection.git",
   "engines": {
     "node": ">= 0.10.0"
   },
-  "homepage": "https://runspired.github.io/smoke-and-mirrors",
-  "bugs": "https://github.com/runspired/smoke-and-mirrors/issues",
+  "homepage": "https://github.com/html-next/vertical-collection",
+  "bugs": "https://github.com/html-next/vertical-collection/issues",
   "author": {
     "name": "Chris Thoburn (@runspired)",
     "url": "http://runspired.com"

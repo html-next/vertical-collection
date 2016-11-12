@@ -1,13 +1,14 @@
 /* global Array, Math */
 import Ember from 'ember';
 import layout from './template';
-import getTagDescendant from '../../utils/get-tag-descendant';
 import scheduler from '../../-private/scheduler';
-import estimateElementHeight from '../../utils/element/estimate-element-height';
-import closestElement from '../../utils/element/closest';
+import estimateElementHeight from '../../-private/utils/element/estimate-element-height';
+import closestElement from '../../-private/utils/element/closest';
 import Token from '../../-private/scheduler/token';
-import List from './data-view/list';
-import RecycleContainer from './data-view/recycle-container';
+import List from '../../-private/data-view/list';
+import VirtualComponent from '../../-private/virtual-component';
+import Proxy from '../../-private/data-view/proxy';
+import { assert, debugOnError } from 'vertical-collection/-debug/helpers';
 
 const {
   A,
@@ -30,8 +31,6 @@ const VerticalCollection = Component.extend({
    * with the `vertical-item`.
    */
   tagName: 'vertical-collection',
-  itemTagName: null,
-  itemClassNames: '',
   attributeBindings: ['boxStyle:style'],
   boxStyle: htmlSafe(''),
 
@@ -68,7 +67,7 @@ const VerticalCollection = Component.extend({
    * how much extra room to keep visible and invisible on
    * either side of the viewport.
    */
-  bufferSize: 0.25,
+  bufferSize: 0.1,
 
   // –––––––––––––– Initial Scroll State
   /*
@@ -114,7 +113,7 @@ const VerticalCollection = Component.extend({
   _isFirstRender: true,
   _isInitializingFromLast: false,
   _firstVisibleIndex: 0,
-  _initialRenderCount: 3,
+  _initialRenderCount: 10,
   _isPrepending: false,
 
   token: null,
@@ -138,8 +137,8 @@ const VerticalCollection = Component.extend({
     let index = 0;
 
     if (first) {
-      index = first.content.index;
-      let bottom = first.content.geography.bottom;
+      index = first.ref.index;
+      let bottom = first.ref.geography.bottom;
       let isVisible = bottom > visibleTop;
       let isFirst = index === 0;
 
@@ -244,6 +243,8 @@ const VerticalCollection = Component.extend({
     if (this._isPrepending) {
       return;
     }
+    this._updateChildStates();
+    return;
     if (this._nextUpdate === null) {
       this._nextUpdate = this.schedule('layout', () => {
         this._updateChildStates();
@@ -278,6 +279,25 @@ const VerticalCollection = Component.extend({
     }
   },
 
+  didRender() {
+    const rendered = this._proxied;
+
+    for (let i = 0, l = rendered.length; i < l; i++) {
+      rendered[i].didRender();
+    }
+  },
+
+  recycleVirtualComponent(component, newContent, newPosition) {
+    debugOnError(`You cannot set an item's content to undefined`, newContent);
+    debugOnError(`You cannot recycle components other than a VirtualComponent`, component instanceof VirtualComponent);
+    debugOnError(`You cannot set an item's content to something other than a Proxy`, newContent instanceof Proxy);
+
+    component.ref = newContent;
+    set(component, 'content', newContent.ref);
+    set(component, 'index', newContent.index);
+    component.position = newPosition;
+  },
+
   updateActiveItems: function(inbound) {
     const outbound = this._proxied;
 
@@ -287,9 +307,8 @@ const VerticalCollection = Component.extend({
     }
 
     for (let i = 0; i < inbound.length; i++) {
-      outbound[i] = outbound[i] || new RecycleContainer();
-      set(outbound[i], 'content', inbound[i]);
-      outbound[i].position = i;
+      outbound[i] = outbound[i] || new VirtualComponent(this.token);
+      this.recycleVirtualComponent(outbound[i], inbound[i], i);
     }
     // this.notifyPropertyChange('length');
 
@@ -306,24 +325,27 @@ const VerticalCollection = Component.extend({
    *
    * @private
    */
+  _currentSlice: null,
   _updateChildStates() {
     if (this._isFirstRender) {
 
       this._initialRenderCount -= 1;
       this._tracker._activeCount += 1;
       this.updateActiveItems(this._tracker.slice());
+      this._currentSlice = {
+        start: 0,
+        end: this._tracker._activeCount,
+        lengthDelta: lenDiff
+      };
 
       let { heightAbove, heightBelow } = this._tracker;
 
       this.set('boxStyle', htmlSafe(`padding-top: ${heightAbove}px; padding-bottom: ${heightBelow}px;`));
 
       this.schedule('affect', () => {
-        window.chunk = window.chunk ? ++window.chunk : 0
-        console.log('appending chunk #' + window.chunk);
         this._tracker.radar.rebuild();
 
-        if (this._initialRenderCount === 0) {
-          console.log('bailing!');
+        if (this._initialRenderCount <= 0) {
           this._isFirstRender = false;
           return;
         }
@@ -349,13 +371,10 @@ const VerticalCollection = Component.extend({
     let bottomItemIndex = topItemIndex;
     let topVisibleSpotted = false;
 
-    // console.log('edges', edges);
-
     while (bottomItemIndex <= maxIndex) {
       const ref = ordered[bottomItemIndex];
       const itemTop = ref.geography.top;
       const itemBottom = ref.geography.bottom;
-      // console.log('examining', ref);
 
       // end the loop if we've reached the end of components we care about
       if (itemTop > edges.bufferedBottom) {
@@ -451,69 +470,102 @@ const VerticalCollection = Component.extend({
     let curProxyLen = _proxied.length;
     let lenDiff = len - curProxyLen;
     let altered;
+    let cachedSlice = this._currentSlice;
+    let newSlice = {
+      start: topItemIndex,
+      end: bottomItemIndex,
+      lengthDelta: lenDiff
+    };
+    this._currentSlice = newSlice;
+
+    console.log(
+      '\tTotal Length:\t' + ordered.length + '\n' +
+      '\tCurrent Active Length:\t' + curProxyLen + '\n' +
+      '\tNew Active Length: \t' + len + '\n' +
+      '\tLength Delta:\t' + lenDiff + '\n' +
+      '\t---------------------------------------------\n' +
+      '\tOld Start Index:\t' + cachedSlice.start + '\n' +
+      '\tOld End Index:\t\t' + cachedSlice.end + '\n' +
+      '\tNew Start Index:\t' + newSlice.start + '\n' +
+      '\tNew End Index:\t\t' + newSlice.end + '\n'
+    );
 
     if (lenDiff < 0) {
       let absDiff = -1 * lenDiff;
-      let n = len + absDiff;
+      let newLength = len;
 
       if (_scrollIsForward) {
-        // console.log('removing ' + absDiff + ' active items from use from the top');
-        // altered = _proxied.splice(0, absDiff);
-        if (topItemIndex - n < 0) {
+        console.log('would remove ' + absDiff + ' active items from use from the top');
+        console.log(absDiff, lenDiff, len);
+        altered = _proxied.splice(0, absDiff);
+        /*
+        console.log('topItemIndex - absDiff < 0', topItemIndex, absDiff);
+        if (topItemIndex - newLength < 0) {
+          // we are bounded to the beginning of the proxy array
+          // and maintain at requisite length
+          //
           topItemIndex = 0;
-          bottomItemIndex = n;
+          bottomItemIndex = newLength;
         } else {
           topItemIndex -= absDiff;
         }
+        */
       } else {
-        // console.log('removing ' + absDiff + ' active items from use from the bottom');
-        // altered = _proxied.splice(len, absDiff);
-        if (bottomItemIndex + n > maxIndex) {
-          topItemIndex = maxIndex - n;
-          bottomItemIndex = maxIndex;
+        console.log('would remove ' + absDiff + ' active items from use from the bottom');
+        altered = _proxied.splice(len, absDiff);
+        /*
+        if (bottomItemIndex + absDiff > maxIndex) {
+          // topItemIndex = maxIndex - n;
+          // bottomItemIndex = maxIndex;
         } else {
-          bottomItemIndex += absDiff;
+          // bottomItemIndex += absDiff;
         }
+        */
       }
       lenDiff = 0;
+      assert(`We got to the right length`, _proxied.length === len);
     } else if (lenDiff > 0) {
-      console.log('adding ' + lenDiff + ' active items');
+      // console.log('adding ' + lenDiff + ' active items');
       altered = new Array(lenDiff);
 
       for (let i = 0; i < lenDiff; i++) {
-        altered[i] = new RecycleContainer(null, curProxyLen + i);
+        altered[i] = new VirtualComponent(this.token);
+        altered[i].position = curProxyLen + i;
       }
       if (_scrollIsForward) {
-        console.log('adding to bottom');
+        // console.log('adding to bottom');
         _proxied.splice(_proxied.length, 0, ...altered);
       } else {
-        console.log('adding to top');
+        // console.log('adding to top');
         _proxied.splice(0, 0, ...altered);
       }
     }
 
     if (position < 0) {
-      console.log('shifted last to front');
+      // console.log('shifted last to front');
       _proxied.unshift(_proxied.pop());
     } else if (position > 0) {
-      console.log('shifted front to last');
+      // console.log('shifted front to last');
       _proxied.push(_proxied.shift());
     }
 
     let _slice = this._tracker.slice(topItemIndex, bottomItemIndex);
+    debugOnError(`slice is the expected length`, _slice.length === len);
 
     for (let i = 0; i < len; i++) {
-      if (_proxied[i].content !== _slice[i]) {
-        set(_proxied[i], 'content', _slice[i]);
+      if (_proxied[i].ref !== _slice[i]) {
+        this.recycleVirtualComponent(_proxied[i], _slice[i], i);
       }
     }
 
     // _proxied.notifyPropertyChanges();
     this.set('activeItems', _proxied);
     this.notifyPropertyChange('activeItems');
-    console.log('active items', _proxied);
+    // console.log('active items', _proxied.length);
 
     let { heightAbove, heightBelow } = this._tracker;
+
+    assert(`Must be equal`, heightAbove === this._tracker.heightAbove);
 
     this.set('boxStyle', htmlSafe(`padding-top: ${heightAbove}px; padding-bottom: ${heightBelow}px;`));
   },
@@ -609,7 +661,7 @@ const VerticalCollection = Component.extend({
   },
 */
 
-  willDestroyElement() {
+  willDestroy() {
     this.token.cancelled = true;
     this._tracker.destroy();
     this._tracker = null;
@@ -619,15 +671,9 @@ const VerticalCollection = Component.extend({
     console.time('vertical-collection-init');
     this._super();
 
-    if (!this.get('itemTagName')) {
-      const collectionTagName = (this.get('tagName') || '').toLowerCase();
-      this.set('itemTagName', getTagDescendant(collectionTagName));
-    }
-
     this._tracker = new List(null, this.get('key'), this.get('defaultHeight'));
     this._proxied = new A();
     this.token = new Token();
-    window.collection = this;
   }
 });
 

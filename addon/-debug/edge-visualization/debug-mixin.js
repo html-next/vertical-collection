@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import Visualization from './visualization';
-import Container from '../../-private/radar/models/container';
+import Container from '../../-private/data-view/container';
 
 const {
   assert,
@@ -30,19 +30,12 @@ export default Mixin.create({
   showEdges: computed.deprecatingAlias('debug'),
 
   _nextVisualization: null,
+  __visualization: null,
 
-  toggleEdgeVisualization() {
-    this.toggleProperty('debug');
-  },
-
-  visualization: null,
-  didInsertElement() {
+  didRender() {
     this._super();
     if (this.get('debug')) {
-      this.visualization = new Visualization(this);
-      requestAnimationFrame(() => {
-        this.visualize();
-      });
+      this.visualizeDebugger();
     }
 
     if (this.get('debugCSS')) {
@@ -135,28 +128,34 @@ export default Mixin.create({
     });
   },
 
-  visualize() {
+  visualizeDebugger() {
     if (!this.get('debug')) {
-      if (this.visualization) {
-        this.visualization.destroy();
-        this.visualization = null;
+      if (this.__visualization !== null) {
+        console.info('tearing down existing visualization');
+        this.__visualization.destroy();
+        this.__visualization = null;
       }
       return;
     }
 
-    if (this.visualization) {
-      this.visualization.render();
-      requestAnimationFrame(() => {
-        this.visualize();
-      });
+    if (this.__visualization === null) {
+      this.__visualization = new Visualization(this);
+      // TODO @runspired figure out why this fails silently if done in the constructor
+      this.__visualization.setupViewport();
     }
+
+    this.__visualization.render();
+    requestAnimationFrame(() => {
+      this.visualizeDebugger();
+    });
   },
 
   willDestroy() {
     this._super();
-    if (this.visualization) {
-      this.visualization.destroy();
-      this.visualization = null;
+    if (this.__visualization) {
+      console.info('destroying visualization');
+      this.__visualization.destroy();
+      this.__visualization = null;
     }
   }
 });

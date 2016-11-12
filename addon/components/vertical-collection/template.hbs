@@ -16,14 +16,11 @@
   {{yield to="inverse"}}
 {{/each}}
 --}}
-{{#each activeItems key='id' as |item|}}
-  {{#vertical-item
-    tagName=itemTagName
-    parentToken=token
-    item=item
-  }}
-    {{yield item.content.ref item.content.index}}
-  {{/vertical-item}}
+{{#each activeItems key='id' as |virtualComponent|}}
+  {{{virtualComponent.upperBound}}}
+    <div style="height: 20px; background: #555; color: #fff; padding: 4px; font-size: 12px; text-align: center;">{{virtualComponent.id}}</div>
+    {{yield virtualComponent.content virtualComponent.index}}
+  {{{virtualComponent.lowerBound}}}
 {{else}}
   {{yield to="inverse"}}
 {{/each}}

@@ -45,15 +45,11 @@ export class Scheduler {
 
     this._nextFlush = requestAnimationFrame(() => {
       this._nextFlush = null;
-      this.ticks++;
       this.flush();
     });
   }
 
   flush() {
-    // if (this.ticks <= 8) {
-    //  console.time('scheduler-flush-' + this.ticks);
-    // }
     let i;
     let q;
 
@@ -75,9 +71,9 @@ export class Scheduler {
         q[i]();
       }
     }
-    // run.end();
+    run.end();
 
-    // run.begin();
+    run.begin();
     if (this.measure.length) {
       q = this.measure;
       this.measure = [];
@@ -96,9 +92,6 @@ export class Scheduler {
       }
     }
     run.end();
-    //if (this.ticks <= 8) {
-    //  console.timeEnd('scheduler-flush-' + this.ticks);
-    //}
   }
 }
 

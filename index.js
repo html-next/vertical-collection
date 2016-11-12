@@ -9,7 +9,7 @@ var removeImports = require('./lib/babel-plugin-remove-imports');
 var Funnel = require('broccoli-funnel');
 
 module.exports = {
-  name: 'smoke-and-mirrors',
+  name: 'vertical-collection',
 
   init: function() {
     this._super.init && this._super.init.apply(this, arguments);
@@ -30,7 +30,7 @@ module.exports = {
 
     if (/production/.test(env) || /test/.test(env)) {
       var strippedModules = {
-        'smoke-and-mirrors/-debug/helpers': [
+        'vertical-collection/-debug/helpers': [
           'assert',
           'warn',
           'debug',
@@ -39,7 +39,7 @@ module.exports = {
           'stripInProduction'
         ]
       };
-      var importNames = ['smoke-and-mirrors/-debug/helpers'];
+      var importNames = ['vertical-collection/-debug/helpers'];
 
       babelOptions.plugins.push(
         filterImports(strippedModules),
@@ -58,7 +58,7 @@ module.exports = {
     }
 
     if (typeof app.import !== 'function') {
-      throw new Error('smoke-and-mirrors is being used within another addon or engine ' +
+      throw new Error('vertical-collection is being used within another addon or engine ' +
         'and is having trouble registering itself to the parent application.');
     }
 
@@ -68,10 +68,11 @@ module.exports = {
     if (!/production/.test(app.env) && !/test/.test(app.env)) {
       this.ui.write(
         chalk.grey("\n===================================================================\n") +
-        chalk.cyan("\tSmoke-and-mirrors\n") +
+        chalk.cyan("\tVertical Collection\n") +
         chalk.grey("\t:: Including CSS for Visual Debugger\n") +
         chalk.grey("\t:: (included in non production builds only)\n") +
-        chalk.grey("\t:: To use, set ") + chalk.yellow("{{vertical-collection debug=true}}") +
+        chalk.grey("\t:: To use, set ") + chalk.yellow("{{#vertical-collection debug=true}}\n") +
+        chalk.grey("\t:: To debug your applied CSS rules, set ") + chalk.yellow("{{#vertical-collection debugCSS=true}}") +
         chalk.grey("\n===================================================================\n")
       );
 

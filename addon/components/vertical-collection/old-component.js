@@ -1,15 +1,15 @@
 /* global Array, Math */
 import Ember from 'ember';
 import layout from './template';
-import getTagDescendant from '../../utils/get-tag-descendant';
-import Radar from './data-view/mini-radar';
+import getTagDescendant from '../../-private/utils/get-tag-descendant';
+import Radar from './-private/data-view/mini-radar';
 import identity from '../../-private/ember/utils/identity';
-import scheduler from '../../-private/scheduler';
-import estimateElementHeight from '../../utils/element/estimate-element-height';
-import closestElement from '../../utils/element/closest';
+import scheduler from './-private/scheduler';
+import estimateElementHeight from '../../-private/utils/element/estimate-element-height';
+import closestElement from '../../-private/utils/element/closest';
 import Token from '../../-private/scheduler/token';
-import List from './data-view/list';
-import ActiveProxy from './data-view/active-proxy';
+import List from '../../-private/data-view/list';
+import ActiveProxy from './-private/data-view/active-proxy';
 
 const {
   A,
