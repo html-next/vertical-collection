@@ -34,6 +34,7 @@ module.exports = {
           'assert',
           'warn',
           'debug',
+          'debugOnError',
           'instrument',
           'deprecate',
           'stripInProduction'

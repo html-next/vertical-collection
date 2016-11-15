@@ -5,10 +5,10 @@ export default class Token {
   }
 
   get cancelled() {
-    return this._cancelled || (this._parent ? this._parent.cancelled : false);
+    return this._cancelled || (this._cancelled = this._parent ? this._parent.cancelled : false);
   }
 
-  set cancelled(v) {
-    this._cancelled = v;
+  cancel() {
+    this._cancelled = true;
   }
 }

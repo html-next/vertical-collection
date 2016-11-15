@@ -34,7 +34,7 @@ export class Scheduler {
 
   forget(token) {
     if (token) {
-      token.cancelled = true;
+      token.cancel();
     }
   }
 

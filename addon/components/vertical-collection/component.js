@@ -522,6 +522,9 @@ const VerticalCollection = Component.extend({
         }
         */
       }
+
+      altered.forEach((p) => { p.destroy(); });
+
       lenDiff = 0;
       assert(`We got to the right length`, _proxied.length === len);
     } else if (lenDiff > 0) {

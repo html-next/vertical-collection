@@ -17,10 +17,9 @@
 {{/each}}
 --}}
 {{#each activeItems key='id' as |virtualComponent|}}
-  {{{virtualComponent.upperBound}}}
-    <div style="height: 20px; background: #555; color: #fff; padding: 4px; font-size: 12px; text-align: center;">{{virtualComponent.id}}</div>
+  {{{unbound virtualComponent.upperBound}}}
     {{yield virtualComponent.content virtualComponent.index}}
-  {{{virtualComponent.lowerBound}}}
+  {{{unbound virtualComponent.lowerBound}}}
 {{else}}
   {{yield to="inverse"}}
 {{/each}}
