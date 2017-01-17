@@ -138,22 +138,19 @@ const VerticalCollection = Component.extend({
 
     if (first) {
       index = first.ref.index;
-      let bottom = first.ref.geography.bottom;
-      let isVisible = bottom > visibleTop;
       let isFirst = index === 0;
 
       if (scrollIsForward) {
-        return isVisible ? { position, index } : { position: 1, index: index + 1 };
+        while (index < ordered.length && ordered[index].geography.bottom < visibleTop) {
+          index++;
+          position++;
+        }
+      } else {
+        while (index > 0 && ordered[index].geography.top > visibleTop) {
+          index--;
+          position--;
+        }
       }
-
-      if (isFirst) {
-        return { position, index };
-      }
-
-      let prev = ordered[index - 1];
-
-      return prev.geography.bottom > visibleTop ?
-        { position: -1, index: index - 1 } : { position, index };
     }
 
     return { position, index };
@@ -245,12 +242,12 @@ const VerticalCollection = Component.extend({
     }
     this._updateChildStates();
     return;
-    if (this._nextUpdate === null) {
-      this._nextUpdate = this.schedule('layout', () => {
-        this._updateChildStates();
-        this._nextUpdate = null;
-      });
-    }
+    // if (this._nextUpdate === null) {
+    //   this._nextUpdate = this.schedule('layout', () => {
+    //     this._updateChildStates();
+    //     this._nextUpdate = null;
+    //   });
+    // }
   },
 
   _scheduleSync() {
@@ -378,6 +375,8 @@ const VerticalCollection = Component.extend({
 
       // end the loop if we've reached the end of components we care about
       if (itemTop > edges.bufferedBottom) {
+        // Add one more, just in case
+        bottomItemIndex++;
         break;
       }
 
@@ -478,24 +477,24 @@ const VerticalCollection = Component.extend({
     };
     this._currentSlice = newSlice;
 
-    console.log(
-      '\tTotal Length:\t' + ordered.length + '\n' +
-      '\tCurrent Active Length:\t' + curProxyLen + '\n' +
-      '\tNew Active Length: \t' + len + '\n' +
-      '\tLength Delta:\t' + lenDiff + '\n' +
-      '\t---------------------------------------------\n' +
-      '\tOld Start Index:\t' + cachedSlice.start + '\n' +
-      '\tOld End Index:\t\t' + cachedSlice.end + '\n' +
-      '\tNew Start Index:\t' + newSlice.start + '\n' +
-      '\tNew End Index:\t\t' + newSlice.end + '\n'
-    );
+    // console.log(
+    //   '\tTotal Length:\t' + ordered.length + '\n' +
+    //   '\tCurrent Active Length:\t' + curProxyLen + '\n' +
+    //   '\tNew Active Length: \t' + len + '\n' +
+    //   '\tLength Delta:\t' + lenDiff + '\n' +
+    //   '\t---------------------------------------------\n' +
+    //   '\tOld Start Index:\t' + cachedSlice.start + '\n' +
+    //   '\tOld End Index:\t\t' + cachedSlice.end + '\n' +
+    //   '\tNew Start Index:\t' + newSlice.start + '\n' +
+    //   '\tNew End Index:\t\t' + newSlice.end + '\n'
+    // );
 
     if (lenDiff < 0) {
       let absDiff = -1 * lenDiff;
       let newLength = len;
 
       if (_scrollIsForward) {
-        console.log('would remove ' + absDiff + ' active items from use from the top');
+        //console.log('would remove ' + absDiff + ' active items from use from the top');
         console.log(absDiff, lenDiff, len);
         altered = _proxied.splice(0, absDiff);
         /*
@@ -528,7 +527,7 @@ const VerticalCollection = Component.extend({
       lenDiff = 0;
       assert(`We got to the right length`, _proxied.length === len);
     } else if (lenDiff > 0) {
-      // console.log('adding ' + lenDiff + ' active items');
+      console.log('adding ' + lenDiff + ' active items');
       altered = new Array(lenDiff);
 
       for (let i = 0; i < lenDiff; i++) {
@@ -544,12 +543,14 @@ const VerticalCollection = Component.extend({
       }
     }
 
-    if (position < 0) {
-      // console.log('shifted last to front');
-      _proxied.unshift(_proxied.pop());
-    } else if (position > 0) {
-      // console.log('shifted front to last');
-      _proxied.push(_proxied.shift());
+    if (position < len) {
+      if (position < 0) {
+        console.log('shifted last to front');
+        _proxied.unshift(..._proxied.splice(position, _proxied.length));
+      } else if (position > 0) {
+        console.log('shifted front to last');
+        _proxied.push(..._proxied.splice(0, position));
+      }
     }
 
     let _slice = this._tracker.slice(topItemIndex, bottomItemIndex);

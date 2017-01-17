@@ -1,4 +1,4 @@
-import Geography from 'vertical-collection/-private/data-view/geography';
+import Geography from './geography';
 
 export default class Proxy {
   constructor(key, ref, height = 0, top = 0) {

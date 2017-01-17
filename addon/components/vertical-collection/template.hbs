@@ -16,6 +16,27 @@
   {{yield to="inverse"}}
 {{/each}}
 --}}
+
+
+
+{{!--<div>
+{{#each _recycleComponentPool key="@index" as |virtualComponent|}}
+  {{{unbound virtualComponent.upperBound}}}
+    {{yield virtualComponent.content virtualComponent.index}}
+  {{{unbound virtualComponent.lowerBound}}}
+{{/each}}
+</div>
+{{{unbound bounds.expressedUpperBound}}}
+{{{unbound bounds.expressedLowerBound}}}
+{{#if bounds.isEmpty}}
+  {{yield to="inverse"}}
+{{/if}}
+
+--}}
+
+
+
+
 {{#each activeItems key='id' as |virtualComponent|}}
   {{{unbound virtualComponent.upperBound}}}
     {{yield virtualComponent.content virtualComponent.index}}

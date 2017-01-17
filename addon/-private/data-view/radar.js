@@ -118,17 +118,17 @@ export default class Radar {
   filterMovement(offsets) {
     // cache the scroll offset, and discard the cycle if
     // movement is within (x) threshold
-    const scrollY = offsets.top;
-    const scrollX = offsets.left;
-    const _scrollY = this.scrollY;
-    const _scrollX = this.scrollX;
+    const newTop = offsets.top;
+    const newLeft = offsets.left;
+    const oldTop = this.scrollY;
+    const oldLeft = this.scrollX;
 
-    if (this.isEarthquake(_scrollY, scrollY) || this.isEarthquake(_scrollX, scrollX)) {
-      this.scrollY = scrollY;
-      this.scrollX = scrollX;
+    //if (this.isEarthquake(oldTop, newTop) || this.isEarthquake(oldLeft, newLeft)) {
+      this.scrollY = newTop;
+      this.scrollX = newLeft;
 
-      const dY = scrollY - _scrollY;
-      const dX = scrollX - _scrollX;
+      const dY = newTop - oldTop;
+      const dX = newLeft - oldLeft;
 
       // move the sky
       this.skyline.left -= dX;
@@ -140,7 +140,7 @@ export default class Radar {
 
       this.didScroll(dY, dX);
       this.currentOffsets = null;
-    }
+    //}
   }
 
   updateScrollPosition(offsets) {
