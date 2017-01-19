@@ -36,7 +36,6 @@ export default class KeyList {
     this.list = null;
     this.ordered = null;
     this._proxied = [];
-    this.radar = null;
     this.itemHeight = itemHeight;
     this.lastChangeWasPrepend = false;
     this._firstItemKey = null;
@@ -51,26 +50,33 @@ export default class KeyList {
   // scroll updates
   updateVisibleContent() {}
 
-  setupRadar(options) {
-    this.radar = new Radar(options);
+  shift(dY, dX) {
+    const { ordered } = this;
+    for (let i = 0; i < ordered.length; i++) {
+      let geo = ordered[i].geography;
 
-    const onScrollMethod = (dY, dX) => {
-      const { ordered } = this;
-      for (let i = 0; i < ordered.length; i++) {
-        let geo = ordered[i].geography;
+      geo.left -= dX;
+      geo.right -= dX;
+      geo.bottom -= dY;
+      geo.top -= dY;
+    }
 
-        geo.left -= dX;
-        geo.right -= dX;
-        geo.bottom -= dY;
-        geo.top -= dY;
-      }
+    // if (!this.lastChangeWasPrepend) {
+    //   this.updateVisibleContent();
+    // }
+  }
 
-      if (!this.lastChangeWasPrepend) {
-        this.updateVisibleContent();
-      }
-    };
+  shiftBelow(dY) {
+    const { _firstItemIndex, ordered, _activeCount } = this;
+    let len = ordered.length;
+    let i;
 
-    this.radar.didScroll = onScrollMethod;
+    for (i = _firstItemIndex + _activeCount; i < len; i++) {
+      let geo = ordered[i].geography;
+
+      geo.bottom -= dY;
+      geo.top -= dY;
+    }
   }
 
   keyForItem(item, index) {
@@ -122,6 +128,19 @@ export default class KeyList {
     return h;
   }
 
+  get height() {
+    const { _firstItemIndex, ordered, _activeCount } = this;
+    const len = _firstItemIndex + _activeCount;
+    let i;
+    let h = 0;
+
+    for (i = _firstItemIndex; i < len; i++) {
+      h += ordered[i].height;
+    }
+
+    return h;
+  }
+
   get heightBelow() {
     const { _firstItemIndex, ordered, _activeCount } = this;
     let len = ordered.length;
@@ -135,7 +154,7 @@ export default class KeyList {
     return h;
   }
 
-  _isMaybePrepend(oldArray, newArray) {
+  isPrepend(oldArray, newArray) {
     if (!oldArray || !newArray) {
       return false;
     }
@@ -175,7 +194,7 @@ export default class KeyList {
     const arr = getArray(dataSource);
     let { list, ordered } = this;
 
-    this.lastChangeWasPrepend = this._isMaybePrepend(ordered, arr);
+    // this.lastChangeWasPrepend = this.isPrepend(ordered, arr);
 
     if (!arr || !arr.length) {
       this.clear();

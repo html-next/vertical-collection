@@ -5,7 +5,8 @@ import scheduler from '../../-private/scheduler';
 import estimateElementHeight from '../../-private/utils/element/estimate-element-height';
 import closestElement from '../../-private/utils/element/closest';
 import Token from '../../-private/scheduler/token';
-import List from '../../-private/data-view/list';
+import Radar from '../../-private/data-view/radar';
+import SatelliteList from '../../-private/data-view/list';
 import VirtualComponent from '../../-private/virtual-component';
 import Proxy from '../../-private/data-view/proxy';
 import { assert, debugOnError } from 'vertical-collection/-debug/helpers';
@@ -117,7 +118,7 @@ const VerticalCollection = Component.extend({
   _isPrepending: false,
 
   token: null,
-  _tracker: null,
+  satelliteList: null,
 
   _proxied: null,
   _nextUpdate: null,
@@ -128,49 +129,10 @@ const VerticalCollection = Component.extend({
     return scheduler.schedule(queueName, job, this.token);
   },
 
-  _findFirstToRender(visibleTop, scrollIsForward) {
-    const { ordered } = this._tracker;
-    const { _proxied } = this;
+  _findTopItemIndex(visibleTop) {
+    const { ordered } = this.satellites;
 
-    let first = _proxied[0];
-    let position = 0;
-    let index = 0;
-
-    if (first) {
-      index = first.ref.index;
-      let isFirst = index === 0;
-
-      if (scrollIsForward) {
-        while (index < ordered.length && ordered[index].geography.bottom < visibleTop) {
-          index++;
-          position++;
-        }
-      } else {
-        while (index > 0 && ordered[index].geography.top > visibleTop) {
-          index--;
-          position--;
-        }
-      }
-    }
-
-    return { position, index };
-  },
-
-  /*
-   Binary search for finding the topmost visible view when restoring
-   scroll position.
-
-   This is not the first visible item on screen, but the first
-   item that will render it's content.
-
-   @method _findFirstRenderedComponent
-   @param {Number} invisibleTop The top/left of the viewport to search against
-   @returns {Number} the index into childViews of the first view to render
-   **/
-  /*
-  _findFirstRenderedComponent(visibleTop) {
-    const childComponents = this.get('children');
-    let maxIndex = childComponents.length - 1;
+    let maxIndex = ordered.length - 1;
     let minIndex = 0;
     let midIndex;
 
@@ -181,11 +143,7 @@ const VerticalCollection = Component.extend({
     while (maxIndex > minIndex) {
       midIndex = Math.floor((minIndex + maxIndex) / 2);
 
-      // in case of not full-window scrolling
-      const component = childComponents[midIndex];
-      const componentBottom = component.satellite.geography.bottom;
-
-      if (componentBottom > visibleTop) {
+      if (ordered[midIndex].geography.bottom > visibleTop) {
         maxIndex = midIndex - 1;
       } else {
         minIndex = midIndex + 1;
@@ -194,17 +152,16 @@ const VerticalCollection = Component.extend({
 
     return minIndex;
   },
-  */
 
   didReceiveAttrs(args) {
     // const oldArray = getArg(args.oldAttrs, 'items');
     const newArray = getArg(args.newAttrs, 'items');
 
-    this._tracker.updateList(newArray);
-    this.updateActiveItems(this._tracker.slice());
+    this.satellites.updateList(newArray);
+    this.updateActiveItems(this.satellites.slice());
     this._scheduleUpdate();
     /*
-        if (this._tracker.lastUpdateWasPrepend) {
+        if (this.satellites.lastUpdateWasPrepend) {
           this._nextUpdate = this.schedule('layout', () => {
             this.radar.silentNight();
             this._updateChildStates();
@@ -250,30 +207,35 @@ const VerticalCollection = Component.extend({
     // }
   },
 
-  _scheduleSync() {
-    if (this._nextSync === null) {
-      this._nextSync = this.schedule('layout', () => {
-        this._tracker.radar.updateSkyline();
-        this._nextSync = null;
-      });
-    }
-  },
+  // _scheduleSync() {
+  //   if (this._nextSync === null) {
+  //     this._nextSync = this.schedule('layout', () => {
+  //       this.satellites.radar.updateSkyline();
+  //       this._nextSync = null;
+  //     });
+  //   }
+  // },
 
-  _scheduleScrollSync() {
-    if (this._isInitializingFromLast) {
-      if (this._nextScrollSync === null) {
-        this._nextScrollSync = this.schedule('measure', () => {
-          const last = this.element.lastElementChild;
+  // _scheduleScrollSync() {
+  //   if (this._isInitializingFromLast) {
+  //     if (this._nextScrollSync === null) {
+  //       this._nextScrollSync = this.schedule('measure', () => {
+  //         const last = this.element.lastElementChild;
 
-          this._isInitializingFromLast = false;
-          if (last) {
-            last.scrollIntoView(false);
-          }
+  //         this._isInitializingFromLast = false;
+  //         if (last) {
+  //           last.scrollIntoView(false);
+  //         }
 
-          this._nextScrollSync = null;
-        });
-      }
-    }
+  //         this._nextScrollSync = null;
+  //       });
+  //     }
+  //   }
+  // },
+
+  didScroll(dY, dX) {
+    this.satellites.shift(dY, dX);
+    this._updateChildStates();
   },
 
   didRender() {
@@ -327,23 +289,29 @@ const VerticalCollection = Component.extend({
     if (this._isFirstRender) {
 
       this._initialRenderCount -= 1;
-      this._tracker._activeCount += 1;
-      this.updateActiveItems(this._tracker.slice());
+      this.satellites._activeCount += 1;
+      this.updateActiveItems(this.satellites.slice(10));
       this._currentSlice = {
         start: 0,
-        end: this._tracker._activeCount,
+        end: this.satellites._activeCount,
         lengthDelta: lenDiff
       };
 
-      let { heightAbove, heightBelow } = this._tracker;
+      let { heightAbove, heightBelow } = this.satellites;
 
       this.set('boxStyle', htmlSafe(`padding-top: ${heightAbove}px; padding-bottom: ${heightBelow}px;`));
 
       this.schedule('affect', () => {
-        this._tracker.radar.rebuild();
+        this.radar.rebuild();
+
+        if (this.element.parentNode.scrollTop !== heightAbove) {
+          this.element.parentNode.scrollTop = heightAbove;
+          this.satellites.shift(heightAbove, 0);
+        }
 
         if (this._initialRenderCount <= 0) {
           this._isFirstRender = false;
+
           return;
         }
 
@@ -352,98 +320,97 @@ const VerticalCollection = Component.extend({
       return;
     }
 
-    const { edges, _scrollIsForward } = this._tracker.radar;
-    const { ordered } = this._tracker;
+    const { edges, _scrollIsForward } = this.radar;
+    const { ordered } = this.satellites;
     const { _proxied } = this;
-    const currentViewportBound = this._tracker.radar.skyline.top;
-    let currentUpperBound = edges.bufferedTop;
 
-    if (currentUpperBound < currentViewportBound) {
-      currentUpperBound = currentViewportBound;
-    }
+    const currentUpperBound = Math.max(edges.bufferedTop, this.radar.skyline.top);
 
-    const { position, index } = this._findFirstToRender(currentUpperBound, _scrollIsForward);
-    let topItemIndex = index;
-    const maxIndex = ordered.length - 1;
+    let topItemIndex = this._findTopItemIndex(currentUpperBound, _scrollIsForward);
     let bottomItemIndex = topItemIndex;
     let topVisibleSpotted = false;
 
-    while (bottomItemIndex <= maxIndex) {
-      const ref = ordered[bottomItemIndex];
-      const itemTop = ref.geography.top;
-      const itemBottom = ref.geography.bottom;
-
-      // end the loop if we've reached the end of components we care about
-      if (itemTop > edges.bufferedBottom) {
-        // Add one more, just in case
-        bottomItemIndex++;
+    while (bottomItemIndex < ordered.length) {
+      if (ordered[bottomItemIndex].geography.bottom > edges.bufferedBottom) {
         break;
       }
 
-      // above the upper reveal boundary
-      if (itemBottom < edges.bufferedTop) {
-        bottomItemIndex++;
-        continue;
-      }
-
-      // above the upper screen boundary
-      if (itemBottom < edges.visibleTop) {
-        /*
-        if (bottomItemIndex === 0) {
-          this.sendActionOnce('firstReached', {
-            item: component,
-            index: bottomItemIndex
-          });
-        }
-        */
-        bottomItemIndex++;
-        continue;
-      }
-
-      // above the lower screen boundary
-      if (itemTop < edges.visibleBottom) {
-        /*
-        if (bottomItemIndex === 0) {
-          this.sendActionOnce('firstReached', {
-            item: component,
-            index: bottomItemIndex
-          });
-        }
-        if (bottomItemIndex === lastIndex) {
-          this.sendActionOnce('lastReached', {
-            item: component,
-            index: bottomItemIndex
-          });
-        }
-        */
-
-        if (!topVisibleSpotted) {
-          topVisibleSpotted = true;
-
-          /*
-          this.set('_firstVisibleIndex', bottomItemIndex);
-          this.sendActionOnce('firstVisibleChanged', {
-            item: component,
-            index: bottomItemIndex
-          });
-          */
-        }
-
-        bottomItemIndex++;
-        continue;
-      }
-
-      // above the lower reveal boundary (componentTop < edges.bufferedBottom)
-        /*
-        if (bottomItemIndex === lastIndex) {
-          this.sendActionOnce('lastReached', {
-            item: component,
-            index: bottomItemIndex
-          });
-        }
-        */
       bottomItemIndex++;
     }
+
+    //   const ref = ordered[bottomItemIndex];
+    //   const itemTop = ref.geography.top;
+    //   const itemBottom = ref.geography.bottom;
+
+    //   // end the loop if we've reached the end of components we care about
+    //   if (itemTop > edges.bufferedBottom) {
+    //     break;
+    //   }
+
+    //   // above the upper reveal boundary
+    //   if (itemBottom < edges.bufferedTop) {
+    //     bottomItemIndex++;
+    //     continue;
+    //   }
+
+    //   // above the upper screen boundary
+    //   if (itemBottom < edges.visibleTop) {
+    //     /*
+    //     if (bottomItemIndex === 0) {
+    //       this.sendActionOnce('firstReached', {
+    //         item: component,
+    //         index: bottomItemIndex
+    //       });
+    //     }
+    //     */
+    //     bottomItemIndex++;
+    //     continue;
+    //   }
+
+    //   // above the lower screen boundary
+    //   if (itemTop < edges.visibleBottom) {
+    //     /*
+    //     if (bottomItemIndex === 0) {
+    //       this.sendActionOnce('firstReached', {
+    //         item: component,
+    //         index: bottomItemIndex
+    //       });
+    //     }
+    //     if (bottomItemIndex === lastIndex) {
+    //       this.sendActionOnce('lastReached', {
+    //         item: component,
+    //         index: bottomItemIndex
+    //       });
+    //     }
+    //     */
+
+    //     if (!topVisibleSpotted) {
+    //       topVisibleSpotted = true;
+
+    //       /*
+    //       this.set('_firstVisibleIndex', bottomItemIndex);
+    //       this.sendActionOnce('firstVisibleChanged', {
+    //         item: component,
+    //         index: bottomItemIndex
+    //       });
+    //       */
+    //     }
+
+    //     bottomItemIndex++;
+    //     continue;
+    //   }
+
+    //   // above the lower reveal boundary (componentTop < edges.bufferedBottom)
+    //     /*
+    //     if (bottomItemIndex === lastIndex) {
+    //       this.sendActionOnce('lastReached', {
+    //         item: component,
+    //         index: bottomItemIndex
+    //       });
+    //     }
+    //     */
+    //   bottomItemIndex++;
+    // }
 
     /*
     this.sendActionOnce('lastVisibleChanged', {
@@ -489,44 +456,46 @@ const VerticalCollection = Component.extend({
     //   '\tNew End Index:\t\t' + newSlice.end + '\n'
     // );
 
-    if (lenDiff < 0) {
-      let absDiff = -1 * lenDiff;
-      let newLength = len;
+    // if (lenDiff < 0) {
+    //   let absDiff = -1 * lenDiff;
+    //   let newLength = len;
 
-      if (_scrollIsForward) {
-        //console.log('would remove ' + absDiff + ' active items from use from the top');
-        console.log(absDiff, lenDiff, len);
-        altered = _proxied.splice(0, absDiff);
-        /*
-        console.log('topItemIndex - absDiff < 0', topItemIndex, absDiff);
-        if (topItemIndex - newLength < 0) {
-          // we are bounded to the beginning of the proxy array
-          // and maintain at requisite length
-          //
-          topItemIndex = 0;
-          bottomItemIndex = newLength;
-        } else {
-          topItemIndex -= absDiff;
-        }
-        */
-      } else {
-        console.log('would remove ' + absDiff + ' active items from use from the bottom');
-        altered = _proxied.splice(len, absDiff);
-        /*
-        if (bottomItemIndex + absDiff > maxIndex) {
-          // topItemIndex = maxIndex - n;
-          // bottomItemIndex = maxIndex;
-        } else {
-          // bottomItemIndex += absDiff;
-        }
-        */
-      }
+    //   if (_scrollIsForward) {
+    //     //console.log('would remove ' + absDiff + ' active items from use from the top');
+    //     console.log(absDiff, lenDiff, len);
+    //     altered = _proxied.splice(0, absDiff);
+    //     /*
+    //     console.log('topItemIndex - absDiff < 0', topItemIndex, absDiff);
+    //     if (topItemIndex - newLength < 0) {
+    //       // we are bounded to the beginning of the proxy array
+    //       // and maintain at requisite length
+    //       //
+    //       topItemIndex = 0;
+    //       bottomItemIndex = newLength;
+    //     } else {
+    //       topItemIndex -= absDiff;
+    //     }
+    //     */
+    //   } else {
+    //     console.log('would remove ' + absDiff + ' active items from use from the bottom');
+    //     altered = _proxied.splice(len, absDiff);
+    //     /*
+    //     if (bottomItemIndex + absDiff > maxIndex) {
+    //       // topItemIndex = maxIndex - n;
+    //       // bottomItemIndex = maxIndex;
+    //     } else {
+    //       // bottomItemIndex += absDiff;
+    //     }
+    //     */
+    //   }
 
-      altered.forEach((p) => { p.destroy(); });
+    //   altered.forEach((p) => { p.destroy(); });
 
-      lenDiff = 0;
-      assert(`We got to the right length`, _proxied.length === len);
-    } else if (lenDiff > 0) {
+    //   lenDiff = 0;
+    //   assert(`We got to the right length`, _proxied.length === len);
+    // }
+
+    if (lenDiff > 0) {
       console.log('adding ' + lenDiff + ' active items');
       altered = new Array(lenDiff);
 
@@ -543,20 +512,31 @@ const VerticalCollection = Component.extend({
       }
     }
 
-    if (position < len) {
-      if (position < 0) {
-        console.log('shifted last to front');
-        _proxied.unshift(..._proxied.splice(position, _proxied.length));
-      } else if (position > 0) {
-        console.log('shifted front to last');
-        _proxied.push(..._proxied.splice(0, position));
-      }
+    // if (position < len) {
+    //   if (position < 0) {
+    //     console.log('shifted last to front');
+    //     _proxied.unshift(..._proxied.splice(position, _proxied.length));
+    //   } else if (position > 0) {
+    //     console.log('shifted front to last');
+    //     _proxied.push(..._proxied.splice(0, position));
+    //   }
+    // }
+
+    let sliceStart, sliceEnd;
+
+    if (_scrollIsForward) {
+      sliceEnd = Math.min(topItemIndex + _proxied.length, ordered.length);
+      sliceStart = Math.max(sliceEnd - _proxied.length, 0);
+    } else {
+      sliceStart = Math.max(bottomItemIndex - _proxied.length, 0);
+      sliceEnd = Math.min(sliceStart + _proxied.length, ordered.length);
     }
 
-    let _slice = this._tracker.slice(topItemIndex, bottomItemIndex);
-    debugOnError(`slice is the expected length`, _slice.length === len);
+    let _slice = this.satellites.slice(sliceStart, sliceEnd);
 
-    for (let i = 0; i < len; i++) {
+    debugOnError(`slice is the expected length`, _slice.length === _proxied.length);
+
+    for (let i = 0; i < _slice.length; i++) {
       if (_proxied[i].ref !== _slice[i]) {
         this.recycleVirtualComponent(_proxied[i], _slice[i], i);
       }
@@ -567,11 +547,24 @@ const VerticalCollection = Component.extend({
     this.notifyPropertyChange('activeItems');
     // console.log('active items', _proxied.length);
 
-    let { heightAbove, heightBelow } = this._tracker;
+    let { height, heightAbove, heightBelow } = this.satellites;
 
-    assert(`Must be equal`, heightAbove === this._tracker.heightAbove);
+    assert(`Must be equal`, heightAbove === this.satellites.heightAbove);
 
     this.set('boxStyle', htmlSafe(`padding-top: ${heightAbove}px; padding-bottom: ${heightBelow}px;`));
+
+    this.schedule('affect', () => {
+      const { height: newHeight } = this.satellites;
+      const dY = height - newHeight;
+
+      if (dY !== 0) {
+        if (!_scrollIsForward) {
+          this.radar.telescope.scrollTop -= dY;
+        } else {
+          this.satellites.shiftBelow(dY);
+        }
+      }
+    });
   },
 
   /*
@@ -612,13 +605,6 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
-    this.setupRadar();
-    // this._initializeScrollState();
-    // this._scheduleUpdate();
-    console.timeEnd('vertical-collection-init');
-  },
-
-  setupRadar() {
     const containerSelector = this.get('containerSelector');
     let container;
 
@@ -628,14 +614,25 @@ const VerticalCollection = Component.extend({
       container = containerSelector ? closestElement(containerSelector) : this.element.parentNode;
     }
 
-    this._tracker.setupRadar({
+    this.radar = new Radar({
       telescope: container,
       sky: this.element,
       minimumMovement: Math.floor(this.get('defaultHeight') / 2),
       bufferSize: this.get('bufferSize')
     });
 
-    this._tracker.updateVisibleContent = () => { this._updateChildStates(); };
+    this.satellites.shift(-this.radar.planet.top);
+
+    this.radar.didScroll = (...args) => { this.didScroll(...args); }
+    // this._initializeScrollState();
+    // this._scheduleUpdate();
+    console.timeEnd('vertical-collection-init');
+  },
+
+  setupRadar() {
+
+
+    this.satellites.updateVisibleContent = () => { this._updateChildStates(); };
   },
 
   /*
@@ -667,15 +664,15 @@ const VerticalCollection = Component.extend({
 
   willDestroy() {
     this.token.cancelled = true;
-    this._tracker.destroy();
-    this._tracker = null;
+    this.satellites.destroy();
+    this.satellites = null;
   },
 
   init() {
     console.time('vertical-collection-init');
     this._super();
 
-    this._tracker = new List(null, this.get('key'), this.get('defaultHeight'));
+    this.satellites = new SatelliteList(null, this.get('key'), this.get('defaultHeight'));
     this._proxied = new A();
     this.token = new Token();
   }

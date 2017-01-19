@@ -123,7 +123,7 @@ export default class Radar {
     const oldTop = this.scrollY;
     const oldLeft = this.scrollX;
 
-    //if (this.isEarthquake(oldTop, newTop) || this.isEarthquake(oldLeft, newLeft)) {
+    if (this.isEarthquake(oldTop, newTop) || this.isEarthquake(oldLeft, newLeft)) {
       this.scrollY = newTop;
       this.scrollX = newLeft;
 
@@ -140,7 +140,7 @@ export default class Radar {
 
       this.didScroll(dY, dX);
       this.currentOffsets = null;
-    //}
+    }
   }
 
   updateScrollPosition(offsets) {
