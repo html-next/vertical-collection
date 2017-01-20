@@ -44,6 +44,11 @@ export function Container() {
     }
   });
 
+  Object.defineProperty(this, 'offsetHeight', {
+    get() {
+      return window.innerHeight;
+    }
+  });
 }
 
 Container.prototype.addEventListener = function addEventListener(event, handler, options) {

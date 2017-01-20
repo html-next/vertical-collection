@@ -2,17 +2,13 @@
     <div class="row">
         <div class="col-sm-7">
           {{!- BEGIN-SNIPPET scrollable-body-example }}
-          {{#vertical-collection
-            content=model.numbers
-            defaultHeight=270
-            alwaysUseDefaultHeight=true
+          {{#vertical-collection model.numbers
+            defaultHeight=40
             containerSelector="body"
             lastReached="loadBelow"
             as |item index|
             }}
-                <div class="image-slide">
-                  {{number-slide item=item index=index}}
-                </div>
+              {{number-slide item=item index=index}}
             {{/vertical-collection}}
           {{!- END-SNIPPET }}
         </div>

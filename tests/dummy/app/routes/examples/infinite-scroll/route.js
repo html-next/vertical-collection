@@ -8,7 +8,7 @@ const {
 export default Route.extend({
   model() {
     return {
-      numbers: getNumbers(0, 100),
+      numbers: getNumbers(0, 100000),
       first: 0,
       last: 100
     };

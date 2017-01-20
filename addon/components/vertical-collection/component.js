@@ -4,25 +4,25 @@ import layout from './template';
 import scheduler from '../../-private/scheduler';
 import estimateElementHeight from '../../-private/utils/element/estimate-element-height';
 import closestElement from '../../-private/utils/element/closest';
+import keyForItem from '../../-private/ember/utils/key-for-item';
 import Token from '../../-private/scheduler/token';
-import Radar from '../../-private/data-view/radar';
-import SatelliteList from '../../-private/data-view/list';
+import NumberTree from '../../-private/data-view/number-tree';
+import Container from '../../-private/data-view/container';
 import VirtualComponent from '../../-private/virtual-component';
-import Proxy from '../../-private/data-view/proxy';
 import { assert, debugOnError } from 'vertical-collection/-debug/helpers';
+
+import {
+  addScrollHandler,
+  removeScrollHandler
+} from 'vertical-collection/-private/data-view/utils/scroll-handler';
 
 const {
   A,
-  get,
   set,
   computed,
   Component,
   String: { htmlSafe }
 } = Ember;
-
-function getArg(args, name) {
-  return (args && args[name]) ? (args[name].value || args[name]) : undefined;
-}
 
 const VerticalCollection = Component.extend({
   layout,
@@ -118,79 +118,25 @@ const VerticalCollection = Component.extend({
   _isPrepending: false,
 
   token: null,
-  satelliteList: null,
 
-  _proxied: null,
-  _nextUpdate: null,
-  _nextSync: null,
-  _nextScrollSync: null,
+  indexForFirstItem: 0,
+
+  _scrollIsForward: false,
+  _scrollTop: 0,
+  _virtualComponents: null,
+
+  _nextUpdateHeights: null,
+  _nextSilentNight: null,
 
   schedule(queueName, job) {
     return scheduler.schedule(queueName, job, this.token);
   },
 
-  _findTopItemIndex(visibleTop) {
-    const { ordered } = this.satellites;
+  didReceiveAttrs() {
+    const arrayLength = this.get('items.length');
 
-    let maxIndex = ordered.length - 1;
-    let minIndex = 0;
-    let midIndex;
+    this.heightTree = new NumberTree(arrayLength, this.get('defaultHeight'));
 
-    if (maxIndex < 0) {
-      return 0;
-    }
-
-    while (maxIndex > minIndex) {
-      midIndex = Math.floor((minIndex + maxIndex) / 2);
-
-      if (ordered[midIndex].geography.bottom > visibleTop) {
-        maxIndex = midIndex - 1;
-      } else {
-        minIndex = midIndex + 1;
-      }
-    }
-
-    return minIndex;
-  },
-
-  didReceiveAttrs(args) {
-    // const oldArray = getArg(args.oldAttrs, 'items');
-    const newArray = getArg(args.newAttrs, 'items');
-
-    this.satellites.updateList(newArray);
-    this.updateActiveItems(this.satellites.slice());
-    this._scheduleUpdate();
-    /*
-        if (this.satellites.lastUpdateWasPrepend) {
-          this._nextUpdate = this.schedule('layout', () => {
-            this.radar.silentNight();
-            this._updateChildStates();
-            this._isPrepending = false;
-            this._nextUpdate = null;
-          });
-        } else {
-          this._scheduleSync();
-        }
-
-    if (oldArray && newArray && this._changeIsPrepend(oldArray, newArray)) {
-      this._isPrepending = true;
-      scheduler.forget(this._nextUpdate);
-
-      this._nextUpdate = this.schedule('layout', () => {
-        this.radar.silentNight();
-        this._updateChildStates();
-        this._isPrepending = false;
-        this._nextUpdate = null;
-      });
-
-    } else {
-      if (newArray && (!oldArray || get(oldArray, 'length') <= get(newArray, 'length'))) {
-        this._scheduleUpdate();
-      }
-
-      this._scheduleSync();
-    }
-    */
   },
 
   _scheduleUpdate() {
@@ -198,82 +144,79 @@ const VerticalCollection = Component.extend({
       return;
     }
     this._updateChildStates();
-    return;
-    // if (this._nextUpdate === null) {
-    //   this._nextUpdate = this.schedule('layout', () => {
-    //     this._updateChildStates();
-    //     this._nextUpdate = null;
-    //   });
-    // }
-  },
-
-  // _scheduleSync() {
-  //   if (this._nextSync === null) {
-  //     this._nextSync = this.schedule('layout', () => {
-  //       this.satellites.radar.updateSkyline();
-  //       this._nextSync = null;
-  //     });
-  //   }
-  // },
-
-  // _scheduleScrollSync() {
-  //   if (this._isInitializingFromLast) {
-  //     if (this._nextScrollSync === null) {
-  //       this._nextScrollSync = this.schedule('measure', () => {
-  //         const last = this.element.lastElementChild;
-
-  //         this._isInitializingFromLast = false;
-  //         if (last) {
-  //           last.scrollIntoView(false);
-  //         }
-
-  //         this._nextScrollSync = null;
-  //       });
-  //     }
-  //   }
-  // },
-
-  didScroll(dY, dX) {
-    this.satellites.shift(dY, dX);
-    this._updateChildStates();
   },
 
   didRender() {
-    const rendered = this._proxied;
+    const rendered = this._virtualComponents;
+    let oldHeight = this._heightAbove;
+    let newHeight = this._heightAbove;
+    let indexBeforeViewport = 0;
 
-    for (let i = 0, l = rendered.length; i < l; i++) {
-      rendered[i].didRender();
+    while (oldHeight < this._scrollTop) {
+      oldHeight += rendered[indexBeforeViewport].height;
+      indexBeforeViewport++;
+    }
+
+    if (!this._nextUpdateHeights) {
+      this._nextUpdateHeights = this.schedule('measure', () => {
+        this._nextUpdateHeights = null;
+        let i, l, height, index;
+
+        for (i = 0, l = rendered.length; i < l; i++) {
+          rendered[i].updateDimensions();
+
+          height = rendered[i].height;
+          index = rendered[i].index;
+
+          this.heightTree.setIndex(index, height);
+
+          if (i < indexBeforeViewport) {
+            newHeight += height;
+          }
+        }
+
+        if (newHeight !== oldHeight) {
+          this._silentNight(newHeight - oldHeight);
+        }
+      });
     }
   },
 
-  recycleVirtualComponent(component, newContent, newPosition) {
+  _silentNight(dY) {
+    if (!this._nextSilentNight) {
+      this._nextSilentNight = this.schedule('affect', () => {
+        this._nextSilentNight = null;
+        this._container.scrollTop += dY;
+      });
+    }
+  },
+
+  recycleVirtualComponent(component, newContent, newIndex, newHeight) {
     debugOnError(`You cannot set an item's content to undefined`, newContent);
     debugOnError(`You cannot recycle components other than a VirtualComponent`, component instanceof VirtualComponent);
-    debugOnError(`You cannot set an item's content to something other than a Proxy`, newContent instanceof Proxy);
 
-    component.ref = newContent;
-    set(component, 'content', newContent.ref);
-    set(component, 'index', newContent.index);
-    component.position = newPosition;
+    set(component, 'content', newContent);
+    set(component, 'index', newIndex);
+    set(component, 'height', newHeight);
   },
 
-  updateActiveItems: function(inbound) {
-    const outbound = this._proxied;
+  // updateActiveItems: function(inbound) {
+  //   const outbound = this._virtualComponents;
 
-    if (!inbound || !inbound.length) {
-      outbound.length = 0;
-      return outbound;
-    }
+  //   if (!inbound || !inbound.length) {
+  //     outbound.length = 0;
+  //     return outbound;
+  //   }
 
-    for (let i = 0; i < inbound.length; i++) {
-      outbound[i] = outbound[i] || new VirtualComponent(this.token);
-      this.recycleVirtualComponent(outbound[i], inbound[i], i);
-    }
-    // this.notifyPropertyChange('length');
+  //   for (let i = 0; i < inbound.length; i++) {
+  //     outbound[i] = outbound[i] || new VirtualComponent(this.token);
+  //     this.recycleVirtualComponent(outbound[i], inbound[i], i);
+  //   }
+  //   // this.notifyPropertyChange('length');
 
-    this.set('activeItems', outbound);
-    this.notifyPropertyChange('activeItems');
-  },
+  //   this.set('activeItems', outbound);
+  //   this.notifyPropertyChange('activeItems');
+  // },
 
   /*
    *
@@ -286,154 +229,72 @@ const VerticalCollection = Component.extend({
    */
   _currentSlice: null,
   _updateChildStates() {
-    if (this._isFirstRender) {
+    // if (this._isFirstRender) {
 
-      this._initialRenderCount -= 1;
-      this.satellites._activeCount += 1;
-      this.updateActiveItems(this.satellites.slice(10));
-      this._currentSlice = {
-        start: 0,
-        end: this.satellites._activeCount,
-        lengthDelta: lenDiff
-      };
+    //   this._initialRenderCount -= 1;
+    //   this.satellites._activeCount += 1;
+    //   this.updateActiveItems(this.satellites.slice(10));
+    //   this._currentSlice = {
+    //     start: 0,
+    //     end: this.satellites._activeCount,
+    //     lengthDelta: lenDiff
+    //   };
 
-      let { heightAbove, heightBelow } = this.satellites;
+    //   let { heightAbove, heightBelow } = this.satellites;
 
-      this.set('boxStyle', htmlSafe(`padding-top: ${heightAbove}px; padding-bottom: ${heightBelow}px;`));
+    //   this.set('boxStyle', htmlSafe(`padding-top: ${heightAbove}px; padding-bottom: ${heightBelow}px;`));
 
-      this.schedule('affect', () => {
-        this.radar.rebuild();
+    //   this.schedule('affect', () => {
+    //     this.radar.rebuild();
 
-        if (this.element.parentNode.scrollTop !== heightAbove) {
-          this.element.parentNode.scrollTop = heightAbove;
-          this.satellites.shift(heightAbove, 0);
-        }
+    //     if (this.element.parentNode.scrollTop !== heightAbove) {
+    //       this.element.parentNode.scrollTop = heightAbove;
+    //       this.satellites.shift(heightAbove, 0);
+    //     }
 
-        if (this._initialRenderCount <= 0) {
-          this._isFirstRender = false;
+    //     if (this._initialRenderCount <= 0) {
+    //       this._isFirstRender = false;
 
-          return;
-        }
+    //       return;
+    //     }
 
-        this._scheduleUpdate();
-      });
-      return;
-    }
+    //     this._scheduleUpdate();
+    //   });
+    //   return;
+    // }
 
-    const { edges, _scrollIsForward } = this.radar;
-    const { ordered } = this.satellites;
-    const { _proxied } = this;
+    // const { edges, _scrollIsForward } = this.radar;
+    // const { ordered } = this.satellites;
+    const { _virtualComponents, _scrollIsForward } = this;
 
-    const currentUpperBound = Math.max(edges.bufferedTop, this.radar.skyline.top);
+    const currentUpperBound = this._scrollTop;
+    const containerHeight = this._container.offsetHeight;
+    const currentLowerBound = currentUpperBound + containerHeight;
 
-    let topItemIndex = this._findTopItemIndex(currentUpperBound, _scrollIsForward);
+    const bufferSize = this.get('bufferSize');
+
+    let { values: heights, total: totalHeight } = this.heightTree;
+
+    const bufferedTop = Math.max(currentUpperBound - (bufferSize * containerHeight), 0);
+    const bufferedBottom = Math.min(currentLowerBound + (bufferSize * containerHeight), totalHeight);
+
+    let {
+      index: topItemIndex,
+      totalBefore: heightAbove,
+      totalAfter: heightBelow
+    } = this.heightTree.getIndex(bufferedTop);
+
     let bottomItemIndex = topItemIndex;
-    let topVisibleSpotted = false;
+    let bottomItemBottom = heightAbove;
 
-    while (bottomItemIndex < ordered.length) {
-      if (ordered[bottomItemIndex].geography.bottom > edges.bufferedBottom) {
-        break;
-      }
-
+    while (bottomItemIndex < heights.length && bottomItemBottom < bufferedBottom) {
+      bottomItemBottom += heights[bottomItemIndex];
+      heightBelow -= heights[bottomItemIndex];
       bottomItemIndex++;
     }
 
-    //   const ref = ordered[bottomItemIndex];
-    //   const itemTop = ref.geography.top;
-    //   const itemBottom = ref.geography.bottom;
-
-    //   // end the loop if we've reached the end of components we care about
-    //   if (itemTop > edges.bufferedBottom) {
-    //     break;
-    //   }
-
-    //   // above the upper reveal boundary
-    //   if (itemBottom < edges.bufferedTop) {
-    //     bottomItemIndex++;
-    //     continue;
-    //   }
-
-    //   // above the upper screen boundary
-    //   if (itemBottom < edges.visibleTop) {
-    //     /*
-    //     if (bottomItemIndex === 0) {
-    //       this.sendActionOnce('firstReached', {
-    //         item: component,
-    //         index: bottomItemIndex
-    //       });
-    //     }
-    //     */
-    //     bottomItemIndex++;
-    //     continue;
-    //   }
-
-    //   // above the lower screen boundary
-    //   if (itemTop < edges.visibleBottom) {
-    //     /*
-    //     if (bottomItemIndex === 0) {
-    //       this.sendActionOnce('firstReached', {
-    //         item: component,
-    //         index: bottomItemIndex
-    //       });
-    //     }
-    //     if (bottomItemIndex === lastIndex) {
-    //       this.sendActionOnce('lastReached', {
-    //         item: component,
-    //         index: bottomItemIndex
-    //       });
-    //     }
-    //     */
-
-    //     if (!topVisibleSpotted) {
-    //       topVisibleSpotted = true;
-
-    //       /*
-    //       this.set('_firstVisibleIndex', bottomItemIndex);
-    //       this.sendActionOnce('firstVisibleChanged', {
-    //         item: component,
-    //         index: bottomItemIndex
-    //       });
-    //       */
-    //     }
-
-    //     bottomItemIndex++;
-    //     continue;
-    //   }
-
-    //   // above the lower reveal boundary (componentTop < edges.bufferedBottom)
-    //     /*
-    //     if (bottomItemIndex === lastIndex) {
-    //       this.sendActionOnce('lastReached', {
-    //         item: component,
-    //         index: bottomItemIndex
-    //       });
-    //     }
-    //     */
-    //   bottomItemIndex++;
-    // }
-
-    /*
-    this.sendActionOnce('lastVisibleChanged', {
-      item: ordered[bottomItemIndex - 1],
-      index: bottomItemIndex - 1
-    });
-    */
-
-    // debugger;
-    // this._scheduleScrollSync();
-
-    /*
-    if (this._isFirstRender) {
-      this._isFirstRender = false;
-      this.sendActionOnce('didMountCollection', {
-        firstVisible: { item: ordered[topItemIndex], index: topItemIndex },
-        lastVisible: { item: ordered[bottomItemIndex - 1], index: bottomItemIndex - 1 }
-      });
-    }
-    */
-
     let len = bottomItemIndex - topItemIndex;
-    let curProxyLen = _proxied.length;
+    let curProxyLen = _virtualComponents.length;
     let lenDiff = len - curProxyLen;
     let altered;
     let cachedSlice = this._currentSlice;
@@ -456,47 +317,45 @@ const VerticalCollection = Component.extend({
     //   '\tNew End Index:\t\t' + newSlice.end + '\n'
     // );
 
-    // if (lenDiff < 0) {
-    //   let absDiff = -1 * lenDiff;
-    //   let newLength = len;
+    if (lenDiff < 0) {
+      let absDiff = -1 * lenDiff;
+      let newLength = len;
 
-    //   if (_scrollIsForward) {
-    //     //console.log('would remove ' + absDiff + ' active items from use from the top');
-    //     console.log(absDiff, lenDiff, len);
-    //     altered = _proxied.splice(0, absDiff);
-    //     /*
-    //     console.log('topItemIndex - absDiff < 0', topItemIndex, absDiff);
-    //     if (topItemIndex - newLength < 0) {
-    //       // we are bounded to the beginning of the proxy array
-    //       // and maintain at requisite length
-    //       //
-    //       topItemIndex = 0;
-    //       bottomItemIndex = newLength;
-    //     } else {
-    //       topItemIndex -= absDiff;
-    //     }
-    //     */
-    //   } else {
-    //     console.log('would remove ' + absDiff + ' active items from use from the bottom');
-    //     altered = _proxied.splice(len, absDiff);
-    //     /*
-    //     if (bottomItemIndex + absDiff > maxIndex) {
-    //       // topItemIndex = maxIndex - n;
-    //       // bottomItemIndex = maxIndex;
-    //     } else {
-    //       // bottomItemIndex += absDiff;
-    //     }
-    //     */
-    //   }
+      if (_scrollIsForward) {
+        //console.log('would remove ' + absDiff + ' active items from use from the top');
+        // console.log(absDiff, lenDiff, len);
+        altered = _virtualComponents.splice(0, absDiff);
+        /*
+        console.log('topItemIndex - absDiff < 0', topItemIndex, absDiff);
+        if (topItemIndex - newLength < 0) {
+          // we are bounded to the beginning of the proxy array
+          // and maintain at requisite length
+          //
+          topItemIndex = 0;
+          bottomItemIndex = newLength;
+        } else {
+          topItemIndex -= absDiff;
+        }
+        */
+      } else {
+        // console.log('would remove ' + absDiff + ' active items from use from the bottom');
+        altered = _virtualComponents.splice(len, absDiff);
+        /*
+        if (bottomItemIndex + absDiff > maxIndex) {
+          // topItemIndex = maxIndex - n;
+          // bottomItemIndex = maxIndex;
+        } else {
+          // bottomItemIndex += absDiff;
+        }
+        */
+      }
 
-    //   altered.forEach((p) => { p.destroy(); });
+      altered.forEach((p) => { p.destroy(); });
 
-    //   lenDiff = 0;
-    //   assert(`We got to the right length`, _proxied.length === len);
-    // }
-
-    if (lenDiff > 0) {
-      console.log('adding ' + lenDiff + ' active items');
+      lenDiff = 0;
+      assert(`We got to the right length`, _virtualComponents.length === len);
+    } else if (lenDiff > 0) {
+      // console.log('adding ' + lenDiff + ' active items');
       altered = new Array(lenDiff);
 
       for (let i = 0; i < lenDiff; i++) {
@@ -505,175 +364,109 @@ const VerticalCollection = Component.extend({
       }
       if (_scrollIsForward) {
         // console.log('adding to bottom');
-        _proxied.splice(_proxied.length, 0, ...altered);
+        _virtualComponents.splice(_virtualComponents.length, 0, ...altered);
       } else {
         // console.log('adding to top');
-        _proxied.splice(0, 0, ...altered);
+        _virtualComponents.splice(0, 0, ...altered);
       }
     }
 
-    // if (position < len) {
-    //   if (position < 0) {
-    //     console.log('shifted last to front');
-    //     _proxied.unshift(..._proxied.splice(position, _proxied.length));
-    //   } else if (position > 0) {
-    //     console.log('shifted front to last');
-    //     _proxied.push(..._proxied.splice(0, position));
-    //   }
-    // }
+    let _slice = this.get('items').slice(topItemIndex, bottomItemIndex);
 
-    let sliceStart, sliceEnd;
-
-    if (_scrollIsForward) {
-      sliceEnd = Math.min(topItemIndex + _proxied.length, ordered.length);
-      sliceStart = Math.max(sliceEnd - _proxied.length, 0);
-    } else {
-      sliceStart = Math.max(bottomItemIndex - _proxied.length, 0);
-      sliceEnd = Math.min(sliceStart + _proxied.length, ordered.length);
-    }
-
-    let _slice = this.satellites.slice(sliceStart, sliceEnd);
-
-    debugOnError(`slice is the expected length`, _slice.length === _proxied.length);
+    debugOnError(`slice is the expected length`, _slice.length === _virtualComponents.length);
 
     for (let i = 0; i < _slice.length; i++) {
-      if (_proxied[i].ref !== _slice[i]) {
-        this.recycleVirtualComponent(_proxied[i], _slice[i], i);
-      }
+      let heightIndex = topItemIndex + i;
+      this.recycleVirtualComponent(_virtualComponents[i], _slice[i], heightIndex, heights[heightIndex]);
     }
 
-    // _proxied.notifyPropertyChanges();
-    this.set('activeItems', _proxied);
+    this.set('activeItems', _virtualComponents);
     this.notifyPropertyChange('activeItems');
-    // console.log('active items', _proxied.length);
 
-    let { height, heightAbove, heightBelow } = this.satellites;
-
-    assert(`Must be equal`, heightAbove === this.satellites.heightAbove);
+    this._heightAbove = heightAbove;
+    this._heightBelow = heightBelow;
 
     this.set('boxStyle', htmlSafe(`padding-top: ${heightAbove}px; padding-bottom: ${heightBelow}px;`));
-
-    this.schedule('affect', () => {
-      const { height: newHeight } = this.satellites;
-      const dY = height - newHeight;
-
-      if (dY !== 0) {
-        if (!_scrollIsForward) {
-          this.radar.telescope.scrollTop -= dY;
-        } else {
-          this.satellites.shiftBelow(dY);
-        }
-      }
-    });
   },
-
-  /*
-  _oldUpdateChildStates() {  // eslint: complexity
-    const edges = this._edges;
-    const childComponents = this.get('children');
-
-    if (!get(childComponents, 'length')) {
-      return;
-    }
-
-
-    if (this._isFirstRender) {
-      if (this.get('renderAllInitially')) {
-        childComponents.forEach((i) => {
-          i.show();
-        });
-
-        this._scheduleScrollSync();
-
-        this._isFirstRender = false;
-        return;
-      }
-    }
-      ...
-
-    this._scheduleScrollSync();
-
-    if (this._isFirstRender) {
-      this._isFirstRender = false;
-      this.sendActionOnce('didMountCollection', {
-        firstVisible: { item: childComponents[topComponentIndex], index: topComponentIndex },
-        lastVisible: { item: childComponents[bottomComponentIndex - 1], index: bottomComponentIndex - 1 }
-      });
-    }
-  },
-  */
 
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
     const containerSelector = this.get('containerSelector');
-    let container;
 
     if (containerSelector === 'body') {
-      container = window;
+      this._container = Container;
+      this._scrollTop = this.element.getBoundingClientRect().top;
     } else {
-      container = containerSelector ? closestElement(containerSelector) : this.element.parentNode;
+      this._container = containerSelector ? closestElement(containerSelector) : this.element.parentNode;
     }
 
-    this.radar = new Radar({
-      telescope: container,
-      sky: this.element,
-      minimumMovement: Math.floor(this.get('defaultHeight') / 2),
-      bufferSize: this.get('bufferSize')
-    });
+    this._initializeScrollState();
+    this._scheduleUpdate();
 
-    this.satellites.shift(-this.radar.planet.top);
+    this._cachedTop = 0;
+    this._scrollHandler = ({ top }) => {
+      let dY = top - this._cachedTop;
+      this._scrollIsForward = dY > 0;
+      this._scrollTop += dY;
+      this._cachedTop = top;
 
-    this.radar.didScroll = (...args) => { this.didScroll(...args); }
-    // this._initializeScrollState();
-    // this._scheduleUpdate();
+      if (this._isEarthquake(top)) {
+        this._updateChildStates();
+      }
+    };
+
+    addScrollHandler(this._container, this._scrollHandler);
+
     console.timeEnd('vertical-collection-init');
   },
 
-  setupRadar() {
+  _isEarthquake() {
+    if (Math.abs(this._lastEarthquake - this._scrollTop) > 10) {
+      this._lastEarthquake = this._scrollTop;
 
-
-    this.satellites.updateVisibleContent = () => { this._updateChildStates(); };
-  },
-
-  /*
-  _initializeScrollState() {
-    const idForFirstItem = this.get('idForFirstItem');
-
-    if (this.scrollPosition) {
-      this.radar.telescope.scrollTop = this.scrollPosition;
-    } else if (this.get('renderFromLast')) {
-      const last = this.element.lastElementChild;
-
-      this.set('__isInitializingFromLast', true);
-      if (last) {
-        last.scrollIntoView(false);
-      }
-    } else if (idForFirstItem) {
-      const items = this.get('items');
-      let firstVisibleIndex;
-
-      for (let i = 0; i < get(items, 'length'); i++) {
-        if (idForFirstItem === this.keyForItem(valueForIndex(items, i), i)) {
-          firstVisibleIndex = i;
-        }
-      }
-      this.radar.telescope.scrollTop = (firstVisibleIndex || 0) * this.get('_defaultHeight');
+      return true;
     }
+
+    return false;
   },
-*/
+
+  _initializeScrollState() {
+    this._lastEarthquake = this._scrollTop;
+
+    const retainScrollPosition = this.get('retainScrollPosition');
+    const idForFirstItem = this.get('idForFirstItem');
+    const indexForFirstItem = this.get('indexForFirstItem');
+    const defaultHeight = this.get('defaultHeight');
+
+    if (!retainScrollPosition) {
+      let index = indexForFirstItem;
+
+      if (idForFirstItem) {
+        if (!this.keyIndexMap) {
+          this._constructKeyIndexMap;
+        }
+
+        index = this.keyIndexMap[idForFirstItem];
+      }
+
+      this._scrollTop = index * defaultHeight;
+    }
+
+    this.schedule('affect', () => {
+      this._container.scrollTop = this._scrollTop;
+    });
+  },
 
   willDestroy() {
-    this.token.cancelled = true;
-    this.satellites.destroy();
-    this.satellites = null;
+    removeScrollHandler(this._container, this._scrollHandler);
+    //this.token.cancelled = true;
   },
 
   init() {
     console.time('vertical-collection-init');
     this._super();
 
-    this.satellites = new SatelliteList(null, this.get('key'), this.get('defaultHeight'));
-    this._proxied = new A();
+    this._virtualComponents = A();
     this.token = new Token();
   }
 });
