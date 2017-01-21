@@ -19,12 +19,14 @@
 
 
 
-{{!--<div>
-{{#each _recycleComponentPool key="@index" as |virtualComponent|}}
-  {{{unbound virtualComponent.upperBound}}}
-    {{yield virtualComponent.content virtualComponent.index}}
-  {{{unbound virtualComponent.lowerBound}}}
-{{/each}}
+<div id="grab-me">
+  test
+  {{#each _virtualComponents key="id" as |virtualComponent|}}
+    test
+    {{{unbound virtualComponent.upperBound}}}
+      {{yield virtualComponent.content virtualComponent.index}}
+    {{{unbound virtualComponent.lowerBound}}}
+  {{/each}}
 </div>
 {{{unbound bounds.expressedUpperBound}}}
 {{{unbound bounds.expressedLowerBound}}}
@@ -32,15 +34,15 @@
   {{yield to="inverse"}}
 {{/if}}
 
---}}
 
 
 
 
-{{#each activeItems key='id' as |virtualComponent|}}
+
+{{!--{{#each activeItems key='id' as |virtualComponent|}}
   {{{unbound virtualComponent.upperBound}}}
     {{yield virtualComponent.content virtualComponent.index}}
   {{{unbound virtualComponent.lowerBound}}}
 {{else}}
   {{yield to="inverse"}}
-{{/each}}
+{{/each}}--}}

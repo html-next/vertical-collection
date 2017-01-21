@@ -6,10 +6,10 @@
             <div class="table-wrapper dark">
               {{#vertical-collection model.numbers
                 debug=false
-                defaultHeight=40
+                minHeight=40
                 firstReached="loadAbove"
                 lastReached="loadBelow"
-                indexForFirstItem=5
+                indexForFirstItem=0
                 as |item index|
               }}
                 {{number-slide item=item index=index}}
