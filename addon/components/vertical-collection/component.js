@@ -287,7 +287,7 @@ const VerticalCollection = Component.extend({
 
     if (containerSelector === 'body') {
       this._container = Container;
-      this._scrollTop = this.element.getBoundingClientRect().top;
+      this._scrollTop = this._container.scrollTop - this.element.getBoundingClientRect().top;
     } else {
       this._container = containerSelector ? closestElement(containerSelector) : this.element.parentNode;
     }
@@ -296,9 +296,7 @@ const VerticalCollection = Component.extend({
     this._initializeScrollState();
     this._scheduleUpdate();
 
-    this._cachedTop = this._scrollTop;
-
-    const minHeight = this.get('minHeight');
+    this._cachedTop = 0;
     this._scrollHandler = () => {
       let top = this._container.scrollTop;
       let dY = top - this._cachedTop;
@@ -306,7 +304,7 @@ const VerticalCollection = Component.extend({
       this._scrollTop += dY;
       this._cachedTop = top;
 
-      if (Math.abs(dY) > (minHeight / 2)) {
+      if (this._isEarthquake()) {
         this._scheduleUpdate();
       }
     };
@@ -316,7 +314,18 @@ const VerticalCollection = Component.extend({
     console.timeEnd('vertical-collection-init');
   },
 
+  _isEarthquake() {
+    if (Math.abs(this._lastEarthquake - this._scrollTop) > 10) {
+      this._lastEarthquake = this._scrollTop;
+
+      return true;
+    }
+
+    return false;
+  },
+
   _initializeScrollState() {
+    this._lastEarthquake = 0;
   },
 
   willDestroy() {
