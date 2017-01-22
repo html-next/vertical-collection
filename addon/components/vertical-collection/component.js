@@ -136,6 +136,9 @@ const VerticalCollection = Component.extend({
 
     this.heightTree = new NumberTree(arrayLength, this.get('minHeight'));
 
+    if (this.element) {
+      this.element.style.height = `${this.heightTree.total}px`;
+    }
   },
 
   _scheduleUpdate() {
@@ -143,24 +146,56 @@ const VerticalCollection = Component.extend({
 
     if (!this._nextUpdate) {
       this._nextUpdate = this.schedule('affect', () => {
-        this._virtualComponentAttacher.style.top = `${this._heightAbove}px`;
-        // this._virtualComponentAttacher.style.paddingBottom = `${this._heightBelow}px`;
+        const _virtualComponents = this.get('_virtualComponents');
+
         this._nextUpdate = null;
-        // this._virtualComponentAttacher.innerHTML = '';
-        // let i;
-        // const components = this.get('_virtualComponents');
-        // for (i = 0; i < components.length; i++) {
-        //   components[i].updateBounds();
-        //   this._virtualComponentAttacher.appendChild(components[i].range.cloneContents());
-        //   components[i].range.detach();
+        this._virtualComponentAttacher.innerHTML = '';
+        this._virtualComponentAttacher.style.top = `${this._heightAbove}px`;
+
+        // this._virtualComponentAttacher.style.paddingBottom = `${this._heightBelow}px`;
+
+        // This strategy causes flicker, very noticeably. Should look into it, may be a way to
+        // shave off a couple more ms of DOM manipulation time...
+
+        // const { _lastVirtualTop: currentVirtualTop } = this;
+        // const delta = currentVirtualTop - _lastVirtualTop;
+
+        // let current = _lastVirtualTop;
+
+        // console.log(_lastVirtualTop, currentVirtualTop, delta);
+
+        // if (delta > 0) {
+        //   while (current !== currentVirtualTop) {
+        //     this._virtualComponentAttacher.appendChild(_virtualComponents[current].cloneContents());
+        //     current++;
+        //   }
+        // } else {
+        //   while (current !== currentVirtualTop) {
+        //     this._virtualComponentAttacher.prepend(_virtualComponents[current].domFragment);
+        //     current--;
+        //   }
         // }
+
+        let i, length;
+        let current = this._lastVirtualTop;
+
+        for (i = 0, length = _virtualComponents.length; i < length; i++) {
+          _virtualComponents[current].updateBounds();
+          this._virtualComponentAttacher.appendChild(_virtualComponents[current].range.cloneContents());
+          _virtualComponents[current].range.detach();
+          current++;
+
+          if (current === length) {
+            current = 0;
+          }
+        }
       });
     }
   },
 
-  didRender() {
+  // didRender() {
 
-  },
+  // },
 
   _silentNight(dY) {
     if (!this._nextSilentNight) {
@@ -189,15 +224,6 @@ const VerticalCollection = Component.extend({
       set(component, 'content', {});
       components.pushObject(component);
     }
-
-    this.schedule('affect', () => {
-      let i;
-      for (i = 0; i < components.length; i++) {
-        components[i].updateBounds();
-        this._virtualComponentAttacher.appendChild(components[i].range.extractContents());
-        components[i].range.detach();
-      }
-    });
   },
 
   recycleVirtualComponent(component, newContent, newIndex, newHeight) {
@@ -224,7 +250,13 @@ const VerticalCollection = Component.extend({
 
     const {
       _scrollTop,
-      _containerHeight
+      _containerHeight,
+      _lastTopItemIndex,
+      _lastBottomItemIndex
+    } = this;
+
+    let {
+      _lastVirtualTop: currentVirtualTop
     } = this;
 
     let { values: heights } = this.heightTree;
@@ -260,18 +292,53 @@ const VerticalCollection = Component.extend({
       }
     }
 
-    let _slice = this.get('items').slice(topItemIndex, bottomItemIndex);
+    let _slice, itemIndex;
 
-    for (let i = 0; i < _slice.length; i++) {
-      let heightIndex = topItemIndex + i;
-      this.recycleVirtualComponent(_virtualComponents[i], _slice[i], heightIndex, heights[heightIndex]);
+    if (topItemIndex < _lastTopItemIndex) {
+      _slice = this.get('items').slice(topItemIndex, _lastTopItemIndex);
+      itemIndex = _lastTopItemIndex;
+
+      for (let i = _slice.length - 1; i >= 0; i--) {
+        if (currentVirtualTop === 0) {
+          currentVirtualTop = _virtualComponents.length;
+        }
+
+        currentVirtualTop--;
+        itemIndex--;
+
+        this.recycleVirtualComponent(_virtualComponents[currentVirtualTop], _slice[i], itemIndex, heights[itemIndex]);
+      }
+    } else if (topItemIndex > _lastTopItemIndex) {
+      _slice = this.get('items').slice(_lastBottomItemIndex, bottomItemIndex);
+      itemIndex = _lastBottomItemIndex;
+
+      for (let i = 0; i < _slice.length; i++) {
+        this.recycleVirtualComponent(_virtualComponents[currentVirtualTop], _slice[i], itemIndex, heights[itemIndex]);
+
+        currentVirtualTop++;
+        itemIndex++;
+
+        if (currentVirtualTop === _virtualComponents.length) {
+          currentVirtualTop = 0;
+        }
+      }
+    } else {
+      _slice = this.get('items').slice(topItemIndex, bottomItemIndex);
+      itemIndex = topItemIndex;
+
+      currentVirtualTop = 0;
+
+      for (let i = 0; i < _slice.length; i++) {
+        this.recycleVirtualComponent(_virtualComponents[i], _slice[i], itemIndex, heights[itemIndex]);
+        itemIndex++;
+      }
     }
 
+    this._lastVirtualTop = currentVirtualTop || 0;
+    this._lastBottomItemIndex = bottomItemIndex;
+    this._lastTopItemIndex = topItemIndex;
     this._heightAbove = heightAbove;
     this._heightBelow = heightBelow;
-
-
-
 
     // if (!this._nextUpdateHeights) {
     //   this._nextUpdateHeights = this.schedule('measure', () => {
@@ -304,8 +371,10 @@ const VerticalCollection = Component.extend({
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
     const containerSelector = this.get('containerSelector');
-    this._virtualComponentRenderer = document.getElementById('grab-me');
-    this._virtualComponentAttacher = document.getElementById('attach-me');
+
+    this._virtualComponentRenderer = this.element.getElementsByClassName('virtual-component-renderer')[0];
+    this._virtualComponentAttacher = this.element.getElementsByClassName('virtual-component-attacher')[0];
+
     this.element.removeChild(this._virtualComponentRenderer);
     this.element.style.position = 'relative';
     this._virtualComponentAttacher.style.position = 'absolute';
@@ -342,7 +411,6 @@ const VerticalCollection = Component.extend({
   },
 
   _isEarthquake() {
-    this._container
     if (Math.abs(this._lastEarthquake - this._scrollTop) > 0.75 * this._bufferHeight) {
       this._lastEarthquake = this._scrollTop;
 

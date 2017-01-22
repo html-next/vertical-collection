@@ -19,14 +19,14 @@
 
 
 
-<div id="grab-me">
+<div class="virtual-component-renderer">
   {{#each _virtualComponents key="id" as |virtualComponent|}}
     {{{unbound virtualComponent.upperBound}}}
       {{yield virtualComponent.content virtualComponent.index}}
     {{{unbound virtualComponent.lowerBound}}}
   {{/each}}
 </div>
-<div id="attach-me">
+<div class="virtual-component-attacher">
 
 </div>
 {{{unbound bounds.expressedUpperBound}}}
