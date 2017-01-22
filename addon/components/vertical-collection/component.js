@@ -67,7 +67,7 @@ const VerticalCollection = Component.extend({
    * how much extra room to keep visible and invisible on
    * either side of the viewport.
    */
-  bufferSize: 0.1,
+  bufferSize: 1,
 
   // –––––––––––––– Initial Scroll State
   /*
@@ -139,16 +139,23 @@ const VerticalCollection = Component.extend({
   },
 
   _scheduleUpdate() {
-    // if (this._isPrepending) {
-    //   return;
-    // }
-    if (this._nextUpdate) {
-      this._nextUpdate.cancel();
-    }
+    this._updateChildStates();
 
-    this._nextUpdate = this.schedule('affect', () => {
-      this._updateChildStates();
-    });
+    if (!this._nextUpdate) {
+      this._nextUpdate = this.schedule('affect', () => {
+        this._virtualComponentAttacher.style.top = `${this._heightAbove}px`;
+        // this._virtualComponentAttacher.style.paddingBottom = `${this._heightBelow}px`;
+        this._nextUpdate = null;
+        // this._virtualComponentAttacher.innerHTML = '';
+        // let i;
+        // const components = this.get('_virtualComponents');
+        // for (i = 0; i < components.length; i++) {
+        //   components[i].updateBounds();
+        //   this._virtualComponentAttacher.appendChild(components[i].range.cloneContents());
+        //   components[i].range.detach();
+        // }
+      });
+    }
   },
 
   didRender() {
@@ -168,8 +175,9 @@ const VerticalCollection = Component.extend({
     const components = this.get('_virtualComponents');
     const minHeight = this.get('minHeight');
     const bufferSize = this.get('bufferSize');
-    const containerHeight = this._container.offsetHeight;
-    const containerWithBuffers = containerHeight + (containerHeight * bufferSize * 2);
+    const containerHeight = this._containerHeight = this._container.offsetHeight;
+    const bufferHeight = this._bufferHeight = containerHeight * bufferSize;
+    const containerWithBuffers = containerHeight + (bufferHeight * 2);
 
     const totalComponents = Math.min(this.get('items.length'), Math.ceil(containerWithBuffers / minHeight) + 1);
     const componentsToAdd = totalComponents - components.length;
@@ -183,9 +191,11 @@ const VerticalCollection = Component.extend({
     }
 
     this.schedule('affect', () => {
-      for (let i = 0; i < components.length; i++) {
+      let i;
+      for (i = 0; i < components.length; i++) {
         components[i].updateBounds();
-        this.element.appendChild(components[i].range.extractContents());
+        this._virtualComponentAttacher.appendChild(components[i].range.extractContents());
+        components[i].range.detach();
       }
     });
   },
@@ -212,44 +222,56 @@ const VerticalCollection = Component.extend({
   _updateChildStates() {
     const _virtualComponents = this.get('_virtualComponents');
 
-    const currentUpperBound = this._scrollTop;
-    const containerHeight = this._container.offsetHeight;
+    const {
+      _scrollTop,
+      _containerHeight
+    } = this;
 
-    const bufferSize = this.get('bufferSize');
-
-    let { values: heights, total: totalHeight } = this.heightTree;
-
-    const bufferedTop = Math.max(currentUpperBound - (bufferSize * containerHeight), 0);
+    let { values: heights } = this.heightTree;
 
     let {
-      index: topItemIndex,
+      index: middleItemIndex,
       totalBefore: heightAbove,
       totalAfter: heightBelow
-    } = this.heightTree.getIndex(bufferedTop);
+    } = this.heightTree.getIndex(_scrollTop + (_containerHeight / 2));
 
-    let bottomItemIndex = topItemIndex;
+    let topItemIndex, bottomItemIndex;
 
-    while (bottomItemIndex - topItemIndex !== _virtualComponents.length) {
+    topItemIndex = bottomItemIndex = middleItemIndex;
+
+    // Middle out algorithm :P
+    while (true) {
       if (bottomItemIndex < heights.length) {
         heightBelow -= heights[bottomItemIndex];
         bottomItemIndex++;
-      } else if (topItemIndex > 0) {
-        heightAbove -= heights[topItemIndex];
+      }
+
+      if (bottomItemIndex - topItemIndex === _virtualComponents.length) {
+        break;
+      }
+
+      if (topItemIndex > 0) {
         topItemIndex--;
+        heightAbove -= heights[topItemIndex];
+      }
+
+      if (bottomItemIndex - topItemIndex === _virtualComponents.length) {
+        break;
       }
     }
 
     let _slice = this.get('items').slice(topItemIndex, bottomItemIndex);
-
-    // debugOnError(`slice is the expected length`, _slice.length === _virtualComponents.length);
 
     for (let i = 0; i < _slice.length; i++) {
       let heightIndex = topItemIndex + i;
       this.recycleVirtualComponent(_virtualComponents[i], _slice[i], heightIndex, heights[heightIndex]);
     }
 
-    this.element.style.paddingTop = `${heightAbove}px`;
-    this.element.style.paddingBottom  = `${heightBelow}px`;
+    this._heightAbove = heightAbove;
+    this._heightBelow = heightBelow;
+
+
+
 
     // if (!this._nextUpdateHeights) {
     //   this._nextUpdateHeights = this.schedule('measure', () => {
@@ -283,7 +305,10 @@ const VerticalCollection = Component.extend({
   didInsertElement() {
     const containerSelector = this.get('containerSelector');
     this._virtualComponentRenderer = document.getElementById('grab-me');
+    this._virtualComponentAttacher = document.getElementById('attach-me');
     this.element.removeChild(this._virtualComponentRenderer);
+    this.element.style.position = 'relative';
+    this._virtualComponentAttacher.style.position = 'absolute';
 
     if (containerSelector === 'body') {
       this._container = Container;
@@ -291,6 +316,8 @@ const VerticalCollection = Component.extend({
     } else {
       this._container = containerSelector ? closestElement(containerSelector) : this.element.parentNode;
     }
+
+    this.element.style.height = `${this.heightTree.total}px`;
 
     this._updateVirtualComponents();
     this._initializeScrollState();
@@ -315,7 +342,8 @@ const VerticalCollection = Component.extend({
   },
 
   _isEarthquake() {
-    if (Math.abs(this._lastEarthquake - this._scrollTop) > 10) {
+    this._container
+    if (Math.abs(this._lastEarthquake - this._scrollTop) > 0.75 * this._bufferHeight) {
       this._lastEarthquake = this._scrollTop;
 
       return true;
@@ -337,7 +365,7 @@ const VerticalCollection = Component.extend({
     console.time('vertical-collection-init');
     this._super();
 
-    this.set('_virtualComponents', A())
+    this.set('_virtualComponents', A());
     this.token = new Token();
   }
 });
