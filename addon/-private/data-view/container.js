@@ -14,18 +14,16 @@
  */
 export function Container() {
 
+  // A bug occurs in Chrome when we reload the browser at a lower
+  // scrollTop, window.scrollY becomes stuck on a single value.
   Object.defineProperty(this, 'scrollTop', {
     get() {
-      return window.scrollY ||
-        window.pageYOffset ||
-        document.body.scrollTop ||
+      return document.body.scrollTop ||
         document.documentElement.scrollTop;
     },
     set(v) {
-      return window.scrollY =
-        window.pageYOffset =
-          document.body.scrollTop =
-            document.documentElement.scrollTop = v;
+      return document.body.scrollTop =
+        document.documentElement.scrollTop = v;
     }
   });
 

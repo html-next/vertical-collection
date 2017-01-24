@@ -31,21 +31,42 @@ export default class VirtualComponent {
     return this._lowerBound;
   }
 
-  updateBounds() {
-    const { range } = this;
-
-    range.setStart(this.upperBound, 0);
-    range.setEnd(this.lowerBound, 0);
+  get hasClone() {
+    return this.cloneUpperBound && this.cloneUpperBound.parentNode !== null;
   }
 
-  updateDimensions() {
-    assert(`VirtualComponent.updateDimensions cannot fetch bounds when not inserted`, this.upperBound.parentNode);
-    this.updateBounds();
+  updateCloneDimensions() {
+    this.range.setStart(this.cloneUpperBound, 0);
+    this.range.setEnd(this.cloneLowerBound, 0);
 
     const { height, width } = this.range.getBoundingClientRect();
 
+    this.range.detach();
+
     this.height = height;
     this.width = width;
+  }
+
+  deleteCurrentClone() {
+    this.range.setStart(this.cloneUpperBound, 0);
+    this.range.setEnd(this.cloneLowerBound, 0);
+
+    this.range.deleteContents();
+    this.range.detach();
+  }
+
+  cloneContents() {
+    this.range.setStart(this.upperBound, 0);
+    this.range.setEnd(this.lowerBound, 0);
+
+    const domFragment = this.range.cloneContents();
+
+    this.range.detach();
+
+    this.cloneUpperBound = domFragment.firstChild;
+    this.cloneLowerBound = domFragment.lastChild;
+
+    return domFragment;
   }
 
   static create(parentToken) {
