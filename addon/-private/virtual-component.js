@@ -35,9 +35,9 @@ export default class VirtualComponent {
     return this.cloneUpperBound && this.cloneUpperBound.parentNode !== null;
   }
 
-  updateCloneDimensions() {
-    this.range.setStart(this.cloneUpperBound, 0);
-    this.range.setEnd(this.cloneLowerBound, 0);
+  updateDimensions() {
+    this.range.setStart(this.upperBound, 0);
+    this.range.setEnd(this.lowerBound, 0);
 
     const { height, width } = this.range.getBoundingClientRect();
 
@@ -47,24 +47,16 @@ export default class VirtualComponent {
     this.width = width;
   }
 
-  deleteCurrentClone() {
-    this.range.setStart(this.cloneUpperBound, 0);
-    this.range.setEnd(this.cloneLowerBound, 0);
-
-    this.range.deleteContents();
-    this.range.detach();
-  }
-
-  cloneContents() {
+  extractContents() {
     this.range.setStart(this.upperBound, 0);
     this.range.setEnd(this.lowerBound, 0);
 
-    const domFragment = this.range.cloneContents();
+    const domFragment = this.range.extractContents();
 
     this.range.detach();
 
-    this.cloneUpperBound = domFragment.firstChild;
-    this.cloneLowerBound = domFragment.lastChild;
+    this._upperBound = domFragment.firstChild;
+    this._lowerBound = domFragment.lastChild;
 
     return domFragment;
   }

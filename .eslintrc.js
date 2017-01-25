@@ -11,6 +11,10 @@ module.exports = {
   env: {
     'browser': true
   },
+  globals: {
+    ArrayBuffer: true,
+    Uint32Array: true
+  },
   rules: {
     'quotes': ['error', 'single', {  "allowTemplateLiterals": true, "avoidEscape": true }],
     'ember-suave/no-const-outside-module-scope': 0,

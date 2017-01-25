@@ -4,6 +4,7 @@ export default function estimateElementHeight(element, fallbackHeight) {
   assert(`You called estimateElement height without a fallbackHeight`, fallbackHeight);
   assert(`You called estimateElementHeight without an element`, element);
 
+
   if (fallbackHeight.indexOf('%') !== -1) {
     let parentHeight = element.parentNode.innerHeight;
     let per = parseFloat(fallbackHeight);

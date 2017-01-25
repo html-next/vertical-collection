@@ -1,24 +1,3 @@
-{{!--
-{{#each items key='@index' as |item index|}}
-  {{#vertical-item
-    tagName=itemTagName
-    classNames=itemClassNames
-    defaultHeight=_defaultHeight
-    alwaysRemeasure=alwaysRemeasure
-    content=item
-    index=index
-    register=(action register)
-    unregister=(action unregister)
-  }}
-    {{yield item index}}
-  {{/vertical-item}}
-{{else}}
-  {{yield to="inverse"}}
-{{/each}}
---}}
-
-
-
 <div class="virtual-component-renderer">
   {{#each _virtualComponents key="id" as |virtualComponent|}}
     {{{unbound virtualComponent.upperBound}}}
@@ -34,16 +13,3 @@
 {{#if bounds.isEmpty}}
   {{yield to="inverse"}}
 {{/if}}
-
-
-
-
-
-
-{{!--{{#each activeItems key='id' as |virtualComponent|}}
-  {{{unbound virtualComponent.upperBound}}}
-    {{yield virtualComponent.content virtualComponent.index}}
-  {{{unbound virtualComponent.lowerBound}}}
-{{else}}
-  {{yield to="inverse"}}
-{{/each}}--}}
