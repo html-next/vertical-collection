@@ -363,7 +363,7 @@ const VerticalCollection = Component.extend({
         itemIndex--;
 
         this.recycleVirtualComponent(_virtualComponents[currentVirtualTop], slice[i], itemIndex, heights[itemIndex]);
-        _changedVirtualComponents.push(_virtualComponents[currentVirtualTop]);
+        _changedVirtualComponents.unshift(_virtualComponents[currentVirtualTop]);
       }
     } else if (bottomItemIndex > lastBottomItemIndex) {
       scrollIsForward = true;
@@ -420,19 +420,36 @@ const VerticalCollection = Component.extend({
       _firstVisibleIndex
     } = this;
 
+    if (_changedVirtualComponents.length === 0) {
+      return;
+    }
+
     let i, length, height, index, virtualComponent;
 
     let heightBefore = 0;
     let heightAfter = 0;
 
+    const firstComponent = _changedVirtualComponents[0];
+    const lastComponent = _changedVirtualComponents[_changedVirtualComponents.length - 1];
+
+    const rangeToMove = new Range();
+
+    rangeToMove.setStart(firstComponent.upperBound, 0);
+    rangeToMove.setEnd(lastComponent.lowerBound, 0);
+
+    const docFragment = rangeToMove.extractContents();
+
+    firstComponent._upperBound = docFragment.firstChild;
+    lastComponent._lowerBound = docFragment.lastChild;
+
+    if (_scrollIsForward) {
+      this._virtualComponentAttacher.appendChild(docFragment);
+    } else {
+      this._virtualComponentAttacher.prepend(docFragment);
+    }
+
     for (i = 0, length = _changedVirtualComponents.length; i < length; i++) {
       virtualComponent = _changedVirtualComponents[i];
-
-      if (_scrollIsForward) {
-        this._virtualComponentAttacher.appendChild(virtualComponent.extractContents());
-      } else {
-        this._virtualComponentAttacher.prepend(virtualComponent.extractContents());
-      }
 
       // We only need to remeasure immediately if we're scrolling backwards, maybe we can defer this
       if (!keyList.hasKeyFor(virtualComponent.index)) {
