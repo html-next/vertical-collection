@@ -23,6 +23,7 @@ import { assert, debugOnError } from 'vertical-collection/-debug/helpers';
 const {
   A,
   set,
+  get,
   computed,
   Component,
   String: { htmlSafe }
@@ -193,6 +194,8 @@ const VerticalCollection = Component.extend({
     const _virtualComponents = this.get('_virtualComponents');
     const minHeight = this.get('_minHeight');
     const bufferSize = this.get('bufferSize');
+    const { _orderedComponents } = this;
+
     const containerHeight = this._containerHeight = this._container.offsetHeight;
     const bufferHeight = this._bufferHeight = containerHeight * bufferSize;
     const containerWithBuffers = containerHeight + (bufferHeight * 2);
@@ -206,6 +209,12 @@ const VerticalCollection = Component.extend({
       component = new VirtualComponent(this.token);
       set(component, 'content', {});
       _virtualComponents.pushObject(component);
+    }
+
+    _orderedComponents.length = totalComponents;
+
+    for (i = 0; i < totalComponents; i++) {
+      _orderedComponents[i] = _virtualComponents[i];
     }
   },
 
@@ -257,8 +266,7 @@ const VerticalCollection = Component.extend({
    */
   _updateVirtualComponents() {
     const _virtualComponents = this.get('_virtualComponents');
-    const { _changedVirtualComponents } = this;
-    _changedVirtualComponents.length = 0;
+    const { _orderedComponents } = this;
 
     const {
       _scrollTop,
@@ -348,56 +356,37 @@ const VerticalCollection = Component.extend({
       this._lastVisibleReached = false;
     }
 
+    slice = this.items.slice(topItemIndex, bottomItemIndex);
+    let movedComponents;
+
+    itemIndex = topItemIndex;
+
+    let offsetAmount = Math.abs(topItemIndex - lastTopItemIndex) % _virtualComponents.length;
+
     if (topItemIndex < lastTopItemIndex) {
       scrollIsForward = false;
 
-      slice = this.items.slice(topItemIndex, lastTopItemIndex);
-      itemIndex = lastTopItemIndex;
-
-      for (i = slice.length - 1; i >= 0; i--) {
-        if (currentVirtualTop === 0) {
-          currentVirtualTop = _virtualComponents.length;
-        }
-
-        currentVirtualTop--;
-        itemIndex--;
-
-        this.recycleVirtualComponent(_virtualComponents[currentVirtualTop], slice[i], itemIndex, heights[itemIndex]);
-        _changedVirtualComponents.unshift(_virtualComponents[currentVirtualTop]);
-      }
+      movedComponents = _orderedComponents.splice(-offsetAmount);
+      _orderedComponents.unshift(...movedComponents);
     } else if (bottomItemIndex > lastBottomItemIndex) {
       scrollIsForward = true;
 
-      slice = this.items.slice(lastBottomItemIndex, bottomItemIndex);
-      itemIndex = lastBottomItemIndex;
-
-      for (i = 0, length = slice.length; i < length; i++) {
-        this.recycleVirtualComponent(_virtualComponents[currentVirtualTop], slice[i], itemIndex, heights[itemIndex]);
-        _changedVirtualComponents.push(_virtualComponents[currentVirtualTop]);
-
-        currentVirtualTop++;
-        itemIndex++;
-
-        if (currentVirtualTop === _virtualComponents.length) {
-          currentVirtualTop = 0;
-        }
-      }
+      movedComponents = _orderedComponents.splice(0, offsetAmount);
+      _orderedComponents.push(...movedComponents);
     } else if (!this._itemsInserted) {
       scrollIsForward = true;
-
       this._itemsInserted = true;
-
-      slice = this.items.slice(topItemIndex, bottomItemIndex);
-      itemIndex = topItemIndex;
-
-      currentVirtualTop = 0;
-
-      for (let i = 0; i < slice.length; i++) {
-        this.recycleVirtualComponent(_virtualComponents[i], slice[i], itemIndex, heights[itemIndex]);
-        _changedVirtualComponents.push(_virtualComponents[i]);
-        itemIndex++;
-      }
+      movedComponents = _orderedComponents;
+    } else {
+      movedComponents = [];
     }
+
+    for (i = 0, length = slice.length; i < length; i++) {
+      this.recycleVirtualComponent(_orderedComponents[i], slice[i], itemIndex, heights[itemIndex]);
+      itemIndex++;
+    }
+
+    this._movedComponents = movedComponents;
 
     this._currentVirtualTop = currentVirtualTop;
 
@@ -415,41 +404,40 @@ const VerticalCollection = Component.extend({
   _renderChanges() {
     const {
       keyList,
-      _changedVirtualComponents,
+      _virtualComponents,
       _scrollIsForward,
-      _firstVisibleIndex
+      _firstVisibleIndex,
+      _movedComponents
     } = this;
-
-    if (_changedVirtualComponents.length === 0) {
-      return;
-    }
 
     let i, length, height, index, virtualComponent;
 
     let heightBefore = 0;
     let heightAfter = 0;
 
-    const firstComponent = _changedVirtualComponents[0];
-    const lastComponent = _changedVirtualComponents[_changedVirtualComponents.length - 1];
+    if (_movedComponents.length > 0) {
+      const firstComponent = _movedComponents[0];
+      const lastComponent = _movedComponents[_movedComponents.length - 1];
 
-    const rangeToMove = new Range();
+      const rangeToMove = new Range();
 
-    rangeToMove.setStart(firstComponent.upperBound, 0);
-    rangeToMove.setEnd(lastComponent.lowerBound, 0);
+      rangeToMove.setStart(firstComponent.upperBound, 0);
+      rangeToMove.setEnd(lastComponent.lowerBound, 0);
 
-    const docFragment = rangeToMove.extractContents();
+      const docFragment = rangeToMove.extractContents();
 
-    firstComponent._upperBound = docFragment.firstChild;
-    lastComponent._lowerBound = docFragment.lastChild;
+      firstComponent._upperBound = docFragment.firstChild;
+      lastComponent._lowerBound = docFragment.lastChild;
 
-    if (_scrollIsForward) {
-      this._virtualComponentAttacher.appendChild(docFragment);
-    } else {
-      this._virtualComponentAttacher.prepend(docFragment);
+      if (_scrollIsForward) {
+        this._virtualComponentAttacher.appendChild(docFragment);
+      } else {
+        this._virtualComponentAttacher.prepend(docFragment);
+      }
     }
 
-    for (i = 0, length = _changedVirtualComponents.length; i < length; i++) {
-      virtualComponent = _changedVirtualComponents[i];
+    for (i = 0, length = _virtualComponents.length; i < length; i++) {
+      virtualComponent = _virtualComponents[i];
 
       // We only need to remeasure immediately if we're scrolling backwards, maybe we can defer this
       if (!keyList.hasKeyFor(virtualComponent.index)) {
@@ -484,9 +472,11 @@ const VerticalCollection = Component.extend({
     debugOnError(`You cannot set an item's content to undefined`, newContent);
     debugOnError(`You cannot recycle components other than a VirtualComponent`, component instanceof VirtualComponent);
 
-    set(component, 'content', newContent);
-    set(component, 'index', newIndex);
-    set(component, 'height', newHeight);
+    if (get(component, 'content') !== newContent) {
+      set(component, 'content', newContent);
+      set(component, 'index', newIndex);
+      set(component, 'height', newHeight);
+    }
   },
 
   // –––––––––––––– Setup/Teardown
@@ -589,7 +579,7 @@ const VerticalCollection = Component.extend({
     this._super();
 
     this.set('_virtualComponents', A());
-    this._changedVirtualComponents = [];
+    this._orderedComponents = [];
     this._actionsToSend = [];
     this.token = new Token();
   }
