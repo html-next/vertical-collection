@@ -8,7 +8,7 @@ import Token from '../../-private/scheduler/token';
 import estimateElementHeight from '../../-private/utils/element/estimate-element-height';
 import closestElement from '../../-private/utils/element/closest';
 
-import SkipList from '../../-private/data-view/skip-list';
+import GeometryManager from '../../-private/data-view/geometry-manager';
 import LazyKeyList from '../../-private/data-view/lazy-key-list';
 import Container from '../../-private/data-view/container';
 import getArray from '../../-private/data-view/utils/get-array';
@@ -129,65 +129,40 @@ const VerticalCollection = Component.extend({
   },
 
   didReceiveAttrs() {
-    const { heightList, keyList } = this;
+    const { geometryManager, keyList, _items } = this;
 
-    if (heightList && keyList) {
-      const items = this.items = getArray(this.get('items'));
+    if (geometryManager && keyList) {
+      const newItems = getArray(this.get('items'));
+      const lenDiff = newItems.length - _items.length;
+
       const minHeight = this.get('_minHeight');
       const key = this.get('key');
-      let newHeightList;
 
-      if (keyList.canPrepend(items)) {
-        keyList.prepend(items);
+      if (keyList.canPrepend(newItems)) {
+        keyList.prepend(newItems);
+        geometryManager.prepend(lenDiff);
 
-        const { values: prevHeights } = heightList;
-
-        const buffer = new ArrayBuffer(items.length * 4);
-        const newHeights = new Uint32Array(buffer);
-
-        const lenDiff = items.length - prevHeights.length;
-
-        this.schedule('sync', () => {
+        this.schedule('affect', () => {
           this._scrollTop += lenDiff * minHeight;
           this._cachedTop = this._scrollTop;
           this._container.scrollTop = this._scrollTop;
           this._lastEarthquake = this._scrollTop;
 
-          this._topItemIndex += lenDiff;
-          this._bottomItemIndex += lenDiff;
+          this._prevFirstItemIndex += lenDiff;
         });
-
-        newHeights.set(prevHeights, lenDiff);
-        newHeights.fill(minHeight, 0, lenDiff);
-
-        newHeightList = new SkipList(newHeights);
-      } else if (this.keyList.canAppend(items)) {
-        keyList.append(items);
-
-        const { values: prevHeights } = heightList;
-
-        const buffer = new ArrayBuffer(items.length * 4);
-        const newHeights = new Uint32Array(buffer);
-
-        newHeights.set(prevHeights);
-        newHeights.fill(minHeight, prevHeights.length);
-
-        newHeightList = new SkipList(newHeights);
+      } else if (this.keyList.canAppend(newItems)) {
+        keyList.append(newItems);
+        geometryManager.append(lenDiff);
       } else {
         this._itemsInserted = false;
 
         this.keyList = new LazyKeyList(items, key);
-        newHeightList = new SkipList(items.length, minHeight);
+        this.geometryManager = new GeometryManager(newItems.length, minHeight);
       }
 
-      this.heightList = newHeightList;
+      this._items = newItems;
       this._scheduleUpdate();
     }
-
-    this._topItemIndexReached = false;
-    this._bottomItemIndexReached = false;
-    this._firstVisibleReached = false;
-    this._lastVisibleReached = false;
   },
 
   _updateVirtualComponentPool() {
@@ -265,110 +240,34 @@ const VerticalCollection = Component.extend({
    * @private
    */
   _updateVirtualComponents() {
-    const _virtualComponents = this.get('_virtualComponents');
-    const { _orderedComponents } = this;
-
     const {
+      items,
       _scrollTop,
       _containerHeight,
-      _topItemIndex: lastTopItemIndex,
-      _bottomItemIndex: lastBottomItemIndex
+      _prevFirstItemIndex,
+      _orderedComponents
     } = this;
 
-    const { values: heights, total: totalHeight } = this.heightList;
+    let scrollIsForward, movedComponents;
 
-    const maxIndex = heights.length - 1;
-
-    let currentVirtualTop = this._currentVirtualTop || 0;
-
-    let {
-      index: middleItemIndex,
-      totalBefore: heightAbove,
-      totalAfter: heightBelow
-    } = this.heightList.get(_scrollTop + (_containerHeight / 2));
-
-    let i,
-      length,
-      topItemIndex,
-      bottomItemIndex,
+    const {
+      firstItemIndex,
+      lastItemIndex,
       firstVisibleIndex,
       lastVisibleIndex,
-      slice,
-      itemIndex,
-      scrollIsForward;
+      totalBefore,
+      totalAfter
+    } = this.geometryManager.getBounds(_orderedComponents.length, _scrollTop, _scrollTop + _containerHeight);
 
-    topItemIndex = bottomItemIndex = middleItemIndex;
+    const itemDelta = firstItemIndex - _prevFirstItemIndex;
+    const offsetAmount = Math.abs(itemDelta % _orderedComponents.length);
 
-    // Middle out algorithm :P
-    while (true) {
-      if (bottomItemIndex < maxIndex) {
-        heightBelow -= heights[bottomItemIndex];
-        bottomItemIndex++;
-
-        if (!lastVisibleIndex && totalHeight - heightBelow >= _scrollTop + _containerHeight) {
-          lastVisibleIndex = bottomItemIndex - 1;
-        }
-      }
-
-      if (bottomItemIndex - topItemIndex === _virtualComponents.length) {
-        break;
-      }
-
-      if (topItemIndex > 0) {
-        topItemIndex--;
-        heightAbove -= heights[topItemIndex];
-
-        if (!firstVisibleIndex && heightAbove < _scrollTop) {
-          firstVisibleIndex = topItemIndex;
-        }
-      }
-
-      if (bottomItemIndex - topItemIndex === _virtualComponents.length) {
-        break;
-      }
-    }
-
-    if (topItemIndex === 0 && !this._topItemIndexReached) {
-      this.sendActionOnce('firstReached');
-      this._topItemIndexReached = true;
-    } else if (topItemIndex !== 0) {
-      this._topItemIndexReached = false;
-    }
-
-    if (bottomItemIndex === maxIndex && !this._bottomItemIndexReached) {
-      this.sendActionOnce('lastReached');
-      this._bottomItemIndexReached = true;
-    } else if (bottomItemIndex !== maxIndex) {
-      this._bottomItemIndexReached = false;
-    }
-
-    if (firstVisibleIndex === 0 && !this._firstVisibleReached) {
-      this.sendActionOnce('firstVisibleReached');
-      this._firstVisibleReached = true;
-    } else if (firstVisibleIndex !== 0) {
-      this._firstVisibleReached = false;
-    }
-
-    if (lastVisibleIndex === maxIndex && !this._lastVisibleReached) {
-      this.sendActionOnce('lastVisibleReached');
-      this._lastVisibleReached = true;
-    } else if (lastVisibleIndex !== maxIndex) {
-      this._lastVisibleReached = false;
-    }
-
-    slice = this.items.slice(topItemIndex, bottomItemIndex);
-    let movedComponents;
-
-    itemIndex = topItemIndex;
-
-    let offsetAmount = Math.abs(topItemIndex - lastTopItemIndex) % _virtualComponents.length;
-
-    if (topItemIndex < lastTopItemIndex) {
+    if (itemDelta < 0) {
       scrollIsForward = false;
 
       movedComponents = _orderedComponents.splice(-offsetAmount);
       _orderedComponents.unshift(...movedComponents);
-    } else if (bottomItemIndex > lastBottomItemIndex) {
+    } else if (itemDelta > 0) {
       scrollIsForward = true;
 
       movedComponents = _orderedComponents.splice(0, offsetAmount);
@@ -381,39 +280,47 @@ const VerticalCollection = Component.extend({
       movedComponents = [];
     }
 
-    for (i = 0, length = slice.length; i < length; i++) {
-      this.recycleVirtualComponent(_orderedComponents[i], slice[i], itemIndex, heights[itemIndex]);
-      itemIndex++;
+    for (let i = 0, itemIndex = firstItemIndex; itemIndex <= lastItemIndex; i++, itemIndex++) {
+      this.recycleVirtualComponent(_orderedComponents[i], items[itemIndex], itemIndex);
+    }
+
+    if (itemDelta !== 0) {
+      if (firstItemIndex === 0) {
+        this.sendActionOnce('firstReached');
+      }
+
+      if (lastItemIndex === items.length - 1) {
+        this.sendActionOnce('lastReached');
+      }
+
+      if (firstVisibleIndex === 0) {
+        this.sendActionOnce('firstVisibleReached');
+      }
+
+      if (lastVisibleIndex === items.length - 1) {
+        this.sendActionOnce('lastVisibleReached');
+      }
     }
 
     this._movedComponents = movedComponents;
 
-    this._currentVirtualTop = currentVirtualTop;
+    this._totalBefore = totalBefore;
+    this._totalAfter = totalAfter;
 
-    this._heightAbove = heightAbove;
-    this._heightBelow = heightBelow;
-
-    this._topItemIndex = topItemIndex;
-    this._bottomItemIndex = bottomItemIndex;
+    this._prevFirstItemIndex = firstItemIndex;
     this._firstVisibleIndex = firstVisibleIndex;
-    this._lastVisibleIndex = lastVisibleIndex;
 
     this._scrollIsForward = scrollIsForward;
   },
 
   _renderChanges() {
     const {
-      keyList,
-      _virtualComponents,
+      _orderedComponents,
       _scrollIsForward,
       _firstVisibleIndex,
       _movedComponents
     } = this;
 
-    let i, length, height, index, virtualComponent;
-
-    let heightBefore = 0;
-    let heightAfter = 0;
 
     if (_movedComponents.length > 0) {
       const firstComponent = _movedComponents[0];
@@ -436,43 +343,26 @@ const VerticalCollection = Component.extend({
       }
     }
 
-    for (i = 0, length = _virtualComponents.length; i < length; i++) {
-      virtualComponent = _virtualComponents[i];
+    const {
+      deltaBefore,
+      deltaAfter,
+      deltaScroll
+    } = this.geometryManager.remeasure(_orderedComponents, _firstVisibleIndex);
 
-      // We only need to remeasure immediately if we're scrolling backwards, maybe we can defer this
-      if (!keyList.hasKeyFor(virtualComponent.index)) {
-        keyList.get(virtualComponent.index);
 
-        if (virtualComponent.index <= _firstVisibleIndex) {
-          heightBefore += virtualComponent.height;
-        }
-
-        virtualComponent.updateDimensions();
-
-        height = virtualComponent.height;
-        index = virtualComponent.index;
-
-        this.heightList.set(index, height);
-
-        if (virtualComponent.index <= _firstVisibleIndex) {
-          heightAfter += virtualComponent.height;
-        }
-      }
+    if (deltaScroll !== 0) {
+      this._container.scrollTop += deltaScroll;
     }
 
-    if (heightBefore !== heightAfter) {
-      this._container.scrollTop += heightAfter - heightBefore;
-    }
-
-    this._virtualComponentAttacher.style.paddingTop = `${this._heightAbove}px`;
-    this._virtualComponentAttacher.style.paddingBottom = `${this._heightBelow}px`;
+    this._virtualComponentAttacher.style.paddingTop = `${this._totalBefore + deltaBefore}px`;
+    this._virtualComponentAttacher.style.paddingBottom = `${this._totalAfter + deltaAfter}px`;
   },
 
   recycleVirtualComponent(component, newContent, newIndex, newHeight) {
     debugOnError(`You cannot set an item's content to undefined`, newContent);
     debugOnError(`You cannot recycle components other than a VirtualComponent`, component instanceof VirtualComponent);
 
-    if (get(component, 'content') !== newContent) {
+    if (component.content !== newContent) {
       set(component, 'content', newContent);
       set(component, 'index', newIndex);
       set(component, 'height', newHeight);
@@ -481,13 +371,16 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
-    const { items } = this;
     const key = this.get('key');
+    const items = getArray(this.get('items'));
+
+
     this.keyList = new LazyKeyList(items, key);
-    this.heightList = new SkipList(items.length, this.get('_minHeight'));
+    this.geometryManager = new GeometryManager(items.length, this.get('_minHeight'));
+    this._items = items;
 
     this._itemsInserted = false;
-    this.element.style.minHeight = `${this.heightList.total}px`;
+    this.element.style.minHeight = `${this.geometryManager.skipList.total}px`;
 
     const containerSelector = this.get('containerSelector');
 
