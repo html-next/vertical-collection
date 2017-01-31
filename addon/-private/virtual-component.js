@@ -31,20 +31,21 @@ export default class VirtualComponent {
     return this._lowerBound;
   }
 
-  get hasClone() {
-    return this.cloneUpperBound && this.cloneUpperBound.parentNode !== null;
+  get parentElement() {
+    return this._upperBound.parentElement;
   }
 
-  updateDimensions() {
-    this.range.setStart(this.upperBound, 0);
-    this.range.setEnd(this.lowerBound, 0);
+  getBoundingClientRect() {
+    if (this.clientRect === null) {
+      this.range.setStart(this.upperBound, 0);
+      this.range.setEnd(this.lowerBound, 0);
 
-    const { height, width } = this.range.getBoundingClientRect();
+      this.clientRect = this.range.getBoundingClientRect();
 
-    this.range.detach();
+      this.range.detach();
+    }
 
-    this.height = height;
-    this.width = width;
+    return this.clientRect;
   }
 
   extractContents() {

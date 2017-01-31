@@ -5,3 +5,7 @@ vertical-collection {
   min-height: 100%;
   position: relative;
 }
+
+.virtual-component-attacher {
+  overflow:hidden;
+}

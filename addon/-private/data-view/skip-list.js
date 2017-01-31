@@ -1,5 +1,29 @@
 import { assert, debugOnError } from '../../-debug/helpers';
 
+/*
+ * `SkipList` is a data structure designed with two main uses in mind:
+ *
+ * - Given a target value, find the index i in the list such that
+ * `sum(list[0]..list[i]) <= value < sum(list[0]..list[i + 1])`
+ *
+ * - Given the index i (the fulcrum point) from above, get `sum(list[0]..list[i])`
+ *   and `sum(list[i + 1]..list[-1])`
+ *
+ * The idea is that given a list of arbitrary heights or widths in pixels, we want to find
+ * the index of the item such that when all of the items before it are added together, it will
+ * be as close to the target (scrollTop of our container) as possible.
+ *
+ * This data structure acts somewhat like a Binary Search Tree. Given a list of size n, the
+ * retreival time for the index is O(log n) and the update time should any values change is
+ * O(log n). The space complexity is O(n log n) in bytes (using Uint16/32Arrays helps a lot
+ * here), and the initialization time is O(n log n).
+ *
+ * It works by constructing layer arrays, each of which is setup such that
+ * `layer[i] = prevLayer[i * 2] + prevLayer[(i * 2) + 1]`. This allows us to traverse the layers
+ * downward using a binary search to arrive at the index we want. We also add the values up as we
+ * traverse to get the total value before and after the final index.
+ */
+
 export default class SkipList {
   constructor(values, defaultValue) {
     const layers = [values];
@@ -15,12 +39,19 @@ export default class SkipList {
       layer = new Uint32Array(buffer);
 
       if (defaultValue) {
+        // If given a default value we assume that we can fill each
+        // layer of the skip list with the previous layer's value * 2.
+        // This allows us to use the `fill` method on Typed arrays, which
+        // an order of magnitude faster than manually calculating each value.
         defaultValue = defaultValue * 2;
         layer.fill(defaultValue);
 
         left = prevLayer[(length - 1) * 2] || 0;
         right = prevLayer[((length - 1) * 2) + 1] || 0;
 
+        // Layers are not powers of 2, and sometimes they may by odd sizes.
+        // Only the last value of a layer will be different, so we calculate
+        // its value manually.
         layer[length - 1] = left + right;
       } else {
         for (i = 0; i < length; i++) {
