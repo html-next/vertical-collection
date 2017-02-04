@@ -77,8 +77,8 @@ export default class GeometryManager {
     // which are the boundaries of the visible indexes.
     while (true) {
       if (lastItemIndex < maxIndex) {
-        totalAfter -= values[lastItemIndex];
         lastItemIndex++;
+        totalAfter -= values[lastItemIndex];
 
         if (!lastVisibleIndex && total - totalAfter >= lastVisibleValue) {
           lastVisibleIndex = lastItemIndex - 1;
@@ -93,7 +93,7 @@ export default class GeometryManager {
         firstItemIndex--;
         totalBefore -= values[firstItemIndex];
 
-        if (!firstVisibleIndex && totalBefore < firstVisibleValue) {
+        if (!firstVisibleIndex && totalBefore <= firstVisibleValue) {
           firstVisibleIndex = firstItemIndex;
         }
 
@@ -220,7 +220,7 @@ export default class GeometryManager {
       let index = affectedIndexes[i];
       let delta = this._recalculateHeight(index);
 
-      if (index >= firstIndex  && index <= firstVisibleIndex && delta > 0) {
+      if (index >= firstIndex  && index < firstVisibleIndex && delta > 0) {
         deltaScroll += delta;
       } else if (index < firstIndex) {
         deltaBefore = delta;

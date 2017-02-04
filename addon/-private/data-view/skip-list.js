@@ -1,4 +1,4 @@
-import { assert, debugOnError } from '../../-debug/helpers';
+import { assert, debugOnError } from 'vertical-collection/-debug/helpers';
 
 /*
  * `SkipList` is a data structure designed with two main uses in mind:
@@ -97,7 +97,7 @@ export default class SkipList {
 
     index = index / 2;
 
-    totalAfter = total - totalBefore;
+    totalAfter = total - totalBefore - this.values[index];
 
     debugOnError('index must be within bounds', index >= 0 && index < this.values.length);
 

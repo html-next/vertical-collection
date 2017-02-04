@@ -253,13 +253,13 @@ const VerticalCollection = Component.extend({
   _moveDOM(firstComponent, lastComponent, prepend) {
     const rangeToMove = new Range();
 
-    rangeToMove.setStart(firstComponent.upperBound, 0);
-    rangeToMove.setEnd(lastComponent.lowerBound, 0);
+    rangeToMove.setStart(firstComponent._upperBound, 0);
+    rangeToMove.setEnd(lastComponent._lowerBound, 0);
 
     const docFragment = rangeToMove.extractContents();
 
-    firstComponent._upperBound = docFragment.firstChild;
-    lastComponent._lowerBound = docFragment.lastChild;
+    firstComponent._upperBound = docFragment.firstChild || firstComponent._upperBound;
+    lastComponent._lowerBound = docFragment.lastChild || lastComponent._lowerBound;
 
     if (prepend) {
       this._virtualComponentAttacher.prepend(docFragment);

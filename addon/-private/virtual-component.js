@@ -37,29 +37,16 @@ export default class VirtualComponent {
 
   getBoundingClientRect() {
     if (this.clientRect === null) {
-      this.range.setStart(this.upperBound, 0);
-      this.range.setEnd(this.lowerBound, 0);
+      this.range.setStart(this._upperBound, 0);
+      this.range.setEnd(this._lowerBound, 0);
 
+      console.count('layout-invalidation');
       this.clientRect = this.range.getBoundingClientRect();
 
       this.range.detach();
     }
 
     return this.clientRect;
-  }
-
-  extractContents() {
-    this.range.setStart(this.upperBound, 0);
-    this.range.setEnd(this.lowerBound, 0);
-
-    const domFragment = this.range.extractContents();
-
-    this.range.detach();
-
-    this._upperBound = domFragment.firstChild;
-    this._lowerBound = domFragment.lastChild;
-
-    return domFragment;
   }
 
   static create(parentToken) {
