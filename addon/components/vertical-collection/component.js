@@ -263,6 +263,7 @@ const VerticalCollection = Component.extend({
 
     if (prepend) {
       this._virtualComponentAttacher.prepend(docFragment);
+      this._container.scrollTop = this._scrollTop;
     } else {
       this._virtualComponentAttacher.appendChild(docFragment);
     }
