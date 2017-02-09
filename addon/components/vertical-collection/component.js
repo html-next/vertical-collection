@@ -258,12 +258,15 @@ const VerticalCollection = Component.extend({
 
     const docFragment = rangeToMove.extractContents();
 
+    // The first and last nodes in the range do not get extracted, and are instead cloned, so they
+    // have to be reset.
+    //
+    // NOTE: Ember 1.11 - there are cases where docFragment is null (they haven't been rendered yet.)
     firstComponent._upperBound = docFragment.firstChild || firstComponent._upperBound;
     lastComponent._lowerBound = docFragment.lastChild || lastComponent._lowerBound;
 
     if (prepend) {
       this._virtualComponentAttacher.prepend(docFragment);
-      this._container.scrollTop = this._scrollTop;
     } else {
       this._virtualComponentAttacher.appendChild(docFragment);
     }
@@ -278,6 +281,8 @@ const VerticalCollection = Component.extend({
       deltaScroll
     } = this.geometryManager.remeasure(_orderedComponents, _firstVisibleIndex);
 
+    // Fix for Chrome bug, sometimes scrolltop get's screwy and needs to be reset
+    this._container.scrollTop = this._scrollTop;
 
     if (deltaScroll !== 0) {
       this._container.scrollTop += deltaScroll;
