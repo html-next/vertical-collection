@@ -38,7 +38,7 @@ nav a {
   display: block;
 }
 
-.table-wrapper {
+.table-wrapper, .scrollable {
   display: block;
   height: 500px;
   max-height: 500px;

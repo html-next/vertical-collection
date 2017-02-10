@@ -129,8 +129,8 @@ const VerticalCollection = Component.extend({
 
         const { length } = this._actionsToSend;
 
-        for (let i = 0; i < length; i++) {
-          this.sendAction(this._actionsToSend[i]);
+        for (let i = 0; i < length; i += 2) {
+          this.sendAction(this._actionsToSend[i], ...this._actionsToSend[i + 1]);
         }
 
         this._actionsToSend.length = 0;
@@ -138,8 +138,8 @@ const VerticalCollection = Component.extend({
     }
   },
 
-  sendActionOnce(action) {
-    this._actionsToSend.push(action);
+  sendActionOnce(action, ...args) {
+    this._actionsToSend.push(action, args);
     this._scheduleSendActions();
   },
 
@@ -182,6 +182,8 @@ const VerticalCollection = Component.extend({
       _scrollTop,
       _containerHeight,
       _prevFirstItemIndex,
+      _prevFirstVisibleIndex,
+      _prevLastVisibleIndex,
       _orderedComponents
     } = this;
 
@@ -204,18 +206,20 @@ const VerticalCollection = Component.extend({
     const itemDelta = firstItemIndex - _prevFirstItemIndex;
     const offsetAmount = Math.abs(itemDelta % _orderedComponents.length);
 
-    if (itemDelta < 0) {
-      // Scrolling up
-      let movedComponents = _orderedComponents.splice(-offsetAmount);
-      _orderedComponents.unshift(...movedComponents);
+    if (offsetAmount > 0) {
+      if (itemDelta < 0) {
+        // Scrolling up
+        let movedComponents = _orderedComponents.splice(-offsetAmount);
+        _orderedComponents.unshift(...movedComponents);
 
-      this._moveDOM(movedComponents[0], movedComponents[movedComponents.length - 1], true);
-    } else if (itemDelta > 0) {
-      // Scrolling down
-      let movedComponents = _orderedComponents.splice(0, offsetAmount);
-      _orderedComponents.push(...movedComponents);
+        this._moveDOM(movedComponents[0], movedComponents[movedComponents.length - 1], true);
+      } else if (itemDelta > 0) {
+        // Scrolling down
+        let movedComponents = _orderedComponents.splice(0, offsetAmount);
+        _orderedComponents.push(...movedComponents);
 
-      this._moveDOM(movedComponents[0], movedComponents[movedComponents.length - 1], false);
+        this._moveDOM(movedComponents[0], movedComponents[movedComponents.length - 1], false);
+      }
     }
 
     for (let i = 0, itemIndex = firstItemIndex; itemIndex <= lastItemIndex; i++, itemIndex++) {
@@ -230,21 +234,14 @@ const VerticalCollection = Component.extend({
       if (lastItemIndex === _items.length - 1) {
         this.sendActionOnce('lastReached');
       }
-
-      if (firstVisibleIndex === 0) {
-        this.sendActionOnce('firstVisibleReached');
-      }
-
-      if (lastVisibleIndex === _items.length - 1) {
-        this.sendActionOnce('lastVisibleReached');
-      }
     }
 
     this._totalBefore = totalBefore;
     this._totalAfter = totalAfter;
 
     this._prevFirstItemIndex = firstItemIndex;
-    this._firstVisibleIndex = firstVisibleIndex;
+    this._prevFirstVisibleIndex = firstVisibleIndex;
+    this._prevLastVisibleIndex = lastVisibleIndex;
   },
 
   // VirtualComponent DOM is extracted by using a Range that begins at the first component to be
@@ -273,16 +270,16 @@ const VerticalCollection = Component.extend({
   },
 
   _adjustRender() {
-    const { _orderedComponents, _firstVisibleIndex } = this;
+    const { _orderedComponents, _prevFirstVisibleIndex } = this;
 
     const {
       deltaBefore,
       deltaAfter,
       deltaScroll
-    } = this.geometryManager.remeasure(_orderedComponents, _firstVisibleIndex);
+    } = this.geometryManager.remeasure(_orderedComponents, _prevFirstVisibleIndex);
 
     // Fix for Chrome bug, sometimes scrolltop get's screwy and needs to be reset
-    this._container.scrollTop = this._scrollTop;
+    this._container.scrollTop = this._scrollTop + this._scrollTopOffset;
 
     if (deltaScroll !== 0) {
       this._container.scrollTop += deltaScroll;
@@ -292,7 +289,7 @@ const VerticalCollection = Component.extend({
     this._virtualComponentAttacher.style.paddingBottom = `${this._totalAfter + deltaAfter}px`;
   },
 
-  recycleVirtualComponent(component, newContent, newIndex, newHeight) {
+  recycleVirtualComponent(component, newContent, newIndex) {
     debugOnError(`You cannot set an item's content to undefined`, newContent);
     debugOnError(`You cannot recycle components other than a VirtualComponent`, component instanceof VirtualComponent);
 
@@ -339,25 +336,35 @@ const VerticalCollection = Component.extend({
     // container with its buffers. Combined with the above rendering strategy this fairly
     // performant, even if mean item size is above the minimum.
     const totalComponents = Math.min(this.get('items.length'), Math.ceil(containerWithBuffers / minHeight) + 1);
-    const componentsToAdd = totalComponents - _virtualComponents.length;
+
+    const delta = totalComponents - _virtualComponents.length;
 
     let i, component;
 
-    for (i = 0; i < componentsToAdd; i++) {
-      component = new VirtualComponent(this.token);
-      set(component, 'content', {});
-      _virtualComponents.pushObject(component);
+    if (delta > 0) {
+      for (i = 0; i < delta; i++) {
+        component = new VirtualComponent(this.token);
+        set(component, 'content', {});
+        _virtualComponents.pushObject(component);
+      }
+    } else {
+      for (i = 0; i > delta; i--) {
+        _virtualComponents[i].destroy;
+      }
     }
 
+    _virtualComponents.length = totalComponents;
     _orderedComponents.length = totalComponents;
 
     for (i = 0; i < totalComponents; i++) {
       _orderedComponents[i] = _virtualComponents[i];
     }
 
-    this.schedule('sync', () => {
-      this._moveDOM(_orderedComponents[0], _orderedComponents[_orderedComponents.length - 1]);
-    });
+    if (totalComponents > 0) {
+      this.schedule('sync', () => {
+        this._moveDOM(_orderedComponents[0], _orderedComponents[_orderedComponents.length - 1]);
+      });
+    }
   },
 
   didUpdateAttrs() {
@@ -377,9 +384,9 @@ const VerticalCollection = Component.extend({
       this.schedule('sync', () => {
         this._prevFirstItemIndex += lenDiff;
         this._scrollTop += lenDiff * minHeight;
-        this._cachedTop = this._scrollTop;
-        this._lastEarthquake = this._scrollTop;
-        this._container.scrollTop = this._scrollTop;
+        this._cachedTop = this._scrollTop + this._scrollTopOffset;
+        this._lastEarthquake = this._scrollTop + this._scrollTopOffset;
+        this._container.scrollTop = this._scrollTop + this._scrollTopOffset;
       });
     } else if (this.keyList.canAppend(newItems)) {
       keyList.append(newItems);
@@ -416,12 +423,14 @@ const VerticalCollection = Component.extend({
     const containerSelector = this.get('containerSelector');
 
     // standard _scrollTop doesn't allow for negative values. In the case where the scroll container
-    // is the window, anytime the viewport is above the collection we would like to capture that assert
+    // is the window, anytime the viewport is above the collection we would like to capture that as
     // a negative value
     if (containerSelector === 'body') {
       this._container = Container;
-      this._scrollTop = this._container.scrollTop - this.element.getBoundingClientRect().top;
+      this._scrollTop = -this.element.getBoundingClientRect().top;
+      this._scrollTopOffset = this._container.scrollTop - this._scrollTop;
     } else {
+      this._scrollTopOffset = 0;
       this._container = containerSelector ? closestElement(containerSelector) : this.element.parentNode;
     }
 

@@ -29,7 +29,7 @@ export default class SkipList {
     const layers = [values];
     let i, length, buffer, layer, prevLayer, left, right;
 
-    prevLayer = values;
+    prevLayer = layer = values;
     length = values.length;
 
     while (length > 2) {
@@ -65,7 +65,7 @@ export default class SkipList {
       prevLayer = layer;
     }
 
-    this.total = layers[0][0] + layers[0][1];
+    this.total = layer.length > 0 ? layer.length > 1 ? layer[0] + layer[1] : layer[0] : 0;
     this.layers = layers;
     this.values = values;
   }
@@ -79,6 +79,11 @@ export default class SkipList {
     let totalBefore = 0;
     let totalAfter = 0;
 
+    targetValue = Math.min(total, targetValue);
+
+    debugOnError('targetValue must be greater than or equal to 0', targetValue >= 0);
+    debugOnError('targetValue must be no more than total', targetValue <= total);
+
     for (i = 0; i < numLayers; i++) {
       layer = layers[i];
 
@@ -87,7 +92,7 @@ export default class SkipList {
 
       left = layer[leftIndex];
 
-      if (targetValue >= totalBefore + left) {
+      if (targetValue > totalBefore + left) {
         totalBefore = totalBefore + left;
         index = rightIndex * 2;
       } else {
@@ -97,8 +102,9 @@ export default class SkipList {
 
     index = index / 2;
 
-    totalAfter = total - totalBefore - this.values[index];
+    totalAfter = total - totalBefore;
 
+    debugOnError('index must be a number', typeof index === 'number');
     debugOnError('index must be within bounds', index >= 0 && index < this.values.length);
 
     return { index, totalBefore, totalAfter };

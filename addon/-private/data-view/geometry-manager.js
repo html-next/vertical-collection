@@ -68,38 +68,34 @@ export default class GeometryManager {
       index: middleItemIndex
     } = this.skipList.get(middleVisibleValue);
 
-    let firstItemIndex, lastItemIndex, firstVisibleIndex, lastVisibleIndex;
+    let firstVisibleIndex, lastVisibleIndex;
 
-    firstItemIndex = lastItemIndex = middleItemIndex;
+    let firstItemIndex = middleItemIndex - Math.floor((totalIndexes - 1) / 2);
+    let lastItemIndex = middleItemIndex + Math.ceil((totalIndexes - 1) / 2);
 
-    // Middle out algorithm. It should give us a range with a static number of indexes,
-    // the total offsets before and after that range, and the indexes within that range
-    // which are the boundaries of the visible indexes.
-    while (true) {
-      if (lastItemIndex < maxIndex) {
-        lastItemIndex++;
-        totalAfter -= values[lastItemIndex];
+    if (firstItemIndex < 0) {
+      firstItemIndex = 0;
+      lastItemIndex = totalIndexes - 1;
+    }
 
-        if (!lastVisibleIndex && total - totalAfter >= lastVisibleValue) {
-          lastVisibleIndex = lastItemIndex - 1;
-        }
+    if (lastItemIndex > maxIndex) {
+      lastItemIndex = maxIndex;
+      firstItemIndex = maxIndex - (totalIndexes - 1);
+    }
 
-        if (lastItemIndex - firstItemIndex === totalIndexes - 1) {
-          break;
-        }
+    for (let i = middleItemIndex - 1; i >= firstItemIndex; i--) {
+      totalBefore -= values[i];
+
+      if (!firstVisibleIndex && totalBefore <= firstVisibleValue) {
+        firstVisibleIndex = i;
       }
+    }
 
-      if (firstItemIndex > 0) {
-        firstItemIndex--;
-        totalBefore -= values[firstItemIndex];
+    for (let i = middleItemIndex; i <= lastItemIndex; i++) {
+      totalAfter -= values[i];
 
-        if (!firstVisibleIndex && totalBefore <= firstVisibleValue) {
-          firstVisibleIndex = firstItemIndex;
-        }
-
-        if (lastItemIndex - firstItemIndex === totalIndexes - 1) {
-          break;
-        }
+      if (!lastVisibleIndex && total - totalAfter >= lastVisibleValue) {
+        lastVisibleIndex = i - 1;
       }
     }
 
@@ -114,15 +110,20 @@ export default class GeometryManager {
   }
 
   remeasure(components, firstVisibleIndex) {
-    let scrollBefore = 0;
-    let scrollAfter = 0;
+    // If length is zero, return early
+    if (this.length === 0) {
+      return {
+        deltaBefore: 0,
+        deltaAfter: 0,
+        deltaScroll: 0
+      };
+    }
 
     const {
       measureStates,
       afterMargins,
       beforeMargins,
-      scalars,
-      skipList: { values }
+      scalars
     } = this;
 
     const firstIndex = components[0].index;
@@ -207,9 +208,9 @@ export default class GeometryManager {
         }
       }
 
-      measureStates[index] = measureState;
       measureStates[prevIndex] = prevMeasureState;
       measureStates[nextIndex] = nextMeasureState;
+      measureStates[index] = measureState;
     }
 
     let deltaScroll = 0;
