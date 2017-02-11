@@ -164,8 +164,15 @@ const VerticalCollection = Component.extend({
     }
 
     if (!this._nextMeasure) {
-      this._nextMeasure = this.schedule('affect', () => {
+      this._nextMeasure = this.schedule('measure', () => {
         this._nextMeasure = null;
+        this._measure();
+      });
+    }
+
+    if (!this._nextAdjustRender) {
+      this._nextAdjustRender = this.schedule('affect', () => {
+        this._nextAdjustRender = null;
         this._adjustRender();
       });
     }
@@ -179,16 +186,14 @@ const VerticalCollection = Component.extend({
   _updateVirtualComponents() {
     const {
       _items,
-      _scrollTop,
+      _visibleTop,
       _containerHeight,
       _prevFirstItemIndex,
-      _prevFirstVisibleIndex,
-      _prevLastVisibleIndex,
       _orderedComponents
     } = this;
 
-    const visibleTop = _scrollTop;
-    const visibleBottom = _scrollTop + _containerHeight;
+    const visibleTop = _visibleTop;
+    const visibleBottom = _visibleTop + _containerHeight;
 
     // Get the current bounds based on number of VCs and visible boundaries
     const {
@@ -226,22 +231,14 @@ const VerticalCollection = Component.extend({
       this.recycleVirtualComponent(_orderedComponents[i], _items[itemIndex], itemIndex);
     }
 
-    if (itemDelta !== 0) {
-      if (firstItemIndex === 0) {
-        this.sendActionOnce('firstReached');
-      }
-
-      if (lastItemIndex === _items.length - 1) {
-        this.sendActionOnce('lastReached');
-      }
-    }
-
     this._totalBefore = totalBefore;
     this._totalAfter = totalAfter;
 
-    this._prevFirstItemIndex = firstItemIndex;
-    this._prevFirstVisibleIndex = firstVisibleIndex;
-    this._prevLastVisibleIndex = lastVisibleIndex;
+    this._firstItemIndex = firstItemIndex;
+    this._lastItemIndex = lastItemIndex;
+
+    this._firstVisibleIndex = firstVisibleIndex;
+    this._lastVisibleIndex = lastVisibleIndex;
   },
 
   // VirtualComponent DOM is extracted by using a Range that begins at the first component to be
@@ -269,24 +266,82 @@ const VerticalCollection = Component.extend({
     }
   },
 
-  _adjustRender() {
-    const { _orderedComponents, _prevFirstVisibleIndex } = this;
+  _measure() {
+    const {
+      _visibleTop,
+      _containerHeight,
+      _orderedComponents,
+      _firstVisibleIndex
+    } = this;
 
     const {
       deltaBefore,
       deltaAfter,
       deltaScroll
-    } = this.geometryManager.remeasure(_orderedComponents, _prevFirstVisibleIndex);
+    } = this.geometryManager.remeasure(_orderedComponents, _firstVisibleIndex);
 
-    // Fix for Chrome bug, sometimes scrolltop get's screwy and needs to be reset
-    this._container.scrollTop = this._scrollTop + this._scrollTopOffset;
+    this._visibleTop += deltaScroll;
+    this._totalBefore += deltaBefore;
+    this._totalAfter += deltaAfter;
 
-    if (deltaScroll !== 0) {
-      this._container.scrollTop += deltaScroll;
+    // Get the current bounds based on number of VCs and visible boundaries
+    const {
+      firstVisibleIndex,
+      lastVisibleIndex
+    } = this.geometryManager.getBounds(
+      _orderedComponents.length,
+      _visibleTop,
+      _visibleTop + _containerHeight
+    );
+
+    this._firstVisibleIndex = firstVisibleIndex;
+    this._lastVisibleIndex = lastVisibleIndex
+
+  },
+
+  _adjustRender() {
+    const {
+      _items,
+
+      _totalBefore,
+      _totalAfter,
+      _firstItemIndex,
+      _lastItemIndex,
+      _firstVisibleIndex,
+      _lastVisibleIndex,
+
+      _prevFirstItemIndex,
+      _prevLastItemIndex,
+      _prevFirstVisibleIndex,
+      _prevLastVisibleIndex
+    } = this;
+
+    if (_firstItemIndex === 0 && _firstItemIndex !== _prevFirstItemIndex) {
+      this.sendActionOnce('firstReached');
     }
 
-    this._virtualComponentAttacher.style.paddingTop = `${this._totalBefore + deltaBefore}px`;
-    this._virtualComponentAttacher.style.paddingBottom = `${this._totalAfter + deltaAfter}px`;
+    if (_lastItemIndex === _items.length - 1 && _lastItemIndex !== _prevLastItemIndex) {
+      this.sendActionOnce('lastReached');
+    }
+
+    if (_firstVisibleIndex !== _prevFirstVisibleIndex) {
+      this.sendActionOnce('firstVisibleChanged', _items[_firstVisibleIndex], _firstVisibleIndex);
+    }
+
+    if (_lastVisibleIndex !== _prevLastVisibleIndex) {
+      this.sendActionOnce('lastVisibleChanged', _items[_lastVisibleIndex], _lastVisibleIndex);
+    }
+
+    // Fix for Chrome bug, sometimes scrolltop get's screwy and needs to be reset
+    this._resetScrollTop();
+
+    this._virtualComponentAttacher.style.paddingTop = `${_totalBefore}px`;
+    this._virtualComponentAttacher.style.paddingBottom = `${_totalAfter}px`;
+
+    this._prevFirstItemIndex = _firstItemIndex;
+    this._prevLastItemIndex = _lastItemIndex;
+    this._prevFirstVisibleIndex = _firstVisibleIndex;
+    this._prevLastVisibleIndex = _lastVisibleIndex;
   },
 
   recycleVirtualComponent(component, newContent, newIndex) {
@@ -383,10 +438,8 @@ const VerticalCollection = Component.extend({
       // added by the new items, and add to the prevFirstItemIndex to get an accurate itemDelta
       this.schedule('sync', () => {
         this._prevFirstItemIndex += lenDiff;
-        this._scrollTop += lenDiff * minHeight;
-        this._cachedTop = this._scrollTop + this._scrollTopOffset;
-        this._lastEarthquake = this._scrollTop + this._scrollTopOffset;
-        this._container.scrollTop = this._scrollTop + this._scrollTopOffset;
+        this._visibleTop += lenDiff * minHeight;
+        this._resetScrollTop();
       });
     } else if (this.keyList.canAppend(newItems)) {
       keyList.append(newItems);
@@ -411,7 +464,7 @@ const VerticalCollection = Component.extend({
 
     // The container element needs to have some height in order for us to set the scroll position
     // on initiliaziation, so we set this min-height property to the known minimum height
-    this.element.style.minHeight = `${this.geometryManager.skipList.total}px`;
+    // this.element.style.minHeight = `${this.geometryManager.skipList.total}px`;
 
     this._virtualComponentRenderer = this.element.getElementsByClassName('virtual-component-renderer')[0];
     this._virtualComponentAttacher = this.element.getElementsByClassName('virtual-component-attacher')[0];
@@ -427,10 +480,7 @@ const VerticalCollection = Component.extend({
     // a negative value
     if (containerSelector === 'body') {
       this._container = Container;
-      this._scrollTop = -this.element.getBoundingClientRect().top;
-      this._scrollTopOffset = this._container.scrollTop - this._scrollTop;
     } else {
-      this._scrollTopOffset = 0;
       this._container = containerSelector ? closestElement(containerSelector) : this.element.parentNode;
     }
 
@@ -442,10 +492,7 @@ const VerticalCollection = Component.extend({
     this._scheduleUpdate();
 
     this._scrollHandler = () => {
-      let top = this._container.scrollTop;
-      let dY = top - this._cachedTop;
-      this._scrollTop += dY;
-      this._cachedTop = top;
+      this._visibleTop = this._container.scrollTop - this._scrollTopOffset;
 
       if (this._isEarthquake()) {
         this._scheduleUpdate();
@@ -465,8 +512,8 @@ const VerticalCollection = Component.extend({
   },
 
   _isEarthquake() {
-    if (Math.abs(this._lastEarthquake - this._scrollTop) > this.get('_minHeight') / 2) {
-      this._lastEarthquake = this._scrollTop;
+    if (Math.abs(this._lastEarthquake - this._visibleTop) > this.get('_minHeight') / 2) {
+      this._lastEarthquake = this._visibleTop;
 
       return true;
     }
@@ -474,8 +521,20 @@ const VerticalCollection = Component.extend({
     return false;
   },
 
+  _resetScrollTop() {
+    this._lastEarthquake = this._visibleTop;
+    this._container.scrollTop = this._visibleTop + this._scrollTopOffset;
+  },
+
   _initializeScrollState() {
+    this._visibleTop = 0;
     this._lastEarthquake = 0;
+
+    // Generally, visibleTop === container.scrollTop. However, if the container is larger than the
+    // collection, this may not be the case (ex: Window is the container). In this case, we can say
+    // that the visibleTop === container.scrollTop + offset, where offset is some constant distance.
+    const containerOffset = this.element.getBoundingClientRect().top - this._container.getBoundingClientRect().top;
+    this._scrollTopOffset = this._container.scrollTop + containerOffset;
 
     const idForFirstItem = this.get('idForFirstItem');
     const indexForFirstItem = this.get('indexForFirstItem');
@@ -498,12 +557,12 @@ const VerticalCollection = Component.extend({
     // }
 
     if (index > 0) {
-      this._scrollTop = Math.min(index * minHeight, (maxIndex * minHeight) - this._containerHeight);
+      this._visibleTop = Math.min(index * minHeight, (maxIndex * minHeight) - this._containerHeight);
 
-      this._container.scrollTop = this._scrollTop;
+      this._resetScrollTop();
     }
 
-    this._cachedTop = this._container.scrollTop;
+    this._visibleTop -= this._scrollTopOffset;
   },
 
   willDestroy() {
