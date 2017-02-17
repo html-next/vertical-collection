@@ -95,7 +95,7 @@ export default class GeometryManager {
       totalAfter -= values[i];
 
       if (!lastVisibleIndex && total - totalAfter >= lastVisibleValue) {
-        lastVisibleIndex = i - 1;
+        lastVisibleIndex = i;
       }
     }
 
@@ -109,7 +109,7 @@ export default class GeometryManager {
     };
   }
 
-  remeasure(components, firstVisibleIndex) {
+  remeasure(components, staticVisibleIndex) {
     // If length is zero, return early
     if (this.length === 0) {
       return {
@@ -221,7 +221,7 @@ export default class GeometryManager {
       let index = affectedIndexes[i];
       let delta = this._recalculateHeight(index);
 
-      if (index >= firstIndex  && index < firstVisibleIndex && delta > 0) {
+      if (index >= firstIndex  && index < staticVisibleIndex && delta > 0) {
         deltaScroll += delta;
       } else if (index < firstIndex) {
         deltaBefore = delta;
@@ -240,7 +240,7 @@ export default class GeometryManager {
   _recalculateHeight(index) {
     const scalar = this.scalars[index];
     const marginBefore = this.beforeMargins[index];
-    const marginAfter = index === this.length - 1 ? 0 : this.afterMargins[index] - this.beforeMargins[index + 1];
+    const marginAfter = index === this.length - 1 ? this.afterMargins[index] : this.afterMargins[index] - this.beforeMargins[index + 1];
 
     const oldHeight = this.skipList.values[index];
     const newHeight = scalar + Math.max(marginBefore, 0) + Math.max(marginAfter, 0);

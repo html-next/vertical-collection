@@ -91,8 +91,6 @@ const VerticalCollection = Component.extend({
    */
   idForFirstItem: null,
 
-  indexForFirstItem: 0,
-
   /*
    * If set, if scrollPosition is empty
    * at initialization, the component will
@@ -271,14 +269,18 @@ const VerticalCollection = Component.extend({
       _visibleTop,
       _containerHeight,
       _orderedComponents,
-      _firstVisibleIndex
+      _firstVisibleIndex,
+      _lastVisibleIndex
     } = this;
+
+    const renderFromLast = this.get('renderFromLast');
+    const staticVisibleIndex = renderFromLast ? _lastVisibleIndex + 1 : _firstVisibleIndex;
 
     const {
       deltaBefore,
       deltaAfter,
       deltaScroll
-    } = this.geometryManager.remeasure(_orderedComponents, _firstVisibleIndex);
+    } = this.geometryManager.remeasure(_orderedComponents, staticVisibleIndex);
 
     this._visibleTop += deltaScroll;
     this._totalBefore += deltaBefore;
@@ -295,8 +297,7 @@ const VerticalCollection = Component.extend({
     );
 
     this._firstVisibleIndex = firstVisibleIndex;
-    this._lastVisibleIndex = lastVisibleIndex
-
+    this._lastVisibleIndex = lastVisibleIndex;
   },
 
   _adjustRender() {
@@ -536,13 +537,12 @@ const VerticalCollection = Component.extend({
     const containerOffset = this.element.getBoundingClientRect().top - this._container.getBoundingClientRect().top;
     this._scrollTopOffset = this._container.scrollTop + containerOffset;
 
-    const idForFirstItem = this.get('idForFirstItem');
-    const indexForFirstItem = this.get('indexForFirstItem');
-    const minHeight = this.get('_minHeight');
     const renderFromLast = this.get('renderFromLast');
+    const idForFirstItem = this.get('idForFirstItem');
+    const minHeight = this.get('_minHeight');
     const maxIndex = this._items.length;
 
-    let index = indexForFirstItem;
+    let index = 0;
 
     // if (idForFirstItem) {
     //   if (!this.keyIndexMap) {
