@@ -4,12 +4,12 @@ import layout from './template';
 
 import scheduler from '../../-private/scheduler';
 import Token from '../../-private/scheduler/token';
+import keyForItem from '../../-private/ember/utils/key-for-item';
 
 import estimateElementHeight from '../../-private/utils/element/estimate-element-height';
 import closestElement from '../../-private/utils/element/closest';
 
 import GeometryManager from '../../-private/data-view/geometry-manager';
-import LazyKeyList from '../../-private/data-view/lazy-key-list';
 import Container from '../../-private/data-view/container';
 import getArray from '../../-private/data-view/utils/get-array';
 import {
@@ -423,16 +423,48 @@ const VerticalCollection = Component.extend({
     }
   },
 
+  _isPrepend(oldItems, newItems) {
+    const lenDiff = newItems.length - oldItems.length;
+
+    if (lenDiff <= 0) {
+      return false;
+    }
+
+    const key = this.get('key');
+
+    const oldFirstKey = keyForItem(oldItems[0], key, 0);
+    const oldLastKey = keyForItem(oldItems[oldItems.length - 1], key, oldItems.length - 1);
+    const newFirstKey = keyForItem(newItems[lenDiff], key, lenDiff);
+    const newLastKey = keyForItem(newItems[newItems.length - 1], key, newItems.length - 1);
+
+    return oldFirstKey === newFirstKey && oldLastKey === newLastKey;
+  },
+
+  _isAppend(oldItems, newItems) {
+    const lenDiff = newItems.length - oldItems.length;
+
+    if (lenDiff <= 0) {
+      return false;
+    }
+
+    const key = this.get('key');
+
+    const oldFirstKey = keyForItem(oldItems[0], key, 0);
+    const oldLastKey = keyForItem(oldItems[oldItems.length - 1], key, oldItems.length - 1);
+    const newFirstKey = keyForItem(newItems[0], key, 0);
+    const newLastKey = keyForItem(newItems[newItems.length - lenDiff - 1], key, newItems.length - lenDiff - 1);
+
+    return oldFirstKey === newFirstKey && oldLastKey === newLastKey;
+  },
+
   didUpdateAttrs() {
-    const { geometryManager, keyList, _items } = this;
+    const { geometryManager, _items } = this;
     const newItems = getArray(this.get('items'));
     const minHeight = this.get('_minHeight');
-    const key = this.get('key');
 
     const lenDiff = newItems.length - _items.length;
 
-    if (keyList.canPrepend(newItems)) {
-      keyList.prepend(newItems);
+    if (this._isPrepend(_items, newItems)) {
       geometryManager.prepend(lenDiff);
 
       // When items are prepended we have to move the current scroll position downward by the amount
@@ -442,11 +474,9 @@ const VerticalCollection = Component.extend({
         this._visibleTop += lenDiff * minHeight;
         this._resetScrollTop();
       });
-    } else if (this.keyList.canAppend(newItems)) {
-      keyList.append(newItems);
+    } else if (this._isAppend(_items, newItems)) {
       geometryManager.append(lenDiff);
     } else {
-      this.keyList = new LazyKeyList(newItems, key);
       this.geometryManager = new GeometryManager(newItems.length, minHeight);
     }
 
@@ -459,7 +489,6 @@ const VerticalCollection = Component.extend({
     const key = this.get('key');
     const items = getArray(this.get('items'));
 
-    this.keyList = new LazyKeyList(items, key);
     this.geometryManager = new GeometryManager(items.length, this.get('_minHeight'));
     this._items = items;
 
@@ -539,30 +568,36 @@ const VerticalCollection = Component.extend({
 
     const renderFromLast = this.get('renderFromLast');
     const idForFirstItem = this.get('idForFirstItem');
+    const key = this.get('key');
+
     const minHeight = this.get('_minHeight');
-    const maxIndex = this._items.length;
+    const items = this._items;
+    const maxIndex = items.length;
 
-    let index = 0;
+    let index;
 
-    // if (idForFirstItem) {
-    //   if (!this.keyIndexMap) {
-    //     this._constructKeyIndexMap;
-    //   }
+    if (idForFirstItem) {
+      for (let i = 0; i < maxIndex; i++) {
+        if (keyForItem(items[i], key, i) === idForFirstItem) {
+          index = i;
+          break;
+        }
+      }
 
-    //   index = this.keyIndexMap[idForFirstItem];
-    // }
+      assert(`id not found: ${idForFirstItem}`, typeof index === 'number');
 
-    // if (renderFromLast) {
-    //   index = maxIndex;
-    // }
+      this._visibleTop = index * minHeight;
 
-    if (index > 0) {
-      this._visibleTop = Math.min(index * minHeight, (maxIndex * minHeight) - this._containerHeight);
+      if (renderFromLast) {
+        this._visibleTop -= this._containerHeight;
+      }
+    }
+
+    if (this._visibleTop > 0) {
+      this._visibleTop = Math.min(this._visibleTop, (maxIndex * minHeight) - this._containerHeight);
 
       this._resetScrollTop();
     }
-
-    this._visibleTop -= this._scrollTopOffset;
   },
 
   willDestroy() {
