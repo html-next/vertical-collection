@@ -486,7 +486,6 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
-    const key = this.get('key');
     const items = getArray(this.get('items'));
 
     this.geometryManager = new GeometryManager(items.length, this.get('_minHeight'));

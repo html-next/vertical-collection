@@ -68,8 +68,6 @@ export default class GeometryManager {
       index: middleItemIndex
     } = this.skipList.get(middleVisibleValue);
 
-    let firstVisibleIndex, lastVisibleIndex;
-
     let firstItemIndex = middleItemIndex - Math.floor((totalIndexes - 1) / 2);
     let lastItemIndex = middleItemIndex + Math.ceil((totalIndexes - 1) / 2);
 
@@ -83,10 +81,15 @@ export default class GeometryManager {
       firstItemIndex = maxIndex - (totalIndexes - 1);
     }
 
+    // There are cases where the middle item is the first visible item or the last visible item, so
+    // we need to check before we begin subtracting to get the before/after totals.
+    let firstVisibleIndex = totalBefore <= firstVisibleValue ? middleItemIndex : null;
+    let lastVisibleIndex = total - totalAfter >= lastVisibleValue ? middleItemIndex : null;
+
     for (let i = middleItemIndex - 1; i >= firstItemIndex; i--) {
       totalBefore -= values[i];
 
-      if (!firstVisibleIndex && totalBefore <= firstVisibleValue) {
+      if (firstVisibleIndex === null && totalBefore <= firstVisibleValue) {
         firstVisibleIndex = i;
       }
     }
@@ -94,7 +97,7 @@ export default class GeometryManager {
     for (let i = middleItemIndex; i <= lastItemIndex; i++) {
       totalAfter -= values[i];
 
-      if (!lastVisibleIndex && total - totalAfter >= lastVisibleValue) {
+      if (lastVisibleIndex === null && total - totalAfter >= lastVisibleValue) {
         lastVisibleIndex = i;
       }
     }
