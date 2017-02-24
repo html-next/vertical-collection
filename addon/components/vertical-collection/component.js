@@ -9,7 +9,7 @@ import keyForItem from '../../-private/ember/utils/key-for-item';
 import estimateElementHeight from '../../-private/utils/element/estimate-element-height';
 import closestElement from '../../-private/utils/element/closest';
 
-import GeometryManager from '../../-private/data-view/geometry-manager';
+import Radar from '../../-private/data-view/radar';
 import Container from '../../-private/data-view/container';
 import getArray from '../../-private/data-view/utils/get-array';
 import {
@@ -18,6 +18,8 @@ import {
 } from 'vertical-collection/-private/data-view/utils/scroll-handler';
 
 import VirtualComponent from '../../-private/virtual-component';
+import moveComponents from '../../-private/utils/virtual-component/move-components';
+
 import { assert, debugOnError } from 'vertical-collection/-debug/helpers';
 
 const {
@@ -161,13 +163,6 @@ const VerticalCollection = Component.extend({
       });
     }
 
-    if (!this._nextMeasure) {
-      this._nextMeasure = this.schedule('measure', () => {
-        this._nextMeasure = null;
-        this._measure();
-      });
-    }
-
     if (!this._nextAdjustRender) {
       this._nextAdjustRender = this.schedule('affect', () => {
         this._nextAdjustRender = null;
@@ -182,26 +177,19 @@ const VerticalCollection = Component.extend({
    * @private
    */
   _updateVirtualComponents() {
+    const items = this.get('items');
+
     const {
-      _items,
-      _visibleTop,
-      _containerHeight,
       _prevFirstItemIndex,
       _orderedComponents
     } = this;
 
-    const visibleTop = _visibleTop;
-    const visibleBottom = _visibleTop + _containerHeight;
-
-    // Get the current bounds based on number of VCs and visible boundaries
     const {
       firstItemIndex,
       lastItemIndex,
-      firstVisibleIndex,
-      lastVisibleIndex,
       totalBefore,
       totalAfter
-    } = this.geometryManager.getBounds(_orderedComponents.length, visibleTop, visibleBottom);
+    } = this.radar;
 
     // itemDelta is the number of items we've changed since last, render, could be greater than the
     // number of VCs. offsetAmount is the number of VCs we want to shift from front to back or back
@@ -213,148 +201,80 @@ const VerticalCollection = Component.extend({
       if (itemDelta < 0) {
         // Scrolling up
         let movedComponents = _orderedComponents.splice(-offsetAmount);
+
+        _orderedComponents[0].hasBeenMeasured = false;
         _orderedComponents.unshift(...movedComponents);
 
-        this._moveDOM(movedComponents[0], movedComponents[movedComponents.length - 1], true);
+        moveComponents(this.element, movedComponents[0], movedComponents[movedComponents.length - 1], true);
       } else if (itemDelta > 0) {
         // Scrolling down
         let movedComponents = _orderedComponents.splice(0, offsetAmount);
+
+        _orderedComponents[0].hasBeenMeasured = false;
         _orderedComponents.push(...movedComponents);
 
-        this._moveDOM(movedComponents[0], movedComponents[movedComponents.length - 1], false);
+        moveComponents(this.element, movedComponents[0], movedComponents[movedComponents.length - 1], false);
       }
     }
 
     for (let i = 0, itemIndex = firstItemIndex; itemIndex <= lastItemIndex; i++, itemIndex++) {
-      this.recycleVirtualComponent(_orderedComponents[i], _items[itemIndex], itemIndex);
+      _orderedComponents[i].hasBeenMeasured = false;
+      this.recycleVirtualComponent(_orderedComponents[i], items[itemIndex], itemIndex);
     }
 
-    this._totalBefore = totalBefore;
-    this._totalAfter = totalAfter;
-
-    this._firstItemIndex = firstItemIndex;
-    this._lastItemIndex = lastItemIndex;
-
-    this._firstVisibleIndex = firstVisibleIndex;
-    this._lastVisibleIndex = lastVisibleIndex;
-  },
-
-  // VirtualComponent DOM is extracted by using a Range that begins at the first component to be
-  // moved and ends at the last. Glimmer's bindings allow us to extract the contents and move them,
-  // even before they are rendered.
-  _moveDOM(firstComponent, lastComponent, prepend) {
-    const rangeToMove = new Range();
-
-    rangeToMove.setStart(firstComponent._upperBound, 0);
-    rangeToMove.setEnd(lastComponent._lowerBound, 0);
-
-    const docFragment = rangeToMove.extractContents();
-
-    // The first and last nodes in the range do not get extracted, and are instead cloned, so they
-    // have to be reset.
-    //
-    // NOTE: Ember 1.11 - there are cases where docFragment is null (they haven't been rendered yet.)
-    firstComponent._upperBound = docFragment.firstChild || firstComponent._upperBound;
-    lastComponent._lowerBound = docFragment.lastChild || lastComponent._lowerBound;
-
-    if (prepend) {
-      this._virtualComponentAttacher.prepend(docFragment);
-    } else {
-      this._virtualComponentAttacher.appendChild(docFragment);
-    }
-  },
-
-  _measure() {
-    const {
-      _visibleTop,
-      _containerHeight,
-      _orderedComponents,
-      _firstVisibleIndex,
-      _lastVisibleIndex
-    } = this;
-
-    const renderFromLast = this.get('renderFromLast');
-    const staticVisibleIndex = renderFromLast ? _lastVisibleIndex + 1 : _firstVisibleIndex;
-
-    const {
-      deltaBefore,
-      deltaAfter,
-      deltaScroll
-    } = this.geometryManager.remeasure(_orderedComponents, staticVisibleIndex);
-
-    this._visibleTop += deltaScroll;
-    this._totalBefore += deltaBefore;
-    this._totalAfter += deltaAfter;
-
-    // Get the current bounds based on number of VCs and visible boundaries
-    const {
-      firstVisibleIndex,
-      lastVisibleIndex
-    } = this.geometryManager.getBounds(
-      _orderedComponents.length,
-      _visibleTop,
-      _visibleTop + _containerHeight
-    );
-
-    this._firstVisibleIndex = firstVisibleIndex;
-    this._lastVisibleIndex = lastVisibleIndex;
+    this.element.style.paddingTop = `${totalBefore}px`;
+    this.element.style.paddingBottom = `${totalAfter}px`;
   },
 
   _adjustRender() {
+    const items = this.get('items');
+
     const {
-      _items,
-
-      _totalBefore,
-      _totalAfter,
-      _firstItemIndex,
-      _lastItemIndex,
-      _firstVisibleIndex,
-      _lastVisibleIndex,
-
       _prevFirstItemIndex,
       _prevLastItemIndex,
       _prevFirstVisibleIndex,
       _prevLastVisibleIndex
     } = this;
 
-    if (_firstItemIndex === 0 && _firstItemIndex !== _prevFirstItemIndex) {
+    const {
+      firstItemIndex,
+      lastItemIndex,
+      firstVisibleIndex,
+      lastVisibleIndex
+    } = this.radar;
+
+    if (firstItemIndex === 0 && firstItemIndex !== _prevFirstItemIndex) {
       this.sendActionOnce('firstReached');
     }
 
-    if (_lastItemIndex === _items.length - 1 && _lastItemIndex !== _prevLastItemIndex) {
+    if (lastItemIndex === items.length - 1 && lastItemIndex !== _prevLastItemIndex) {
       this.sendActionOnce('lastReached');
     }
 
-    if (_firstVisibleIndex !== _prevFirstVisibleIndex) {
-      this.sendActionOnce('firstVisibleChanged', _items[_firstVisibleIndex], _firstVisibleIndex);
+    if (firstVisibleIndex !== _prevFirstVisibleIndex) {
+      this.sendActionOnce('firstVisibleChanged', items[firstVisibleIndex], firstVisibleIndex);
     }
 
-    if (_lastVisibleIndex !== _prevLastVisibleIndex) {
-      this.sendActionOnce('lastVisibleChanged', _items[_lastVisibleIndex], _lastVisibleIndex);
+    if (lastVisibleIndex !== _prevLastVisibleIndex) {
+      this.sendActionOnce('lastVisibleChanged', items[lastVisibleIndex], lastVisibleIndex);
     }
 
     // Fix for Chrome bug, sometimes scrolltop get's screwy and needs to be reset
-    this._resetScrollTop();
+    //this._resetScrollTop();
 
-    this._virtualComponentAttacher.style.paddingTop = `${_totalBefore}px`;
-    this._virtualComponentAttacher.style.paddingBottom = `${_totalAfter}px`;
-
-    this._prevFirstItemIndex = _firstItemIndex;
-    this._prevLastItemIndex = _lastItemIndex;
-    this._prevFirstVisibleIndex = _firstVisibleIndex;
-    this._prevLastVisibleIndex = _lastVisibleIndex;
+    this._prevFirstItemIndex = firstItemIndex;
+    this._prevLastItemIndex = lastItemIndex;
+    this._prevFirstVisibleIndex = firstVisibleIndex;
+    this._prevLastVisibleIndex = lastVisibleIndex;
   },
 
   recycleVirtualComponent(component, newContent, newIndex) {
     debugOnError(`You cannot set an item's content to undefined`, newContent);
     debugOnError(`You cannot recycle components other than a VirtualComponent`, component instanceof VirtualComponent);
 
-    component.clientRect = null;
     set(component, 'index', newIndex);
-
-    if (component.content !== newContent) {
-      set(component, 'content', newContent);
-    }
+    set(component, 'content', newContent);
+    set(component, 'rect', null);
   },
 
   /*
@@ -404,7 +324,7 @@ const VerticalCollection = Component.extend({
         _virtualComponents.pushObject(component);
       }
     } else {
-      for (i = 0; i > delta; i--) {
+      for (i = _virtualComponents.length; i > delta; i--) {
         _virtualComponents[i].destroy;
       }
     }
@@ -416,87 +336,89 @@ const VerticalCollection = Component.extend({
       _orderedComponents[i] = _virtualComponents[i];
     }
 
-    if (totalComponents > 0) {
+    if (delta > 0) {
       this.schedule('sync', () => {
-        this._moveDOM(_orderedComponents[0], _orderedComponents[_orderedComponents.length - 1]);
+        moveComponents(
+          this.element,
+          _orderedComponents[_orderedComponents.length - delta],
+          _orderedComponents[_orderedComponents.length - 1]
+        );
       });
     }
   },
 
-  _isPrepend(oldItems, newItems) {
-    const lenDiff = newItems.length - oldItems.length;
-
+  _isPrepend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
     if (lenDiff <= 0) {
       return false;
     }
 
-    const key = this.get('key');
-
-    const oldFirstKey = keyForItem(oldItems[0], key, 0);
-    const oldLastKey = keyForItem(oldItems[oldItems.length - 1], key, oldItems.length - 1);
     const newFirstKey = keyForItem(newItems[lenDiff], key, lenDiff);
     const newLastKey = keyForItem(newItems[newItems.length - 1], key, newItems.length - 1);
 
     return oldFirstKey === newFirstKey && oldLastKey === newLastKey;
   },
 
-  _isAppend(oldItems, newItems) {
-    const lenDiff = newItems.length - oldItems.length;
-
+  _isAppend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
     if (lenDiff <= 0) {
       return false;
     }
 
-    const key = this.get('key');
-
-    const oldFirstKey = keyForItem(oldItems[0], key, 0);
-    const oldLastKey = keyForItem(oldItems[oldItems.length - 1], key, oldItems.length - 1);
     const newFirstKey = keyForItem(newItems[0], key, 0);
     const newLastKey = keyForItem(newItems[newItems.length - lenDiff - 1], key, newItems.length - lenDiff - 1);
 
     return oldFirstKey === newFirstKey && oldLastKey === newLastKey;
   },
 
-  didUpdateAttrs() {
-    const { geometryManager, _items } = this;
-    const newItems = getArray(this.get('items'));
+  _updateRadar() {
+    const {
+      radar,
+      oldLength,
+      oldFirstKey,
+      oldLastKey
+    } = this;
+
+    const items = getArray(this.get('items'));
     const minHeight = this.get('_minHeight');
+    const key = this.get('key');
 
-    const lenDiff = newItems.length - _items.length;
+    const lenDiff = items.length - oldLength;
 
-    if (this._isPrepend(_items, newItems)) {
-      geometryManager.prepend(lenDiff);
+    if (this._isPrepend(lenDiff, items, key, oldFirstKey, oldLastKey)) {
+      radar.prepend(lenDiff);
 
       // When items are prepended we have to move the current scroll position downward by the amount
       // added by the new items, and add to the prevFirstItemIndex to get an accurate itemDelta
       this.schedule('sync', () => {
         this._prevFirstItemIndex += lenDiff;
-        this._visibleTop += lenDiff * minHeight;
+        radar.visibleTop += lenDiff * minHeight;
         this._resetScrollTop();
       });
-    } else if (this._isAppend(_items, newItems)) {
-      geometryManager.append(lenDiff);
+    } else if (this._isAppend(lenDiff, items, key, oldFirstKey, oldLastKey)) {
+      radar.append(lenDiff);
     } else {
-      this.geometryManager = new GeometryManager(newItems.length, minHeight);
+      this.radar = new Radar(this._container, this.element, this._orderedComponents, items.length, minHeight, this.token);
     }
 
-    this._items = newItems;
-    this._scheduleUpdate();
-  },
-
-  // –––––––––––––– Setup/Teardown
-  didInsertElement() {
-    const items = getArray(this.get('items'));
-
-    this.geometryManager = new GeometryManager(items.length, this.get('_minHeight'));
     this._items = items;
+    this.oldLength = items.length;
+    this.oldFirstKey = keyForItem(items[0], key, 0);
+    this.oldLastKey = keyForItem(items[items.length - 1], key, items.length - 1);
+
 
     // The container element needs to have some height in order for us to set the scroll position
     // on initiliaziation, so we set this min-height property to the known minimum height
-    // this.element.style.minHeight = `${this.geometryManager.skipList.total}px`;
+    this.element.style.minHeight = `${this.radar.skipList.total}px`;
 
+    this._scheduleUpdate();
+  },
+
+  watchItems: Ember.observer('items.length', function() {
+    this._updateRadar();
+  }),
+
+  // –––––––––––––– Setup/Teardown
+  didInsertElement() {
     this._virtualComponentRenderer = this.element.getElementsByClassName('virtual-component-renderer')[0];
-    this._virtualComponentAttacher = this.element.getElementsByClassName('virtual-component-attacher')[0];
 
     // The rendered {{each}} is removed from the DOM, but a reference is kept, allowing Glimmer to
     // continue rendering to the node. This enables the manual diffing strategy described above.
@@ -504,9 +426,6 @@ const VerticalCollection = Component.extend({
 
     const containerSelector = this.get('containerSelector');
 
-    // standard _scrollTop doesn't allow for negative values. In the case where the scroll container
-    // is the window, anytime the viewport is above the collection we would like to capture that as
-    // a negative value
     if (containerSelector === 'body') {
       this._container = Container;
     } else {
@@ -516,14 +435,13 @@ const VerticalCollection = Component.extend({
     this._containerHeight = this._container.offsetHeight;
 
     // Initialize the component pool, set the scroll state, and schedule the first update
+    this._updateRadar();
     this._updateVirtualComponentPool();
     this._initializeScrollState();
-    this._scheduleUpdate();
 
     this._scrollHandler = () => {
-      this._visibleTop = this._container.scrollTop - this._scrollTopOffset;
-
       if (this._isEarthquake()) {
+        this.radar.scrollTop = this._container.scrollTop;
         this._scheduleUpdate();
       }
     };
@@ -541,8 +459,8 @@ const VerticalCollection = Component.extend({
   },
 
   _isEarthquake() {
-    if (Math.abs(this._lastEarthquake - this._visibleTop) > this.get('_minHeight') / 2) {
-      this._lastEarthquake = this._visibleTop;
+    if (Math.abs(this._lastEarthquake - this._container.scrollTop) > this.get('_minHeight') / 2) {
+      this._lastEarthquake = this._container.scrollTop;
 
       return true;
     }
@@ -551,26 +469,19 @@ const VerticalCollection = Component.extend({
   },
 
   _resetScrollTop() {
-    this._lastEarthquake = this._visibleTop;
-    this._container.scrollTop = this._visibleTop + this._scrollTopOffset;
+    this._lastEarthquake = this.radar.scrollTop;
+    this._container.scrollTop = this.radar.scrollTop;
   },
 
   _initializeScrollState() {
-    this._visibleTop = 0;
-    this._lastEarthquake = 0;
-
-    // Generally, visibleTop === container.scrollTop. However, if the container is larger than the
-    // collection, this may not be the case (ex: Window is the container). In this case, we can say
-    // that the visibleTop === container.scrollTop + offset, where offset is some constant distance.
-    const containerOffset = this.element.getBoundingClientRect().top - this._container.getBoundingClientRect().top;
-    this._scrollTopOffset = this._container.scrollTop + containerOffset;
+    let visibleTop = this.get('scrollPosition');
 
     const renderFromLast = this.get('renderFromLast');
     const idForFirstItem = this.get('idForFirstItem');
     const key = this.get('key');
 
     const minHeight = this.get('_minHeight');
-    const items = this._items;
+    const items = this.get('items');
     const maxIndex = items.length;
 
     let index;
@@ -585,16 +496,16 @@ const VerticalCollection = Component.extend({
 
       assert(`id not found: ${idForFirstItem}`, typeof index === 'number');
 
-      this._visibleTop = index * minHeight;
+      visibleTop = index * minHeight;
 
       if (renderFromLast) {
-        this._visibleTop -= this._containerHeight;
+        visibleTop -= this._containerHeight;
       }
     }
 
-    if (this._visibleTop > 0) {
-      this._visibleTop = Math.min(this._visibleTop, (maxIndex * minHeight) - this._containerHeight);
+    this.radar.visibleTop = Math.min(visibleTop, (maxIndex * minHeight) - this._containerHeight);
 
+    if (visibleTop > 0) {
       this._resetScrollTop();
     }
   },

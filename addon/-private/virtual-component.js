@@ -36,17 +36,16 @@ export default class VirtualComponent {
   }
 
   getBoundingClientRect() {
-    if (this.clientRect === null) {
+    if (!this.rect) {
       this.range.setStart(this._upperBound, 0);
       this.range.setEnd(this._lowerBound, 0);
 
-      console.count('layout-invalidation');
-      this.clientRect = this.range.getBoundingClientRect();
+      this.rect = this.range.getBoundingClientRect();
 
       this.range.detach();
     }
 
-    return this.clientRect;
+    return this.rect;
   }
 
   static create(parentToken) {

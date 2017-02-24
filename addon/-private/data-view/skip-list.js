@@ -25,7 +25,18 @@ import { assert, debugOnError } from 'vertical-collection/-debug/helpers';
  */
 
 export default class SkipList {
-  constructor(values, defaultValue) {
+  constructor(length, defaultValue) {
+    const values = new Uint16Array(new ArrayBuffer(length * 2));
+
+    values.fill(defaultValue);
+
+    this.length = length;
+    this.defaultValue = defaultValue;
+
+    this._initializeLayers(values, defaultValue);
+  }
+
+  _initializeLayers(values, defaultValue) {
     const layers = [values];
     let i, length, buffer, layer, prevLayer, left, right;
 
@@ -70,7 +81,7 @@ export default class SkipList {
     this.values = values;
   }
 
-  get(targetValue) {
+  find(targetValue) {
     const { layers, total } = this;
     const numLayers = layers.length;
 
@@ -116,7 +127,7 @@ export default class SkipList {
     const delta = value - oldValue;
 
     if (delta === 0) {
-      return;
+      return delta;
     }
 
     let i, layer;
@@ -130,5 +141,43 @@ export default class SkipList {
     }
 
     this.total += delta;
+
+    return delta;
+  }
+
+  prepend(numPrepended) {
+    const {
+      values: oldValues,
+      length: oldLength,
+      defaultValue
+    } = this;
+
+    const newLength = numPrepended + oldLength;
+
+    const newValues = new Uint16Array(new ArrayBuffer(newLength * 2));
+
+    newValues.set(oldValues, numPrepended);
+    newValues.fill(defaultValue, 0, numPrepended);
+
+    this.length = newLength;
+    this._initializeLayers(newValues);
+  }
+
+  append(numAppended) {
+    const {
+      values: oldValues,
+      length: oldLength,
+      defaultValue
+    } = this;
+
+    const newLength = numAppended + oldLength;
+
+    const newValues = new Uint16Array(new ArrayBuffer(newLength * 2));
+
+    newValues.set(oldValues);
+    newValues.fill(defaultValue, oldLength);
+
+    this.length = newLength;
+    this._initializeLayers(newValues);
   }
 }
