@@ -1,5 +1,5 @@
-import scheduler from '../../scheduler';
-import Token from '../../scheduler/token';
+import scheduler from 'vertical-collection/-private/scheduler';
+import Token from 'vertical-collection/-private/scheduler/token';
 
 import { assert } from 'vertical-collection/-debug/helpers';
 
@@ -14,11 +14,13 @@ export default class Radar {
       top: itemContainerTop
     } = itemContainer.getBoundingClientRect();
 
-
     this.scrollContainer = scrollContainer;
     this.scrollContainerTop = scrollContainerTop;
     this.scrollContainerHeight = scrollContainerHeight;
+
+    this.itemContainer = itemContainer;
     this.itemContainerTop = itemContainerTop;
+
     this.itemElements = itemElements;
     this.totalItems = totalItems;
     this.minValue = minValue;
@@ -68,6 +70,11 @@ export default class Radar {
 
   get visibleBottom() {
     return this.visibleTop + this.scrollContainerHeight;
+  }
+
+  shiftContainers(dY) {
+    this.scrollContainerTop -= dY;
+    this.itemContainerTop -= dY;
   }
 
   prepend(numPrepended) {

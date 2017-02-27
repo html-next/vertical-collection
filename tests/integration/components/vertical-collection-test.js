@@ -53,7 +53,6 @@ test('The Collection Renders when content is empty', function(assert) {
   });
 });
 
-
 test('Scroll to last item when actual item sizes are significantly larger than default item size.', function(assert) {
   assert.expect(1);
 

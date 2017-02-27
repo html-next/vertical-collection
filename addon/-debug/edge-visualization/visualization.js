@@ -1,5 +1,4 @@
 /* global document */
-import Geography from '../../-private/data-view/geography';
 import Container from '../../-private/data-view/container';
 
 const SYS_WIDTH = 250;
@@ -7,9 +6,8 @@ const SYS_WIDTH = 250;
 export default class Visualization {
   constructor(component) {
     this.component = component;
-    this.minimumMovement = Math.floor(component.defaultHeight / 2);
-    this.radar = component._tracker.radar;
-    this._trackedItems = component._tracker;
+    this.minimumMovement = Math.floor(component.get('_minHeight') / 2);
+    this.radar = component._radar;
     this.satellites = [];
     this.cache = [];
   }
@@ -73,7 +71,7 @@ export default class Visualization {
 
   applySatelliteMirrorStyles(element, componentElement, compare) {
     const adj = this.currentOffsetAdjustment();
-    const geography = componentElement ? new Geography(componentElement) : compare;
+    const geography = componentElement ? componentElement.getBoundingClientRect() : compare;
     const left = 2 * SYS_WIDTH;
     let errorLevel = false;
 
@@ -103,31 +101,29 @@ export default class Visualization {
 
   styleViewport() {
     const {
-      edges,
-      planet,
-      skyline
-      } = this.radar;
-    this.container.style.height = `${planet.height}px`;
+      itemContainer,
+      scrollContainer
+    } = this.radar;
+    this.container.style.height = `${scrollContainer.getBoundingClientRect().height}px`;
 
-    Visualization.applyVerticalStyles(this.telescope, planet);
-    Visualization.applyVerticalStyles(this.sky, skyline);
+    Visualization.applyVerticalStyles(this.telescope, scrollContainer.getBoundingClientRect());
+    Visualization.applyVerticalStyles(this.sky, itemContainer.getBoundingClientRect());
 
-    Visualization.applyVerticalStyles(this.screen, new Geography(Container));
+    Visualization.applyVerticalStyles(this.screen, Container.getBoundingClientRect());
 
-    Visualization.applyVerticalStyles(this.visAbove, {
-      top: edges.bufferedTop,
-      height: edges.visibleTop - edges.visibleTop
-    });
+    // Visualization.applyVerticalStyles(this.visAbove, {
+    //   top: edges.bufferedTop,
+    //   height: edges.visibleTop - edges.visibleTop
+    // });
 
-    Visualization.applyVerticalStyles(this.visBelow, {
-      top: edges.visibleBottom,
-      height: edges.bufferedBottom - edges.visibleBottom
-    });
+    // Visualization.applyVerticalStyles(this.visBelow, {
+    //   top: edges.visibleBottom,
+    //   height: edges.bufferedBottom - edges.visibleBottom
+    // });
   }
 
   makeSatellite() {
-    let satellite;
-    let mirror;
+    let satellite, mirror;
 
     if (this.cache.length) {
       satellite = this.cache.pop();
@@ -144,19 +140,22 @@ export default class Visualization {
       satellite.mirrorSatellite = mirror;
     }
     this.satellites.push(satellite);
-    this.container.insertBefore(satellite, this.container.firstElementChild);
-    this.container.insertBefore(mirror, this.container.firstElementChild);
+    this.sky.append(satellite);
+    // this.container.insertBefore(mirror, this.container.firstElementChild);
   }
 
   makeSatellites() {
     const {
-      ordered
-    } = this._trackedItems;
-    const { length } = ordered;
+      totalItems,
+      itemElements: { length }
+    } = this.radar;
     const { satellites } = this;
-    const isShrinking = satellites.length > length;
 
-    while (satellites.length !== length) {
+    const lengthWithBuffer = Math.min(length + 20, totalItems);
+
+    const isShrinking = satellites.length > lengthWithBuffer;
+
+    while (satellites.length !== lengthWithBuffer) {
       if (isShrinking) {
         const satellite = satellites.pop();
 
@@ -172,20 +171,52 @@ export default class Visualization {
 
   styleSatellites() {
     const { satellites: sats } = this;
-    const { ordered: satellites } = this._trackedItems;
+    let {
+      firstItemIndex,
+      lastItemIndex,
+      totalItems,
+      totalBefore,
+      totalAfter,
+      skipList: { values }
+    } = this.radar;
 
-    satellites.forEach((sat, index) => {
-      const element = sats[index];
+    const totalVisualizedItems = sats.length;
+    let firstVisualizedIndex = firstItemIndex - 10;
+    let lastVisualizedIndex = lastItemIndex + 10;
 
-      this.applySatelliteStyles(element, sat.geography);
-      element.setAttribute('viewState', sat.geography.element? 'visible' : 'culled');
-      element.mirrorSatellite.setAttribute('viewState', sat.geography.element ? 'visible' : 'culled');
-      element.setAttribute('index', String(index));
-      element.mirrorSatellite.setAttribute('index', String(index));
-      element.innerText = String(index);
-      this.applySatelliteMirrorStyles(element.mirrorSatellite, sat.geography.element, sat.geography);
-      element.mirrorSatellite.innerText = String(index);
-    });
+    if (firstVisualizedIndex < 0) {
+      firstVisualizedIndex = 0;
+      lastVisualizedIndex = totalVisualizedItems - 1;
+    }
+
+    if (lastVisualizedIndex > totalItems - 1) {
+      lastVisualizedIndex = totalItems - 1;
+      firstVisualizedIndex = totalItems - totalVisualizedItems;
+    }
+
+    for (let itemIndex = firstVisualizedIndex, i = 0; itemIndex <= lastVisualizedIndex; itemIndex++, i++) {
+      const element = sats[i];
+
+      element.style.height = `${values[itemIndex]}px`;
+      element.setAttribute('index', String(itemIndex));
+      element.innerText = String(itemIndex);
+
+      if (itemIndex < firstItemIndex) {
+        element.setAttribute('viewState', 'culled');
+        totalBefore -= values[itemIndex];
+      } else if (itemIndex > lastItemIndex) {
+        element.setAttribute('viewState', 'culled');
+        totalAfter -= values[itemIndex];
+      } else {
+        // this.applySatelliteMirrorStyles(element.mirrorSatellite, elements);
+        // element.mirrorSatellite.setAttribute('index', String(itemIndex));
+        // element.mirrorSatellite.innerText = String(itemIndex);
+        element.setAttribute('viewState', 'visible');
+      }
+    }
+
+    this.sky.style.paddingTop = `${totalBefore}px`;
+    this.sky.style.paddingBottom = `${totalAfter}px`;
   }
 
   render() {

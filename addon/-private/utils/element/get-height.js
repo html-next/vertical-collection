@@ -3,9 +3,9 @@ export default function getHeight(dims, withMargins) {
 
   switch (dims.boxSizing) {
     case 'border-box':
-      height = dims.height +
-      dims.borderTopWidth + dims.borderBottomWidth +
-      dims.paddingTop + dims.paddingBottom;
+      height = dims.height
+      + dims.borderTopWidth + dims.borderBottomWidth
+      + dims.paddingTop + dims.paddingBottom;
       break;
     case 'content-box':
       height = dims.height;

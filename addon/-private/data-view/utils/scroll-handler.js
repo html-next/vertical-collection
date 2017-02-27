@@ -16,8 +16,7 @@ export class ScrollHandler {
 
   addScrollHandler(element, handler) {
     let index = this.elements.indexOf(element);
-    let handlers;
-    let cache;
+    let handlers, cache;
 
     if (index === -1) {
       index = this.length++;
@@ -32,12 +31,17 @@ export class ScrollHandler {
 
       this.elements[index] = element;
       cache = this.handlers[index] = {
-        top: UNDEFINED_VALUE,
-        left: UNDEFINED_VALUE,
+        top: element.scrollTop,
+        left: element.scrollLeft,
         handlers
       };
-      cache.passiveHandler = SUPPORTS_PASSIVE ? function() { ScrollHandler.triggerElementHandlers(element, cache); }
-        : UNDEFINED_VALUE
+      if (SUPPORTS_PASSIVE) {
+        cache.passiveHandler = function() {
+          ScrollHandler.triggerElementHandlers(element, cache);
+        };
+      } else {
+        cache.passiveHandler = UNDEFINED_VALUE;
+      }
     } else {
       cache = this.handlers[index];
       handlers = cache.handlers;
@@ -78,7 +82,7 @@ export class ScrollHandler {
         }
 
         if (this.isUsingPassive) {
-          element.removeEventListener('scroll', elementCache.passiveHandler, {capture: true, passive: true});
+          element.removeEventListener('scroll', elementCache.passiveHandler, { capture: true, passive: true });
         }
       }
 
@@ -90,8 +94,8 @@ export class ScrollHandler {
   static triggerElementHandlers(element, meta) {
     let cachedTop = element.scrollTop;
     let cachedLeft = element.scrollLeft;
-    let topChanged = cachedTop !== meta.top && meta.top !== UNDEFINED_VALUE;
-    let leftChanged = cachedLeft !== meta.left && meta.left !== UNDEFINED_VALUE;
+    let topChanged = cachedTop !== meta.top;
+    let leftChanged = cachedLeft !== meta.left;
 
     meta.top = cachedTop;
     meta.left = cachedLeft;

@@ -92,7 +92,6 @@ export default class DynamicRadar extends Radar {
 
         const itemDelta = skipList.set(itemIndex, currentItemHeight + margin);
 
-
         if (itemIndex < staticVisibleIndex && itemDelta !== 0) {
           this._scrollTop += itemDelta;
           this.itemContainerTop -= itemDelta;

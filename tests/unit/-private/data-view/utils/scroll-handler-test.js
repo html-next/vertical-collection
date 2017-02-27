@@ -1,8 +1,8 @@
 import { module, test } from 'qunit';
 import {
   ScrollHandler
-} from 'smoke-and-mirrors/-private/radar/utils/scroll-handler';
-import scheduler from 'smoke-and-mirrors/-private/scheduler';
+} from 'vertical-collection/-private/data-view/utils/scroll-handler';
+import scheduler from 'vertical-collection/-private/scheduler';
 
 const dom = document;
 
@@ -35,12 +35,15 @@ test('We can add, trigger, and remove a scroll handler', (assert) => {
   let scrollHandlers = new ScrollHandler();
   let done = assert.async(2);
   let scrollable = createScrollable();
-  let handler = () => { assert.ok('handler was triggered'); done(); };
+  let handler = () => {
+    assert.ok('handler was triggered');
+    done();
+  };
 
   assert.equal(scrollHandlers.length, 0, `We initially have no elements to watch.`);
 
   // test adding a single handler
-  scrollHandlers.addElementHandler(scrollable, handler);
+  scrollHandlers.addScrollHandler(scrollable, handler);
 
   assert.equal(scrollHandlers.length, 1, `We have one element to watch.`);
 
@@ -58,7 +61,7 @@ test('We can add, trigger, and remove a scroll handler', (assert) => {
 
     afterNextScrollUpdate(() => {
       // test removing that handler
-      scrollHandlers.removeElementHandler(scrollable, handler);
+      scrollHandlers.removeScrollHandler(scrollable, handler);
       let newScrollableIndex = scrollHandlers.elements.indexOf(scrollable);
 
       assert.ok(cache.handlers.length === 0, `The handler was removed from the listener cache.`);
@@ -78,13 +81,19 @@ test('Adding/removing multiple handlers to an element works as expected', (asser
   let scrollHandlers = new ScrollHandler();
   let done = assert.async(3);
   let scrollable = createScrollable();
-  let handler1 = () => { assert.ok('handler1 was triggered'); done(); };
-  let handler2 = () => { assert.ok('handler2 was triggered'); done(); };
+  let handler1 = () => {
+    assert.ok('handler1 was triggered');
+    done();
+  };
+  let handler2 = () => {
+    assert.ok('handler2 was triggered');
+    done();
+  };
 
   // test adding the handlers
   assert.equal(scrollHandlers.length, 0, `We initially have no elements to watch.`);
-  scrollHandlers.addElementHandler(scrollable, handler1);
-  scrollHandlers.addElementHandler(scrollable, handler2);
+  scrollHandlers.addScrollHandler(scrollable, handler1);
+  scrollHandlers.addScrollHandler(scrollable, handler2);
 
   assert.equal(scrollHandlers.length, 1, `We have one element to watch.`);
 
@@ -102,7 +111,7 @@ test('Adding/removing multiple handlers to an element works as expected', (asser
 
     afterNextScrollUpdate(() => {
       // test removing that handler
-      scrollHandlers.removeElementHandler(scrollable, handler1);
+      scrollHandlers.removeScrollHandler(scrollable, handler1);
       let newScrollableIndex = scrollHandlers.elements.indexOf(scrollable);
 
       assert.ok(cache.handlers.length === 1, `The handler was removed from the listener cache.`);
@@ -110,7 +119,7 @@ test('Adding/removing multiple handlers to an element works as expected', (asser
       assert.ok(scrollHandlers.handlers.indexOf(cache) !== -1, `When an element has other handlers, ths cache is not removed.`);
       assert.equal(scrollHandlers.length, 1, `We have one element to watch.`);
 
-      scrollHandlers.removeElementHandler(scrollable, handler2);
+      scrollHandlers.removeScrollHandler(scrollable, handler2);
       newScrollableIndex = scrollHandlers.elements.indexOf(scrollable);
       assert.ok(cache.handlers.length === 0, `The handler was removed from the listener cache.`);
       assert.ok(newScrollableIndex === -1, `Removing the last handler removed the element from the watched elements list.`);
@@ -130,13 +139,19 @@ test('Multiple elements with handlers works as expected', (assert) => {
   let done = assert.async(3);
   let scrollable1 = createScrollable();
   let scrollable2 = createScrollable();
-  let handler1 = () => { assert.ok('handler1 was triggered'); done(); };
-  let handler2 = () => { assert.ok('handler2 was triggered'); done(); };
+  let handler1 = () => {
+    assert.ok('handler1 was triggered');
+    done();
+  };
+  let handler2 = () => {
+    assert.ok('handler2 was triggered');
+    done();
+  };
 
   // test adding the handlers
   assert.equal(scrollHandlers.length, 0, `We initially have no elements to watch.`);
-  scrollHandlers.addElementHandler(scrollable1, handler1);
-  scrollHandlers.addElementHandler(scrollable2, handler2);
+  scrollHandlers.addScrollHandler(scrollable1, handler1);
+  scrollHandlers.addScrollHandler(scrollable2, handler2);
 
   assert.equal(scrollHandlers.length, 2, `We have two elements to watch.`);
 
@@ -163,7 +178,7 @@ test('Multiple elements with handlers works as expected', (assert) => {
 
     afterNextScrollUpdate(() => {
       // test removing that handler
-      scrollHandlers.removeElementHandler(scrollable1, handler1);
+      scrollHandlers.removeScrollHandler(scrollable1, handler1);
       let newScrollableIndex = scrollHandlers.elements.indexOf(scrollable1);
 
       assert.ok(cache1.handlers.length === 0, `The handler was removed from the listener cache.`);
@@ -171,7 +186,7 @@ test('Multiple elements with handlers works as expected', (assert) => {
       assert.ok(scrollHandlers.handlers.indexOf(cache1) === -1, `The cache was also removed.`);
       assert.equal(scrollHandlers.length, 1, `We were removed entirely`);
 
-      scrollHandlers.removeElementHandler(scrollable2, handler2);
+      scrollHandlers.removeScrollHandler(scrollable2, handler2);
       newScrollableIndex = scrollHandlers.elements.indexOf(scrollable2);
       assert.ok(cache2.handlers.length === 0, `The handler was removed from the listener cache.`);
       assert.ok(newScrollableIndex === -1, `Removing the last handler removed the element from the watched elements list.`);

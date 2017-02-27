@@ -7,12 +7,14 @@ var stripClassCallCheck = require('babel5-plugin-strip-class-callcheck');
 var filterImports = require('babel-plugin-filter-imports');
 var removeImports = require('./lib/babel-plugin-remove-imports');
 var Funnel = require('broccoli-funnel');
+var VersionChecker = require('ember-cli-version-checker');
 
 module.exports = {
   name: 'vertical-collection',
 
   init: function() {
     this._super.init && this._super.init.apply(this, arguments);
+    this.versionChecker = new VersionChecker(this);
 
     this.options = this.options || {};
   },
@@ -28,8 +30,11 @@ module.exports = {
     babelOptions.plugins = babelOptions.plugins || [];
     babelOptions.plugins.push({ transformer: stripClassCallCheck, position: 'after' });
 
+    var strippedModules;
+    var importNames;
+
     if (/production/.test(env) || /test/.test(env)) {
-      var strippedModules = {
+      strippedModules = {
         'vertical-collection/-debug/helpers': [
           'assert',
           'warn',
@@ -40,13 +45,23 @@ module.exports = {
           'stripInProduction'
         ]
       };
-      var importNames = ['vertical-collection/-debug/helpers'];
+      importNames = ['vertical-collection/-debug/helpers'];
+    } else {
+      strippedModules = {
+        'vertical-collection/-debug/helpers': []
+      };
 
-      babelOptions.plugins.push(
-        filterImports(strippedModules),
-        removeImports(importNames)
-      );
+      importNames = [];
     }
+
+    if (this.versionChecker.forEmber().isAbove('1.13.0')) {
+      strippedModules['vertical-collection/-debug/helpers'].push('stripInModernEmber');
+    }
+
+    babelOptions.plugins.push(
+      filterImports(strippedModules),
+      removeImports(importNames)
+    );
 
     this._hasSetupBabelOptions = true;
   },

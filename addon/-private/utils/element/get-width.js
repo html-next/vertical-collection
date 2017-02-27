@@ -3,9 +3,9 @@ export default function getWidth(dims, withMargins) {
 
   switch (dims.boxSizing) {
     case 'border-box':
-      width = dims.width +
-      dims.borderLeftWidth + dims.borderRightWidth +
-      dims.paddingLeft + dims.paddingRight;
+      width = dims.width
+      + dims.borderLeftWidth + dims.borderRightWidth
+      + dims.paddingLeft + dims.paddingRight;
       break;
     case 'content-box':
       width = dims.width;

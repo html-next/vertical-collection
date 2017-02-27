@@ -1,4 +1,4 @@
-import { assert, debugOnError } from 'vertical-collection/-debug/helpers';
+import { assert } from 'vertical-collection/-debug/helpers';
 
 /*
  * `SkipList` is a data structure designed with two main uses in mind:
@@ -92,8 +92,8 @@ export default class SkipList {
 
     targetValue = Math.min(total, targetValue);
 
-    debugOnError('targetValue must be greater than or equal to 0', targetValue >= 0);
-    debugOnError('targetValue must be no more than total', targetValue <= total);
+    assert('targetValue must be greater than or equal to 0', targetValue >= 0);
+    assert('targetValue must be no more than total', targetValue <= total);
 
     for (i = 0; i < numLayers; i++) {
       layer = layers[i];
@@ -115,8 +115,8 @@ export default class SkipList {
 
     totalAfter = total - totalBefore;
 
-    debugOnError('index must be a number', typeof index === 'number');
-    debugOnError('index must be within bounds', index >= 0 && index < this.values.length);
+    assert('index must be a number', typeof index === 'number');
+    assert('index must be within bounds', index >= 0 && index < this.values.length);
 
     return { index, totalBefore, totalAfter };
   }

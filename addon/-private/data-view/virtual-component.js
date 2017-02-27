@@ -1,6 +1,7 @@
 import Token from 'vertical-collection/-private/scheduler/token';
-import { assert } from 'vertical-collection/-debug/helpers';
 import Ember from 'ember';
+
+import { assert } from 'vertical-collection/-debug/helpers';
 
 const { set } = Ember;
 
@@ -52,6 +53,18 @@ export default class VirtualComponent {
     return new VirtualComponent(parentToken);
   }
 
+  recycle(newContent, newIndex) {
+    assert(`You cannot set an item's content to undefined`, newContent);
+
+    set(this, 'index', newIndex);
+    this.rect = null;
+
+    if (this.content !== newContent) {
+      this.hasBeenMeasured = false;
+      set(this, 'content', newContent);
+    }
+  }
+
   destroy() {
     this.token.cancel();
     this.range.detach();
@@ -61,5 +74,27 @@ export default class VirtualComponent {
     this._lowerBound = null;
 
     set(this, 'content', null);
+  }
+
+  static moveComponents(element, firstComponent, lastComponent, prepend) {
+    const rangeToMove = new Range();
+
+    rangeToMove.setStart(firstComponent._upperBound, 0);
+    rangeToMove.setEnd(lastComponent._lowerBound, 0);
+
+    const docFragment = rangeToMove.extractContents();
+
+    // The first and last nodes in the range do not get extracted, and are instead cloned, so they
+    // have to be reset.
+    //
+    // NOTE: Ember 1.11 - there are cases where docFragment is null (they haven't been rendered yet.)
+    firstComponent._upperBound = docFragment.firstChild || firstComponent._upperBound;
+    lastComponent._lowerBound = docFragment.lastChild || lastComponent._lowerBound;
+
+    if (prepend) {
+      element.prepend(docFragment);
+    } else {
+      element.appendChild(docFragment);
+    }
   }
 }

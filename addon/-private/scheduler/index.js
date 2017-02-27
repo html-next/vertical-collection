@@ -50,8 +50,7 @@ export class Scheduler {
   }
 
   flush() {
-    let i;
-    let q;
+    let i, q;
 
     run.begin();
     if (this.sync.length) {

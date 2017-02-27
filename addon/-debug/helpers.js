@@ -1,7 +1,6 @@
 import Ember from 'ember';
 
 const {
-  assert: emberAssert,
   warn: emberWarn,
   deprecate: emberDeprecate,
   Logger
@@ -17,8 +16,8 @@ export function debug() {
 
 export function debugOnError(msg, conditional) {
   if (!conditional) {
-    console.error(msg);
-    debugger;
+    console.error(msg); // eslint-disable-line no-console
+    debugger; // eslint-disable-line no-debugger
   }
 }
 
@@ -37,5 +36,9 @@ export function deprecate() {
 }
 
 export function stripInProduction(cb) {
+  cb();
+}
+
+export function stripInModernEmber(cb) {
   cb();
 }

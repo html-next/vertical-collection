@@ -18,27 +18,26 @@ export function Container() {
   // scrollTop, window.scrollY becomes stuck on a single value.
   Object.defineProperty(this, 'scrollTop', {
     get() {
-      return document.body.scrollTop ||
-        document.documentElement.scrollTop;
+      return document.body.scrollTop
+        || document.documentElement.scrollTop;
     },
     set(v) {
-      return document.body.scrollTop =
-        document.documentElement.scrollTop = v;
+      return document.body.scrollTop = document.documentElement.scrollTop = v;
     }
   });
 
   Object.defineProperty(this, 'scrollLeft', {
     get() {
-      return window.scrollX ||
-        window.pageXOffset ||
-        document.body.scrollLeft ||
-        document.documentElement.scrollLeft;
+      return window.scrollX
+        || window.pageXOffset
+        || document.body.scrollLeft
+        || document.documentElement.scrollLeft;
     },
     set(v) {
-      return window.scrollX =
-        window.pageXOffset =
-          document.body.scrollLeft =
-            document.documentElement.scrollLeft = v;
+      return window.scrollX
+        = window.pageXOffset
+        = document.body.scrollLeft
+        = document.documentElement.scrollLeft = v;
     }
   });
 

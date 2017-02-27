@@ -8,6 +8,8 @@ try {
   });
 
   window.addEventListener('test', null, opts);
-} catch(e) {}
+} catch(e) {
+  // do nothing
+}
 
 export default supportsPassive;

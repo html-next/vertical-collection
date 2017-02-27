@@ -45,10 +45,8 @@ export default Mixin.create({
 
   detectIssuesWithCSS() {
     let defaultHeight = this.get('defaultHeight');
-    let radar = this._tracker.radar;
-    let styles;
-    let rules;
-    let rect;
+    let radar = this._radar;
+    let styles, rules, rect;
 
     // check telescope
     if (radar.telescope !== Container) {
@@ -131,7 +129,7 @@ export default Mixin.create({
   visualizeDebugger() {
     if (!this.get('debug')) {
       if (this.__visualization !== null) {
-        console.info('tearing down existing visualization');
+        console.info('tearing down existing visualization'); // eslint-disable-line no-console
         this.__visualization.destroy();
         this.__visualization = null;
       }
@@ -153,7 +151,7 @@ export default Mixin.create({
   willDestroy() {
     this._super();
     if (this.__visualization) {
-      console.info('destroying visualization');
+      console.info('destroying visualization'); // eslint-disable-line no-console
       this.__visualization.destroy();
       this.__visualization = null;
     }

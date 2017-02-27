@@ -2,33 +2,32 @@
 import Ember from 'ember';
 import layout from './template';
 
-import scheduler from '../../-private/scheduler';
-import Token from '../../-private/scheduler/token';
-import keyForItem from '../../-private/ember/utils/key-for-item';
+import scheduler from 'vertical-collection/-private/scheduler';
+import Token from 'vertical-collection/-private/scheduler/token';
+import keyForItem from 'vertical-collection/-private/ember/utils/key-for-item';
 
-import estimateElementHeight from '../../-private/utils/element/estimate-element-height';
-import closestElement from '../../-private/utils/element/closest';
+import estimateElementHeight from 'vertical-collection/-private/utils/element/estimate-element-height';
+import closestElement from 'vertical-collection/-private/utils/element/closest';
 
-import DynamicRadar from '../../-private/data-view/radar/dynamic-radar';
-import StaticRadar from '../../-private/data-view/radar/static-radar';
+import DynamicRadar from 'vertical-collection/-private/data-view/radar/dynamic-radar';
+import StaticRadar from 'vertical-collection/-private/data-view/radar/static-radar';
 
-import Container from '../../-private/data-view/container';
-import getArray from '../../-private/data-view/utils/get-array';
+import Container from 'vertical-collection/-private/data-view/container';
+import getArray from 'vertical-collection/-private/data-view/utils/get-array';
 import {
   addScrollHandler,
   removeScrollHandler
 } from 'vertical-collection/-private/data-view/utils/scroll-handler';
 
-import VirtualComponent from '../../-private/virtual-component';
-import moveComponents from '../../-private/utils/virtual-component/move-components';
+import VirtualComponent from 'vertical-collection/-private/data-view/virtual-component';
 
-import { assert, debugOnError } from 'vertical-collection/-debug/helpers';
+import { stripInModernEmber } from 'vertical-collection/-debug/helpers';
 
 const {
   A,
   set,
   computed,
-  observer,
+  addObserver,
   Component,
   String: { htmlSafe }
 } = Ember;
@@ -191,7 +190,7 @@ const VerticalCollection = Component.extend({
         _orderedComponents[0].hasBeenMeasured = false;
         _orderedComponents.unshift(...movedComponents);
 
-        moveComponents(this.element, movedComponents[0], movedComponents[movedComponents.length - 1], true);
+        VirtualComponent.moveComponents(this.element, movedComponents[0], movedComponents[movedComponents.length - 1], true);
       } else if (itemDelta > 0) {
         // Scrolling down
         let movedComponents = _orderedComponents.splice(0, offsetAmount);
@@ -199,12 +198,12 @@ const VerticalCollection = Component.extend({
         _orderedComponents[0].hasBeenMeasured = false;
         _orderedComponents.push(...movedComponents);
 
-        moveComponents(this.element, movedComponents[0], movedComponents[movedComponents.length - 1], false);
+        VirtualComponent.moveComponents(this.element, movedComponents[0], movedComponents[movedComponents.length - 1], false);
       }
     }
 
     for (let i = 0, itemIndex = firstItemIndex; itemIndex <= lastItemIndex; i++, itemIndex++) {
-      recycleVirtualComponent(_orderedComponents[i], _items[itemIndex], itemIndex);
+      _orderedComponents[i].recycle(_items[itemIndex], itemIndex);
     }
 
     this.element.style.paddingTop = `${totalBefore}px`;
@@ -310,7 +309,7 @@ const VerticalCollection = Component.extend({
 
     if (delta > 0) {
       this.schedule('sync', () => {
-        moveComponents(
+        VirtualComponent.moveComponents(
           this.element,
           _orderedComponents[_orderedComponents.length - delta],
           _orderedComponents[_orderedComponents.length - 1]
@@ -359,7 +358,6 @@ const VerticalCollection = Component.extend({
     this._prevFirstKey = keyForItem(items[0], key, 0);
     this._prevLastKey = keyForItem(items[items.length - 1], key, items.length - 1);
 
-
     // The container element needs to have some height in order for us to set the scroll position
     // on initialization, so we set this min-height property to radar's total
     this.element.style.minHeight = `${this._radar.total}px`;
@@ -367,9 +365,9 @@ const VerticalCollection = Component.extend({
     this._scheduleUpdate();
   },
 
-  watchItems: observer('items.length', function() {
+  didUpdateAttrs() {
     this._updateRadar();
-  }),
+  },
 
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
@@ -385,6 +383,15 @@ const VerticalCollection = Component.extend({
       this._container = Container;
     } else {
       this._container = containerSelector ? closestElement(containerSelector) : this.element.parentNode;
+
+      this._windowScrollTop = Container.scrollTop;
+
+      this._radarShiftHandler = addScrollHandler(Container, ({ top }) => {
+        const dY = top - this._windowScrollTop;
+        this._windowScrollTop = top;
+
+        this._radar.shiftContainers(dY);
+      });
     }
 
     this._containerHeight = this._container.offsetHeight;
@@ -409,7 +416,11 @@ const VerticalCollection = Component.extend({
     addScrollHandler(this._container, this._scrollHandler);
     this._container.addEventListener('resize', this._resizeHandler);
 
-    console.timeEnd('vertical-collection-init');
+    stripInModernEmber(() => {
+      addObserver(this, 'items.[]', this, '_updateRadar');
+    });
+
+    console.timeEnd('vertical-collection-init'); // eslint-disable-line no-console
   },
 
   _isEarthquake() {
@@ -459,13 +470,17 @@ const VerticalCollection = Component.extend({
   willDestroy() {
     removeScrollHandler(this._container, this._scrollHandler);
 
+    if (this._radarShiftHandler) {
+      removeScrollHandler(Container, this._radarShiftHandler);
+    }
+
     this._container.removeEventListener('resize', this._resizeHandler);
 
     this.token.cancel();
   },
 
   init() {
-    console.time('vertical-collection-init');
+    console.time('vertical-collection-init'); // eslint-disable-line no-console
     this._super();
 
     this.RadarClass = this.get('alwaysRemeasure') ? DynamicRadar : StaticRadar;
@@ -479,19 +494,6 @@ const VerticalCollection = Component.extend({
 VerticalCollection.reopenClass({
   positionalParams: ['items']
 });
-
-function recycleVirtualComponent(component, newContent, newIndex) {
-  debugOnError(`You cannot set an item's content to undefined`, newContent);
-  debugOnError(`You cannot recycle components other than a VirtualComponent`, component instanceof VirtualComponent);
-
-  set(component, 'index', newIndex);
-  set(component, 'rect', null);
-
-  if (component.content !== newContent) {
-    component.hasBeenMeasured = false;
-    set(component, 'content', newContent);
-  }
-}
 
 function isPrepend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
   if (lenDiff <= 0) {
