@@ -1,9 +1,9 @@
 import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import Ember from 'ember';
-import wait from 'ember-test-helpers/wait';
 
 import getNumbers from 'dummy/lib/get-numbers';
+import wait from '../../helpers/wait';
 
 moduleForComponent('vertical-collection', 'Integration | Component | vertical collection', {
   integration: true
