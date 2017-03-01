@@ -19,8 +19,7 @@ test('The Collection Renders', function(assert) {
   // Template block usage:
   this.render(hbs`
   <div style="height: 500px; width: 500px;">
-    {{#vertical-collection items
-      items=items
+    {{#vertical-collection ${'items'}
 
       as |item|}}
       <vertical-item>
@@ -45,8 +44,7 @@ test('The Collection Renders when content is empty', function(assert) {
   // Template block usage:
   this.render(hbs`
   <div style="height: 500px; width: 500px;">
-    {{#vertical-collection items
-      items=items
+    {{#vertical-collection ${'items'}
 
       as |item|}}
       <vertical-item>
@@ -68,8 +66,7 @@ test('Scroll to last item when actual item sizes are significantly larger than d
 
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection items
-      items=items
+    {{#vertical-collection ${'items'}
       minHeight=10
       alwaysRemeasure=true
 
@@ -111,8 +108,7 @@ test('Sends the last visible changed action', function(assert) {
 
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection items
-      items=items
+    {{#vertical-collection ${'items'}
       minHeight=20
       lastVisibleChanged="lastVisibleChanged"
 
@@ -144,8 +140,7 @@ test('Sends the first visible changed action', function(assert) {
 
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection items
-      items=items
+    {{#vertical-collection ${'items'}
       minHeight=20
       firstVisibleChanged="firstVisibleChanged"
 
@@ -166,8 +161,7 @@ test('Collection prepends via set correctly', function(assert) {
 
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection items
-      items=items
+    {{#vertical-collection ${'items'}
       minHeight=20
 
       as |item i|}}
@@ -200,8 +194,7 @@ test('Collection prepends via unshiftObjects correctly', function(assert) {
 
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection items
-      items=items
+    {{#vertical-collection ${'items'}
       minHeight=20
 
       as |item i|}}

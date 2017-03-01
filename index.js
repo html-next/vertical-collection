@@ -48,9 +48,9 @@ module.exports = {
         filterImports(strippedModules),
         removeImports(importNames)
       );
-
-      this._hasSetupBabelOptions = true;
     }
+
+    this._hasSetupBabelOptions = true;
   },
 
   included: function(app) {
