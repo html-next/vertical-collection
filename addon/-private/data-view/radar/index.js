@@ -234,7 +234,7 @@ export default class Radar {
           virtualComponents.pushObject(component);
         }
       } else {
-        for (let i = virtualComponents.length; i > delta; i--) {
+        for (let i = virtualComponents.length - 1; i > delta; i--) {
           virtualComponents[i].destroy;
         }
       }

@@ -7,14 +7,12 @@ var stripClassCallCheck = require('babel5-plugin-strip-class-callcheck');
 var filterImports = require('babel-plugin-filter-imports');
 var removeImports = require('./lib/babel-plugin-remove-imports');
 var Funnel = require('broccoli-funnel');
-var VersionChecker = require('ember-cli-version-checker');
 
 module.exports = {
   name: 'vertical-collection',
 
   init: function() {
     this._super.init && this._super.init.apply(this, arguments);
-    this.versionChecker = new VersionChecker(this);
 
     this.options = this.options || {};
   },
@@ -46,20 +44,14 @@ module.exports = {
         ]
       };
       importNames = ['vertical-collection/-debug/helpers'];
-    } else {
-      strippedModules = {
-        'vertical-collection/-debug/helpers': []
-      };
 
-      importNames = [];
+      babelOptions.plugins.push(
+        filterImports(strippedModules),
+        removeImports(importNames)
+      );
+
+      this._hasSetupBabelOptions = true;
     }
-
-    babelOptions.plugins.push(
-      filterImports(strippedModules),
-      removeImports(importNames)
-    );
-
-    this._hasSetupBabelOptions = true;
   },
 
   included: function(app) {
