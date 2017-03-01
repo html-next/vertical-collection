@@ -9,7 +9,7 @@ module.exports = function(environment) {
     modulePrefix: 'dummy',
     podModulePrefix: 'dummy/routes',
     environment,
-    // rootURL: './vertical-collection/',
+    rootURL: '/',
     locationType: 'hash',
     EmberENV: {
       FEATURES: {},
