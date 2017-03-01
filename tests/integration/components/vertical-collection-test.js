@@ -19,7 +19,10 @@ test('The Collection Renders', function(assert) {
   // Template block usage:
   this.render(hbs`
   <div style="height: 500px; width: 500px;">
-    {{#vertical-collection items=items as |item|}}
+    {{#vertical-collection items
+      items=items
+
+      as |item|}}
       <vertical-item>
         {{item.text}}
       </vertical-item>
@@ -42,7 +45,10 @@ test('The Collection Renders when content is empty', function(assert) {
   // Template block usage:
   this.render(hbs`
   <div style="height: 500px; width: 500px;">
-    {{#vertical-collection items=items as |item|}}
+    {{#vertical-collection items
+      items=items
+
+      as |item|}}
       <vertical-item>
         {{item.text}}
       </vertical-item>
@@ -62,10 +68,12 @@ test('Scroll to last item when actual item sizes are significantly larger than d
 
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection
+    {{#vertical-collection items
+      items=items
       minHeight=10
       alwaysRemeasure=true
-      items=items as |item i|}}
+
+      as |item i|}}
       <div style="height: 100px;">{{item.text}} {{i}}</div>
     {{/vertical-collection}}
   </div>
@@ -103,10 +111,12 @@ test('Sends the last visible changed action', function(assert) {
 
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection
-      minHeight=20
+    {{#vertical-collection items
       items=items
-      lastVisibleChanged='lastVisibleChanged' as |item|}}
+      minHeight=20
+      lastVisibleChanged="lastVisibleChanged"
+
+      as |item|}}
       <div style="height:20px;">
         {{item.text}} {{i}}
       </div>
@@ -134,10 +144,12 @@ test('Sends the first visible changed action', function(assert) {
 
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection
-      minHeight=20
+    {{#vertical-collection items
       items=items
-      firstVisibleChanged='firstVisibleChanged' as |item|}}
+      minHeight=20
+      firstVisibleChanged="firstVisibleChanged"
+
+      as |item|}}
       <div style="height:20px;">
         {{item.text}} {{i}}
       </div>
@@ -154,9 +166,9 @@ test('Collection prepends via set correctly', function(assert) {
 
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection
-      minHeight=20
+    {{#vertical-collection items
       items=items
+      minHeight=20
 
       as |item i|}}
       <div style="height:20px;">
@@ -188,9 +200,9 @@ test('Collection prepends via unshiftObjects correctly', function(assert) {
 
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection
-      minHeight=20
+    {{#vertical-collection items
       items=items
+      minHeight=20
 
       as |item i|}}
       <div style="height:20px;">
@@ -258,7 +270,7 @@ test("The Collection Reveals it's children when `renderAllInitially` is true.", 
   // Template block usage:
   this.render(hbs`
   <div style="height: 500px; width: 500px;">
-    {{#vertical-collection content=items renderAllInitially=true as |item|}}
+    {{#vertical-collection items=items renderAllInitially=true as |item|}}
       {{item.text}}
     {{/vertical-collection}}
   </div>

@@ -34,7 +34,6 @@ const VerticalCollection = Component.extend({
   boxStyle: htmlSafe(''),
 
   key: '@identity',
-  content: computed.deprecatingAlias('items'),
 
   // –––––––––––––– Required Settings
 
@@ -153,7 +152,7 @@ const VerticalCollection = Component.extend({
       _prevLastKey
     } = this;
 
-    const items = getArray(this.get('items'));
+    const items = getArray(this.get('items') || this.get('content'));
     const key = this.get('key');
     const lenDiff = items.length - (_prevItemsLength || 0);
 
@@ -189,8 +188,6 @@ const VerticalCollection = Component.extend({
     this.element.removeChild(this._virtualComponentRenderer);
 
     const containerSelector = this.get('containerSelector');
-
-    this.propertyDidChange('items.[]');
 
     if (containerSelector === 'body') {
       this._scrollContainer = Container;
@@ -244,7 +241,7 @@ const VerticalCollection = Component.extend({
     const key = this.get('key');
 
     const minHeight = this.get('_minHeight');
-    const items = this.get('items');
+    const items = this._items;
     const maxIndex = items.length;
 
     let index = 0;

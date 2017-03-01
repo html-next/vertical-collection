@@ -2,7 +2,7 @@
   "name": "smoke-and-mirrors",
   "dependencies": {
     "animation-frame": "~0.2.4",
-    "ember": "canary",
+    "ember": "1.13.13",
     "ember-cli-shims": "0.1.1"
   },
   "devDependencies": {
