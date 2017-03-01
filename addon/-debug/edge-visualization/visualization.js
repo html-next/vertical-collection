@@ -101,13 +101,13 @@ export default class Visualization {
 
   styleViewport() {
     const {
-      itemContainer,
-      scrollContainer
+      _itemContainer,
+      _scrollContainer
     } = this.radar;
-    this.container.style.height = `${scrollContainer.getBoundingClientRect().height}px`;
+    this.container.style.height = `${_scrollContainer.getBoundingClientRect().height}px`;
 
-    Visualization.applyVerticalStyles(this.telescope, scrollContainer.getBoundingClientRect());
-    Visualization.applyVerticalStyles(this.sky, itemContainer.getBoundingClientRect());
+    Visualization.applyVerticalStyles(this.telescope, _scrollContainer.getBoundingClientRect());
+    Visualization.applyVerticalStyles(this.sky, _itemContainer.getBoundingClientRect());
 
     Visualization.applyVerticalStyles(this.screen, Container.getBoundingClientRect());
 
@@ -147,7 +147,7 @@ export default class Visualization {
   makeSatellites() {
     const {
       totalItems,
-      itemElements: { length }
+      orderedComponents: { length }
     } = this.radar;
     const { satellites } = this;
 
@@ -174,7 +174,7 @@ export default class Visualization {
     let {
       firstItemIndex,
       lastItemIndex,
-      totalItems,
+      items: { length },
       totalBefore,
       totalAfter,
       skipList: { values }
@@ -189,9 +189,9 @@ export default class Visualization {
       lastVisualizedIndex = totalVisualizedItems - 1;
     }
 
-    if (lastVisualizedIndex > totalItems - 1) {
-      lastVisualizedIndex = totalItems - 1;
-      firstVisualizedIndex = totalItems - totalVisualizedItems;
+    if (lastVisualizedIndex > length - 1) {
+      lastVisualizedIndex = length - 1;
+      firstVisualizedIndex = length - totalVisualizedItems;
     }
 
     for (let itemIndex = firstVisualizedIndex, i = 0; itemIndex <= lastVisualizedIndex; itemIndex++, i++) {

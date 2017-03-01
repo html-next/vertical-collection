@@ -1,6 +1,5 @@
-/* jshint node:true */
-// jscs:disable
-/* global module */
+/* eslint-env node */
+'use strict';
 let pkg = require('../../../package.json');
 
 module.exports = function(environment) {
@@ -10,7 +9,7 @@ module.exports = function(environment) {
     modulePrefix: 'dummy',
     podModulePrefix: 'dummy/routes',
     environment,
-    // rootURL: './vertical-collection/',
+    rootURL: '/',
     locationType: 'hash',
     EmberENV: {
       FEATURES: {},
