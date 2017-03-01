@@ -1,5 +1,4 @@
-// jscs: disable
-/* jshint node: true */
+/* eslint-env node */
 'use strict';
 
 var chalk = require('chalk');

@@ -1,6 +1,5 @@
-/* jshint node:true */
-// jscs:disable
-/* global module */
+/* eslint-env node */
+'use strict';
 let pkg = require('../../../package.json');
 
 module.exports = function(environment) {
