@@ -2,8 +2,6 @@
 import Ember from 'ember';
 import layout from './template';
 
-import scheduler from 'vertical-collection/-private/scheduler';
-import Token from 'vertical-collection/-private/scheduler/token';
 import keyForItem from 'vertical-collection/-private/ember/utils/key-for-item';
 
 import estimateElementHeight from 'vertical-collection/-private/utils/element/estimate-element-height';
@@ -19,15 +17,8 @@ import {
   removeScrollHandler
 } from 'vertical-collection/-private/data-view/utils/scroll-handler';
 
-import VirtualComponent from 'vertical-collection/-private/data-view/virtual-component';
-
-import { stripInModernEmber } from 'vertical-collection/-debug/helpers';
-
 const {
-  A,
-  set,
   computed,
-  addObserver,
   Component,
   String: { htmlSafe }
 } = Ember;
@@ -114,102 +105,6 @@ const VerticalCollection = Component.extend({
     }
   }),
 
-  token: null,
-
-  _scrollTop: 0,
-  _virtualComponents: null,
-  _orderedComponents: null,
-
-  schedule(queueName, job) {
-    return scheduler.schedule(queueName, job, this.token);
-  },
-
-  /*
-   * Schedules an update for the next RAF
-   *
-   * This will first run _updateVirtualComponents in the sync phase, which figures out what
-   * components need to be rerendered and updates the appropriate VCs and moves their associated
-   * DOM. At the end of the `sync` phase the runloop is flushed and Glimmer renders the changes.
-   *
-   * By the `affect` phase the Radar should have had time to measure, meaning it has all of the
-   * current info and we can send actions for any changes.
-   *
-   * @private
-   */
-  _scheduleUpdate() {
-    if (!this._nextUpdate) {
-      this._nextUpdate = this.schedule('sync', () => {
-        this._nextUpdate = null;
-        this._updateVirtualComponents();
-      });
-    }
-
-    if (!this._nextSendActions) {
-      this._nextSendActions = this.schedule('affect', () => {
-        this._nextSendActions = null;
-        this._sendActions();
-      });
-    }
-  },
-
-  /*
-   * Update the VirtualComponents state based on current scroll position
-   *
-   * @private
-   */
-  _updateVirtualComponents() {
-    const {
-      _prevFirstItemIndex,
-      _orderedComponents,
-      _items,
-      _radar
-    } = this;
-
-    // Set the radar's scrollTop to the current value. We do this here rather than in the scroll
-    // handler to avoid repeatedly updating the scroll position and all of the radar's properties.
-    _radar.scrollTop = this._container.scrollTop;
-
-    const {
-      firstItemIndex,
-      lastItemIndex,
-      totalBefore,
-      totalAfter
-    } = _radar;
-
-    // itemDelta is the number of items we've changed since last render, could be greater than the
-    // number of VCs. offsetAmount is the number of VCs we want to shift from front to back or back
-    // to front, which will necessarily be less than the number of VCs.
-    const itemDelta = firstItemIndex - _prevFirstItemIndex;
-    const offsetAmount = Math.abs(itemDelta % _orderedComponents.length);
-
-    if (offsetAmount > 0) {
-      if (itemDelta < 0) {
-        // Scrolling up
-        let movedComponents = _orderedComponents.splice(-offsetAmount);
-
-        _orderedComponents[0].hasBeenMeasured = false;
-        _orderedComponents.unshift(...movedComponents);
-
-        VirtualComponent.moveComponents(this.element, movedComponents[0], movedComponents[movedComponents.length - 1], true);
-      } else if (itemDelta > 0) {
-        // Scrolling down
-        let movedComponents = _orderedComponents.splice(0, offsetAmount);
-
-        _orderedComponents[0].hasBeenMeasured = false;
-        _orderedComponents.push(...movedComponents);
-
-        VirtualComponent.moveComponents(this.element, movedComponents[0], movedComponents[movedComponents.length - 1], false);
-      }
-    }
-
-    for (let i = 0, itemIndex = firstItemIndex; itemIndex <= lastItemIndex; i++, itemIndex++) {
-      _orderedComponents[i].recycle(_items[itemIndex], itemIndex);
-    }
-
-    this.element.style.paddingTop = `${totalBefore}px`;
-    this.element.style.paddingBottom = `${totalAfter}px`;
-  },
-
   _sendActions() {
     const {
       _items,
@@ -249,183 +144,71 @@ const VerticalCollection = Component.extend({
     this._prevLastVisibleIndex = lastVisibleIndex;
   },
 
-  /*
-   * Sets up _virtualComponents, which is meant to be a static pool of components that we render to.
-   * In order to decrease the time spent rendering and diffing, we pull the {{each}} out of the DOM
-   * and only replace the content of _virtualComponents which are removed/added.
-   *
-   * For instance, if we start with the following and scroll down, items 2 and 3 do not need to be
-   * rerendered, only item 1 needs to be removed and only item 4 needs to be added. So we replace
-   * item 1 with item 4, and then manually move the DOM:
-   *
-   *   1                        4                         2
-   *   2 -> replace 1 with 4 -> 2 -> manually move DOM -> 3
-   *   3                        3                         4
-   *
-   * However, _virtualComponents is still out of order. Rather than keep track of the state of
-   * things in _virtualComponents, we track the visually ordered components in the
-   * _orderedComponents array. This is possible because all of our operations are relatively simple,
-   * popping some number of components off one end and pushing them onto the other.
-   *
-   * @private
-   */
-
-  _updateVirtualComponentPool() {
-    const _virtualComponents = this.get('_virtualComponents');
-    const minHeight = this.get('_minHeight');
-    const bufferSize = this.get('bufferSize');
-
+  radar: computed('items.[]', function() {
     const {
-      _containerHeight,
-      _orderedComponents,
-      _items
-    } = this;
-
-    // The total number of components is determined by the minimum number required to span the
-    // container with its buffers. Combined with the above rendering strategy this fairly
-    // performant, even if mean item size is above the minimum.
-    const totalHeight = _containerHeight + (_containerHeight * bufferSize * 2);
-    const totalComponents = Math.min(_items.length, Math.ceil(totalHeight / minHeight) + 1);
-    const delta = totalComponents - _virtualComponents.length;
-
-    if (delta > 0) {
-      for (let i = 0; i < delta; i++) {
-        let component = new VirtualComponent(this.token);
-        set(component, 'content', {});
-        _virtualComponents.pushObject(component);
-      }
-    } else {
-      for (let i = _virtualComponents.length; i > delta; i--) {
-        _virtualComponents[i].destroy;
-      }
-    }
-
-    _virtualComponents.length = totalComponents;
-    _orderedComponents.length = totalComponents;
-
-    for (let i = 0; i < totalComponents; i++) {
-      _orderedComponents[i] = _virtualComponents[i];
-    }
-
-    if (delta > 0) {
-      this.schedule('sync', () => {
-        VirtualComponent.moveComponents(
-          this.element,
-          _orderedComponents[_orderedComponents.length - delta],
-          _orderedComponents[_orderedComponents.length - 1]
-        );
-      });
-    }
-  },
-
-  _updateRadar() {
-    const {
-      RadarClass,
       _radar,
+
       _prevItemsLength,
       _prevFirstKey,
       _prevLastKey
     } = this;
 
     const items = getArray(this.get('items'));
-    const minHeight = this.get('_minHeight');
-    const renderFromLast = this.get('renderFromLast');
     const key = this.get('key');
-
     const lenDiff = items.length - (_prevItemsLength || 0);
-
-    if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
-      _radar.prepend(lenDiff);
-
-      // When items are prepended we have to add to the prevFirstItemIndex to get an accurate itemDelta
-      this._prevFirstItemIndex += lenDiff;
-    } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
-      _radar.append(lenDiff);
-    } else {
-      this._radar = new RadarClass({
-        scrollContainer: this._container,
-        itemContainer: this.element,
-        itemElements: this._orderedComponents,
-        totalItems: items.length,
-        minValue: minHeight,
-        renderFromLast,
-        parentToken: this.token
-      });
-    }
 
     this._items = items;
     this._prevItemsLength = items.length;
     this._prevFirstKey = keyForItem(items[0], key, 0);
     this._prevLastKey = keyForItem(items[items.length - 1], key, items.length - 1);
 
+    if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
+      _radar.prepend(items, lenDiff);
+    } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
+      _radar.append(items, lenDiff);
+    } else {
+      _radar.resetItems(items);
+    }
+
     // The container element needs to have some height in order for us to set the scroll position
     // on initialization, so we set this min-height property to radar's total
-    this.element.style.minHeight = `${this._radar.total}px`;
+    // this.element.style.minHeight = `${this._radar.total}px`;
 
-    this._scheduleUpdate();
-  },
+    return this._radar;
+  }),
 
   didUpdateAttrs() {
-    this._updateRadar();
+    this._initializeRadar();
   },
 
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
-    this._virtualComponentRenderer = this.element.getElementsByClassName('virtual-component-renderer')[0];
-
     // The rendered {{each}} is removed from the DOM, but a reference is kept, allowing Glimmer to
     // continue rendering to the node. This enables the manual diffing strategy described above.
+    this._virtualComponentRenderer = this.element.getElementsByClassName('virtual-component-renderer')[0];
     this.element.removeChild(this._virtualComponentRenderer);
 
     const containerSelector = this.get('containerSelector');
 
+    this.propertyDidChange('items.[]');
+
     if (containerSelector === 'body') {
-      this._container = Container;
+      this._scrollContainer = Container;
     } else {
-      this._container = containerSelector ? closestElement(containerSelector) : this.element.parentNode;
-
-      this._windowScrollTop = Container.scrollTop;
-
-      this._radarShiftHandler = addScrollHandler(Container, ({ top }) => {
-        const dY = top - this._windowScrollTop;
-        this._windowScrollTop = top;
-
-        this._radar.shiftContainers(dY);
-      });
+      this._scrollContainer = containerSelector ? closestElement(containerSelector) : this.element.parentNode;
     }
 
-    this._containerHeight = this._container.offsetHeight;
-
-    // Initialize the component pool, set the scroll state, and schedule the first update
-    this._updateRadar();
-    this._updateVirtualComponentPool();
+    // Initialize the Radar and set the scroll state
+    this._initializeRadar();
     this._initializeScrollState();
-
-    this._scrollHandler = () => {
-      if (this._isEarthquake()) {
-        this._scheduleUpdate();
-      }
-    };
-
-    this._resizeHandler = () => {
-      this._containerHeight = this._container.offsetHeight;
-      this._updateVirtualComponentPool();
-      this._scheduleUpdate();
-    };
-
-    addScrollHandler(this._container, this._scrollHandler);
-    this._container.addEventListener('resize', this._resizeHandler);
-
-    stripInModernEmber(() => {
-      addObserver(this, 'items.[]', this, '_updateRadar');
-    });
+    this._initializeEventHandlers();
 
     console.timeEnd('vertical-collection-init'); // eslint-disable-line no-console
   },
 
-  _isEarthquake() {
-    if (Math.abs(this._lastEarthquake - this._container.scrollTop) > this.get('_minHeight') / 2) {
-      this._lastEarthquake = this._container.scrollTop;
+  _isEarthquake(top) {
+    if (Math.abs(this._lastEarthquake - top) > this.get('_minHeight') / 2) {
+      this._lastEarthquake = top;
 
       return true;
     }
@@ -433,8 +216,28 @@ const VerticalCollection = Component.extend({
     return false;
   },
 
+  /*
+   * Set all of the Radar's properties, including `items`. This is a separate function from
+   * `_resetRadar` because it needs to set `items` on the Radar _after_ minHeight has been set, but
+   * _before_ we update the VirtualComponentPool and schedule an update. In the normal
+   *
+   * @private
+   */
+  _initializeRadar() {
+    const minHeight = this.get('_minHeight');
+    const bufferSize = this.get('bufferSize');
+    const renderFromLast = this.get('renderFromLast');
+
+    const {
+      element,
+      _scrollContainer
+    } = this;
+
+    this._radar.init(element, _scrollContainer, minHeight, bufferSize, renderFromLast);
+  },
+
   _initializeScrollState() {
-    let visibleTop = this.get('scrollPosition');
+    let scrollPosition = this.get('scrollPosition');
 
     const renderFromLast = this.get('renderFromLast');
     const idForFirstItem = this.get('idForFirstItem');
@@ -454,40 +257,67 @@ const VerticalCollection = Component.extend({
         }
       }
 
-      visibleTop = index * minHeight;
+      scrollPosition = index * minHeight;
 
       if (renderFromLast) {
-        visibleTop -= this._containerHeight - minHeight;
+        scrollPosition -= this._radar._scrollContainerHeight;
       }
     }
 
-    this._radar.visibleTop = visibleTop;
+    this._radar.visibleTop = scrollPosition;
 
-    this._container.scrollTop = this._radar.visibleTop;
-    this._lastEarthquake = this._radar.visibleTop;
+    this._scrollContainer.scrollTop = this._radar.scrollTop;
+    this._lastEarthquake = this._radar.scrollTop;
+  },
+
+  _initializeEventHandlers() {
+    this._scrollHandler = ({ top }) => {
+      if (this._isEarthquake(top)) {
+        this._radar.scrollTop = top;
+      }
+    };
+
+    this._resizeHandler = () => {
+      this._scheduleUpdate();
+    };
+
+    addScrollHandler(this._scrollContainer, this._scrollHandler);
+    this._scrollContainer.addEventListener('resize', this._resizeHandler);
+
+    if (this._scrollContainer !== Container) {
+      this._windowScrollTop = Container.scrollTop;
+
+      this._radarShiftHandler = ({ top }) => {
+        const dY = top - this._windowScrollTop;
+        this._windowScrollTop = top;
+
+        this._radar.shiftContainers(dY);
+      };
+
+      addScrollHandler(Container, this._radarShiftHandler);
+    }
   },
 
   willDestroy() {
-    removeScrollHandler(this._container, this._scrollHandler);
+    removeScrollHandler(this._scrollContainer, this._scrollHandler);
+    this._scrollContainer.removeEventListener('resize', this._resizeHandler);
 
     if (this._radarShiftHandler) {
       removeScrollHandler(Container, this._radarShiftHandler);
     }
-
-    this._container.removeEventListener('resize', this._resizeHandler);
-
-    this.token.cancel();
   },
 
   init() {
     console.time('vertical-collection-init'); // eslint-disable-line no-console
     this._super();
 
-    this.RadarClass = this.get('alwaysRemeasure') ? DynamicRadar : StaticRadar;
+    const RadarClass = this.get('alwaysRemeasure') ? DynamicRadar : StaticRadar;
 
-    this.set('_virtualComponents', A());
-    this._orderedComponents = [];
-    this.token = new Token();
+    this._radar = new RadarClass();
+
+    this._radar.didUpdate = () => {
+      this._sendActions();
+    };
   }
 });
 

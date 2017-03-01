@@ -4,20 +4,27 @@ import SkipList from '../skip-list';
 import { assert } from 'vertical-collection/-debug/helpers';
 
 export default class DynamicRadar extends Radar {
-  constructor(options) {
-    super(options);
+  init(...args) {
+    super.init(...args);
 
-    this.skipList = new SkipList(this.totalItems, this.minValue);
-
-    this._update();
+    if (!this.initialized) {
+      this.skipList = new SkipList(this.items.length, this.minHeight);
+      this.initialized = true;
+    }
   }
 
-  _update() {
+  destroy() {
+    super.destroy();
+
+    this.skipList = null;
+  }
+
+  _updateIndexes() {
     const { values } = this.skipList;
-    const totalIndexes = this.itemElements.length;
+    const totalIndexes = this.orderedComponents.length;
     const maxIndex = this.totalItems - 1;
 
-    const middleVisibleValue = this.visibleTop + (this.scrollContainerHeight  / 2);
+    const middleVisibleValue = this.visibleTop + ((this.visibleBottom - this.visibleTop) / 2);
 
     let {
       totalBefore,
@@ -56,9 +63,9 @@ export default class DynamicRadar extends Radar {
 
   _measure() {
     const {
-      itemElements,
       firstItemIndex,
-      itemContainerTop,
+      orderedComponents,
+      _itemContainerTop,
       totalBefore,
       skipList
     } = this;
@@ -67,13 +74,13 @@ export default class DynamicRadar extends Radar {
 
     let scrollTopDidChange = false;
 
-    for (let i = 0; i < itemElements.length; i++) {
+    for (let i = 0; i < orderedComponents.length; i++) {
       let itemIndex = firstItemIndex + i;
 
-      const currentItem = itemElements[i];
+      const currentItem = orderedComponents[i];
 
       if (currentItem.hasBeenMeasured === false) {
-        const previousItem = itemElements[i - 1];
+        const previousItem = orderedComponents[i - 1];
 
         const {
           top: currentItemTop,
@@ -85,16 +92,16 @@ export default class DynamicRadar extends Radar {
         if (previousItem) {
           margin = Math.round(currentItemTop - previousItem.getBoundingClientRect().bottom);
         } else {
-          margin = Math.round(currentItemTop - itemContainerTop - totalBefore);
+          margin = Math.round(currentItemTop - _itemContainerTop - totalBefore);
         }
 
-        assert(`item height must always be above minimum value. Item ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minValue);
+        assert(`item height must always be above minimum value. Item ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minHeight);
 
         const itemDelta = skipList.set(itemIndex, currentItemHeight + margin);
 
         if (itemIndex < staticVisibleIndex && itemDelta !== 0) {
           this._scrollTop += itemDelta;
-          this.itemContainerTop -= itemDelta;
+          this._itemContainerTop -= itemDelta;
 
           scrollTopDidChange = true;
         }
@@ -104,7 +111,7 @@ export default class DynamicRadar extends Radar {
     }
 
     if (scrollTopDidChange) {
-      this.scrollContainer.scrollTop = this._scrollTop;
+      this._scrollContainer.scrollTop = this._scrollTop;
     }
   }
 
@@ -166,15 +173,21 @@ export default class DynamicRadar extends Radar {
     }
   }
 
-  prepend(numPrepended) {
+  prepend(items, numPrepended) {
     this.skipList.prepend(numPrepended);
 
-    super.prepend(numPrepended);
+    super.prepend(items, numPrepended);
   }
 
-  append(numAppended) {
+  append(items, numAppended) {
     this.skipList.append(numAppended);
 
-    super.append(numAppended);
+    super.append(items, numAppended);
+  }
+
+  resetItems(items) {
+    this.skipList = new SkipList(items.length, this.minHeight);
+
+    super.resetItems(items);
   }
 }

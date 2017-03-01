@@ -3,6 +3,8 @@ import hbs from 'htmlbars-inline-precompile';
 import Ember from 'ember';
 import wait from 'ember-test-helpers/wait';
 
+import getNumbers from 'dummy/lib/get-numbers';
+
 moduleForComponent('vertical-collection', 'Integration | Component | vertical collection', {
   integration: true
 });
@@ -17,7 +19,7 @@ test('The Collection Renders', function(assert) {
   // Template block usage:
   this.render(hbs`
   <div style="height: 500px; width: 500px;">
-    {{#vertical-collection content=items as |item|}}
+    {{#vertical-collection items=items as |item|}}
       <vertical-item>
         {{item.text}}
       </vertical-item>
@@ -40,7 +42,7 @@ test('The Collection Renders when content is empty', function(assert) {
   // Template block usage:
   this.render(hbs`
   <div style="height: 500px; width: 500px;">
-    {{#vertical-collection content=items as |item|}}
+    {{#vertical-collection items=items as |item|}}
       <vertical-item>
         {{item.text}}
       </vertical-item>
@@ -62,7 +64,8 @@ test('Scroll to last item when actual item sizes are significantly larger than d
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection
       minHeight=10
-      content=items as |item i|}}
+      alwaysRemeasure=true
+      items=items as |item i|}}
       <div style="height: 100px;">{{item.text}} {{i}}</div>
     {{/vertical-collection}}
   </div>
@@ -83,29 +86,165 @@ test('Scroll to last item when actual item sizes are significantly larger than d
     });
 });
 
-// test('Sends the last visible changed action', function(assert) {
-//   const done = assert.async();
+test('Sends the last visible changed action', function(assert) {
+  const called = assert.async(2);
+  let count = 0;
 
-//   this.set('items', Array(50).fill({ text: 'b' }));
-//   this.on('lastVisibleChanged', (item) => {
-//     assert.equal(item.index, 30, 'the last visible changed should be item 30');
-//     done();
-//   });
+  this.set('items', Array(50).fill({ text: 'b' }));
+  this.on('lastVisibleChanged', (item, index) => {
+    if (count === 0) {
+      assert.equal(index, 10, 'the first last visible changed should be item 10');
+    } else {
+      assert.equal(index, 20, 'after scroll the last visible change should be item 20');
+    }
+    count++;
+    called();
+  });
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection
+      minHeight=20
+      items=items
+      lastVisibleChanged='lastVisibleChanged' as |item|}}
+      <div style="height:20px;">
+        {{item.text}} {{i}}
+      </div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  wait().then(() => this.$('.scrollable').scrollTop(200));
+});
+
+test('Sends the first visible changed action', function(assert) {
+  const called = assert.async(2);
+  let count = 0;
+
+  this.set('items', Array(50).fill({ text: 'b' }));
+  this.on('firstVisibleChanged', (item, index) => {
+    if (count === 0) {
+      assert.equal(index, 0, 'the first last visible changed should be item 0');
+    } else {
+      assert.equal(index, 10, 'after scroll the last visible change should be item 10');
+    }
+    count++;
+    called();
+  });
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection
+      minHeight=20
+      items=items
+      firstVisibleChanged='firstVisibleChanged' as |item|}}
+      <div style="height:20px;">
+        {{item.text}} {{i}}
+      </div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  wait().then(() => this.$('.scrollable').scrollTop(200));
+});
+
+test('Collection prepends via set correctly', function(assert) {
+  assert.expect(4);
+  this.set('items', getNumbers(0, 100));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection
+      minHeight=20
+      items=items
+
+      as |item i|}}
+      <div style="height:20px;">
+        {{item.number}} {{i}}
+      </div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  const scrollable = this.$('.scrollable');
+
+  return wait().then(() => {
+    assert.equal(scrollable.find('div:first').text().trim(), '0 0', 'items rendered correctly');
+    assert.equal(scrollable.scrollTop(), 0, 'scrollTop is correct before prepend');
+
+    const newNumbers = getNumbers(-20, 20).concat(this.get('items'));
+    this.set('items', newNumbers);
+
+    return wait();
+  }).then(() => {
+    assert.equal(scrollable.find('div:first').text().trim(), '-10 10', 'items prepended and rendered correctly');
+    assert.equal(scrollable.scrollTop(), 400, 'scrollTop is correct after prepend');
+  });
+});
+
+test('Collection prepends via unshiftObjects correctly', function(assert) {
+  assert.expect(4);
+  this.set('items', Ember.A(getNumbers(0, 100)));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection
+      minHeight=20
+      items=items
+
+      as |item i|}}
+      <div style="height:20px;">
+        {{item.number}} {{i}}
+      </div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  const scrollable = this.$('.scrollable');
+
+  return wait().then(() => {
+    assert.equal(scrollable.find('div:first').text().trim(), '0 0', 'items rendered correctly');
+    assert.equal(scrollable.scrollTop(), 0, 'scrollTop is correct before prepend');
+
+    this.get('items').unshiftObjects(getNumbers(-20, 20));
+
+    return wait();
+  }).then(() => {
+    assert.equal(scrollable.find('div:first').text().trim(), '-10 10', 'items prepended and rendered correctly');
+    assert.equal(scrollable.scrollTop(), 400, 'scrollTop is correct after prepend');
+  });
+});
+
+// test('Collection prepends correctly if prepend would cause more VCs to be shown', function(assert) {
+//   assert.async();
+//   this.set('items', getNumbers(0, 20));
 
 //   this.render(hbs`
 //   <div style="height: 200px; width: 100px;" class="scrollable">
 //     {{#vertical-collection
 //       minHeight=10
-//       content=items
-//       lastVisibleChanged='lastVisibleChanged' as |item|}}
+//       items=items
+
+//       as |item i|}}
 //       <div style="height:20px;">
-//         {{item.text}} {{i}}
+//         {{item.number}} {{i}}
 //       </div>
 //     {{/vertical-collection}}
 //   </div>
 //   `);
 
-//   wait().then(() => this.$('.scrollable').scrollTop(100));
+//   wait().then(() => {
+//     const newNumbers = getNumbers(-20, 20).concat(this.get('items'));
+//     this.set('items', newNumbers);
+
+//     return wait();
+//   }).then(() => {
+
+//     const scrollable = this.$('.scrollable');
+
+//     assert.equal(scrollable.find('div:first').html(), '-10', 'items prepended and rendered correctly');
+//     assert.equal(scrollable.scrollTop(), 200, 'scrollTop is correct after prepend');
+//   });
 // });
 
 /*

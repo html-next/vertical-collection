@@ -1,59 +1,124 @@
+import Ember from 'ember';
+
 import scheduler from 'vertical-collection/-private/scheduler';
 import Token from 'vertical-collection/-private/scheduler/token';
 
+import VirtualComponent from 'vertical-collection/-private/data-view/virtual-component';
+
 import { assert } from 'vertical-collection/-debug/helpers';
 
+const {
+  A,
+  set
+} = Ember;
+
 export default class Radar {
-  constructor({ scrollContainer, itemContainer, itemElements, totalItems, minValue, renderFromLast, parentToken }) {
-    const {
-      top: scrollContainerTop,
-      height: scrollContainerHeight
-    } = scrollContainer.getBoundingClientRect();
+  constructor() {
+    this.token = new Token();
 
-    const {
-      top: itemContainerTop
-    } = itemContainer.getBoundingClientRect();
+    this.virtualComponents = A();
+    this.orderedComponents = [];
+  }
 
-    this.scrollContainer = scrollContainer;
-    this.scrollContainerTop = scrollContainerTop;
-    this.scrollContainerHeight = scrollContainerHeight;
+  init(...args) {
+    this.setContainerState(...args);
+  }
 
+  setContainerState(itemContainer, scrollContainer, minHeight, bufferSize, renderFromLast) {
     this.itemContainer = itemContainer;
-    this.itemContainerTop = itemContainerTop;
+    this.scrollContainer = scrollContainer;
 
-    this.itemElements = itemElements;
-    this.totalItems = totalItems;
-    this.minValue = minValue;
+    this.minHeight = minHeight;
+    this.bufferSize = bufferSize;
     this.renderFromLast = renderFromLast;
 
-    this.token = new Token(parentToken);
+    this._updateVirtualComponentPool();
+    this._scheduleUpdate();
+  }
 
-    // Generally, visibleTop === container.scrollTop. However, if the container is larger than the
-    // collection, this may not be the case (ex: Window is the container). In this case, we can say
-    // that the visibleTop === container.scrollTop + offset, where offset is some constant distance.
-    this._scrollTopOffset = scrollContainer.scrollTop + (itemContainerTop - scrollContainerTop);
-    this._scrollTop = scrollContainer.scrollTop;
+  destroy() {
+    this.token.cancel();
+
+    for (let i = 0; i < this.orderedComponents.length; i++) {
+      this.orderedComponents[i].destroy();
+    }
+
+    this.orderedComponents = null;
+    this.virtualComponents = null;
+
   }
 
   schedule(queueName, job) {
     return scheduler.schedule(queueName, job, this.token);
   }
 
+  /*
+   * Schedules an update for the next RAF
+   *
+   * This will first run _updateVirtualComponents in the sync phase, which figures out what
+   * components need to be rerendered and updates the appropriate VCs and moves their associated
+   * DOM. At the end of the `sync` phase the runloop is flushed and Glimmer renders the changes.
+   *
+   * By the `affect` phase the Radar should have had time to measure, meaning it has all of the
+   * current info and we can send actions for any changes.
+   *
+   * @private
+   */
+  _scheduleUpdate() {
+    if (!this._nextUpdate) {
+      this._nextUpdate = this.schedule('sync', () => {
+        this._nextUpdate = null;
+        this._updateIndexes();
+        this._updateVirtualComponents();
+      });
+    }
+
+    if (!this._nextDidUpdate) {
+      this._nextDidUpdate = this.schedule('affect', () => {
+        this._nextDidUpdate = null;
+        this.didUpdate();
+      });
+    }
+  }
+
+  get totalItems() {
+    return this.items ? this.items.length : 0;
+  }
+
+  set itemContainer(itemContainer) {
+    const { top } = itemContainer.getBoundingClientRect();
+
+    this._itemContainer = itemContainer;
+    this._itemContainerTop = top;
+
+    this._scrollTopOffset = (this._scrollTop + this._itemContainerTop) - this._scrollContainerTop;
+  }
+
+  set scrollContainer(scrollContainer) {
+    const { top, height } = scrollContainer.getBoundingClientRect();
+
+    this._scrollContainer = scrollContainer;
+    this._scrollContainerTop = top;
+    this._scrollContainerHeight = height;
+
+    this._scrollTopOffset = (scrollContainer.scrollTop + this._itemContainerTop) - this._scrollContainerTop;
+  }
+
   get scrollTop() {
     return this._scrollTop;
   }
 
-  set scrollTop(scrollY) {
-    const deltaScroll = scrollY - (this._scrollTop || 0);
-    this._scrollTop = scrollY;
+  set scrollTop(scrollTop) {
+    if (this._scrollTop === scrollTop) {
+      return;
+    }
 
-    this.itemContainerTop -= deltaScroll;
+    const deltaScroll = scrollTop - (this._scrollTop || 0);
+    this._itemContainerTop -= deltaScroll;
 
-    this._update();
-  }
+    this._scrollTop = scrollTop;
 
-  get scrollTopOffset() {
-    return this._scrollTopOffset;
+    this._scheduleUpdate();
   }
 
   get visibleTop() {
@@ -63,30 +128,156 @@ export default class Radar {
   set visibleTop(visibleTop) {
     assert('Must set visibleTop to a number', typeof visibleTop === 'number');
 
-    visibleTop = Math.max(0, Math.min(visibleTop, this.total - this.scrollContainerHeight));
-
     this.scrollTop = visibleTop - this._scrollTopOffset;
   }
 
   get visibleBottom() {
-    return this.visibleTop + this.scrollContainerHeight;
+    return this.visibleTop + this._scrollContainerHeight;
+  }
+
+  /*
+   * Update the VirtualComponents state based on current scroll position
+   *
+   * @private
+   */
+  _updateVirtualComponents() {
+    const {
+      items,
+      orderedComponents,
+
+      _itemContainer,
+      _prevFirstItemIndex,
+
+      firstItemIndex,
+      lastItemIndex,
+      totalBefore,
+      totalAfter
+    } = this;
+
+    const itemDelta = firstItemIndex - _prevFirstItemIndex;
+    const offsetAmount = Math.abs(itemDelta % orderedComponents.length);
+
+    if (offsetAmount > 0) {
+      if (itemDelta < 0) {
+        // Scrolling up
+        let movedComponents = orderedComponents.splice(-offsetAmount);
+
+        orderedComponents[0].hasBeenMeasured = false;
+        orderedComponents.unshift(...movedComponents);
+
+        VirtualComponent.moveComponents(_itemContainer, movedComponents[0], movedComponents[movedComponents.length - 1], true);
+      } else if (itemDelta > 0) {
+        // Scrolling down
+        let movedComponents = orderedComponents.splice(0, offsetAmount);
+
+        orderedComponents[0].hasBeenMeasured = false;
+        orderedComponents.push(...movedComponents);
+
+        VirtualComponent.moveComponents(_itemContainer, movedComponents[0], movedComponents[movedComponents.length - 1], false);
+      }
+    }
+
+    for (let i = 0, itemIndex = firstItemIndex; itemIndex <= lastItemIndex; i++, itemIndex++) {
+      orderedComponents[i].recycle(items[itemIndex], itemIndex);
+    }
+
+    _itemContainer.style.paddingTop = `${totalBefore}px`;
+    _itemContainer.style.paddingBottom = `${totalAfter}px`;
+
+    this._prevFirstItemIndex = firstItemIndex;
+  }
+
+  /*
+   * Sets up _virtualComponents, which is meant to be a static pool of components that we render to.
+   * In order to decrease the time spent rendering and diffing, we pull the {{each}} out of the DOM
+   * and only replace the content of _virtualComponents which are removed/added.
+   *
+   * For instance, if we start with the following and scroll down, items 2 and 3 do not need to be
+   * rerendered, only item 1 needs to be removed and only item 4 needs to be added. So we replace
+   * item 1 with item 4, and then manually move the DOM:
+   *
+   *   1                        4                         2
+   *   2 -> replace 1 with 4 -> 2 -> manually move DOM -> 3
+   *   3                        3                         4
+   *
+   * However, _virtualComponents is still out of order. Rather than keep track of the state of
+   * things in _virtualComponents, we track the visually ordered components in the
+   * _orderedComponents array. This is possible because all of our operations are relatively simple,
+   * popping some number of components off one end and pushing them onto the other.
+   *
+   * @private
+   */
+
+  _updateVirtualComponentPool() {
+    const {
+      _scrollContainerHeight,
+      bufferSize,
+      minHeight,
+      virtualComponents,
+      orderedComponents,
+      totalItems
+    } = this;
+
+    // The total number of components is determined by the minimum number required to span the
+    // container with its buffers. Combined with the above rendering strategy this fairly
+    // performant, even if mean item size is above the minimum.
+    const totalHeight = _scrollContainerHeight + (_scrollContainerHeight * bufferSize * 2);
+    const totalComponents = Math.min(totalItems, Math.ceil(totalHeight / minHeight) + 1);
+    const delta = totalComponents - virtualComponents.get('length');
+
+    if (delta) {
+      if (delta > 0) {
+        for (let i = 0; i < delta; i++) {
+          let component = new VirtualComponent(this.token);
+          set(component, 'content', {});
+
+          virtualComponents.pushObject(component);
+        }
+      } else {
+        for (let i = virtualComponents.length; i > delta; i--) {
+          virtualComponents[i].destroy;
+        }
+      }
+
+      virtualComponents.length = totalComponents;
+      orderedComponents.length = totalComponents;
+
+      for (let i = 0; i < totalComponents; i++) {
+        orderedComponents[i] = virtualComponents[i];
+      }
+
+      if (delta > 0) {
+        this.schedule('sync', () => {
+          VirtualComponent.moveComponents(
+            this._itemContainer,
+            orderedComponents[orderedComponents.length - delta],
+            orderedComponents[orderedComponents.length - 1]
+          );
+        });
+      }
+    }
   }
 
   shiftContainers(dY) {
     this.scrollContainerTop -= dY;
-    this.itemContainerTop -= dY;
+    this.containerTop -= dY;
   }
 
-  prepend(numPrepended) {
-    this.totalItems += numPrepended;
+  prepend(items, numPrepended) {
+    this.items = items;
+    this._prevFirstItemIndex += numPrepended;
+    this.scrollTop += numPrepended * this.minHeight;
 
     this.schedule('sync', () => {
-      this.scrollTop += numPrepended * this.minValue;
-      this.scrollContainer.scrollTop = this.scrollTop;
+      this._scrollContainer.scrollTop = this.scrollTop;
     });
   }
 
-  append(numAppended) {
-    this.totalItems += numAppended;
+  append(items) {
+    this.items = items;
+  }
+
+  resetItems(items) {
+    this.items = items;
   }
 }

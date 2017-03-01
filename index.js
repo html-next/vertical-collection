@@ -54,10 +54,6 @@ module.exports = {
       importNames = [];
     }
 
-    if (this.versionChecker.forEmber().isAbove('1.13.0')) {
-      strippedModules['vertical-collection/-debug/helpers'].push('stripInModernEmber');
-    }
-
     babelOptions.plugins.push(
       filterImports(strippedModules),
       removeImports(importNames)

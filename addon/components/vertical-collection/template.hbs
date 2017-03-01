@@ -1,5 +1,5 @@
 <div class="virtual-component-renderer">
-  {{#each _virtualComponents key="id" as |virtualComponent|}}
+  {{#each radar.virtualComponents key="id" as |virtualComponent|}}
     {{{unbound virtualComponent.upperBound}}}
       {{yield virtualComponent.content virtualComponent.index}}
     {{{unbound virtualComponent.lowerBound}}}

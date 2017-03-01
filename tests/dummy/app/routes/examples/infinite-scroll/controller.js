@@ -3,11 +3,13 @@ import getNumbers from 'dummy/lib/get-numbers';
 
 const {
   Controller
-  } = Ember;
+} = Ember;
 
 export default Controller.extend({
 
   numImages: 5,
+
+  someProperty: 50,
 
   actions: {
 
@@ -15,8 +17,8 @@ export default Controller.extend({
       let first = this.get('model.first');
       let numbers = getNumbers(first - 20, 20);
       let model = this.get('model.numbers');
-      let newModel =  numbers.concat(model);
-      this.set('model.numbers', newModel);
+      model.unshiftObjects(numbers);
+      // this.set('model.numbers', newModel);
       this.set('model.first', first - 20);
     },
 
@@ -24,11 +26,14 @@ export default Controller.extend({
       let last = this.get('model.last');
       let numbers = getNumbers(last, 20);
       let model = this.get('model.numbers');
-      let newModel =  model.concat(numbers);
-      this.set('model.numbers', newModel);
+      model.pushObjects(numbers);
+      // this.set('model.numbers', newModel);
       this.set('model.last', last + 20);
-    }
+    },
 
+    setMinHeight() {
+      this.set('someProperty', 90);
+    }
   }
 
 });

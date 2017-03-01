@@ -6,9 +6,9 @@
             <div class="table-wrapper dark">
               {{#vertical-collection
                 items=model.numbers
-                debug=true
-                minHeight=50
+                minHeight=someProperty
                 alwaysRemeasure=true
+                debug=true
                 firstReached="loadAbove"
                 lastReached="loadBelow"
                 as |item index|
@@ -33,6 +33,8 @@
               they return.
           </p>
             <h4>Code for Demo</h4>
+
+          <button {{action "setMinHeight"}}>Do it </button>
           {{!-- {{code-snippet name="infinite-scroll-example.hbs"}} --}}
         </div>
     </div>

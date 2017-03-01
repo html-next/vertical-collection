@@ -1,16 +1,12 @@
 import Radar from './index';
 
 export default class StaticRadar extends Radar {
-  constructor(options) {
-    super(options);
-  }
-
-  _update() {
-    const totalIndexes = this.itemElements.length;
+  _updateIndexes() {
+    const totalIndexes = this.orderedComponents.length;
     const maxIndex = this.totalItems - 1;
 
-    const middleVisibleValue = this.visibleTop + (this.scrollContainerHeight  / 2);
-    const middleItemIndex = Math.ceil(middleVisibleValue / this.minValue);
+    const middleVisibleValue = this.visibleTop + ((this.visibleBottom - this.visibleTop)  / 2);
+    const middleItemIndex = Math.ceil(middleVisibleValue / this.minHeight);
 
     let firstItemIndex = middleItemIndex - Math.floor((totalIndexes - 1) / 2);
     let lastItemIndex = middleItemIndex + Math.ceil((totalIndexes - 1) / 2);
@@ -30,15 +26,15 @@ export default class StaticRadar extends Radar {
   }
 
   get total() {
-    return this.totalItems * this.minValue;
+    return this.totalItems * this.minHeight;
   }
 
   get totalBefore() {
-    return this.firstItemIndex * this.minValue;
+    return this.firstItemIndex * this.minHeight;
   }
 
   get totalAfter() {
-    return this.total - (this.lastItemIndex * this.minValue);
+    return this.total - (this.lastItemIndex * this.minHeight);
   }
 
   get firstItemIndex() {
@@ -50,10 +46,10 @@ export default class StaticRadar extends Radar {
   }
 
   get firstVisibleIndex() {
-    return Math.ceil(this.visibleTop / this.minValue);
+    return Math.ceil(this.visibleTop / this.minHeight);
   }
 
   get lastVisibleIndex() {
-    return Math.ceil(this.visibleBottom / this.minValue);
+    return Math.ceil(this.visibleBottom / this.minHeight);
   }
 }

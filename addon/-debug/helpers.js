@@ -38,7 +38,3 @@ export function deprecate() {
 export function stripInProduction(cb) {
   cb();
 }
-
-export function stripInModernEmber(cb) {
-  cb();
-}
