@@ -127,6 +127,10 @@ export default Mixin.create({
   },
 
   visualizeDebugger() {
+    if (this.isDestroying || this.isDestroyed) {
+      return;
+    }
+
     if (!this.get('debug')) {
       if (this.__visualization !== null) {
         console.info('tearing down existing visualization'); // eslint-disable-line no-console
@@ -157,4 +161,3 @@ export default Mixin.create({
     }
   }
 });
-
