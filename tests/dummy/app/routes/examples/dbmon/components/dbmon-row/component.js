@@ -11,7 +11,7 @@ export default Ember.Component.extend({
   queries: computed.alias('db.queries'),
 
   topFiveQueries: computed('queries', function() {
-    let queries = this.get('queries');
+    let queries = this.get('queries') || [];
     let topFiveQueries = queries.slice(0, 5);
 
     while (topFiveQueries.length < 5) {
@@ -30,7 +30,7 @@ export default Ember.Component.extend({
   }),
 
   countClassName: computed('queries', function() {
-    let queries = this.get('queries');
+    let queries = this.get('queries') || [];
     let countClassName = 'label';
 
     if (queries.length >= 20) {
