@@ -220,6 +220,36 @@ test('Collection prepends via unshiftObjects correctly', function(assert) {
   });
 });
 
+test('Collection measures correctly when it\'s scroll parent has scrolled', function(assert) {
+  assert.expect(0);
+  this.set('items', Ember.A(getNumbers(0, 100)));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
+    <div style="height: 400px; width: 100px;" class="scroll-child scrollable">
+      {{#vertical-collection ${'items'}
+        minHeight=20
+        alwaysRemeasure=true
+
+        as |item i|}}
+        <div style="height:20px;">
+          {{item.number}} {{i}}
+        </div>
+      {{/vertical-collection}}
+    </div>
+  </div>
+  `);
+
+  const scrollChild = this.$('.scroll-child');
+  const scrollParent = this.$('.scroll-parent');
+
+  return wait().then(() => {
+    scrollParent.scrollTop(200);
+    scrollChild.scrollTop(600);
+    // An assertion will be thrown if the scroll parent affects the measurement
+  });
+});
+
 // test('Collection prepends correctly if prepend would cause more VCs to be shown', function(assert) {
 //   assert.async();
 //   this.set('items', getNumbers(0, 20));
