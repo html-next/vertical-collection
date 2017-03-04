@@ -279,29 +279,12 @@ const VerticalCollection = Component.extend({
     };
 
     addScrollHandler(this._scrollContainer, this._scrollHandler);
-    this._scrollContainer.addEventListener('resize', this._resizeHandler);
-
-    if (this._scrollContainer !== Container) {
-      this._windowScrollTop = Container.scrollTop;
-
-      this._radarShiftHandler = ({ top }) => {
-        const dY = top - this._windowScrollTop;
-        this._windowScrollTop = top;
-
-        this._radar.shiftContainers(dY);
-      };
-
-      addScrollHandler(Container, this._radarShiftHandler);
-    }
+    Container.addEventListener('resize', this._resizeHandler);
   },
 
   willDestroy() {
     removeScrollHandler(this._scrollContainer, this._scrollHandler);
-    this._scrollContainer.removeEventListener('resize', this._resizeHandler);
-
-    if (this._radarShiftHandler) {
-      removeScrollHandler(Container, this._radarShiftHandler);
-    }
+    Container.removeEventListener('resize', this._resizeHandler);
   },
 
   init() {

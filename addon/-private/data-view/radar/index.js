@@ -16,6 +16,16 @@ export default class Radar {
   constructor() {
     this.token = new Token();
 
+    this._scrollTop = 0;
+    this._scrollTopOffset = null;
+
+    this._itemContainer = null;
+    this._scrollContiner = null;
+
+    this.minHeight = 0;
+    this.bufferSize = 0;
+    this.renderFromLast = 0;
+
     this.virtualComponents = A();
     this.orderedComponents = [];
   }
@@ -86,22 +96,23 @@ export default class Radar {
   }
 
   set itemContainer(itemContainer) {
-    const { top } = itemContainer.getBoundingClientRect();
-
     this._itemContainer = itemContainer;
-    this._itemContainerTop = top;
+    this._scrollTopOffset = null;
+  }
 
-    this._scrollTopOffset = (this._scrollTop + this._itemContainerTop) - this._scrollContainerTop;
+  get itemContainer() {
+    return this._itemContainer;
   }
 
   set scrollContainer(scrollContainer) {
-    const { top, height } = scrollContainer.getBoundingClientRect();
-
     this._scrollContainer = scrollContainer;
-    this._scrollContainerTop = top;
-    this._scrollContainerHeight = height;
+    this._scrollTopOffset = null;
+    this._scrollTop = scrollContainer.scrollTop;
+    this.scrollContainerHeight = scrollContainer.getBoundingClientRect().height;
+  }
 
-    this._scrollTopOffset = (scrollContainer.scrollTop + this._itemContainerTop) - this._scrollContainerTop;
+  get scrollContainer() {
+    return this._scrollContainer;
   }
 
   get scrollTop() {
@@ -113,26 +124,34 @@ export default class Radar {
       return;
     }
 
-    const deltaScroll = scrollTop - (this._scrollTop || 0);
-    this._itemContainerTop -= deltaScroll;
-
     this._scrollTop = scrollTop;
 
     this._scheduleUpdate();
   }
 
+  get scrollTopOffset() {
+    if (this._scrollTopOffset === null) {
+      const itemContainerTop = this.itemContainer ? this.itemContainer.getBoundingClientRect().top : 0;
+      const scrollContainerTop = this.scrollContainer ? this.scrollContainer.getBoundingClientRect().top : 0;
+
+      this._scrollTopOffset = (this.scrollContainer.scrollTop + itemContainerTop) - scrollContainerTop;
+    }
+
+    return this._scrollTopOffset;
+  }
+
   get visibleTop() {
-    return this.scrollTop + this._scrollTopOffset;
+    return this.scrollTop + this.scrollTopOffset;
   }
 
   set visibleTop(visibleTop) {
     assert('Must set visibleTop to a number', typeof visibleTop === 'number');
 
-    this.scrollTop = visibleTop - this._scrollTopOffset;
+    this.scrollTop = visibleTop - this.scrollTopOffset;
   }
 
   get visibleBottom() {
-    return this.visibleTop + this._scrollContainerHeight;
+    return this.visibleTop + this.scrollContainerHeight;
   }
 
   /*
@@ -210,7 +229,7 @@ export default class Radar {
 
   _updateVirtualComponentPool() {
     const {
-      _scrollContainerHeight,
+      scrollContainerHeight,
       bufferSize,
       minHeight,
       virtualComponents,
@@ -221,7 +240,7 @@ export default class Radar {
     // The total number of components is determined by the minimum number required to span the
     // container with its buffers. Combined with the above rendering strategy this fairly
     // performant, even if mean item size is above the minimum.
-    const totalHeight = _scrollContainerHeight + (_scrollContainerHeight * bufferSize * 2);
+    const totalHeight = scrollContainerHeight + (scrollContainerHeight * bufferSize * 2);
     const totalComponents = Math.min(totalItems, Math.ceil(totalHeight / minHeight) + 1);
     const delta = totalComponents - virtualComponents.get('length');
 
@@ -249,18 +268,13 @@ export default class Radar {
       if (delta > 0) {
         this.schedule('sync', () => {
           VirtualComponent.moveComponents(
-            this._itemContainer,
+            this.itemContainer,
             orderedComponents[orderedComponents.length - delta],
             orderedComponents[orderedComponents.length - 1]
           );
         });
       }
     }
-  }
-
-  shiftContainers(dY) {
-    this.scrollContainerTop -= dY;
-    this.containerTop -= dY;
   }
 
   prepend(items, numPrepended) {

@@ -65,14 +65,14 @@ export default class DynamicRadar extends Radar {
     const {
       firstItemIndex,
       orderedComponents,
-      _itemContainerTop,
+      itemContainer,
       totalBefore,
       skipList
     } = this;
 
     const staticVisibleIndex = this.renderFromLast ? this.lastVisibleIndex + 1 : this.firstVisibleIndex;
 
-    let scrollTopDidChange = false;
+    let totalDelta = 0;
 
     for (let i = 0; i < orderedComponents.length; i++) {
       let itemIndex = firstItemIndex + i;
@@ -92,7 +92,7 @@ export default class DynamicRadar extends Radar {
         if (previousItem) {
           margin = Math.round(currentItemTop - previousItem.getBoundingClientRect().bottom);
         } else {
-          margin = Math.round(currentItemTop - _itemContainerTop - totalBefore);
+          margin = Math.round(currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore);
         }
 
         assert(`item height must always be above minimum value. Item ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minHeight);
@@ -100,18 +100,16 @@ export default class DynamicRadar extends Radar {
         const itemDelta = skipList.set(itemIndex, currentItemHeight + margin);
 
         if (itemIndex < staticVisibleIndex && itemDelta !== 0) {
-          this._scrollTop += itemDelta;
-          this._itemContainerTop -= itemDelta;
-
-          scrollTopDidChange = true;
+          totalDelta += itemDelta;
         }
 
         currentItem.hasBeenMeasured = true;
       }
     }
 
-    if (scrollTopDidChange) {
-      this._scrollContainer.scrollTop = this._scrollTop;
+    if (totalDelta > 0) {
+      this.scrollContainer.scrollTop += totalDelta;
+      this._scrollTop = this.scrollContainer.scrollTop;
     }
   }
 
