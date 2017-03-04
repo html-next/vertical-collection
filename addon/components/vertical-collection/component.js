@@ -270,12 +270,12 @@ const VerticalCollection = Component.extend({
   _initializeEventHandlers() {
     this._scrollHandler = ({ top }) => {
       if (this._isEarthquake(top)) {
-        this._radar.scrollTop = top;
+        this._radar.scheduleUpdate();
       }
     };
 
     this._resizeHandler = () => {
-      this._scheduleUpdate();
+      this._initializeRadar();
     };
 
     addScrollHandler(this._scrollContainer, this._scrollHandler);

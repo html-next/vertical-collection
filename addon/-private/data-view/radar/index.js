@@ -20,7 +20,7 @@ export default class Radar {
     this._scrollTopOffset = null;
 
     this._itemContainer = null;
-    this._scrollContiner = null;
+    this._scrollContainer = null;
 
     this.minHeight = 0;
     this.bufferSize = 0;
@@ -43,7 +43,7 @@ export default class Radar {
     this.renderFromLast = renderFromLast;
 
     this._updateVirtualComponentPool();
-    this._scheduleUpdate();
+    this.scheduleUpdate();
   }
 
   destroy() {
@@ -74,7 +74,7 @@ export default class Radar {
    *
    * @private
    */
-  _scheduleUpdate() {
+  scheduleUpdate() {
     if (!this._nextUpdate) {
       this._nextUpdate = this.schedule('sync', () => {
         this._nextUpdate = null;
@@ -115,29 +115,23 @@ export default class Radar {
     return this._scrollContainer;
   }
 
-  get scrollTop() {
-    return this._scrollTop;
-  }
-
-  set scrollTop(scrollTop) {
-    if (this._scrollTop === scrollTop) {
-      return;
-    }
-
-    this._scrollTop = scrollTop;
-
-    this._scheduleUpdate();
-  }
-
   get scrollTopOffset() {
     if (this._scrollTopOffset === null) {
       const itemContainerTop = this.itemContainer ? this.itemContainer.getBoundingClientRect().top : 0;
       const scrollContainerTop = this.scrollContainer ? this.scrollContainer.getBoundingClientRect().top : 0;
 
-      this._scrollTopOffset = (this.scrollContainer.scrollTop + itemContainerTop) - scrollContainerTop;
+      this._scrollTopOffset = (this.scrollTop + itemContainerTop) - scrollContainerTop;
     }
 
     return this._scrollTopOffset;
+  }
+
+  get scrollTop() {
+    return this.scrollContainer.scrollTop;
+  }
+
+  set scrollTop(scrollTop) {
+    this.scrollContainer.scrollTop = scrollTop;
   }
 
   get visibleTop() {
@@ -280,11 +274,12 @@ export default class Radar {
   prepend(items, numPrepended) {
     this.items = items;
     this._prevFirstItemIndex += numPrepended;
-    this.scrollTop += numPrepended * this.minHeight;
 
     this.schedule('sync', () => {
-      this._scrollContainer.scrollTop = this.scrollTop;
+      this.scrollTop += numPrepended * this.minHeight;
     });
+
+    this.scheduleUpdate();
   }
 
   append(items) {
