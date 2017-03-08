@@ -109,7 +109,6 @@ export default class DynamicRadar extends Radar {
 
     if (totalDelta > 0) {
       this.scrollContainer.scrollTop += totalDelta;
-      this._scrollTop = this.scrollContainer.scrollTop;
     }
   }
 
