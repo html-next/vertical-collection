@@ -250,6 +250,21 @@ test('Collection measures correctly when it\'s scroll parent has scrolled', func
   });
 });
 
+test('Yields to inverse when no content is provided', function(assert) {
+  assert.expect(1);
+  this.set('items', []);
+
+  this.render(hbs`
+    {{#vertical-collection items}}
+      {{else}}
+        Foobar
+    {{/vertical-collection}}
+  `);
+  return wait().then(() => {
+    const el = this.$('vertical-collection');
+    assert.equal(el.html().trim(), 'Foobar');
+  });
+});
 // test('Collection prepends correctly if prepend would cause more VCs to be shown', function(assert) {
 //   assert.async();
 //   this.set('items', getNumbers(0, 20));
