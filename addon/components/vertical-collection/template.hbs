@@ -6,6 +6,6 @@
   {{/each}}
 </div>
 
-{{#unless radar.totalItems}}
+{{#if isEmpty}}
   {{yield to="inverse"}}
-{{/unless}}
+{{/if}}

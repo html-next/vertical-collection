@@ -104,6 +104,8 @@ const VerticalCollection = Component.extend({
     }
   }),
 
+  isEmpty: computed.empty('items'),
+
   _sendActions() {
     const {
       _items,
