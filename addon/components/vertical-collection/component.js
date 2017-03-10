@@ -19,8 +19,10 @@ import {
 
 const {
   computed,
+  compare,
   Component,
-  String: { htmlSafe }
+  String: { htmlSafe },
+  VERSION
 } = Ember;
 
 const VerticalCollection = Component.extend({
@@ -105,7 +107,10 @@ const VerticalCollection = Component.extend({
   }),
 
   isEmpty: computed.empty('items'),
-
+  supportsInverse: computed(function() {
+    return compare(VERSION, '1.13.0') !== -1;
+  }),
+  shouldYieldToinverse: computed.and('isEmpty', 'supportsInverse'),
   _sendActions() {
     const {
       _items,
