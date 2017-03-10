@@ -110,7 +110,7 @@ const VerticalCollection = Component.extend({
   supportsInverse: computed(function() {
     return compare(VERSION, '1.13.0') !== -1;
   }),
-  shouldYieldToinverse: computed.and('isEmpty', 'supportsInverse'),
+  shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
   _sendActions() {
     const {
       _items,
