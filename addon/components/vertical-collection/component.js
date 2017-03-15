@@ -107,8 +107,8 @@ const VerticalCollection = Component.extend({
 
   isEmpty: computed.empty('items'),
   supportsInverse: computed(function() {
-    // Support added for {{yield to='inverse'}} for >= 1.13.0
-    // https://github.com/emberjs/ember.js/pull/11084
+    // This is not a direct semver comparison, just a standard JS String comparison.
+    // It happens to work for the cases we need to compare (since we don't support < 1.11)
     return VERSION >= '1.13.0';
   }),
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
