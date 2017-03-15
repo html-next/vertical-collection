@@ -19,7 +19,6 @@ import {
 
 const {
   computed,
-  compare,
   Component,
   String: { htmlSafe },
   VERSION
@@ -108,7 +107,9 @@ const VerticalCollection = Component.extend({
 
   isEmpty: computed.empty('items'),
   supportsInverse: computed(function() {
-    return compare(VERSION, '1.13.0') !== -1;
+    // Support added for {{yield to='inverse'}} for >= 1.13.0
+    // https://github.com/emberjs/ember.js/pull/11084
+    return VERSION >= '1.13.0';
   }),
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
   _sendActions() {
