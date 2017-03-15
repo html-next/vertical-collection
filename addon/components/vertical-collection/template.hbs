@@ -1,7 +1,11 @@
 <div class="virtual-component-renderer">
   {{#each radar.virtualComponents key="id" as |virtualComponent|}}
     {{{unbound virtualComponent.upperBound}}}
-      {{yield virtualComponent.content virtualComponent.index}}
+      {{yield
+        virtualComponent.content
+        virtualComponent.index
+        (action 'heightDidChange' virtualComponent)
+      }}
     {{{unbound virtualComponent.lowerBound}}}
   {{/each}}
 </div>
