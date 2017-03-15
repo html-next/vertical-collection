@@ -20,7 +20,8 @@ import {
 const {
   computed,
   Component,
-  String: { htmlSafe }
+  String: { htmlSafe },
+  VERSION
 } = Ember;
 
 const VerticalCollection = Component.extend({
@@ -104,6 +105,13 @@ const VerticalCollection = Component.extend({
     }
   }),
 
+  isEmpty: computed.empty('items'),
+  supportsInverse: computed(function() {
+    // This is not a direct semver comparison, just a standard JS String comparison.
+    // It happens to work for the cases we need to compare (since we don't support < 1.11)
+    return VERSION >= '1.13.0';
+  }),
+  shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
   _sendActions() {
     const {
       _items,
