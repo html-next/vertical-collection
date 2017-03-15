@@ -249,7 +249,7 @@ test('Collection measures correctly when it\'s scroll parent has scrolled', func
     // An assertion will be thrown if the scroll parent affects the measurement
   });
 });
-if (VERSION >= '1.13.0') {
+if (Ember.VERSION >= '1.13.0') {
   test('Yields to inverse when no content is provided', function(assert) {
     assert.expect(1);
     this.set('items', []);
