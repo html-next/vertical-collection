@@ -308,9 +308,9 @@ const VerticalCollection = Component.extend({
     };
   },
   actions: {
-    heightDidChange (component) {
-      component.hasBeenMeasured = false
-      this._radar.scheduleUpdate()
+    heightDidChange(component) {
+      component.hasBeenMeasured = false;
+      this._radar.scheduleUpdate();
     }
   }
 });

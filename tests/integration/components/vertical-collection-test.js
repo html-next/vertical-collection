@@ -249,6 +249,7 @@ test('Collection measures correctly when it\'s scroll parent has scrolled', func
     // An assertion will be thrown if the scroll parent affects the measurement
   });
 });
+
 if (Ember.VERSION >= '1.13.0') {
   test('Yields to inverse when no content is provided', function(assert) {
     assert.expect(1);
@@ -267,6 +268,42 @@ if (Ember.VERSION >= '1.13.0') {
   });
 }
 
+test('Collection measures correctly after firing heightDidChange', function(assert) {
+  assert.expect(1);
+  const items = getNumbers(0, 10);
+
+  this.set('items', items.map((item) => {
+    item.height = 250;
+    return item;
+  }));
+
+  this.render(hbs`
+    <div style="height: 500px; width: 500px;" class="scroll-parent scrollable">
+      {{#vertical-collection ${'items'}
+        minHeight=250
+        alwaysRemeasure=true
+        as |item i heightDidChange|}}
+        {{number-slide
+          item=item
+          index=index
+          incrementBy=250
+          didResize=heightDidChange
+        }}
+      {{/vertical-collection}}
+    </div>
+  `);
+  return wait()
+    .then(() => {
+      const firstItem = this.$('number-slide').get(0);
+      firstItem.click(); // item height should now be 500
+      return wait();
+    }).then(() => {
+      this.$('.scrollable')[0].scrollTop += 500;
+      return wait();
+    }).then(() => {
+      assert.equal(this.$('vertical-collection')[0].style.paddingTop, '500px');
+    });
+});
 // test('Collection prepends correctly if prepend would cause more VCs to be shown', function(assert) {
 //   assert.async();
 //   this.set('items', getNumbers(0, 20));

@@ -49,10 +49,11 @@ export default Component.extend({
   layout,
   index: 0,
   item: null,
+  incrementBy: 250,
   number: computed.alias('item.number'),
-  click () {
-    this.item.height += 25
-    this.notifyPropertyChange('item')
-    this.sendAction('didResize')
+  click() {
+    this.item.height += this.get('incrementBy');
+    this.notifyPropertyChange('item');
+    this.sendAction('didResize');
   }
 });
