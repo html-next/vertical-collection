@@ -269,18 +269,19 @@ if (Ember.VERSION >= '1.13.0') {
 }
 
 test('Collection measures correctly after firing heightDidChange', function(assert) {
-  assert.expect(1);
-  const items = getNumbers(0, 10);
+  assert.expect(2);
+
+  let firstItem;
+  const items = getNumbers(0, 20);
 
   this.set('items', items.map((item) => {
-    item.height = 250;
+    item.height = 100;
     return item;
   }));
 
   this.render(hbs`
-    <div style="height: 500px; width: 500px;" class="scroll-parent scrollable">
+    <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
       {{#vertical-collection ${'items'}
-        minHeight=250
         alwaysRemeasure=true
         as |item i heightDidChange|}}
         {{number-slide
@@ -294,14 +295,15 @@ test('Collection measures correctly after firing heightDidChange', function(asse
   `);
   return wait()
     .then(() => {
-      const firstItem = this.$('number-slide').get(0);
-      firstItem.click(); // item height should now be 500
+      firstItem = this.$('number-slide').get(0);
+      firstItem.click(); // item height will now be 350
       return wait();
     }).then(() => {
-      this.$('.scrollable')[0].scrollTop += 500;
+      assert.equal(firstItem.style.height, '350px');
+      this.$('.scrollable')[0].scrollTop += 750;
       return wait();
     }).then(() => {
-      assert.equal(this.$('vertical-collection')[0].style.paddingTop, '500px');
+      assert.equal(this.$('vertical-collection')[0].style.paddingTop, '350px');
     });
 });
 // test('Collection prepends correctly if prepend would cause more VCs to be shown', function(assert) {
