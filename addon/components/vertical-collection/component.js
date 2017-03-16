@@ -111,6 +111,7 @@ const VerticalCollection = Component.extend({
     // It happens to work for the cases we need to compare (since we don't support < 1.11)
     return VERSION >= '1.13.0';
   }),
+  supportsActionsInYield: computed.alias('supportsInverse'),
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
   _sendActions() {
     const {
