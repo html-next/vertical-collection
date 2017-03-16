@@ -10,9 +10,13 @@
                 debug=true
                 firstReached="loadAbove"
                 lastReached="loadBelow"
-                as |item index|
+                as |item index heightDidChange|
               }}
-                {{number-slide item=item index=index}}
+                {{number-slide
+                  item=item
+                  index=index
+                  didResize=heightDidChange
+                }}
               {{/vertical-collection}}
             </div>
           {{!- END-SNIPPET }}

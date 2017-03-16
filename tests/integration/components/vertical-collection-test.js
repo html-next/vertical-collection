@@ -249,6 +249,7 @@ test('Collection measures correctly when it\'s scroll parent has scrolled', func
     // An assertion will be thrown if the scroll parent affects the measurement
   });
 });
+
 if (Ember.VERSION >= '1.13.0') {
   test('Yields to inverse when no content is provided', function(assert) {
     assert.expect(1);
@@ -264,6 +265,45 @@ if (Ember.VERSION >= '1.13.0') {
       const el = this.$('vertical-collection');
       assert.equal(el.html().trim(), 'Foobar');
     });
+  });
+
+  test('Collection measures correctly after firing heightDidChange', function(assert) {
+    assert.expect(2);
+
+    let firstItem;
+    const items = getNumbers(0, 20);
+
+    this.set('items', items.map((item) => {
+      item.height = 100;
+      return item;
+    }));
+
+    this.render(hbs`
+      <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
+        {{#vertical-collection ${'items'}
+          alwaysRemeasure=true
+          as |item i heightDidChange|}}
+          {{number-slide
+            item=item
+            index=index
+            incrementBy=250
+            didResize=heightDidChange
+          }}
+        {{/vertical-collection}}
+      </div>
+    `);
+    return wait()
+      .then(() => {
+        firstItem = this.$('number-slide').get(0);
+        firstItem.click(); // item height will now be 350
+        return wait();
+      }).then(() => {
+        assert.equal(firstItem.style.height, '350px');
+        this.$('.scrollable')[0].scrollTop += 750;
+        return wait();
+      }).then(() => {
+        assert.equal(this.$('vertical-collection')[0].style.paddingTop, '350px');
+      });
   });
 }
 

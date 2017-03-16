@@ -26,7 +26,7 @@ function numberToOpacity(number) {
 export default Component.extend({
   tagName: 'number-slide',
   attributeBindings: ['style'],
-  isDynamic: false,
+  isDynamic: true,
   prefixed: false,
   style: computed('isDynamic', 'item', function() {
     let item = this.get('item');
@@ -49,5 +49,11 @@ export default Component.extend({
   layout,
   index: 0,
   item: null,
-  number: computed.alias('item.number')
+  incrementBy: 250,
+  number: computed.alias('item.number'),
+  click() {
+    this.item.height += this.get('incrementBy');
+    this.notifyPropertyChange('item');
+    this.sendAction('didResize');
+  }
 });
