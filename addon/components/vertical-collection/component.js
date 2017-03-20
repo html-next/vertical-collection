@@ -191,6 +191,14 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
+    const el = this.get('element');
+    const mutationObserver = new MutationObserver(() => this._radar.scheduleUpdate());
+    mutationObserver.observe(el, {
+      characterData: true,
+      attributes: true,
+      subtree: true
+    });
+    this.set('mutationObserver', mutationObserver);
     // The rendered {{each}} is removed from the DOM, but a reference is kept, allowing Glimmer to
     // continue rendering to the node. This enables the manual diffing strategy described above.
     this._virtualComponentRenderer = this.element.getElementsByClassName('virtual-component-renderer')[0];
@@ -294,6 +302,7 @@ const VerticalCollection = Component.extend({
   willDestroy() {
     removeScrollHandler(this._scrollContainer, this._scrollHandler);
     Container.removeEventListener('resize', this._resizeHandler);
+    this.get('mutationObserver').disconnect();
   },
 
   init() {
@@ -307,12 +316,6 @@ const VerticalCollection = Component.extend({
     this._radar.didUpdate = () => {
       this._sendActions();
     };
-  },
-  actions: {
-    heightDidChange(component) {
-      component.hasBeenMeasured = false;
-      this._radar.scheduleUpdate();
-    }
   }
 });
 
