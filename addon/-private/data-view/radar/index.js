@@ -17,6 +17,7 @@ export default class Radar {
     this.token = new Token();
 
     this._scrollTop = 0;
+    this._prependOffset = 0;
     this._scrollTopOffset = null;
 
     this._itemContainer = null;
@@ -76,6 +77,7 @@ export default class Radar {
   scheduleUpdate() {
     if (!this._nextUpdate) {
       this._nextUpdate = this.schedule('sync', () => {
+        this._scrollTop = this.scrollContainer.scrollTop;
         this._nextUpdate = null;
         this._updateIndexes();
         this._updateVirtualComponents();
@@ -114,6 +116,22 @@ export default class Radar {
     return this._scrollContainer;
   }
 
+  get scrollTop() {
+    return this.scrollContainer.scrollTop;
+  }
+
+  set scrollTop(scrollTop) {
+    this.scrollContainer.scrollTop = scrollTop;
+  }
+
+  /*
+   * Represents the offset between the top of the itemContainer and the top of scrollContainer
+   * when `scrollTop === 0`. Basically, the item container could "begin" anywhere in the
+   * scrollContainer. There could be some header or other element _before_ the itemContainer that
+   * pushes it down a little bit. In this case, the true position of the scrollContainer's top
+   * relative to our measurements, which begin at 0, is `scrollTop - scrollTopOffset`. In other
+   * words, while we _can't_ have a negative `scrollTop`, we _can_ have a negative `visibleTop`.
+   */
   get scrollTopOffset() {
     if (this._scrollTopOffset === null) {
       const itemContainerTop = this.itemContainer ? this.itemContainer.getBoundingClientRect().top : 0;
@@ -125,22 +143,40 @@ export default class Radar {
     return this._scrollTopOffset;
   }
 
-  get scrollTop() {
-    return this.scrollContainer.scrollTop;
+  /*
+   * `prependOffset` exists because there are times when we need to do the following in this exact
+   * order:
+   *
+   * 1. Prepend, which means we need to adjust the scroll position by `minHeight * numPrepended`
+   * 2. Calculate the items that will be displayed after the prepend, and move VCs around as
+   *    necessary (`scheduleUpdate`).
+   * 3. Actually add the amount prepended to `scrollContainer.scrollTop`
+   *
+   * This is due to some strange behavior in Chrome where it will modify `scrollTop` on it's own
+   * when prepending item elements. We seem to avoid this behavior by doing these things in a RAF
+   * in this exact order.
+   */
+  get prependOffset() {
+    return this._prependOffset;
   }
 
-  set scrollTop(scrollTop) {
-    this.scrollContainer.scrollTop = scrollTop;
+  set prependOffset(offset) {
+    this._prependOffset = offset;
+
+    this.schedule('sync', () => {
+      this.scrollTop += this._prependOffset;
+      this._prependOffset = 0;
+    });
   }
 
   get visibleTop() {
-    return this.scrollTop + this.scrollTopOffset;
+    return this.scrollTop + this.prependOffset + this.scrollTopOffset;
   }
 
   set visibleTop(visibleTop) {
     assert('Must set visibleTop to a number', typeof visibleTop === 'number');
 
-    this.scrollTop = visibleTop - this.scrollTopOffset;
+    this.scrollTop = visibleTop - this.prependOffset - this.scrollTopOffset;
   }
 
   get visibleBottom() {
@@ -163,7 +199,8 @@ export default class Radar {
       firstItemIndex,
       lastItemIndex,
       totalBefore,
-      totalAfter
+      totalAfter,
+      total
     } = this;
 
     const itemDelta = firstItemIndex - _prevFirstItemIndex;
@@ -195,6 +232,7 @@ export default class Radar {
 
     _itemContainer.style.paddingTop = `${totalBefore}px`;
     _itemContainer.style.paddingBottom = `${totalAfter}px`;
+    _itemContainer.style.minHeight = `${total}px`;
 
     this._prevFirstItemIndex = firstItemIndex;
   }
@@ -219,7 +257,6 @@ export default class Radar {
    *
    * @private
    */
-
   _updateVirtualComponentPool() {
     const {
       scrollContainerHeight,
@@ -244,18 +281,15 @@ export default class Radar {
           set(component, 'content', {});
 
           virtualComponents.pushObject(component);
+          orderedComponents.push(component);
         }
       } else {
         for (let i = virtualComponents.length - 1; i > delta; i--) {
           virtualComponents[i].destroy;
         }
-      }
 
-      virtualComponents.length = totalComponents;
-      orderedComponents.length = totalComponents;
-
-      for (let i = 0; i < totalComponents; i++) {
-        orderedComponents[i] = virtualComponents[i];
+        virtualComponents.length = totalComponents;
+        orderedComponents.length = totalComponents;
       }
 
       if (delta > 0) {
@@ -274,18 +308,23 @@ export default class Radar {
     this.items = items;
     this._prevFirstItemIndex += numPrepended;
 
-    this.schedule('sync', () => {
-      this.scrollTop += numPrepended * this.minHeight;
-    });
-
+    this._updateVirtualComponentPool();
     this.scheduleUpdate();
+
+    this.prependOffset = numPrepended * this.minHeight;
   }
 
   append(items) {
     this.items = items;
+
+    this._updateVirtualComponentPool();
+    this.scheduleUpdate();
   }
 
   resetItems(items) {
     this.items = items;
+
+    this._updateVirtualComponentPool();
+    this.scheduleUpdate();
   }
 }

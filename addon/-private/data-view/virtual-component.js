@@ -84,6 +84,8 @@ export default class VirtualComponent {
 
     const docFragment = rangeToMove.extractContents();
 
+    rangeToMove.detach();
+
     // The first and last nodes in the range do not get extracted, and are instead cloned, so they
     // have to be reset.
     //
@@ -92,7 +94,7 @@ export default class VirtualComponent {
     lastComponent._lowerBound = docFragment.lastChild || lastComponent._lowerBound;
 
     if (prepend) {
-      element.prepend(docFragment);
+      element.insertBefore(docFragment, element.firstChild);
     } else {
       element.appendChild(docFragment);
     }

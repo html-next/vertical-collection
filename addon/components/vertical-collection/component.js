@@ -131,11 +131,11 @@ const VerticalCollection = Component.extend({
     } = this._radar;
 
     if (firstItemIndex === 0 && firstItemIndex !== _prevFirstItemIndex) {
-      this.sendAction('firstReached');
+      this.sendAction('firstReached', _items[firstItemIndex], firstItemIndex);
     }
 
     if (lastItemIndex === _items.length - 1 && lastItemIndex !== _prevLastItemIndex) {
-      this.sendAction('lastReached');
+      this.sendAction('lastReached', _items[lastItemIndex], lastItemIndex);
     }
 
     if (firstVisibleIndex !== _prevFirstVisibleIndex) {
@@ -171,16 +171,15 @@ const VerticalCollection = Component.extend({
     this._prevLastKey = keyForItem(items[items.length - 1], key, items.length - 1);
 
     if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
+      this._prevFirstItemIndex += lenDiff;
+      this._prevFirstVisibleIndex += lenDiff;
+
       _radar.prepend(items, lenDiff);
     } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
       _radar.append(items, lenDiff);
     } else {
       _radar.resetItems(items);
     }
-
-    // The container element needs to have some height in order for us to set the scroll position
-    // on initialization, so we set this min-height property to radar's total
-    // this.element.style.minHeight = `${this._radar.total}px`;
 
     return this._radar;
   }),
@@ -277,6 +276,10 @@ const VerticalCollection = Component.extend({
         scrollPosition -= this._radar._scrollContainerHeight;
       }
     }
+
+    // The container element needs to have some height in order for us to set the scroll position
+    // on initialization, so we set this min-height property to radar's total
+    this.element.style.minHeight = `${this._radar.total}px`;
 
     this._radar.visibleTop = scrollPosition;
 
