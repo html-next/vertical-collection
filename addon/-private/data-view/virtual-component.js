@@ -21,6 +21,7 @@ export default class VirtualComponent {
     this.height = 0;
     this.range = doc.createRange();
     this.content = null;
+    this.inDOM = false;
     this.token = new Token(parentToken);
   }
 
@@ -37,30 +38,22 @@ export default class VirtualComponent {
   }
 
   getBoundingClientRect() {
-    if (!this.rect) {
-      this.range.setStart(this._upperBound, 0);
-      this.range.setEnd(this._lowerBound, 0);
+    this.range.setStart(this._upperBound, 0);
+    this.range.setEnd(this._lowerBound, 0);
 
-      this.rect = this.range.getBoundingClientRect();
+    const rect = this.range.getBoundingClientRect();
 
-      this.range.detach();
-    }
+    this.range.detach();
 
-    return this.rect;
-  }
-
-  static create(parentToken) {
-    return new VirtualComponent(parentToken);
+    return rect;
   }
 
   recycle(newContent, newIndex) {
     assert(`You cannot set an item's content to undefined`, newContent);
 
     set(this, 'index', newIndex);
-    this.rect = null;
 
     if (this.content !== newContent) {
-      this.hasBeenMeasured = false;
       set(this, 'content', newContent);
     }
   }
@@ -74,6 +67,10 @@ export default class VirtualComponent {
     this._lowerBound = null;
 
     set(this, 'content', null);
+  }
+
+  static create(parentToken) {
+    return new VirtualComponent(parentToken);
   }
 
   static moveComponents(element, firstComponent, lastComponent, prepend) {
