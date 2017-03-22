@@ -34,7 +34,7 @@ export default class StaticRadar extends Radar {
   }
 
   get totalAfter() {
-    return this.total - (this.lastItemIndex * this.minHeight);
+    return this.total - ((this.lastItemIndex + 1) * this.minHeight);
   }
 
   get firstItemIndex() {
