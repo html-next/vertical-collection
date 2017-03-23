@@ -1,14 +1,9 @@
 {
   "name": "smoke-and-mirrors",
   "dependencies": {
-    "animation-frame": "~0.2.4",
-    "ember": "beta",
-    "ember-cli-shims": "0.1.1"
+    "animation-frame": "~0.2.4"
   },
   "devDependencies": {
     "bootstrap": "~3.3.5"
-  },
-  "resolutions": {
-    "ember": "beta"
   }
 }
