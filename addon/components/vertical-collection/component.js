@@ -21,7 +21,8 @@ const {
   computed,
   Component,
   String: { htmlSafe },
-  VERSION
+  VERSION,
+  run
 } = Ember;
 
 const VerticalCollection = Component.extend({
@@ -191,13 +192,18 @@ const VerticalCollection = Component.extend({
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
     const el = this.get('element');
-    const mutationObserver = new MutationObserver(() => this._radar.scheduleUpdate());
-    mutationObserver.observe(el, {
-      characterData: true,
+    const performUpdate = run.bind(this._radar, this._radar.scheduleUpdate);
+
+    this._mutationObserver = new MutationObserver(() => {
+      requestIdleCallback(performUpdate);
+    });
+
+    this._mutationObserver.observe(el, {
       attributes: true,
+      characterData: true,
       subtree: true
     });
-    this.set('mutationObserver', mutationObserver);
+
     // The rendered {{each}} is removed from the DOM, but a reference is kept, allowing Glimmer to
     // continue rendering to the node. This enables the manual diffing strategy described above.
     this._virtualComponentRenderer = this.element.getElementsByClassName('virtual-component-renderer')[0];
@@ -305,7 +311,7 @@ const VerticalCollection = Component.extend({
   willDestroy() {
     removeScrollHandler(this._scrollContainer, this._scrollHandler);
     Container.removeEventListener('resize', this._resizeHandler);
-    this.get('mutationObserver').disconnect();
+    this._mutationObserver.disconnect();
   },
 
   init() {
