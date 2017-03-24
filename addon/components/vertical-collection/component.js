@@ -177,7 +177,7 @@ const VerticalCollection = Component.extend({
       _radar.prepend(items, lenDiff);
     } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
       _radar.append(items, lenDiff);
-    } else {
+    } else if (!isSameArray(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
       _radar.resetItems(items);
     }
 
@@ -341,6 +341,17 @@ function isAppend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
 
   const newFirstKey = keyForItem(newItems[0], key, 0);
   const newLastKey = keyForItem(newItems[newItems.length - lenDiff - 1], key, newItems.length - lenDiff - 1);
+
+  return oldFirstKey === newFirstKey && oldLastKey === newLastKey;
+}
+
+function isSameArray(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
+  if (lenDiff !== 0) {
+    return false;
+  }
+
+  const newFirstKey = keyForItem(newItems[0], key, 0);
+  const newLastKey = keyForItem(newItems[newItems.length - 1], key, newItems.length - 1);
 
   return oldFirstKey === newFirstKey && oldLastKey === newLastKey;
 }

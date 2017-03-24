@@ -234,3 +234,42 @@ test('Collection appends correctly if prepend would cause more VCs to be shown',
     assert.equal(itemContainer.outerHeight(), 800, 'itemContainer height is correct after append');
   });
 });
+
+test('Collection maintains state if the same list is passed in twice', function(assert) {
+  assert.expect(4);
+  const items = getNumbers(0, 100);
+  this.set('items', items);
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection ${'items'}
+      minHeight=20
+      alwaysRemeasure=true
+
+      as |item i|}}
+      <div style="height:40px;">
+        {{item.number}} {{i}}
+      </div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  const scrollContainer = this.$('.scrollable');
+  const itemContainer = this.$('vertical-collection');
+
+  return wait().then(() => {
+    scrollContainer.scrollTop(541);
+
+    return wait();
+  }).then(() => {
+    assert.equal(scrollContainer.find('div:first').text().trim(), '1 1', 'first item rendered correctly after same items set');
+    assert.equal(itemContainer.css('padding-top'), '40px', 'itemContainer height is correct before append');
+
+    this.set('items', items.slice());
+
+    return wait();
+  }).then(() => {
+    assert.equal(scrollContainer.find('div:first').text().trim(), '1 1', 'first item rendered correctly after same items set');
+    assert.equal(itemContainer.css('padding-top'), '40px', 'itemContainer padding correct after same items set');
+  });
+});
