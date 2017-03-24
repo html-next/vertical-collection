@@ -1,7 +1,10 @@
 import Radar from './index';
 import SkipList from '../skip-list';
+import Ember from 'ember';
 
 import { assert } from 'vertical-collection/-debug/helpers';
+
+const { run } = Ember;
 
 export default class DynamicRadar extends Radar {
   init(...args) {
@@ -21,10 +24,12 @@ export default class DynamicRadar extends Radar {
 
   _updateIndexes() {
     const { values } = this.skipList;
-    const totalIndexes = this.orderedComponents.length;
     const maxIndex = this.totalItems - 1;
-
+    const numComponents = this.orderedComponents.length;
+    const prevFirstItemIndex = this.firstItemIndex;
     const middleVisibleValue = this.visibleTop + ((this.visibleBottom - this.visibleTop) / 2);
+
+    this._measure(0, numComponents - 1);
 
     let {
       totalBefore,
@@ -32,17 +37,17 @@ export default class DynamicRadar extends Radar {
       index: middleItemIndex
     } = this.skipList.find(middleVisibleValue);
 
-    let firstItemIndex = middleItemIndex - Math.floor((totalIndexes - 1) / 2);
-    let lastItemIndex = middleItemIndex + Math.ceil((totalIndexes - 1) / 2);
+    let firstItemIndex = middleItemIndex - Math.floor((numComponents - 1) / 2);
+    let lastItemIndex = middleItemIndex + Math.ceil((numComponents - 1) / 2);
 
     if (firstItemIndex < 0) {
       firstItemIndex = 0;
-      lastItemIndex = totalIndexes - 1;
+      lastItemIndex = numComponents - 1;
     }
 
     if (lastItemIndex > maxIndex) {
       lastItemIndex = maxIndex;
-      firstItemIndex = maxIndex - (totalIndexes - 1);
+      firstItemIndex = maxIndex - (numComponents - 1);
     }
 
     for (let i = middleItemIndex - 1; i >= firstItemIndex; i--) {
@@ -53,15 +58,33 @@ export default class DynamicRadar extends Radar {
       totalAfter -= values[i];
     }
 
+    const itemDelta = firstItemIndex - prevFirstItemIndex;
+    const numCulled = Math.abs(itemDelta % numComponents);
+
+    if (itemDelta < 0) {
+      // schedule a measurement for items that could affect scrollTop
+      this.schedule('measure', () => {
+        const staticVisibleIndex = this.renderFromLast ? this.lastVisibleIndex + 1 : this.firstVisibleIndex;
+        const numBeforeStatic = staticVisibleIndex - firstItemIndex;
+
+        const lastIndex = Math.min(numCulled, numBeforeStatic - 1);
+        this._prependOffset += this._measure(0, lastIndex);
+      });
+    }
+
+    run.next(() => {
+      this._measure(0, numComponents - 1);
+    });
+
     this._firstItemIndex = firstItemIndex;
     this._lastItemIndex = lastItemIndex;
     this._totalBefore = totalBefore;
     this._totalAfter = totalAfter;
 
-    this.schedule('measure', () => this._measure());
+    return itemDelta;
   }
 
-  _measure() {
+  _measure(firstComponentIndex, lastComponentIndex) {
     const {
       firstItemIndex,
       orderedComponents,
@@ -70,46 +93,40 @@ export default class DynamicRadar extends Radar {
       skipList
     } = this;
 
-    const staticVisibleIndex = this.renderFromLast ? this.lastVisibleIndex + 1 : this.firstVisibleIndex;
-
     let totalDelta = 0;
 
-    for (let i = 0; i < orderedComponents.length; i++) {
-      let itemIndex = firstItemIndex + i;
-
+    for (let i = firstComponentIndex; i <= lastComponentIndex; i++) {
+      const itemIndex = firstItemIndex + i;
       const currentItem = orderedComponents[i];
+      const previousItem = orderedComponents[i - 1];
 
-      if (currentItem.hasBeenMeasured === false) {
-        const previousItem = orderedComponents[i - 1];
+      if (!currentItem.inDOM) {
+        continue;
+      }
 
-        const {
-          top: currentItemTop,
-          height: currentItemHeight
-        } = currentItem.getBoundingClientRect();
+      const {
+        top: currentItemTop,
+        height: currentItemHeight
+      } = currentItem.getBoundingClientRect();
 
-        let margin;
+      let margin;
 
-        if (previousItem) {
-          margin = Math.round(currentItemTop - previousItem.getBoundingClientRect().bottom);
-        } else {
-          margin = Math.round(currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore);
-        }
+      if (previousItem) {
+        margin = Math.round(currentItemTop - previousItem.getBoundingClientRect().bottom);
+      } else {
+        margin = Math.round(currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore);
+      }
 
-        assert(`item height must always be above minimum value. Item ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minHeight);
+      assert(`item height must always be above minimum value. Item ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minHeight);
 
-        const itemDelta = skipList.set(itemIndex, currentItemHeight + margin);
+      const itemDelta = skipList.set(itemIndex, currentItemHeight + margin);
 
-        if (itemIndex < staticVisibleIndex && itemDelta !== 0) {
-          totalDelta += itemDelta;
-        }
-
-        currentItem.hasBeenMeasured = true;
+      if (itemDelta !== 0) {
+        totalDelta += itemDelta;
       }
     }
 
-    if (totalDelta > 0) {
-      this.scrollContainer.scrollTop += totalDelta;
-    }
+    return totalDelta;
   }
 
   get total() {
@@ -128,8 +145,16 @@ export default class DynamicRadar extends Radar {
     return this._firstItemIndex;
   }
 
+  set firstItemIndex(index) {
+    this._firstItemIndex = index;
+  }
+
   get lastItemIndex() {
     return this._lastItemIndex;
+  }
+
+  set lastItemIndex(index) {
+    this._lastItemIndex = index;
   }
 
   get firstVisibleIndex() {

@@ -2,6 +2,10 @@ import Radar from './index';
 
 export default class StaticRadar extends Radar {
   _updateIndexes() {
+    const {
+      _firstItemIndex: prevFirstItemIndex
+    } = this;
+
     const totalIndexes = this.orderedComponents.length;
     const maxIndex = this.totalItems - 1;
 
@@ -23,6 +27,8 @@ export default class StaticRadar extends Radar {
 
     this._firstItemIndex = firstItemIndex;
     this._lastItemIndex = lastItemIndex;
+
+    return firstItemIndex - prevFirstItemIndex;
   }
 
   get total() {
@@ -41,8 +47,16 @@ export default class StaticRadar extends Radar {
     return this._firstItemIndex;
   }
 
+  set firstItemIndex(index) {
+    this._firstItemIndex = index;
+  }
+
   get lastItemIndex() {
     return this._lastItemIndex;
+  }
+
+  set lastItemIndex(index) {
+    this._lastItemIndex = index;
   }
 
   get firstVisibleIndex() {

@@ -78,16 +78,23 @@ export default class Radar {
   scheduleUpdate() {
     if (!this._nextUpdate) {
       this._nextUpdate = this.schedule('sync', () => {
-        this._scrollTop = this.scrollContainer.scrollTop;
         this._nextUpdate = null;
-        this._updateIndexes();
-        this._updateVirtualComponents();
+        this._scrollTop = this.scrollContainer.scrollTop;
+
+        const delta = this._updateIndexes();
+        this._updateVirtualComponents(delta);
       });
     }
 
     if (!this._nextDidUpdate) {
       this._nextDidUpdate = this.schedule('affect', () => {
         this._nextDidUpdate = null;
+
+        if (this._prependOffset !== 0) {
+          this.scrollTop += this._prependOffset;
+          this._prependOffset = 0;
+        }
+
         this.didUpdate();
       });
     }
@@ -109,7 +116,6 @@ export default class Radar {
   set scrollContainer(scrollContainer) {
     this._scrollContainer = scrollContainer;
     this._scrollTopOffset = null;
-    this._scrollTop = scrollContainer.scrollTop;
     this.scrollContainerHeight = scrollContainer.getBoundingClientRect().height;
   }
 
@@ -118,11 +124,11 @@ export default class Radar {
   }
 
   get scrollTop() {
-    return this.scrollContainer.scrollTop;
+    return this._scrollTop;
   }
 
   set scrollTop(scrollTop) {
-    this.scrollContainer.scrollTop = scrollTop;
+    this.scrollContainer.scrollTop = this._scrollTop = scrollTop;
   }
 
   /*
@@ -157,27 +163,14 @@ export default class Radar {
    * when prepending item elements. We seem to avoid this behavior by doing these things in a RAF
    * in this exact order.
    */
-  get prependOffset() {
-    return this._prependOffset;
-  }
-
-  set prependOffset(offset) {
-    this._prependOffset = offset;
-
-    this.schedule('sync', () => {
-      this.scrollTop += this._prependOffset;
-      this._prependOffset = 0;
-    });
-  }
-
   get visibleTop() {
-    return this.scrollTop + this.prependOffset + this.scrollTopOffset;
+    return this.scrollTop + this._prependOffset + this.scrollTopOffset;
   }
 
   set visibleTop(visibleTop) {
     assert('Must set visibleTop to a number', typeof visibleTop === 'number');
 
-    this.scrollTop = visibleTop - this.prependOffset - this.scrollTopOffset;
+    this.scrollTop = visibleTop - this._prependOffset - this.scrollTopOffset;
   }
 
   get visibleBottom() {
@@ -189,13 +182,11 @@ export default class Radar {
    *
    * @private
    */
-  _updateVirtualComponents() {
+  _updateVirtualComponents(itemDelta) {
     const {
       items,
       orderedComponents,
-
-      _itemContainer,
-      _prevFirstItemIndex,
+      itemContainer,
 
       firstItemIndex,
       lastItemIndex,
@@ -204,26 +195,21 @@ export default class Radar {
       total
     } = this;
 
-    const itemDelta = firstItemIndex - _prevFirstItemIndex;
     const offsetAmount = Math.abs(itemDelta % orderedComponents.length);
 
     if (offsetAmount > 0) {
       if (itemDelta < 0) {
         // Scrolling up
         let movedComponents = orderedComponents.splice(-offsetAmount);
-
-        orderedComponents[0].hasBeenMeasured = false;
         orderedComponents.unshift(...movedComponents);
 
-        VirtualComponent.moveComponents(_itemContainer, movedComponents[0], movedComponents[movedComponents.length - 1], true);
+        VirtualComponent.moveComponents(itemContainer, movedComponents[0], movedComponents[movedComponents.length - 1], true);
       } else if (itemDelta > 0) {
         // Scrolling down
         let movedComponents = orderedComponents.splice(0, offsetAmount);
-
-        orderedComponents[0].hasBeenMeasured = false;
         orderedComponents.push(...movedComponents);
 
-        VirtualComponent.moveComponents(_itemContainer, movedComponents[0], movedComponents[movedComponents.length - 1], false);
+        VirtualComponent.moveComponents(itemContainer, movedComponents[0], movedComponents[movedComponents.length - 1], false);
       }
     }
 
@@ -231,11 +217,9 @@ export default class Radar {
       orderedComponents[i].recycle(items[itemIndex], itemIndex);
     }
 
-    _itemContainer.style.paddingTop = `${totalBefore}px`;
-    _itemContainer.style.paddingBottom = `${totalAfter}px`;
-    _itemContainer.style.minHeight = `${total}px`;
-
-    this._prevFirstItemIndex = firstItemIndex;
+    itemContainer.style.paddingTop = `${totalBefore}px`;
+    itemContainer.style.paddingBottom = `${totalAfter}px`;
+    itemContainer.style.minHeight = `${total}px`;
   }
 
   /*
@@ -269,50 +253,43 @@ export default class Radar {
     } = this;
 
     // The total number of components is determined by the minimum number required to span the
-    // container with its buffers. Combined with the above rendering strategy this fairly
+    // container with its buffers. Combined with the above rendering strategy this is fairly
     // performant, even if mean item size is above the minimum.
     const totalHeight = scrollContainerHeight + (scrollContainerHeight * bufferSize * 2);
     const totalComponents = Math.min(totalItems, Math.ceil(totalHeight / minHeight) + 1);
     const delta = totalComponents - virtualComponents.get('length');
 
-    if (delta) {
-      if (delta > 0) {
-        for (let i = 0; i < delta; i++) {
-          let component = new VirtualComponent(this.token);
-          set(component, 'content', {});
+    if (delta > 0) {
+      for (let i = 0; i < delta; i++) {
+        let component = VirtualComponent.create(this.token);
+        set(component, 'content', {});
 
-          virtualComponents.pushObject(component);
-          orderedComponents.push(component);
-        }
-      } else {
-        for (let i = virtualComponents.length - 1; i > delta; i--) {
-          virtualComponents[i].destroy;
-        }
-
-        virtualComponents.length = totalComponents;
-        orderedComponents.length = totalComponents;
+        virtualComponents.pushObject(component);
+        orderedComponents.push(component);
       }
 
-      if (delta > 0) {
-        this.schedule('sync', () => {
-          VirtualComponent.moveComponents(
-            this.itemContainer,
-            orderedComponents[orderedComponents.length - delta],
-            orderedComponents[orderedComponents.length - 1]
-          );
-        });
-      }
+      this.schedule('sync', () => {
+        const firstIndex = orderedComponents.length - delta;
+        const lastIndex = orderedComponents.length - 1;
+
+        VirtualComponent.moveComponents(this.itemContainer, orderedComponents[firstIndex], orderedComponents[lastIndex]);
+
+        for (let i = firstIndex; i <= lastIndex; i++) {
+          orderedComponents[i].inDOM = true;
+        }
+      });
     }
   }
 
   prepend(items, numPrepended) {
     this.items = items;
-    this._prevFirstItemIndex += numPrepended;
+    this.firstItemIndex += numPrepended;
+    this.lastItemIndex += numPrepended;
 
     this._updateVirtualComponentPool();
     this.scheduleUpdate();
 
-    this.prependOffset = numPrepended * this.minHeight;
+    this._prependOffset = numPrepended * this.minHeight;
   }
 
   append(items) {

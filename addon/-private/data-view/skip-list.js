@@ -77,6 +77,9 @@ export default class SkipList {
     }
 
     this.total = layer.length > 0 ? layer.length > 1 ? layer[0] + layer[1] : layer[0] : 0;
+
+    assert('total must be a number', typeof this.total === 'number');
+
     this.layers = layers;
     this.values = values;
   }
@@ -92,6 +95,7 @@ export default class SkipList {
 
     targetValue = Math.min(total, targetValue);
 
+    assert('targetValue must be a number', typeof targetValue === 'number');
     assert('targetValue must be greater than or equal to 0', targetValue >= 0);
     assert('targetValue must be no more than total', targetValue <= total);
 
@@ -122,6 +126,10 @@ export default class SkipList {
   }
 
   set(index, value) {
+    assert('value must be a number', typeof value === 'number');
+    assert('index must be a number', typeof index === 'number');
+    assert('index must be within bounds', index >= 0 && index < this.values.length);
+
     const { layers } = this;
     const oldValue = layers[layers.length - 1][index];
     const delta = value - oldValue;

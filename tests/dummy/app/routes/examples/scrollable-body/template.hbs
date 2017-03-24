@@ -4,9 +4,9 @@
           {{!- BEGIN-SNIPPET scrollable-body-example }}
           {{#vertical-collection model.numbers
             minHeight=40
+            alwaysRemeasure=true
             containerSelector="body"
             indexForFirstItem=20
-            renderFromLast=true
             as |item index|
             }}
               {{number-slide item=item index=index}}
