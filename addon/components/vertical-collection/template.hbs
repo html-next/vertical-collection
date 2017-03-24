@@ -1,18 +1,7 @@
 <div class="virtual-component-renderer">
   {{#each radar.virtualComponents key="id" as |virtualComponent|}}
     {{{unbound virtualComponent.upperBound}}}
-      {{#if supportsActionsInYield}}
-        {{yield
-          virtualComponent.content
-          virtualComponent.index
-          (action 'heightDidChange' virtualComponent)
-        }}
-      {{else}}
-        {{yield
-          virtualComponent.content
-          virtualComponent.index
-        }}
-      {{/if}}
+      {{yield virtualComponent.content virtualComponent.index}}
     {{{unbound virtualComponent.lowerBound}}}
   {{/each}}
 </div>

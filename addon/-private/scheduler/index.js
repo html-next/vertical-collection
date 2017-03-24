@@ -50,14 +50,14 @@ export class Scheduler {
   }
 
   flush() {
-    let i, q;
+    let i, q, len;
 
     run.begin();
     if (this.sync.length) {
       q = this.sync;
       this.sync = [];
 
-      for (i = 0; i < q.length; i++) {
+      for (i = 0, len = q.length; i < len; i++) {
         q[i]();
       }
     }
@@ -66,7 +66,7 @@ export class Scheduler {
       q = this.layout;
       this.layout = [];
 
-      for (i = 0; i < q.length; i++) {
+      for (i = 0, len = q.length; i < len; i++) {
         q[i]();
       }
     }
@@ -77,7 +77,7 @@ export class Scheduler {
       q = this.measure;
       this.measure = [];
 
-      for (i = 0; i < q.length; i++) {
+      for (i = 0, len = q.length; i < len; i++) {
         q[i]();
       }
     }
@@ -86,7 +86,7 @@ export class Scheduler {
       q = this.affect;
       this.affect = [];
 
-      for (i = 0; i < q.length; i++) {
+      for (i = 0, len = q.length; i < len; i++) {
         q[i]();
       }
     }

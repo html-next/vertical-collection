@@ -74,37 +74,34 @@ export default class DynamicRadar extends Radar {
 
     let totalDelta = 0;
 
-    for (let i = 0; i < orderedComponents.length; i++) {
+    for (let i = 0, len = orderedComponents.length; i < len; i++) {
       let itemIndex = firstItemIndex + i;
 
       const currentItem = orderedComponents[i];
 
-      if (currentItem.hasBeenMeasured === false) {
-        const previousItem = orderedComponents[i - 1];
+      const previousItem = orderedComponents[i - 1];
 
-        const {
-          top: currentItemTop,
-          height: currentItemHeight
-        } = currentItem.getBoundingClientRect();
+      const {
+        top: currentItemTop,
+        height: currentItemHeight
+      } = currentItem.getBoundingClientRect();
 
-        let margin;
+      let margin;
 
-        if (previousItem) {
-          margin = Math.round(currentItemTop - previousItem.getBoundingClientRect().bottom);
-        } else {
-          margin = Math.round(currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore);
-        }
-
-        assert(`item height must always be above minimum value. Item ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minHeight);
-
-        const itemDelta = skipList.set(itemIndex, currentItemHeight + margin);
-
-        if (itemIndex < staticVisibleIndex && itemDelta !== 0) {
-          totalDelta += itemDelta;
-        }
-
-        currentItem.hasBeenMeasured = true;
+      if (previousItem) {
+        margin = Math.round(currentItemTop - previousItem.getBoundingClientRect().bottom);
+      } else {
+        margin = Math.round(currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore);
       }
+
+      assert(`item height must always be above minimum value. Item ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minHeight);
+
+      const itemDelta = skipList.set(itemIndex, currentItemHeight + margin);
+
+      if (itemIndex < staticVisibleIndex && itemDelta !== 0) {
+        totalDelta += itemDelta;
+      }
+
     }
 
     if (totalDelta > 0) {

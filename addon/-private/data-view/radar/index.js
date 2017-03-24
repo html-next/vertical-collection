@@ -42,7 +42,6 @@ export default class Radar {
     this.minHeight = minHeight;
     this.bufferSize = bufferSize;
     this.renderFromLast = renderFromLast;
-
     this._updateVirtualComponentPool();
     this.scheduleUpdate();
   }
@@ -50,7 +49,7 @@ export default class Radar {
   destroy() {
     this.token.cancel();
 
-    for (let i = 0; i < this.orderedComponents.length; i++) {
+    for (let i = 0, len = this.orderedComponents.length; i < len; i++) {
       this.orderedComponents[i].destroy();
     }
 
