@@ -20,6 +20,7 @@ import {
 const {
   computed,
   Component,
+  run,
   String: { htmlSafe },
   VERSION
 } = Ember;
@@ -308,7 +309,7 @@ const VerticalCollection = Component.extend({
     this._radar = new RadarClass();
 
     this._radar.didUpdate = () => {
-      this._sendActions();
+      run.next(() => this._sendActions());
     };
   },
   actions: {
