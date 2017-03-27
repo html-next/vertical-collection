@@ -1,35 +1,33 @@
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-sm-7">
-          {{!- BEGIN-SNIPPET flexible-layout-example }}
-            <div class="table-wrapper">
-              {{#vertical-collection model.numbers
-                minHeight=90
-                alwaysRemeasure=true
-                renderFromLast=true
-                idForFirstItem=40
-                key="number"
-                firstReached="loadAbove"
-                lastReached="loadBelow"
-                as |item index|
-              }}
-                {{number-slide isDynamic=true item=item index=index}}
-              {{/vertical-collection}}
-            </div>
-          {{!- END-SNIPPET }}
+  <div class="row">
+    <div class="col-sm-6">
+      <h3>Demo</h3>
+      {{!- BEGIN-SNIPPET flexible-layout-example }}
+        <div class="table-wrapper dark">
+          {{#vertical-collection model.numbers
+            minHeight=270
+            alwaysRemeasure=true
+            firstReached="loadAbove"
+            lastReached="loadBelow"
+            as |item index|
+          }}
+            {{number-slide isDynamic=true item=item index=index}}
+          {{/vertical-collection}}
         </div>
-        <div class="col-sm-5">
-            <h3>Flexible Layouts</h3>
-            <p>
-                The Vertical Collection doesn't care if your items are of a uniform
-                size or type.
-            </p>
-            <p>
-                This layout agnostic behavior will improve even more in upcoming releases
-                with integration with the pre-render component.
-            </p>
-            <h4>Code for Demo</h4>
-          {{code-snippet name="flexible-layout-example.hbs"}}
-        </div>
+      {{!- END-SNIPPET }}
     </div>
+    <div class="col-sm-6">
+      <h3>Flexible Layouts</h3>
+      <p>
+        The Vertical Collection doesn't care if your items are of a uniform
+        size or type.
+      </p>
+      <p>
+        This layout agnostic behavior will improve even more in upcoming releases
+        with integration with the pre-render component.
+      </p>
+      <h4>Code for Demo</h4>
+      {{code-snippet name="flexible-layout-example.hbs"}}
+    </div>
+  </div>
 </div>

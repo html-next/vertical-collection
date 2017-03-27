@@ -1,26 +1,21 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-sm-5">
+    <div class="col-sm-6">
       <h3>Demo</h3>
       {{!- BEGIN-SNIPPET infinite-scroll-example }}
         <div class="table-wrapper dark">
           {{#vertical-collection model.numbers
-            minHeight=40
-            alwaysRemeasure=true
+            minHeight=90
             firstReached="loadAbove"
             lastReached="loadBelow"
-            as |item index heightDidChange|
+            as |item index|
           }}
-            {{number-slide
-              item=item
-              index=index
-              isDynamic=false
-            }}
+            {{number-slide item=item index=index}}
           {{/vertical-collection}}
         </div>
       {{!- END-SNIPPET }}
     </div>
-    <div class="col-sm-7">
+    <div class="col-sm-6">
       <h3>Infinite Scroll</h3>
       <p>
         The Vertical Collection can be used to quickly build a robust infinite scroll.
@@ -35,7 +30,7 @@
         they return.
       </p>
       <h4>Code for Demo</h4>
-      {{!-- {{code-snippet name="infinite-scroll-example.hbs"}} --}}
+      {{code-snippet name="infinite-scroll-example.hbs"}}
     </div>
   </div>
 </div>

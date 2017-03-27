@@ -15,10 +15,7 @@ Router.map(function() {
     this.route('scrollable-body');
   });
 
-  this.route('available-components', function() {
-    this.route('vertical-collection');
-  });
-
+  this.route('settings');
 });
 
 export default Router;

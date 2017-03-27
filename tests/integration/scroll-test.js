@@ -432,4 +432,3 @@ test('Collection scrolls and measures correctly when parent is a table', functio
     assert.equal(rowTop - tableTop, 37, 'first row offset is correct');
   });
 });
-
