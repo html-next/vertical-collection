@@ -19,7 +19,6 @@ export default class VirtualComponent {
     this._upperBound = doc.createTextNode('');
     this._lowerBound = doc.createTextNode('');
     this.height = 0;
-    this.range = doc.createRange();
     this.content = null;
     this.inDOM = false;
     this.token = new Token(parentToken);
@@ -38,12 +37,14 @@ export default class VirtualComponent {
   }
 
   getBoundingClientRect() {
-    this.range.setStart(this._upperBound, 0);
-    this.range.setEnd(this._lowerBound, 0);
+    const range = doc.createRange();
 
-    const rect = this.range.getBoundingClientRect();
+    range.setStart(this._upperBound, 0);
+    range.setEnd(this._lowerBound, 0);
 
-    this.range.detach();
+    const rect = range.getBoundingClientRect();
+
+    range.detach();
 
     return rect;
   }
@@ -74,7 +75,7 @@ export default class VirtualComponent {
   }
 
   static moveComponents(element, firstComponent, lastComponent, prepend) {
-    const rangeToMove = new Range();
+    const rangeToMove = doc.createRange();
 
     rangeToMove.setStart(firstComponent._upperBound, 0);
     rangeToMove.setEnd(lastComponent._lowerBound, 0);
