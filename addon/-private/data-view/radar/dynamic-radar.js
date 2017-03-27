@@ -58,17 +58,18 @@ export default class DynamicRadar extends Radar {
       totalAfter -= values[i];
     }
 
-    const itemDelta = firstItemIndex - prevFirstItemIndex;
+    const itemDelta = prevFirstItemIndex ? firstItemIndex - prevFirstItemIndex : 0;
     const numCulled = Math.abs(itemDelta % numComponents);
 
-    if (itemDelta < 0) {
+    if (itemDelta < 0 || this._firstRender) {
       // schedule a measurement for items that could affect scrollTop
       this.schedule('measure', () => {
         const staticVisibleIndex = this.renderFromLast ? this.lastVisibleIndex + 1 : this.firstVisibleIndex;
         const numBeforeStatic = staticVisibleIndex - firstItemIndex;
 
-        const lastIndex = Math.min(numCulled, numBeforeStatic - 1);
+        const lastIndex = this._firstRender ? numBeforeStatic - 1 : Math.min(numCulled, numBeforeStatic - 1);
         this._prependOffset += this._measure(0, lastIndex);
+        this._firstRender = false;
       });
     }
 
@@ -209,6 +210,7 @@ export default class DynamicRadar extends Radar {
 
   resetItems(items) {
     this.skipList = new SkipList(items.length, this.minHeight);
+    this._firstRender = true;
 
     super.resetItems(items);
   }

@@ -41,6 +41,165 @@ test('Scroll to last item when actual item sizes are significantly larger than d
     });
 });
 
+test('Setting renderFromLast on a static collection starts at the bottom of the collection', function(assert) {
+  assert.expect(1);
+
+  this.set('items', new Array(50).fill({ text: 'b' }));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection ${'items'}
+      minHeight=100
+      renderFromLast=true
+
+      as |item i|}}
+      <div style="height: 100px;">{{item.text}} {{i}}</div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  const scrollable = this.$('.scrollable');
+
+  return wait()
+    .then(() => {
+      assert.equal(scrollable.find('div:last').html(), 'b 49', 'the last item in the list should be rendered');
+    });
+});
+
+test('Setting renderFromLast on a dynamic collection starts it at the bottom of the collection', function(assert) {
+  assert.expect(1);
+
+  this.set('items', new Array(50).fill({ text: 'b' }));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection ${'items'}
+      minHeight=10
+      alwaysRemeasure=true
+      renderFromLast=true
+
+      as |item i|}}
+      <div style="height: 100px;">{{item.text}} {{i}}</div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  const scrollable = this.$('.scrollable');
+
+  return wait()
+    .then(() => {
+      assert.equal(scrollable.find('div:last').html(), 'b 49', 'the last item in the list should be rendered');
+    });
+});
+
+test('Setting idForFirstItem on a static collection starts it with the first item at the top', function(assert) {
+  assert.expect(1);
+
+  this.set('items', new Array(50).fill({ text: 'b' }));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection ${'items'}
+      minHeight=100
+      idForFirstItem=25
+      key="@index"
+
+      as |item i|}}
+      <div style="height: 100px;">{{item.text}} {{i}}</div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  const scrollable = this.$('.scrollable');
+
+  return wait()
+    .then(() => {
+      assert.equal(scrollable.scrollTop(), 2500, 'the scroll container offset is correct');
+    });
+});
+
+test('Setting idForFirstItem on a dynamic collection starts it with the first item at the top', function(assert) {
+  assert.expect(1);
+
+  this.set('items', new Array(50).fill({ text: 'b' }));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection ${'items'}
+      minHeight=10
+      alwaysRemeasure=true
+      idForFirstItem=25
+      key="@index"
+
+      as |item i|}}
+      <div style="height: 100px;">{{item.text}} {{i}}</div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  const scrollable = this.$('.scrollable');
+
+  return wait()
+    .then(() => {
+      assert.equal(scrollable.scrollTop(), 2500, 'the scroll container offset is correct');
+    });
+});
+
+test('Setting renderFromLast and idForFirstItem on a static collection starts it with the first item at the bottom', function(assert) {
+  assert.expect(1);
+
+  this.set('items', new Array(50).fill({ text: 'b' }));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection ${'items'}
+      minHeight=100
+      renderFromLast=true
+      idForFirstItem=25
+      key="@index"
+
+      as |item i|}}
+      <div style="height: 100px;">{{item.text}} {{i}}</div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  const scrollable = this.$('.scrollable');
+
+  return wait()
+    .then(() => {
+      assert.equal(scrollable.scrollTop(), 2400, 'the scroll container offset is correct');
+    });
+});
+
+test('Setting renderFromLast and idForFirstItem on a dynamic collection starts it with the first item at the bottom', function(assert) {
+  assert.expect(1);
+
+  this.set('items', new Array(50).fill({ text: 'b' }));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection ${'items'}
+      minHeight=10
+      alwaysRemeasure=true
+      renderFromLast=true
+      idForFirstItem=25
+      key="@index"
+
+      as |item i|}}
+      <div style="height: 100px;">{{item.text}} {{i}}</div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  const scrollable = this.$('.scrollable');
+
+  return wait()
+    .then(() => {
+      assert.equal(scrollable.scrollTop(), 2400, 'the scroll container offset is correct');
+    });
+});
+
 test('Sends the firstVisibleChanged action', function(assert) {
   const called = assert.async(2);
   let count = 0;

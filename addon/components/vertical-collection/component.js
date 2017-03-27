@@ -253,7 +253,7 @@ const VerticalCollection = Component.extend({
 
     const minHeight = this.get('_minHeight');
     const items = this._items;
-    const maxIndex = items.length;
+    const maxIndex = items.length - 1;
 
     let index = 0;
 
@@ -266,10 +266,13 @@ const VerticalCollection = Component.extend({
       }
 
       scrollPosition = index * minHeight;
+    } else if (renderFromLast) {
+      // If no id was set and `renderFromLast` is true, start from the bottom
+      scrollPosition = maxIndex * minHeight;
+    }
 
-      if (renderFromLast) {
-        scrollPosition -= this._radar._scrollContainerHeight;
-      }
+    if (renderFromLast) {
+      scrollPosition -= (this._radar.scrollContainerHeight - minHeight);
     }
 
     // The container element needs to have some height in order for us to set the scroll position

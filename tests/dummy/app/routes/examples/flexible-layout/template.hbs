@@ -4,16 +4,16 @@
           {{!- BEGIN-SNIPPET flexible-layout-example }}
             <div class="table-wrapper">
               {{#vertical-collection model.numbers
-                defaultHeight=270
+                minHeight=90
                 alwaysRemeasure=true
                 renderFromLast=true
+                idForFirstItem=40
+                key="number"
                 firstReached="loadAbove"
                 lastReached="loadBelow"
                 as |item index|
               }}
-                  <div class="image-slide flexible">
-                    {{number-slide isDynamic=true item=item index=index}}
-                  </div>
+                {{number-slide isDynamic=true item=item index=index}}
               {{/vertical-collection}}
             </div>
           {{!- END-SNIPPET }}
