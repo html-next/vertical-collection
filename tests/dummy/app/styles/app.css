@@ -200,3 +200,7 @@ img.auto-size {
 .display-inline {
   display: inline-block;
 }
+
+vertical-item {
+  display: block;
+}

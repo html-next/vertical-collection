@@ -2,6 +2,7 @@ import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import Ember from 'ember';
 
+import getNumbers from 'dummy/lib/get-numbers';
 import wait from 'dummy/tests/helpers/wait';
 
 moduleForComponent('vertical-collection', 'Integration | Basic Tests', {
@@ -72,6 +73,33 @@ test('The Collection Renders with a key path set', function(assert) {
 
   return wait().then(() => {
     assert.equal(this.$().find('vertical-item').length, 3);
+  });
+});
+
+test('The collection renders with containerSelector set', function(assert) {
+  assert.expect(1);
+
+  this.set('items', getNumbers(0, 100));
+
+  this.render(hbs`
+  <div style="height: 100px;" class="scrollable">
+    <div>
+      {{#vertical-collection ${'items'}
+        containerSelector=".scrollable"
+        minHeight=20
+        bufferSize=0
+
+        as |item i|}}
+        <vertical-item style="height: 20px">
+          {{item.number}} {{i}}
+        </vertical-item>
+      {{/vertical-collection}}
+    </div>
+  </div>
+  `);
+
+  return wait().then(() => {
+    assert.equal(this.$().find('vertical-item').length, 6);
   });
 });
 
