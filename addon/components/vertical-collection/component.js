@@ -259,7 +259,7 @@ const VerticalCollection = Component.extend({
 
     if (idForFirstItem) {
       for (let i = 0; i < maxIndex; i++) {
-        if (keyForItem(items[i], key, i) === idForFirstItem) {
+        if (keyForItem(items[i], key, i) == idForFirstItem) {
           index = i;
           break;
         }
@@ -327,7 +327,7 @@ VerticalCollection.reopenClass({
 });
 
 function isPrepend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
-  if (lenDiff <= 0) {
+  if (lenDiff <= 0 || lenDiff >= newItems.length) {
     return false;
   }
 
@@ -338,7 +338,7 @@ function isPrepend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
 }
 
 function isAppend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
-  if (lenDiff <= 0) {
+  if (lenDiff <= 0 || lenDiff >= newItems.length) {
     return false;
   }
 
