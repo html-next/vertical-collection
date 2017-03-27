@@ -393,3 +393,43 @@ test('Collection measures correctly when it\'s scroll parent has scrolled', func
     // An assertion will be thrown if the scroll parent affects the measurement
   });
 });
+
+test('Collection scrolls and measures correctly when parent is a table', function(assert) {
+  assert.expect(2);
+  this.set('items', Ember.A(getNumbers(0, 100)));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 200px;" class="scrollable">
+    <table class="table table-striped latest-data">
+      {{#vertical-collection ${'items'}
+        containerSelector=".scrollable"
+        tagName="tbody"
+        minHeight=37
+
+        as |item i|}}
+        <tr>
+          <td>{{item.number}}</td>
+          <td>{{i}}</td>
+        </tr>
+      {{/vertical-collection}}
+    </table>
+  </div>
+  `);
+
+  const scrollContainer = this.$('.scrollable');
+
+  return wait().then(() => {
+    scrollContainer.scrollTop(200);
+
+    return wait();
+  }).then(() => {
+    const tableTop = this.$('table')[0].getBoundingClientRect().top;
+
+    const row = this.$('tr:first');
+    const rowTop = row[0].getBoundingClientRect().top;
+
+    assert.equal(row.text().replace(/\s/g, ''), '11', 'correct first row is rendered');
+    assert.equal(rowTop - tableTop, 37, 'first row offset is correct');
+  });
+});
+
