@@ -141,10 +141,11 @@ export default class Radar {
    */
   get scrollTopOffset() {
     if (this._scrollTopOffset === null) {
+      const marginTop = parseInt(this.itemContainer.style.marginTop || 0);
       const itemContainerTop = this.itemContainer ? this.itemContainer.getBoundingClientRect().top : 0;
       const scrollContainerTop = this.scrollContainer ? this.scrollContainer.getBoundingClientRect().top : 0;
 
-      this._scrollTopOffset = (this.scrollTop + itemContainerTop) - scrollContainerTop;
+      this._scrollTopOffset = (this.scrollTop + (itemContainerTop - marginTop)) - scrollContainerTop;
     }
 
     return this._scrollTopOffset;
@@ -191,8 +192,7 @@ export default class Radar {
       firstItemIndex,
       lastItemIndex,
       totalBefore,
-      totalAfter,
-      total
+      totalAfter
     } = this;
 
     const offsetAmount = Math.abs(itemDelta % orderedComponents.length);
@@ -217,9 +217,9 @@ export default class Radar {
       orderedComponents[i].recycle(items[itemIndex], itemIndex);
     }
 
-    itemContainer.style.paddingTop = `${totalBefore}px`;
-    itemContainer.style.paddingBottom = `${totalAfter}px`;
-    itemContainer.style.minHeight = `${total}px`;
+    itemContainer.style.marginTop = `${totalBefore}px`;
+    itemContainer.style.marginBottom = `${totalAfter}px`;
+    itemContainer.style.minHeight = '';
   }
 
   /*

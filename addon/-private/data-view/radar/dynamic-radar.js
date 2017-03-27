@@ -90,7 +90,6 @@ export default class DynamicRadar extends Radar {
       firstItemIndex,
       orderedComponents,
       itemContainer,
-      totalBefore,
       skipList
     } = this;
 
@@ -115,7 +114,7 @@ export default class DynamicRadar extends Radar {
       if (previousItem) {
         margin = Math.round(currentItemTop - previousItem.getBoundingClientRect().bottom);
       } else {
-        margin = Math.round(currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore);
+        margin = Math.round(currentItemTop - itemContainer.getBoundingClientRect().top);
       }
 
       assert(`item height must always be above minimum value. Item ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minHeight);
