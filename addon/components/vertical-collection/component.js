@@ -12,10 +12,8 @@ import StaticRadar from 'vertical-collection/-private/data-view/radar/static-rad
 
 import Container from 'vertical-collection/-private/data-view/container';
 import getArray from 'vertical-collection/-private/data-view/utils/get-array';
-import {
-  addScrollHandler,
-  removeScrollHandler
-} from 'vertical-collection/-private/data-view/utils/scroll-handler';
+import { addScrollHandler, removeScrollHandler } from 'vertical-collection/-private/data-view/utils/scroll-handler';
+import { addResizeHandler, removeResizeHandler } from 'vertical-collection/-private/data-view/utils/resize-handler';
 
 const {
   computed,
@@ -292,17 +290,24 @@ const VerticalCollection = Component.extend({
       }
     };
 
-    this._resizeHandler = () => {
-      this._initializeRadar();
+    this._itemContainerResizeHandler = () => {
+      this._radar.scheduleUpdate();
+    };
+
+    this._windowResizeHandler = () => {
+      this._radar.scrollContainer = this._scrollContainer;
+      this._radar.scheduleUpdate();
     };
 
     addScrollHandler(this._scrollContainer, this._scrollHandler);
-    Container.addEventListener('resize', this._resizeHandler);
+    addResizeHandler(this.element, this._itemContainerResizeHandler);
+    addResizeHandler(window, this._windowResizeHandler);
   },
 
-  willDestroy() {
+  willRemoveElement() {
     removeScrollHandler(this._scrollContainer, this._scrollHandler);
-    Container.removeEventListener('resize', this._resizeHandler);
+    removeResizeHandler(this.element, this._itemContainerResizeHandler);
+    removeResizeHandler(window, this._windowResizeHandler);
   },
 
   init() {

@@ -43,7 +43,6 @@ export default class Radar {
     this.bufferSize = bufferSize;
     this.renderFromLast = renderFromLast;
 
-    this._updateVirtualComponentPool();
     this.scheduleUpdate();
   }
 
@@ -76,26 +75,29 @@ export default class Radar {
    * @private
    */
   scheduleUpdate() {
-    if (!this._nextUpdate) {
-      this._nextUpdate = this.schedule('sync', () => {
-        this._nextUpdate = null;
+    // We always want to make sure we update the VC pool if needed. Anything could have changed
+    // since the last time `scheduleUpdate` was called, so we do this first.
+    this._updateVirtualComponentPool();
+
+    if (!this._updateScheduled) {
+      this._updateScheduled = true;
+
+      this.schedule('sync', () => {
         this._scrollTop = this.scrollContainer.scrollTop;
 
         const delta = this._updateIndexes();
         this._updateVirtualComponents(delta);
       });
-    }
 
-    if (!this._nextDidUpdate) {
-      this._nextDidUpdate = this.schedule('affect', () => {
-        this._nextDidUpdate = null;
-
+      this.schedule('affect', () => {
         if (this._prependOffset !== 0) {
           this.scrollTop += this._prependOffset;
           this._prependOffset = 0;
         }
 
         this.didUpdate();
+
+        this._updateScheduled = false;
       });
     }
   }
@@ -286,7 +288,6 @@ export default class Radar {
     this.firstItemIndex += numPrepended;
     this.lastItemIndex += numPrepended;
 
-    this._updateVirtualComponentPool();
     this.scheduleUpdate();
 
     this._prependOffset = numPrepended * this.minHeight;
@@ -295,14 +296,12 @@ export default class Radar {
   append(items) {
     this.items = items;
 
-    this._updateVirtualComponentPool();
     this.scheduleUpdate();
   }
 
   resetItems(items) {
     this.items = items;
 
-    this._updateVirtualComponentPool();
     this.scheduleUpdate();
   }
 }
