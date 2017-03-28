@@ -1,12 +1,13 @@
-smoke-and-mirrors
+vertical-collection
 =================
 
 [![npm version](https://badge.fury.io/js/smoke-and-mirrors.svg)](http://badge.fury.io/js/smoke-and-mirrors)
-[![Build Status](https://travis-ci.org/runspired/smoke-and-mirrors.svg)](https://travis-ci.org/runspired/smoke-and-mirrors)
-[![Ember Observer Score](http://emberobserver.com/badges/smoke-and-mirrors.svg)](http://emberobserver.com/addons/smoke-and-mirrors)
+[![Build Status](https://travis-ci.org/html-next/vertical-collection.svg)](https://travis-ci.org/html-next/vertical-collection)
+[![Ember Observer Score](http://emberobserver.com/badges/vertical-collection.svg)](http://emberobserver.com/addons/vertical-collection)
 
-`Smoke-and-mirrors` is an `ember-addon` that focuses on improving initial and re-render performance in high-stress
-situations by providing components and primitives for performant lists and `svelte renders` to match a core belief:
+`vertical-collection` is an `ember-addon` that is part of the `smoke-and-mirrors` framework. It
+focuses on improving initial and re-render performance in high-stress situations by providing a
+component for performant lists and `svelte renders` to match a core belief:
 **Don't render the universe, render the scene.**
 
 #### TL;DR svelte render: the fewer things you need to render, the faster your renders will be.
@@ -16,14 +17,14 @@ out-of-scene content, your application should smartly cull the content it doesn'
 excess content lets the browser perform both initial renders and re-renders at far higher frame-rates, as the only
 content it needs to focus on for layout is the content the user can see.
 
-`Smoke-and-mirrors` augments your existing app, it doesn't ask you to rewrite layouts or logic in order to use it.
+`vertical-collection` augments your existing app, it doesn't ask you to rewrite layouts or logic in order to use it.
 It will try its best to allow you to keep the conventions, structures, and layouts you want.
 
 
 ## Install
 
 ```bash
-ember install smoke-and-mirrors
+ember install vertical-collection
 ```
 
 ## Support, Questions, Collaboration
@@ -37,46 +38,32 @@ Join the [smoke-and-mirrors](https://embercommunity.slack.com/messages/smoke-and
 
 ### Infinite Scroll (bi-directional)
 
-Infinite scroll that remains performant even for very long lists is easily achievable 
-with the [`vertical-collection`](http://runspired.github.io/smoke-and-mirrors/#/available-components/vertical-collection).
+Infinite scroll that remains performant even for very long lists is easily achievable
+with the [`vertical-collection`](http://html-next.github.io/vertical-collection/#/settings).
 It works via a scrollable div or scrollable body.
 
- - [bi-directional scrollable div](http://runspired.github.io/smoke-and-mirrors/#/examples/infinite-scroll)
- - [scrollable body](http://runspired.github.io/smoke-and-mirrors/#/examples/scrollable-body)
- - [dynamic content sizes](http://runspired.github.io/smoke-and-mirrors/#/examples/flexible-layout)
- - [as a table](http://runspired.github.io/smoke-and-mirrors/#/examples/dbmon)
+ - [bi-directional scrollable div](http://html-next.github.io/vertical-collection/#/examples/infinite-scroll)
+ - [scrollable body](http://html-next.github.io/vertical-collection/#/examples/scrollable-body)
+ - [dynamic content sizes](http://html-next.github.io/vertical-collection/#/examples/flexible-layout)
+ - [as a table](http://html-next.github.io/vertical-collection/#/examples/dbmon)
 
 ### Svelte Everything
 
 If it can be trimmer, smoke-and-mirrors likes to trim it.
 
-### Scroll Performance
-
-Under the hood, smoke-and-mirrors is using a powerful scroll-tracking 
-abstraction for each of the components above. That abstraction is made
-available as a service and will soon become it's own addon: [ember-radar](https://github.com/runspired/ember-radar)
-
-## Dependencies
-
-`smoke-and-mirrors` is dependent on and installs `ember-run-raf`, which helps
- you budget and schedule the work in your app more intelligently.
- 
- This dependency will soon be deprecated in favor of [igniter](https://github.com/runspired/igniter).
-
-
 ## Status
 
 [Changelog](./CHANGELOG.md)
 
-[![Build Status](https://travis-ci.org/runspired/smoke-and-mirrors.svg)](https://travis-ci.org/runspired/smoke-and-mirrors)
-[![dependencies](https://david-dm.org/runspired/smoke-and-mirrors.svg)](https://david-dm.org/runspired/smoke-and-mirrors)
-[![devDependency Status](https://david-dm.org/runspired/smoke-and-mirrors/dev-status.svg)](https://david-dm.org/runspired/smoke-and-mirrors#info=devDependencies)
-[![Coverage Status](https://coveralls.io/repos/runspired/smoke-and-mirrors/badge.svg?branch=master&service=github)](https://coveralls.io/github/runspired/smoke-and-mirrors?branch=master)
+[![Build Status](https://travis-ci.org/html-next/vertical-collection.svg)](https://travis-ci.org/html-next/vertical-collection)
+[![dependencies](https://david-dm.org/html-next/vertical-collection.svg)](https://david-dm.org/html-next/vertical-collection)
+[![devDependency Status](https://david-dm.org/html-next/vertical-collection/dev-status.svg)](https://david-dm.org/html-next/vertical-collection#info=devDependencies)
+[![Coverage Status](https://coveralls.io/repos/html-next/vertical-collection/badge.svg?branch=master&service=github)](https://coveralls.io/github/html-next/vertical-collection?branch=master)
 
 
 ## Documentation
 
-For updated documentation and demos see [http://runspired.github.io/smoke-and-mirrors/](http://runspired.github.io/smoke-and-mirrors/)
+For updated documentation and demos see [http://html-next.github.io/vertical-collection/](http://html-next.github.io/vertical-collection/)
 
 ## Contributing
 
@@ -86,26 +73,26 @@ For updated documentation and demos see [http://runspired.github.io/smoke-and-mi
  - Use [Angular Style Commits](https://github.com/angular/angular.js/blob/v1.4.8/CONTRIBUTING.md#commit)
  - PR against `develop` (default branch).
 
-### Commits 
+### Commits
 
 Angular Style commit messages have the full form:
- 
+
  ```
  <type>(<scope>): <title>
- 
+
  <body>
- 
+
  <footer>
  ```
- 
+
  But the abbreviated form (below) is acceptable and often preferred.
- 
+
  ```
  <type>(<scope>): <title>
  ```
- 
+
  Examples:
- 
+
  - chore(deps): bump deps in package.json and bower.json
  - docs(component): document the `fast-action` component
 

@@ -1,5 +1,5 @@
 {
-  "name": "vertical-collection",
+  "name": "@html-next/vertical-collection",
   "version": "1.0.0-beta.1",
   "description": "infinite-scroll, done right. done.",
   "directories": {
