@@ -24,7 +24,7 @@ It will try its best to allow you to keep the conventions, structures, and layou
 ## Install
 
 ```bash
-ember install vertical-collection
+ember install @html-next/vertical-collection
 ```
 
 ## Support, Questions, Collaboration
