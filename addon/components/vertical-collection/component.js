@@ -193,11 +193,6 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
-    // The rendered {{each}} is removed from the DOM, but a reference is kept, allowing Glimmer to
-    // continue rendering to the node. This enables the manual diffing strategy described above.
-    this._virtualComponentRenderer = this.element.getElementsByClassName('virtual-component-renderer')[0];
-    this.element.removeChild(this._virtualComponentRenderer);
-
     const containerSelector = this.get('containerSelector');
 
     if (containerSelector === 'body') {
