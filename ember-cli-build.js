@@ -11,6 +11,10 @@ module.exports = function(defaults) {
   var app = new EmberAddon(defaults);
   var checker = new VersionChecker(app);
 
+  app.isDevelopingAddon = () => {
+    return true;
+  };
+
   app.trees.tests = replace('tests', {
     files: ['**/*'],
     pattern: {

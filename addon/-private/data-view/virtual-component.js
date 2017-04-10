@@ -69,19 +69,12 @@ export default class VirtualComponent {
   static moveComponents(element, firstComponent, lastComponent, prepend) {
     const rangeToMove = doc.createRange();
 
-    rangeToMove.setStart(firstComponent._upperBound, 0);
-    rangeToMove.setEnd(lastComponent._lowerBound, 0);
+    rangeToMove.setStartBefore(firstComponent._upperBound);
+    rangeToMove.setEndAfter(lastComponent._lowerBound);
 
     const docFragment = rangeToMove.extractContents();
 
     rangeToMove.detach();
-
-    // The first and last nodes in the range do not get extracted, and are instead cloned, so they
-    // have to be reset.
-    //
-    // NOTE: Ember 1.11 - there are cases where docFragment is null (they haven't been rendered yet.)
-    firstComponent._upperBound = docFragment.firstChild || firstComponent._upperBound;
-    lastComponent._lowerBound = docFragment.lastChild || lastComponent._lowerBound;
 
     if (prepend) {
       element.insertBefore(docFragment, element.firstChild);

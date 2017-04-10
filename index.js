@@ -27,7 +27,7 @@ module.exports = {
       postTransformPlugins: [StripClassCallCheck]
     };
 
-    if (/production/.test(env) || /test/.test(env)) {
+    if (/production/.test(env) || (/test/.test(env) && !this.isDevelopingAddon())) {
       var strippedImports = {
         'vertical-collection/-debug/helpers': [
           'assert',
@@ -81,7 +81,7 @@ module.exports = {
   treeForAddon: function() {
     var tree = this._super.treeForAddon.apply(this, arguments);
 
-    if (/production/.test(this._env) || /test/.test(this._env)) {
+    if (/production/.test(this._env) || (/test/.test(this._env) && !this.isDevelopingAddon())) {
       tree = new Funnel(tree, { exclude: [ /-debug/ ] });
     }
 
@@ -96,9 +96,5 @@ module.exports = {
     }
 
     return tree;
-  },
-
-  isDevelopingAddon: function() {
-    return true;
   }
 };
