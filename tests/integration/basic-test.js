@@ -103,6 +103,34 @@ test('The collection renders with containerSelector set', function(assert) {
   });
 });
 
+test('The collection renders when yielded item has conditional', function(assert) {
+  assert.expect(1);
+  const items = [{
+    shouldRender: true
+  }];
+  this.set('items', items);
+  this.render(hbs`
+    <div style="height: 500px; width: 500px;">
+      {{#vertical-collection ${'items'}
+        minHeight=10
+        containerSelector="body"
+        alwaysRemeasure=true
+        as |item|
+      }}
+        Content
+        {{#if item.shouldRender}}
+          <section>
+            Conditional Content
+          </section>
+        {{/if}}
+      {{/vertical-collection}}
+    </div>
+  `);
+  return wait().then(() => {
+    assert.ok(true, 'No errors were thrown in the process');
+  });
+});
+
 /*
 test("The Collection Reveals it's children when `renderAllInitially` is true.", function(assert) {
   assert.expect(1);

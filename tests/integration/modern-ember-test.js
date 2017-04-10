@@ -21,7 +21,7 @@ if (Ember.VERSION >= '1.13.0') {
     `);
     return wait().then(() => {
       const el = this.$('vertical-collection');
-      assert.equal(el.html().trim(), 'Foobar');
+      assert.equal(el.html().includes('Foobar'), true);
     });
   });
 }

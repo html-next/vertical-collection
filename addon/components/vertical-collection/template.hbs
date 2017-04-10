@@ -1,13 +1,11 @@
-<div class="virtual-component-renderer">
-  {{#each radar.virtualComponents key="id" as |virtualComponent|}}
-    {{{unbound virtualComponent.upperBound}}}
-      {{yield
-        virtualComponent.content
-        virtualComponent.index
-      }}
-    {{{unbound virtualComponent.lowerBound}}}
-  {{/each}}
-</div>
+{{#each radar.virtualComponents key="id" as |virtualComponent|}}
+  {{{unbound virtualComponent.upperBound}}}
+    {{yield
+      virtualComponent.content
+      virtualComponent.index
+    }}
+  {{{unbound virtualComponent.lowerBound}}}
+{{/each}}
 
 {{#if shouldYieldToInverse}}
   {{yield to="inverse"}}
