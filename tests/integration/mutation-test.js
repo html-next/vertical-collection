@@ -1,4 +1,5 @@
-import { moduleForComponent, test } from 'ember-qunit';
+import { moduleForComponent } from 'ember-qunit';
+import testScenarios from 'dummy/tests/helpers/test-scenarios';
 import hbs from 'htmlbars-inline-precompile';
 import Ember from 'ember';
 
@@ -10,14 +11,11 @@ moduleForComponent('vertical-collection', 'Integration | Mutation Tests', {
   integration: true
 });
 
-test('Collection prepends via array replacement correctly', function(assert) {
-  assert.expect(8);
-  this.set('items', getNumbers(0, 100));
-
-  this.render(hbs`
+const commonTemplate = hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=20
+      alwaysRemeasure=isDynamic
 
       as |item i|}}
       <div style="height:20px;">
@@ -25,7 +23,20 @@ test('Collection prepends via array replacement correctly', function(assert) {
       </div>
     {{/vertical-collection}}
   </div>
-  `);
+`;
+
+const staticScenario = { isDynamic: false };
+const dynamicScenario = { isDynamic: true };
+
+testScenarios('Collection prepends via array replacement correctly', {
+  staticScenario,
+  dynamicScenario
+}, function(scenario, assert) {
+  assert.expect(8);
+  this.setProperties(scenario);
+  this.set('items', getNumbers(0, 100));
+
+  this.render(commonTemplate);
 
   const scrollContainer = this.$('.scrollable');
   const itemContainer = this.$('vertical-collection');
@@ -48,22 +59,15 @@ test('Collection prepends via array replacement correctly', function(assert) {
   });
 });
 
-test('Collection appends via array replacement correctly', function(assert) {
+testScenarios('Collection appends via array replacement correctly', {
+  staticScenario,
+  dynamicScenario
+}, function(scenario, assert) {
   assert.expect(8);
+  this.setProperties(scenario);
   this.set('items', getNumbers(0, 100));
 
-  this.render(hbs`
-  <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection ${'items'}
-      minHeight=20
-
-      as |item i|}}
-      <div style="height:20px;">
-        {{item.number}} {{i}}
-      </div>
-    {{/vertical-collection}}
-  </div>
-  `);
+  this.render(commonTemplate);
 
   const scrollContainer = this.$('.scrollable');
   const itemContainer = this.$('vertical-collection');
@@ -86,22 +90,15 @@ test('Collection appends via array replacement correctly', function(assert) {
   });
 });
 
-test('Collection prepends via array mutation correctly', function(assert) {
+testScenarios('Collection prepends via array mutation correctly', {
+  staticScenario,
+  dynamicScenario
+}, function(scenario, assert) {
   assert.expect(8);
+  this.setProperties(scenario);
   this.set('items', Ember.A(getNumbers(0, 100)));
 
-  this.render(hbs`
-  <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection ${'items'}
-      minHeight=20
-
-      as |item i|}}
-      <div style="height:20px;">
-        {{item.number}} {{i}}
-      </div>
-    {{/vertical-collection}}
-  </div>
-  `);
+  this.render(commonTemplate);
 
   const scrollContainer = this.$('.scrollable');
   const itemContainer = this.$('vertical-collection');
@@ -123,22 +120,15 @@ test('Collection prepends via array mutation correctly', function(assert) {
   });
 });
 
-test('Collection appends via array mutation correctly', function(assert) {
+testScenarios('Collection appends via array mutation correctly', {
+  staticScenario,
+  dynamicScenario
+}, function(scenario, assert) {
   assert.expect(8);
+  this.setProperties(scenario);
   this.set('items', Ember.A(getNumbers(0, 100)));
 
-  this.render(hbs`
-  <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection ${'items'}
-      minHeight=20
-
-      as |item i|}}
-      <div style="height:20px;">
-        {{item.number}} {{i}}
-      </div>
-    {{/vertical-collection}}
-  </div>
-  `);
+  this.render(commonTemplate);
 
   const scrollContainer = this.$('.scrollable');
   const itemContainer = this.$('vertical-collection');
@@ -160,22 +150,15 @@ test('Collection appends via array mutation correctly', function(assert) {
   });
 });
 
-test('Collection prepends correctly if prepend would cause more VCs to be shown', function(assert) {
+testScenarios('Collection prepends correctly if prepend would cause more VCs to be shown', {
+  staticScenario,
+  dynamicScenario
+}, function(scenario, assert) {
   assert.expect(8);
+  this.setProperties(scenario);
   this.set('items', getNumbers(0, 20));
 
-  this.render(hbs`
-  <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection ${'items'}
-      minHeight=20
-
-      as |item i|}}
-      <div style="height:20px;">
-        {{item.number}} {{i}}
-      </div>
-    {{/vertical-collection}}
-  </div>
-  `);
+  this.render(commonTemplate);
 
   const scrollContainer = this.$('.scrollable');
   const itemContainer = this.$('vertical-collection');
@@ -198,22 +181,15 @@ test('Collection prepends correctly if prepend would cause more VCs to be shown'
   });
 });
 
-test('Collection appends correctly if prepend would cause more VCs to be shown', function(assert) {
+testScenarios('Collection appends correctly if append would cause more VCs to be shown', {
+  staticScenario,
+  dynamicScenario
+}, function(scenario, assert) {
   assert.expect(8);
+  this.setProperties(scenario);
   this.set('items', getNumbers(0, 20));
 
-  this.render(hbs`
-  <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection ${'items'}
-      minHeight=20
-
-      as |item i|}}
-      <div style="height:20px;">
-        {{item.number}} {{i}}
-      </div>
-    {{/vertical-collection}}
-  </div>
-  `);
+  this.render(commonTemplate);
 
   const scrollContainer = this.$('.scrollable');
   const itemContainer = this.$('vertical-collection');
@@ -236,7 +212,7 @@ test('Collection appends correctly if prepend would cause more VCs to be shown',
   });
 });
 
-test('Collection maintains state if the same list is passed in twice', function(assert) {
+testScenarios('Dynamic collection maintains state if the same list is passed in twice', function(scenario, assert) {
   assert.expect(4);
   const items = getNumbers(0, 100);
   this.set('items', items);
@@ -264,7 +240,7 @@ test('Collection maintains state if the same list is passed in twice', function(
     return wait();
   }).then(() => {
     assert.equal(scrollContainer.find('div:first').text().trim(), '1 1', 'first item rendered correctly after same items set');
-    assert.equal(paddingBefore(itemContainer), '40px', 'itemContainer height is correct before append');
+    assert.equal(paddingBefore(itemContainer), '40px', 'itemContainer padding correct before same items set');
 
     this.set('items', items.slice());
 

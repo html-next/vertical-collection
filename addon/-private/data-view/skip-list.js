@@ -93,11 +93,11 @@ export default class SkipList {
     let totalBefore = 0;
     let totalAfter = 0;
 
-    targetValue = Math.min(total, targetValue);
+    targetValue = Math.min(total - 1, targetValue);
 
     assert('targetValue must be a number', typeof targetValue === 'number');
     assert('targetValue must be greater than or equal to 0', targetValue >= 0);
-    assert('targetValue must be no more than total', targetValue <= total);
+    assert('targetValue must be no more than total', targetValue < total);
 
     for (i = 0; i < numLayers; i++) {
       layer = layers[i];
@@ -107,7 +107,7 @@ export default class SkipList {
 
       left = layer[leftIndex];
 
-      if (targetValue > totalBefore + left) {
+      if (targetValue >= totalBefore + left) {
         totalBefore = totalBefore + left;
         index = rightIndex * 2;
       } else {

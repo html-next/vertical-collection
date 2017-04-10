@@ -268,11 +268,9 @@ export default class Radar {
         orderedComponents.push(component);
       }
 
-      this.schedule('sync', () => {
+      this.schedule('measure', () => {
         const firstIndex = orderedComponents.length - delta;
         const lastIndex = orderedComponents.length - 1;
-
-        VirtualComponent.moveComponents(this.itemContainer, orderedComponents[firstIndex], orderedComponents[lastIndex]);
 
         for (let i = firstIndex; i <= lastIndex; i++) {
           orderedComponents[i].inDOM = true;
