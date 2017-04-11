@@ -45,8 +45,7 @@ const VerticalCollection = Component.extend({
   items: null,
 
   // –––––––––––––– Optional Settings
-  alwaysRemeasure: false,
-  alwaysUseDefaultHeight: computed.not('alwaysRemeasure'),
+  staticHeight: false,
 
   /*
    * A selector string that will select the element from
@@ -304,7 +303,7 @@ const VerticalCollection = Component.extend({
     console.time('vertical-collection-init'); // eslint-disable-line no-console
     this._super();
 
-    const RadarClass = this.get('alwaysRemeasure') ? DynamicRadar : StaticRadar;
+    const RadarClass = this.get('staticHeight') ? StaticRadar : DynamicRadar;
 
     this._radar = new RadarClass();
 

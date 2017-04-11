@@ -21,7 +21,6 @@ test('The collection correctly remeasures items when scrolling down', function(a
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      alwaysRemeasure=true
       minHeight=20
 
       as |item|}}
@@ -58,7 +57,6 @@ test('The collection correctly remeasures items when scrolling up', function(ass
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      alwaysRemeasure=true
       minHeight=20
 
       as |item|}}

@@ -18,7 +18,6 @@ test('Scroll to last item when actual item sizes are significantly larger than d
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=10
-      alwaysRemeasure=true
 
       as |item i|}}
       <div style="height: 100px;">{{item.text}} {{i}}</div>
@@ -51,6 +50,7 @@ test('Setting renderFromLast on a static collection starts at the bottom of the 
     {{#vertical-collection ${'items'}
       minHeight=100
       renderFromLast=true
+      staticHeight=true
 
       as |item i|}}
       <div style="height: 100px;">{{item.text}} {{i}}</div>
@@ -75,7 +75,6 @@ test('Setting renderFromLast on a dynamic collection starts it at the bottom of 
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=10
-      alwaysRemeasure=true
       renderFromLast=true
 
       as |item i|}}
@@ -101,6 +100,7 @@ test('Setting idForFirstItem on a static collection starts it with the first ite
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=100
+      staticHeight=true
       idForFirstItem=25
       key="@index"
 
@@ -127,7 +127,6 @@ test('Setting idForFirstItem on a dynamic collection starts it with the first it
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=10
-      alwaysRemeasure=true
       idForFirstItem=25
       key="@index"
 
@@ -154,6 +153,7 @@ test('Setting renderFromLast and idForFirstItem on a static collection starts it
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=100
+      staticHeight=true
       renderFromLast=true
       idForFirstItem=25
       key="@index"
@@ -181,7 +181,6 @@ test('Setting renderFromLast and idForFirstItem on a dynamic collection starts i
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=10
-      alwaysRemeasure=true
       renderFromLast=true
       idForFirstItem=25
       key="@index"
@@ -219,6 +218,7 @@ test('Sends the firstVisibleChanged action', function(assert) {
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=20
+      staticHeight=true
       firstVisibleChanged="firstVisibleChanged"
 
       as |item|}}
@@ -251,6 +251,7 @@ test('Sends the lastVisibleChanged action', function(assert) {
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=20
+      staticHeight=true
       lastVisibleChanged="lastVisibleChanged"
 
       as |item|}}
@@ -277,6 +278,7 @@ test('Sends the firstReached action', function(assert) {
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=20
+      staticHeight=true
       firstReached="firstReached"
 
       as |item|}}
@@ -301,6 +303,7 @@ test('Sends the lastReached action', function(assert) {
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=20
+      staticHeight=true
       lastReached="lastReached"
 
       as |item|}}
@@ -328,6 +331,7 @@ test('Sends the firstReached after prepend', function(assert) {
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=20
+      staticHeight=true
       firstReached="firstReached"
 
       as |item index|}}
@@ -353,6 +357,7 @@ test('Sends the lastReached after append', function(assert) {
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=20
+      staticHeight=true
       lastReached="lastReached"
 
       as |item index|}}
@@ -373,7 +378,6 @@ test('Collection measures correctly when it\'s scroll parent has scrolled', func
     <div style="height: 400px; width: 100px;" class="scroll-child scrollable">
       {{#vertical-collection ${'items'}
         minHeight=20
-        alwaysRemeasure=true
 
         as |item i|}}
         <div style="height:20px;">
@@ -405,6 +409,7 @@ test('Collection scrolls and measures correctly when parent is a table', functio
         containerSelector=".scrollable"
         tagName="tbody"
         minHeight=37
+        staticHeight=true
 
         as |item i|}}
         <tr>
