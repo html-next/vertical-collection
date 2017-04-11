@@ -189,7 +189,7 @@ export default class DynamicRadar extends Radar {
     for (let i = lastItemIndex; i >= firstItemIndex; i--) {
       totalAfter += values[i];
 
-      if (total - totalAfter < visibleBottom) {
+      if (total - totalAfter <= visibleBottom) {
         return i;
       }
     }
