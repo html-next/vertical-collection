@@ -1,10 +1,10 @@
-import { moduleForComponent } from 'ember-qunit';
-import testScenarios from 'dummy/tests/helpers/test-scenarios';
+import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import Ember from 'ember';
 
 import getNumbers from 'dummy/lib/get-numbers';
 import wait from 'dummy/tests/helpers/wait';
+import testScenarios from 'dummy/tests/helpers/test-scenarios';
 import { paddingBefore, containerHeight } from 'dummy/tests/helpers/measurement';
 
 moduleForComponent('vertical-collection', 'Integration | Mutation Tests', {
@@ -15,7 +15,7 @@ const commonTemplate = hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=20
-      staticHeight=isStatic
+      staticHeight=staticHeight
 
       as |item i|}}
       <div style="height:20px;">
@@ -25,15 +25,11 @@ const commonTemplate = hbs`
   </div>
 `;
 
-const staticScenario = { isStatic: true };
-const dynamicScenario = { isStatic: false };
+const staticScenario = { staticHeight: true };
+const dynamicScenario = { staticHeight: false };
 
-testScenarios('Collection prepends via array replacement correctly', {
-  staticScenario,
-  dynamicScenario
-}, function(scenario, assert) {
+testScenarios('Collection prepends via array replacement correctly', { staticScenario, dynamicScenario }, function(assert) {
   assert.expect(8);
-  this.setProperties(scenario);
   this.set('items', getNumbers(0, 100));
 
   this.render(commonTemplate);
@@ -59,12 +55,8 @@ testScenarios('Collection prepends via array replacement correctly', {
   });
 });
 
-testScenarios('Collection appends via array replacement correctly', {
-  staticScenario,
-  dynamicScenario
-}, function(scenario, assert) {
+testScenarios('Collection appends via array replacement correctly', { staticScenario, dynamicScenario }, function(assert) {
   assert.expect(8);
-  this.setProperties(scenario);
   this.set('items', getNumbers(0, 100));
 
   this.render(commonTemplate);
@@ -90,12 +82,8 @@ testScenarios('Collection appends via array replacement correctly', {
   });
 });
 
-testScenarios('Collection prepends via array mutation correctly', {
-  staticScenario,
-  dynamicScenario
-}, function(scenario, assert) {
+testScenarios('Collection prepends via array mutation correctly', { staticScenario, dynamicScenario }, function(assert) {
   assert.expect(8);
-  this.setProperties(scenario);
   this.set('items', Ember.A(getNumbers(0, 100)));
 
   this.render(commonTemplate);
@@ -120,12 +108,8 @@ testScenarios('Collection prepends via array mutation correctly', {
   });
 });
 
-testScenarios('Collection appends via array mutation correctly', {
-  staticScenario,
-  dynamicScenario
-}, function(scenario, assert) {
+testScenarios('Collection appends via array mutation correctly', { staticScenario, dynamicScenario }, function(assert) {
   assert.expect(8);
-  this.setProperties(scenario);
   this.set('items', Ember.A(getNumbers(0, 100)));
 
   this.render(commonTemplate);
@@ -150,12 +134,8 @@ testScenarios('Collection appends via array mutation correctly', {
   });
 });
 
-testScenarios('Collection prepends correctly if prepend would cause more VCs to be shown', {
-  staticScenario,
-  dynamicScenario
-}, function(scenario, assert) {
+testScenarios('Collection prepends correctly if prepend would cause more VCs to be shown', { staticScenario, dynamicScenario }, function(assert) {
   assert.expect(8);
-  this.setProperties(scenario);
   this.set('items', getNumbers(0, 20));
 
   this.render(commonTemplate);
@@ -181,12 +161,8 @@ testScenarios('Collection prepends correctly if prepend would cause more VCs to 
   });
 });
 
-testScenarios('Collection appends correctly if append would cause more VCs to be shown', {
-  staticScenario,
-  dynamicScenario
-}, function(scenario, assert) {
+testScenarios('Collection appends correctly if append would cause more VCs to be shown', { staticScenario, dynamicScenario }, function(assert) {
   assert.expect(8);
-  this.setProperties(scenario);
   this.set('items', getNumbers(0, 20));
 
   this.render(commonTemplate);
@@ -212,7 +188,7 @@ testScenarios('Collection appends correctly if append would cause more VCs to be
   });
 });
 
-testScenarios('Dynamic collection maintains state if the same list is passed in twice', function(scenario, assert) {
+test('Dynamic collection maintains state if the same list is passed in twice', function(assert) {
   assert.expect(4);
   const items = getNumbers(0, 100);
   this.set('items', items);
