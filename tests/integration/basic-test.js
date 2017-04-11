@@ -17,6 +17,7 @@ test('The Collection Renders', function(assert) {
   this.render(hbs`
   <div style="height: 500px; width: 500px;">
     {{#vertical-collection ${'items'}
+      staticHeight=true
 
       as |item|}}
       <vertical-item>
@@ -39,6 +40,7 @@ test('The Collection Renders when content is empty', function(assert) {
   this.render(hbs`
   <div style="height: 500px; width: 500px;">
     {{#vertical-collection ${'items'}
+      staticHeight=true
 
       as |item|}}
       <vertical-item>
@@ -62,6 +64,7 @@ test('The Collection Renders with a key path set', function(assert) {
   <div style="height: 500px; width: 500px;">
     {{#vertical-collection ${'items'}
       key="id"
+      staticHeight=true
 
       as |item|}}
       <vertical-item>
@@ -87,6 +90,7 @@ test('The collection renders with containerSelector set', function(assert) {
       {{#vertical-collection ${'items'}
         containerSelector=".scrollable"
         minHeight=20
+        staticHeight=true
         bufferSize=0
 
         as |item i|}}
@@ -114,7 +118,6 @@ test('The collection renders when yielded item has conditional', function(assert
       {{#vertical-collection ${'items'}
         minHeight=10
         containerSelector="body"
-        alwaysRemeasure=true
         as |item|
       }}
         Content

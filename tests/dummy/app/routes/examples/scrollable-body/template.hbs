@@ -2,12 +2,10 @@
     <div class="row">
         <div class="col-sm-7">
           {{!- BEGIN-SNIPPET scrollable-body-example }}
-          {{#vertical-collection model.numbers
-            minHeight=40
-            alwaysRemeasure=true
-            containerSelector="body"
-            indexForFirstItem=20
-            as |item index|
+            {{#vertical-collection model.numbers
+              minHeight=40
+              containerSelector="body"
+              as |item index|
             }}
               {{number-slide isDynamic=true item=item index=index}}
             {{/vertical-collection}}

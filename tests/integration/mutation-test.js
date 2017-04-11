@@ -15,7 +15,7 @@ const commonTemplate = hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=20
-      alwaysRemeasure=isDynamic
+      staticHeight=isStatic
 
       as |item i|}}
       <div style="height:20px;">
@@ -25,8 +25,8 @@ const commonTemplate = hbs`
   </div>
 `;
 
-const staticScenario = { isDynamic: false };
-const dynamicScenario = { isDynamic: true };
+const staticScenario = { isStatic: true };
+const dynamicScenario = { isStatic: false };
 
 testScenarios('Collection prepends via array replacement correctly', {
   staticScenario,
@@ -221,7 +221,6 @@ testScenarios('Dynamic collection maintains state if the same list is passed in 
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       minHeight=20
-      alwaysRemeasure=true
 
       as |item i|}}
       <div style="height:40px;">

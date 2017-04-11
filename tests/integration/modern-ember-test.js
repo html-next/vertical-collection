@@ -14,7 +14,9 @@ if (Ember.VERSION >= '1.13.0') {
     this.set('items', []);
 
     this.render(hbs`
-      {{#vertical-collection ${'items'}}}
+      {{#vertical-collection ${'items'}
+        staticHeight=true
+      }}
         {{else}}
           Foobar
       {{/vertical-collection}}
