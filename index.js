@@ -23,6 +23,7 @@ module.exports = {
     }
 
     this.options.babel = {
+      loose: true,
       postTransformPlugins: [StripClassCallCheck]
     };
 
