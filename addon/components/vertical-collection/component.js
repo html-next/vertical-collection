@@ -295,6 +295,9 @@ const VerticalCollection = Component.extend({
   },
 
   willDestroy() {
+    this._radar.destroy();
+    run.cancel(this._nextSendActions);
+
     removeScrollHandler(this._scrollContainer, this._scrollHandler);
     Container.removeEventListener('resize', this._resizeHandler);
   },
@@ -308,14 +311,8 @@ const VerticalCollection = Component.extend({
     this._radar = new RadarClass();
 
     this._radar.didUpdate = () => {
-      run.next(() => this._sendActions());
+      this._nextSendActions = run.schedule('afterRender', () => this._sendActions());
     };
-  },
-  actions: {
-    heightDidChange(component) {
-      component.hasBeenMeasured = false;
-      this._radar.scheduleUpdate();
-    }
   }
 });
 

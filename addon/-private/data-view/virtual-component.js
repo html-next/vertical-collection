@@ -1,4 +1,3 @@
-import Token from 'vertical-collection/-private/scheduler/token';
 import Ember from 'ember';
 
 import { assert } from 'vertical-collection/-debug/helpers';
@@ -9,19 +8,18 @@ const doc = document;
 let VC_IDENTITY = 0;
 
 export default class VirtualComponent {
-  constructor(parentToken) {
+  constructor() {
     this._tenureId = VC_IDENTITY++;
-    this.init(parentToken);
+    this.init();
   }
 
-  init(parentToken) {
+  init() {
     this.id = VC_IDENTITY++;
     this._upperBound = doc.createTextNode('');
     this._lowerBound = doc.createTextNode('');
     this.height = 0;
     this.content = null;
     this.inDOM = false;
-    this.token = new Token(parentToken);
   }
 
   get upperBound() {
@@ -30,10 +28,6 @@ export default class VirtualComponent {
 
   get lowerBound() {
     return this._lowerBound;
-  }
-
-  get parentElement() {
-    return this._upperBound.parentElement;
   }
 
   getBoundingClientRect() {
@@ -52,7 +46,9 @@ export default class VirtualComponent {
   recycle(newContent, newIndex) {
     assert(`You cannot set an item's content to undefined`, newContent);
 
-    set(this, 'index', newIndex);
+    if (this.index !== newIndex) {
+      set(this, 'index', newIndex);
+    }
 
     if (this.content !== newContent) {
       set(this, 'content', newContent);
@@ -60,18 +56,14 @@ export default class VirtualComponent {
   }
 
   destroy() {
-    this.token.cancel();
-    this.range.detach();
-    this.range = null;
-
     this._upperBound = null;
     this._lowerBound = null;
 
     set(this, 'content', null);
   }
 
-  static create(parentToken) {
-    return new VirtualComponent(parentToken);
+  static create() {
+    return new VirtualComponent();
   }
 
   static moveComponents(element, firstComponent, lastComponent, prepend) {
