@@ -2,9 +2,9 @@
 'use strict';
 
 var chalk = require('chalk');
-var stripClassCallCheck = require('babel5-plugin-strip-class-callcheck');
-var filterImports = require('babel-plugin-filter-imports');
-var removeImports = require('./lib/babel-plugin-remove-imports');
+var StripClassCallCheck = require('babel6-plugin-strip-class-callcheck');
+var FilterImports = require('babel-plugin-filter-imports');
+var RemoveImports = require('./lib/babel-plugin-remove-imports');
 var Funnel = require('broccoli-funnel');
 
 module.exports = {
@@ -22,39 +22,33 @@ module.exports = {
       return;
     }
 
-    var babelOptions = this.options.babel = this.options.babel || {};
-
-    babelOptions.plugins = babelOptions.plugins || [];
-    babelOptions.plugins.push({ transformer: stripClassCallCheck, position: 'after' });
-
-    var strippedModules;
-    var importNames;
+    this.options.babel = {
+      postTransformPlugins: [StripClassCallCheck]
+    };
 
     if (/production/.test(env) || /test/.test(env)) {
-      strippedModules = {
+      var strippedImports = {
         'vertical-collection/-debug/helpers': [
           'assert',
           'warn',
           'debug',
           'debugOnError',
-          'instrument',
           'deprecate',
           'stripInProduction'
         ]
       };
-      importNames = ['vertical-collection/-debug/helpers'];
 
-      babelOptions.plugins.push(
-        filterImports(strippedModules),
-        removeImports(importNames)
-      );
+      this.options.babel.plugins = [
+        [FilterImports, strippedImports],
+        [RemoveImports, 'vertical-collection/-debug/helpers']
+      ];
     }
 
     this._hasSetupBabelOptions = true;
   },
 
   included: function(app) {
-    // this._super.included.apply(this, arguments);
+    this._super.included.apply(this, arguments);
 
     while (typeof app.import !== 'function' && app.app) {
       app = app.app;
