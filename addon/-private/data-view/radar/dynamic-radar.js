@@ -1,10 +1,7 @@
 import Radar from './index';
 import SkipList from '../skip-list';
-import Ember from 'ember';
 
 import { assert } from 'vertical-collection/-debug/helpers';
-
-const { run } = Ember;
 
 export default class DynamicRadar extends Radar {
   init(...args) {
@@ -72,10 +69,6 @@ export default class DynamicRadar extends Radar {
         this._firstRender = false;
       });
     }
-
-    run.next(() => {
-      this._measure(0, numComponents - 1);
-    });
 
     this._firstItemIndex = firstItemIndex;
     this._lastItemIndex = lastItemIndex;

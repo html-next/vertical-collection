@@ -55,7 +55,7 @@ export default class Radar {
     }
 
     this.orderedComponents = null;
-    this.virtualComponents = null;
+    set(this, 'virtualComponents', null);
 
   }
 
@@ -261,7 +261,7 @@ export default class Radar {
 
     if (delta > 0) {
       for (let i = 0; i < delta; i++) {
-        let component = VirtualComponent.create(this.token);
+        let component = VirtualComponent.create();
         set(component, 'content', {});
 
         virtualComponents.pushObject(component);
