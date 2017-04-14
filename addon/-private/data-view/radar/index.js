@@ -276,6 +276,12 @@ export default class Radar {
           orderedComponents[i].inDOM = true;
         }
       });
+    } else if (delta < 0) {
+      for (let i = delta; i < 0; i++) {
+        const component = orderedComponents.pop();
+        virtualComponents.removeObject(component);
+        component.destroy();
+      }
     }
   }
 
@@ -299,6 +305,8 @@ export default class Radar {
 
   resetItems(items) {
     this.items = items;
+    this.firstItemIndex = null;
+    this.lastItemIndex = null;
 
     this._updateVirtualComponentPool();
     this.scheduleUpdate();

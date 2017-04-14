@@ -14,7 +14,7 @@ moduleForComponent('vertical-collection', 'Integration | Mutation Tests', {
 const commonTemplate = hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      minHeight=20
+      minHeight=minHeight
       staticHeight=staticHeight
 
       as |item i|}}
@@ -25,8 +25,8 @@ const commonTemplate = hbs`
   </div>
 `;
 
-const staticScenario = { staticHeight: true };
-const dynamicScenario = { staticHeight: false };
+const staticScenario = { staticHeight: true, minHeight: 20 };
+const dynamicScenario = { staticHeight: false, minHeight: 20 };
 
 testScenarios('Collection prepends via array replacement correctly', { staticScenario, dynamicScenario }, function(assert) {
   assert.expect(8);
@@ -185,6 +185,56 @@ testScenarios('Collection appends correctly if append would cause more VCs to be
     assert.equal(scrollContainer.find('div:last').text().trim(), '30 30', 'last item rendered correctly after append');
     assert.equal(scrollContainer.scrollTop(), 0, 'scrollTop is correct after append');
     assert.equal(containerHeight(itemContainer), 800, 'itemContainer height is correct after append');
+  });
+});
+
+testScenarios('Collection can shrink number of items if would cause fewer VCs to be shown', {
+  staticScenario: { staticHeight: true, minHeight: 20 },
+  dynamicScenario: { staticHeight: false, minHeight: 20 }
+}, function(assert) {
+  assert.expect(6);
+  this.set('items', getNumbers(0, 100));
+
+  this.render(commonTemplate);
+
+  const scrollContainer = this.$('.scrollable');
+
+  return wait().then(() => {
+    assert.equal(scrollContainer.find('div').length, 31, 'correct number of VCs rendered before reset');
+    assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly before reset');
+    assert.equal(scrollContainer.find('div:last').text().trim(), '30 30', 'last item rendered correctly before reset');
+
+    this.set('items', getNumbers(0, 10));
+
+    return wait();
+  }).then(() => {
+    assert.equal(scrollContainer.find('div').length, 10, 'correct number of VCs rendered after reset');
+    assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly after reset');
+    assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly after reset');
+  });
+});
+
+testScenarios('Collection can shrink number of items if would cause fewer VCs to be shown and scroll would change', {
+  staticScenario: { staticHeight: true, minHeight: 20 },
+  dynamicScenario: { staticHeight: false, minHeight: 20 }
+}, function(assert) {
+  assert.expect(1);
+  this.set('items', getNumbers(0, 100));
+
+  this.render(commonTemplate);
+
+  const scrollContainer = this.$('.scrollable');
+
+  return wait().then(() => {
+    scrollContainer.scrollTop(1000);
+
+    return wait();
+  }).then(() => {
+    this.set('items', getNumbers(0, 10));
+
+    return wait();
+  }).then(() => {
+    assert.ok(true, 'No errors encountered (Glimmer would have thrown one)');
   });
 });
 
