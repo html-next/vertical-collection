@@ -8,7 +8,7 @@ export default class DynamicRadar extends Radar {
     super.init(...args);
 
     if (!this.initialized) {
-      this.skipList = new SkipList(this.items.length, this.minHeight);
+      this.skipList = new SkipList(this.totalItems, this.minHeight);
       this.initialized = true;
       this._firstRender = true;
     }
@@ -197,20 +197,20 @@ export default class DynamicRadar extends Radar {
   }
 
   prepend(items, numPrepended) {
-    this.skipList.prepend(numPrepended);
-
     super.prepend(items, numPrepended);
+
+    this.skipList.prepend(numPrepended);
   }
 
   append(items, numAppended) {
-    this.skipList.append(numAppended);
-
     super.append(items, numAppended);
+
+    this.skipList.append(numAppended);
   }
 
   resetItems(items) {
-    this.skipList = new SkipList(items.length, this.minHeight);
-
     super.resetItems(items);
+
+    this.skipList = new SkipList(this.totalItems, this.minHeight);
   }
 }

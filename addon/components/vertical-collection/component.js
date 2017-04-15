@@ -11,7 +11,7 @@ import DynamicRadar from 'vertical-collection/-private/data-view/radar/dynamic-r
 import StaticRadar from 'vertical-collection/-private/data-view/radar/static-radar';
 
 import Container from 'vertical-collection/-private/data-view/container';
-import getArray from 'vertical-collection/-private/data-view/utils/get-array';
+import objectAt from 'vertical-collection/-private/data-view/utils/object-at';
 import {
   addScrollHandler,
   removeScrollHandler
@@ -20,6 +20,7 @@ import {
 const {
   computed,
   Component,
+  get,
   run,
   String: { htmlSafe },
   VERSION
@@ -95,6 +96,8 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– @private
 
+  _items: computed.or('items', 'content'),
+
   _minHeight: computed('minHeight', function() {
     const minHeight = this.get('minHeight');
 
@@ -105,7 +108,7 @@ const VerticalCollection = Component.extend({
     }
   }),
 
-  isEmpty: computed.empty('items'),
+  isEmpty: computed.empty('_items'),
 
   supportsInverse: computed(function() {
     // This is not a direct semver comparison, just a standard JS String comparison.
@@ -116,9 +119,10 @@ const VerticalCollection = Component.extend({
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
 
   _sendActions() {
-    const {
-      _items,
+    const items = this.get('_items');
+    const itemsLength = get(items, 'length');
 
+    const {
       _prevFirstItemIndex,
       _prevLastItemIndex,
       _prevFirstVisibleIndex,
@@ -132,26 +136,26 @@ const VerticalCollection = Component.extend({
       lastVisibleIndex
     } = this._radar;
 
-    if (firstItemIndex === 0 && firstItemIndex !== _prevFirstItemIndex) {
-      this.sendAction('firstReached', _items[firstItemIndex], firstItemIndex);
-    }
-
-    if (lastItemIndex === _items.length - 1 && lastItemIndex !== _prevLastItemIndex) {
-      this.sendAction('lastReached', _items[lastItemIndex], lastItemIndex);
-    }
-
-    if (firstVisibleIndex !== _prevFirstVisibleIndex) {
-      this.sendAction('firstVisibleChanged', _items[firstVisibleIndex], firstVisibleIndex);
-    }
-
-    if (lastVisibleIndex !== _prevLastVisibleIndex) {
-      this.sendAction('lastVisibleChanged', _items[lastVisibleIndex], lastVisibleIndex);
-    }
-
     this._prevFirstItemIndex = firstItemIndex;
     this._prevLastItemIndex = lastItemIndex;
     this._prevFirstVisibleIndex = firstVisibleIndex;
     this._prevLastVisibleIndex = lastVisibleIndex;
+
+    if (firstItemIndex === 0 && firstItemIndex !== _prevFirstItemIndex) {
+      this.sendAction('firstReached', objectAt(items, firstItemIndex), firstItemIndex);
+    }
+
+    if (lastItemIndex === itemsLength - 1 && lastItemIndex !== _prevLastItemIndex) {
+      this.sendAction('lastReached', objectAt(items, lastItemIndex), lastItemIndex);
+    }
+
+    if (firstVisibleIndex !== _prevFirstVisibleIndex) {
+      this.sendAction('firstVisibleChanged', objectAt(items, firstVisibleIndex), firstVisibleIndex);
+    }
+
+    if (lastVisibleIndex !== _prevLastVisibleIndex) {
+      this.sendAction('lastVisibleChanged', objectAt(items, lastVisibleIndex), lastVisibleIndex);
+    }
   },
 
   radar: computed('items.[]', function() {
@@ -163,14 +167,19 @@ const VerticalCollection = Component.extend({
       _prevLastKey
     } = this;
 
-    const items = getArray(this.get('items') || this.get('content'));
-    const key = this.get('key');
-    const lenDiff = items.length - (_prevItemsLength || 0);
+    const items = this.get('_items');
+    const itemsLength = get(items, 'length');
 
-    this._items = items;
-    this._prevItemsLength = items.length;
-    this._prevFirstKey = keyForItem(items[0], key, 0);
-    this._prevLastKey = keyForItem(items[items.length - 1], key, items.length - 1);
+    const key = this.get('key');
+    const lenDiff = itemsLength - (_prevItemsLength || 0);
+
+    if (itemsLength > 0) {
+      this._prevItemsLength = itemsLength;
+      this._prevFirstKey = keyForItem(objectAt(items, 0), key, 0);
+      this._prevLastKey = keyForItem(objectAt(items, itemsLength - 1), key, itemsLength - 1);
+    } else {
+      this._prevItemsLength = this._prevFirstKey = this._prevLastKey = null;
+    }
 
     if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
       this._prevFirstItemIndex += lenDiff;
@@ -246,14 +255,14 @@ const VerticalCollection = Component.extend({
     const key = this.get('key');
 
     const minHeight = this.get('_minHeight');
-    const items = this._items;
-    const maxIndex = items.length - 1;
+    const items = this.get('_items');
+    const maxIndex = get(items, 'length') - 1;
 
     let index = 0;
 
     if (idForFirstItem) {
       for (let i = 0; i < maxIndex; i++) {
-        if (keyForItem(items[i], key, i) == idForFirstItem) {
+        if (keyForItem(objectAt(items, i), key, i) == idForFirstItem) {
           index = i;
           break;
         }
@@ -321,34 +330,40 @@ VerticalCollection.reopenClass({
 });
 
 function isPrepend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
-  if (lenDiff <= 0 || lenDiff >= newItems.length) {
+  const newItemsLength = get(newItems, 'length');
+
+  if (lenDiff <= 0 || lenDiff >= newItemsLength || newItemsLength === 0) {
     return false;
   }
 
-  const newFirstKey = keyForItem(newItems[lenDiff], key, lenDiff);
-  const newLastKey = keyForItem(newItems[newItems.length - 1], key, newItems.length - 1);
+  const newFirstKey = keyForItem(objectAt(newItems, lenDiff), key, lenDiff);
+  const newLastKey = keyForItem(objectAt(newItems, newItemsLength - 1), key, newItemsLength - 1);
 
   return oldFirstKey === newFirstKey && oldLastKey === newLastKey;
 }
 
 function isAppend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
-  if (lenDiff <= 0 || lenDiff >= newItems.length) {
+  const newItemsLength = get(newItems, 'length');
+
+  if (lenDiff <= 0 || lenDiff >= newItemsLength || newItemsLength === 0) {
     return false;
   }
 
-  const newFirstKey = keyForItem(newItems[0], key, 0);
-  const newLastKey = keyForItem(newItems[newItems.length - lenDiff - 1], key, newItems.length - lenDiff - 1);
+  const newFirstKey = keyForItem(objectAt(newItems, 0), key, 0);
+  const newLastKey = keyForItem(objectAt(newItems, newItemsLength - lenDiff - 1), key, newItemsLength - lenDiff - 1);
 
   return oldFirstKey === newFirstKey && oldLastKey === newLastKey;
 }
 
 function isSameArray(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
-  if (lenDiff !== 0) {
+  const newItemsLength = get(newItems, 'length');
+
+  if (lenDiff !== 0 || newItemsLength === 0) {
     return false;
   }
 
-  const newFirstKey = keyForItem(newItems[0], key, 0);
-  const newLastKey = keyForItem(newItems[newItems.length - 1], key, newItems.length - 1);
+  const newFirstKey = keyForItem(objectAt(newItems, 0), key, 0);
+  const newLastKey = keyForItem(objectAt(newItems, newItemsLength - 1), key, newItemsLength - 1);
 
   return oldFirstKey === newFirstKey && oldLastKey === newLastKey;
 }
