@@ -7,7 +7,6 @@ const Router = Ember.Router.extend({
 });
 
 Router.map(function() {
-
   this.route('examples', function() {
     this.route('dbmon');
     this.route('infinite-scroll');
@@ -16,6 +15,11 @@ Router.map(function() {
   });
 
   this.route('settings');
+
+  // For tests
+  this.route('acceptance-tests', function() {
+    this.route('record-array');
+  });
 });
 
 export default Router;

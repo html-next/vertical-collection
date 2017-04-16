@@ -4,11 +4,13 @@ import scheduler from 'vertical-collection/-private/scheduler';
 import Token from 'vertical-collection/-private/scheduler/token';
 
 import VirtualComponent from 'vertical-collection/-private/data-view/virtual-component';
+import objectAt from 'vertical-collection/-private/data-view/utils/object-at';
 
 import { assert } from 'vertical-collection/-debug/helpers';
 
 const {
   A,
+  get,
   set
 } = Ember;
 
@@ -101,7 +103,7 @@ export default class Radar {
   }
 
   get totalItems() {
-    return this.items ? this.items.length : 0;
+    return this.items ? get(this.items, 'length') : 0;
   }
 
   set itemContainer(itemContainer) {
@@ -214,7 +216,7 @@ export default class Radar {
     }
 
     for (let i = 0, itemIndex = firstItemIndex; itemIndex <= lastItemIndex; i++, itemIndex++) {
-      orderedComponents[i].recycle(items[itemIndex], itemIndex);
+      orderedComponents[i].recycle(objectAt(items, itemIndex), itemIndex);
     }
 
     itemContainer.style.marginTop = `${totalBefore}px`;

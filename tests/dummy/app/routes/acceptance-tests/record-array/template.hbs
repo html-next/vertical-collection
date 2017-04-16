@@ -1,0 +1,9 @@
+<div class="table-wrapper dark">
+  {{#vertical-collection
+    content=model
+    minHeight=50
+
+    as |item index|}}
+    {{number-slide item=item index=index}}
+  {{/vertical-collection}}
+</div>
