@@ -9,7 +9,7 @@ import {
   standardTemplate
 } from 'dummy/tests/helpers/test-scenarios';
 
-import { prepend, append } from 'dummy/tests/helpers/array';
+import { prepend, append, emptyArray } from 'dummy/tests/helpers/array';
 import { paddingBefore, containerHeight } from 'dummy/tests/helpers/measurement';
 
 moduleForComponent('vertical-collection', 'Integration | Mutation Tests', {
@@ -164,7 +164,7 @@ testScenarios(
   scenariosFor(getNumbers(0, 100)),
 
   function(assert) {
-    assert.expect(1);
+    assert.expect(6);
 
     const scrollContainer = this.$('.scrollable');
 
@@ -173,11 +173,69 @@ testScenarios(
 
       return wait();
     }).then(() => {
+      assert.equal(scrollContainer.find('div').length, 31, 'correct number of VCs rendered before reset');
+      assert.equal(scrollContainer.find('div:first').text().trim(), '40 40', 'first item rendered correctly before reset');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '70 70', 'last item rendered correctly before reset');
+
       this.set('items', getNumbers(0, 10));
 
       return wait();
     }).then(() => {
-      assert.ok(true, 'No errors encountered (Glimmer would have thrown one)');
+      assert.equal(scrollContainer.find('div').length, 10, 'correct number of VCs rendered after reset');
+      assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly before reset');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly before reset');
+    });
+  }
+);
+
+testScenarios(
+  'Collection can shrink number of items to empty collection',
+  standardTemplate,
+  scenariosFor(getNumbers(0, 100)),
+
+  function(assert) {
+    assert.expect(4);
+
+    const scrollContainer = this.$('.scrollable');
+
+    return wait().then(() => {
+      assert.equal(scrollContainer.find('div').length, 31, 'correct number of VCs rendered before reset');
+      assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly before reset');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '30 30', 'last item rendered correctly before reset');
+
+      emptyArray(this);
+
+      return wait();
+    }).then(() => {
+      assert.equal(scrollContainer.find('div').length, 0, 'correct number of VCs rendered after reset');
+    });
+  }
+);
+
+testScenarios(
+  'Collection can shrink number of items to empty collection (after scroll has changed)',
+  standardTemplate,
+  scenariosFor(getNumbers(0, 100)),
+
+  function(assert) {
+    assert.expect(4);
+
+    const scrollContainer = this.$('.scrollable');
+
+    return wait().then(() => {
+      scrollContainer.scrollTop(1000);
+
+      return wait();
+    }).then(() => {
+      assert.equal(scrollContainer.find('div').length, 31, 'correct number of VCs rendered before reset');
+      assert.equal(scrollContainer.find('div:first').text().trim(), '40 40', 'first item rendered correctly before reset');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '70 70', 'last item rendered correctly before reset');
+
+      emptyArray(this);
+
+      return wait();
+    }).then(() => {
+      assert.equal(scrollContainer.find('div').length, 0, 'correct number of VCs rendered after reset');
     });
   }
 );

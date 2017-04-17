@@ -61,7 +61,7 @@ export default class DynamicRadar extends Radar {
       totalAfter -= values[i];
     }
 
-    const itemDelta = prevFirstItemIndex ? firstItemIndex - prevFirstItemIndex : 0;
+    const itemDelta = (prevFirstItemIndex !== null) ? firstItemIndex - prevFirstItemIndex : 0;
     const numCulled = Math.abs(itemDelta % numComponents);
 
     if (itemDelta < 0 || this._firstRender) {
