@@ -195,10 +195,6 @@ const VerticalCollection = Component.extend({
     return this._radar;
   }),
 
-  didUpdateAttrs() {
-    this._initializeRadar();
-  },
-
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
     const containerSelector = this.get('containerSelector');
@@ -228,9 +224,7 @@ const VerticalCollection = Component.extend({
   },
 
   /*
-   * Set all of the Radar's properties, including `items`. This is a separate function from
-   * `_resetRadar` because it needs to set `items` on the Radar _after_ minHeight has been set, but
-   * _before_ we update the VirtualComponentPool and schedule an update. In the normal
+   * Set all of the Radar's base properties.
    *
    * @private
    */
