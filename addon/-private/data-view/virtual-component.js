@@ -25,7 +25,6 @@ export default class VirtualComponent {
     this._lowerBound = doc.createTextNode('');
     this.height = 0;
     this.content = null;
-    this.inDOM = false;
   }
 
   get element() {

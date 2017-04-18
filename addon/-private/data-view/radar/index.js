@@ -263,7 +263,8 @@ export default class Radar {
       minHeight,
       virtualComponents,
       orderedComponents,
-      totalItems
+      totalItems,
+      items
     } = this;
 
     // The total number of components is determined by the minimum number required to span the
@@ -274,17 +275,15 @@ export default class Radar {
     const delta = totalComponents - orderedComponents.length;
 
     if (delta > 0) {
+      const firstItemIndex = orderedComponents.length > 0 ? orderedComponents[orderedComponents.length - 1].index + 1 : 0;
+
       for (let i = 0; i < delta; i++) {
         let component = VirtualComponent.create();
-        set(component, 'content', {});
+        set(component, 'content', objectAt(items, firstItemIndex + i));
 
         virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
         orderedComponents.push(component);
       }
-
-      this.schedule('measure', () => {
-        orderedComponents.slice(totalComponents - delta).forEach((c) => c.inDOM = true);
-      });
     } else if (delta < 0) {
       for (let i = delta; i < 0; i++) {
         let component = orderedComponents.pop();
