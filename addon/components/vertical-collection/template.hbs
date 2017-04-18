@@ -1,7 +1,11 @@
-{{#each radar.virtualComponents key="id" as |virtualComponent| ~}}
-{{{unbound virtualComponent.upperBound}}}
-  {{~yield virtualComponent.content virtualComponent.index ~}}
-{{{unbound virtualComponent.lowerBound}}}
+{{#each radar.virtualComponents key="id" as |virtualComponent index| ~}}
+  {{~unbound virtualComponent.upperBound~}}
+  {{~#if virtualComponent.element ~}}
+    {{{unbound virtualComponent.element}}}
+  {{~else~}}
+    {{~yield virtualComponent.content virtualComponent.index ~}}
+  {{~/if~}}
+  {{~unbound virtualComponent.lowerBound~}}
 {{~/each}}
 
 {{#if shouldYieldToInverse}}

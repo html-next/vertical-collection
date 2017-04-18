@@ -94,16 +94,11 @@ number-slide {
   color: #fff;
 }
 
-.table > tbody {
-  display: table;
-  width: 100%;
-}
-
 .grid-item number-slide {
    width: 100px;
    height: 100px;
    margin: 0 auto;
- }
+}
 
 number-slide .number {
   font-size: 1.2em;

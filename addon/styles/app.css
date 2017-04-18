@@ -5,3 +5,26 @@ vertical-collection {
   min-height: 100%;
   position: relative;
 }
+
+occluded-content {
+  display: block;
+  position: relative;
+  width: 100%;
+}
+
+table > occluded-content,
+tbody > occluded-content,
+thead > occluded-content {
+  display: table-row;
+  position: relative;
+  width: 100%;
+}
+
+ul > occluded-content,
+ol > occluded-content {
+  display: list-item;
+  position: relative;
+  width: 100%;
+  list-style-type: none;
+  height: 0;
+}
