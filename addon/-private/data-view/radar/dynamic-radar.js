@@ -25,13 +25,16 @@ export default class DynamicRadar extends Radar {
     const maxIndex = this.totalItems - 1;
     const numComponents = this.orderedComponents.length;
     const prevFirstItemIndex = this.firstItemIndex;
+    const prevLastItemIndex = this.lastItemIndex;
     const middleVisibleValue = this.visibleTop + ((this.visibleBottom - this.visibleTop) / 2);
 
     // Don't measure if the radar has just been instantiated or reset, as we are rendering with a
     // completely new set of items and won't get an accurate measurement until after they render the
     // first time.
     if (prevFirstItemIndex !== null) {
-      this._measure(0, numComponents - 1);
+      // We only need to measure the components that were rendered last time, extra components
+      // haven't rendered yet.
+      this._measure(0, prevLastItemIndex - prevFirstItemIndex);
     }
 
     let {
@@ -99,12 +102,6 @@ export default class DynamicRadar extends Radar {
       const itemIndex = firstItemIndex + i;
       const currentItem = orderedComponents[i];
       const previousItem = orderedComponents[i - 1];
-
-      // New items that haven't rendered for the first time can exist when a prepend or append
-      // occurs, so we have to verify that each item has been rendered at least once.
-      if (!currentItem.inDOM) {
-        continue;
-      }
 
       const {
         top: currentItemTop,
