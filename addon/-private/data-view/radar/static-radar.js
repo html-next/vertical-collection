@@ -1,4 +1,4 @@
-import Radar from './index';
+import Radar from './radar';
 
 export default class StaticRadar extends Radar {
   _updateIndexes() {

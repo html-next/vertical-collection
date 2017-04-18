@@ -1,4 +1,4 @@
-import Radar from './index';
+import Radar from './radar';
 import SkipList from '../skip-list';
 
 import { assert } from 'vertical-collection/-debug/helpers';
@@ -7,11 +7,8 @@ export default class DynamicRadar extends Radar {
   init(...args) {
     super.init(...args);
 
-    if (!this.initialized) {
-      this.skipList = new SkipList(this.totalItems, this.minHeight);
-      this.initialized = true;
-      this._firstRender = true;
-    }
+    this.skipList = new SkipList(this.totalItems, this.minHeight);
+    this._firstRender = true;
   }
 
   destroy() {

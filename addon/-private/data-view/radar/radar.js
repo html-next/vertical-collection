@@ -37,11 +37,7 @@ export default class Radar {
     this.orderedComponents = [];
   }
 
-  init(...args) {
-    this.setContainerState(...args);
-  }
-
-  setContainerState(itemContainer, scrollContainer, minHeight, bufferSize, renderFromLast) {
+  init(itemContainer, scrollContainer, minHeight, bufferSize, renderFromLast) {
     this.itemContainer = itemContainer;
     this.scrollContainer = scrollContainer;
 
@@ -82,20 +78,18 @@ export default class Radar {
    * @private
    */
   scheduleUpdate() {
-    if (!this._nextUpdate) {
-      this._nextUpdate = this.schedule('sync', () => {
-        this._nextUpdate = null;
-        this._scrollTop = this.scrollContainer.scrollTop;
-
-        const delta = this._updateIndexes();
-        this._updateVirtualComponents(delta);
-      });
+    if (this._nextUpdate) {
+      return;
     }
 
-    if (!this._nextDidUpdate) {
-      this._nextDidUpdate = this.schedule('affect', () => {
-        this._nextDidUpdate = null;
+    this._nextUpdate = this.schedule('sync', () => {
+      this._nextUpdate = null;
+      this._scrollTop = this.scrollContainer.scrollTop;
 
+      const delta = this._updateIndexes();
+      this._updateVirtualComponents(delta);
+
+      this.schedule('affect', () => {
         if (this._prependOffset !== 0) {
           this.scrollTop += this._prependOffset;
           this._prependOffset = 0;
@@ -103,7 +97,7 @@ export default class Radar {
 
         this.didUpdate();
       });
-    }
+    });
   }
 
   get totalItems() {
