@@ -14,16 +14,13 @@ const isGlimmer2 = VERSION.match(/2.\d\d+.\d+/) !== null;
 
 export default class VirtualComponent {
   constructor(element) {
-    this._tenureId = VC_IDENTITY++;
-    this._element = element;
-    this.init();
-  }
-
-  init() {
     this.id = VC_IDENTITY++;
+
+    this._element = element;
+
     this._upperBound = doc.createTextNode('');
     this._lowerBound = doc.createTextNode('');
-    this.height = 0;
+
     this.content = null;
   }
 
@@ -45,10 +42,6 @@ export default class VirtualComponent {
 
   get realLowerBound() {
     return isGlimmer2 ? this._lowerBound : this._lowerBound.nextSibling;
-  }
-
-  get parentElement() {
-    return this._upperBound.parentElement;
   }
 
   getBoundingClientRect() {
@@ -81,9 +74,5 @@ export default class VirtualComponent {
     this._upperBound = null;
     this._lowerBound = null;
     set(this, 'content', null);
-  }
-
-  static create() {
-    return new VirtualComponent();
   }
 }

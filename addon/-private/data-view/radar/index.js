@@ -278,7 +278,7 @@ export default class Radar {
       const firstItemIndex = orderedComponents.length > 0 ? orderedComponents[orderedComponents.length - 1].index + 1 : 0;
 
       for (let i = 0; i < delta; i++) {
-        let component = VirtualComponent.create();
+        let component = new VirtualComponent();
         set(component, 'content', objectAt(items, firstItemIndex + i));
 
         virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
