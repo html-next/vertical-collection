@@ -2,10 +2,12 @@ import Ember from 'ember';
 
 import { assert } from 'vertical-collection/-debug/helpers';
 
-const { set } = Ember;
+const { set, VERSION } = Ember;
 
 const doc = document;
 let VC_IDENTITY = 0;
+
+const isGlimmer2 = VERSION.match(/2.\d\d+.\d+/) !== null;
 
 export default class VirtualComponent {
   constructor() {
@@ -26,15 +28,27 @@ export default class VirtualComponent {
     return this._upperBound;
   }
 
+  get realUpperBound() {
+    return isGlimmer2 ? this._upperBound : this._upperBound.previousSibling;
+  }
+
   get lowerBound() {
     return this._lowerBound;
+  }
+
+  get realLowerBound() {
+    return isGlimmer2 ? this._lowerBound : this._lowerBound.nextSibling;
+  }
+
+  get parentElement() {
+    return this._upperBound.parentElement;
   }
 
   getBoundingClientRect() {
     const range = doc.createRange();
 
-    range.setStart(this._upperBound, 0);
-    range.setEnd(this._lowerBound, 0);
+    range.setStartBefore(this._upperBound);
+    range.setEndAfter(this._lowerBound);
 
     const rect = range.getBoundingClientRect();
 
@@ -56,30 +70,34 @@ export default class VirtualComponent {
   }
 
   destroy() {
+    if (this.parentElement) {
+      const {
+        parentElement,
+        realUpperBound: firstNode,
+        realLowerBound: lastNode
+      } = this;
+
+      let node = firstNode;
+      let nextNode;
+
+      while (node) {
+        nextNode = node.nextSibling;
+        parentElement.removeChild(node);
+
+        if (node === lastNode) {
+          break;
+        }
+
+        node = nextNode;
+      }
+    }
+
     this._upperBound = null;
     this._lowerBound = null;
-
     set(this, 'content', null);
   }
 
   static create() {
     return new VirtualComponent();
-  }
-
-  static moveComponents(element, firstComponent, lastComponent, prepend) {
-    const rangeToMove = doc.createRange();
-
-    rangeToMove.setStartBefore(firstComponent._upperBound);
-    rangeToMove.setEndAfter(lastComponent._lowerBound);
-
-    const docFragment = rangeToMove.extractContents();
-
-    rangeToMove.detach();
-
-    if (prepend) {
-      element.insertBefore(docFragment, element.firstChild);
-    } else {
-      element.appendChild(docFragment);
-    }
   }
 }

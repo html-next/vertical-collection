@@ -4,6 +4,7 @@ import scheduler from 'vertical-collection/-private/scheduler';
 import Token from 'vertical-collection/-private/scheduler/token';
 
 import VirtualComponent from 'vertical-collection/-private/data-view/virtual-component';
+import moveRange from 'vertical-collection/-private/data-view/utils/move-range';
 import objectAt from 'vertical-collection/-private/data-view/utils/object-at';
 
 import { assert } from 'vertical-collection/-debug/helpers';
@@ -11,6 +12,7 @@ import { assert } from 'vertical-collection/-debug/helpers';
 const {
   A,
   get,
+  run,
   set
 } = Ember;
 
@@ -205,13 +207,19 @@ export default class Radar {
         let movedComponents = orderedComponents.splice(-offsetAmount);
         orderedComponents.unshift(...movedComponents);
 
-        VirtualComponent.moveComponents(itemContainer, movedComponents[0], movedComponents[movedComponents.length - 1], true);
+        const firstNode = movedComponents[0].realUpperBound;
+        const lastNode = movedComponents[movedComponents.length - 1].realLowerBound;
+
+        moveRange(itemContainer, firstNode, lastNode, true);
       } else if (itemDelta > 0) {
         // Scrolling down
         let movedComponents = orderedComponents.splice(0, offsetAmount);
         orderedComponents.push(...movedComponents);
 
-        VirtualComponent.moveComponents(itemContainer, movedComponents[0], movedComponents[movedComponents.length - 1], false);
+        const firstNode = movedComponents[0].realUpperBound;
+        const lastNode = movedComponents[movedComponents.length - 1].realLowerBound;
+
+        moveRange(itemContainer, firstNode, lastNode, false);
       }
     }
 
@@ -271,19 +279,17 @@ export default class Radar {
       }
 
       this.schedule('measure', () => {
-        const firstIndex = orderedComponents.length - delta;
-        const lastIndex = orderedComponents.length - 1;
-
-        for (let i = firstIndex; i <= lastIndex; i++) {
-          orderedComponents[i].inDOM = true;
-        }
+        orderedComponents.slice(totalComponents - delta).forEach((c) => c.inDOM = true);
       });
     } else if (delta < 0) {
-      for (let i = delta; i < 0; i++) {
-        const component = orderedComponents.pop();
-        virtualComponents.removeObject(component);
-        component.destroy();
-      }
+      const componentsToDestroy = orderedComponents.slice(totalComponents);
+
+      componentsToDestroy.forEach((c) => virtualComponents.removeObject(c));
+      orderedComponents.length = totalComponents;
+
+      run.schedule('destroy', () => {
+        componentsToDestroy.forEach((c) => c.destroy());
+      });
     }
   }
 

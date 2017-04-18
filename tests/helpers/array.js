@@ -17,3 +17,13 @@ export function append(context, itemsToAppend) {
     context.set('items', items.concat(itemsToAppend));
   }
 }
+
+export function emptyArray(context) {
+  const items = context.get('items');
+
+  if (items.clear) {
+    items.clear();
+  } else {
+    context.set('items', []);
+  }
+}
