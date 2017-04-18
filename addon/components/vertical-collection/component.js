@@ -158,7 +158,7 @@ const VerticalCollection = Component.extend({
     }
   },
 
-  radar: computed('items.[]', function() {
+  radar: computed('_items.[]', function() {
     const {
       _radar,
 

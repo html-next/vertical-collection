@@ -2,7 +2,10 @@ import Ember from 'ember';
 
 import { assert } from 'vertical-collection/-debug/helpers';
 
-const { set, VERSION } = Ember;
+const {
+  set,
+  VERSION
+} = Ember;
 
 const doc = document;
 let VC_IDENTITY = 0;
@@ -10,8 +13,9 @@ let VC_IDENTITY = 0;
 const isGlimmer2 = VERSION.match(/2.\d\d+.\d+/) !== null;
 
 export default class VirtualComponent {
-  constructor() {
+  constructor(element) {
     this._tenureId = VC_IDENTITY++;
+    this._element = element;
     this.init();
   }
 
@@ -22,6 +26,10 @@ export default class VirtualComponent {
     this.height = 0;
     this.content = null;
     this.inDOM = false;
+  }
+
+  get element() {
+    return this._element;
   }
 
   get upperBound() {
@@ -70,28 +78,7 @@ export default class VirtualComponent {
   }
 
   destroy() {
-    if (this.parentElement) {
-      const {
-        parentElement,
-        realUpperBound: firstNode,
-        realLowerBound: lastNode
-      } = this;
-
-      let node = firstNode;
-      let nextNode;
-
-      while (node) {
-        nextNode = node.nextSibling;
-        parentElement.removeChild(node);
-
-        if (node === lastNode) {
-          break;
-        }
-
-        node = nextNode;
-      }
-    }
-
+    this._element = null;
     this._upperBound = null;
     this._lowerBound = null;
     set(this, 'content', null);

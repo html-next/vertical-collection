@@ -4,7 +4,7 @@ import scheduler from 'vertical-collection/-private/scheduler';
 import Token from 'vertical-collection/-private/scheduler/token';
 
 import VirtualComponent from 'vertical-collection/-private/data-view/virtual-component';
-import moveRange from 'vertical-collection/-private/data-view/utils/move-range';
+import insertRangeBefore from 'vertical-collection/-private/data-view/utils/insert-range-before';
 import objectAt from 'vertical-collection/-private/data-view/utils/object-at';
 
 import { assert } from 'vertical-collection/-debug/helpers';
@@ -12,7 +12,6 @@ import { assert } from 'vertical-collection/-debug/helpers';
 const {
   A,
   get,
-  run,
   set
 } = Ember;
 
@@ -31,7 +30,10 @@ export default class Radar {
     this.bufferSize = 0;
     this.renderFromLast = 0;
 
-    this.virtualComponents = A();
+    this._occludedContentBefore = new VirtualComponent(document.createElement('occluded-content'));
+    this._occludedContentAfter = new VirtualComponent(document.createElement('occluded-content'));
+
+    this.virtualComponents = A([this._occludedContentBefore, this._occludedContentAfter]);
     this.orderedComponents = [];
   }
 
@@ -192,6 +194,8 @@ export default class Radar {
       items,
       orderedComponents,
       itemContainer,
+      _occludedContentBefore,
+      _occludedContentAfter,
 
       firstItemIndex,
       lastItemIndex,
@@ -210,7 +214,7 @@ export default class Radar {
         const firstNode = movedComponents[0].realUpperBound;
         const lastNode = movedComponents[movedComponents.length - 1].realLowerBound;
 
-        moveRange(itemContainer, firstNode, lastNode, true);
+        insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, firstNode, lastNode);
       } else if (itemDelta > 0) {
         // Scrolling down
         let movedComponents = orderedComponents.splice(0, offsetAmount);
@@ -219,7 +223,7 @@ export default class Radar {
         const firstNode = movedComponents[0].realUpperBound;
         const lastNode = movedComponents[movedComponents.length - 1].realLowerBound;
 
-        moveRange(itemContainer, firstNode, lastNode, false);
+        insertRangeBefore(_occludedContentAfter.realUpperBound, firstNode, lastNode);
       }
     }
 
@@ -227,8 +231,8 @@ export default class Radar {
       orderedComponents[i].recycle(objectAt(items, itemIndex), itemIndex);
     }
 
-    itemContainer.style.marginTop = `${totalBefore}px`;
-    itemContainer.style.marginBottom = `${totalAfter}px`;
+    _occludedContentBefore.element.style.height = `${totalBefore}px`;
+    _occludedContentAfter.element.style.height = `${totalAfter}px`;
     itemContainer.style.minHeight = '';
   }
 
@@ -267,14 +271,14 @@ export default class Radar {
     // performant, even if mean item size is above the minimum.
     const totalHeight = scrollContainerHeight + (scrollContainerHeight * bufferSize * 2);
     const totalComponents = Math.min(totalItems, Math.ceil(totalHeight / minHeight) + 1);
-    const delta = totalComponents - virtualComponents.get('length');
+    const delta = totalComponents - orderedComponents.length;
 
     if (delta > 0) {
       for (let i = 0; i < delta; i++) {
         let component = VirtualComponent.create();
         set(component, 'content', {});
 
-        virtualComponents.pushObject(component);
+        virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
         orderedComponents.push(component);
       }
 
@@ -282,14 +286,12 @@ export default class Radar {
         orderedComponents.slice(totalComponents - delta).forEach((c) => c.inDOM = true);
       });
     } else if (delta < 0) {
-      const componentsToDestroy = orderedComponents.slice(totalComponents);
+      for (let i = delta; i < 0; i++) {
+        let component = orderedComponents.pop();
 
-      componentsToDestroy.forEach((c) => virtualComponents.removeObject(c));
-      orderedComponents.length = totalComponents;
-
-      run.schedule('destroy', () => {
-        componentsToDestroy.forEach((c) => c.destroy());
-      });
+        virtualComponents.removeObject(component);
+        component.destroy();
+      }
     }
   }
 

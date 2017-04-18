@@ -1,13 +1,11 @@
 export function containerHeight(itemContainer) {
-  return itemContainer.outerHeight()
-    + parseInt(itemContainer.css('margin-top') || 0)
-    + parseInt(itemContainer.css('margin-bottom') || 0);
+  return itemContainer.outerHeight();
 }
 
 export function paddingBefore(itemContainer) {
-  return itemContainer.css('margin-top');
+  return itemContainer.find('occluded-content:first').outerHeight();
 }
 
 export function paddingAfter(itemContainer) {
-  return itemContainer.css('margin-bottom');
+  return itemContainer.find('occluded-content:last').outerHeight();
 }
