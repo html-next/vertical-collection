@@ -1,10 +1,11 @@
 import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
-import Ember from 'ember';
+
+import { SUPPORTS_INVERSE_BLOCK } from 'vertical-collection/-private/ember/compatibility';
 
 import wait from 'dummy/tests/helpers/wait';
 
-if (Ember.VERSION >= '1.13.0') {
+if (SUPPORTS_INVERSE_BLOCK) {
   moduleForComponent('vertical-collection', 'Integration | Modern Ember Features Tests', {
     integration: true
   });
@@ -15,6 +16,7 @@ if (Ember.VERSION >= '1.13.0') {
 
     this.render(hbs`
       {{#vertical-collection ${'items'}
+        minHeight=20
         staticHeight=true
       }}
         {{else}}
