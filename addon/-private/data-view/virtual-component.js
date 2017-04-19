@@ -1,16 +1,12 @@
 import Ember from 'ember';
+import { IS_GLIMMER_2 } from 'vertical-collection/-private/ember/compatibility';
 
 import { assert } from 'vertical-collection/-debug/helpers';
 
-const {
-  set,
-  VERSION
-} = Ember;
+const { set } = Ember;
 
 const doc = document;
 let VC_IDENTITY = 0;
-
-const isGlimmer2 = VERSION.match(/2.\d\d+.\d+/) !== null;
 
 export default class VirtualComponent {
   constructor(element) {
@@ -33,7 +29,7 @@ export default class VirtualComponent {
   }
 
   get realUpperBound() {
-    return isGlimmer2 ? this._upperBound : this._upperBound.previousSibling;
+    return IS_GLIMMER_2 ? this._upperBound : this._upperBound.previousSibling;
   }
 
   get lowerBound() {
@@ -41,7 +37,7 @@ export default class VirtualComponent {
   }
 
   get realLowerBound() {
-    return isGlimmer2 ? this._lowerBound : this._lowerBound.nextSibling;
+    return IS_GLIMMER_2 ? this._lowerBound : this._lowerBound.nextSibling;
   }
 
   getBoundingClientRect() {

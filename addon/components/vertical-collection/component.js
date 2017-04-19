@@ -3,6 +3,7 @@ import Ember from 'ember';
 import layout from './template';
 
 import keyForItem from 'vertical-collection/-private/ember/utils/key-for-item';
+import { SUPPORTS_INVERSE_BLOCK } from 'vertical-collection/-private/ember/compatibility';
 
 import estimateElementHeight from 'vertical-collection/-private/utils/element/estimate-element-height';
 import closestElement from 'vertical-collection/-private/utils/element/closest';
@@ -17,33 +18,31 @@ import {
   removeScrollHandler
 } from 'vertical-collection/-private/data-view/utils/scroll-handler';
 
+import { assert } from 'vertical-collection/-debug/helpers';
+
 const {
   computed,
   Component,
   get,
-  run,
-  String: { htmlSafe },
-  VERSION
+  run
 } = Ember;
 
 const VerticalCollection = Component.extend({
   layout,
 
-  /*
-   * If itemTagName is blank or null, the `vertical-collection` will [tag match](../addon/utils/get-tag-descendant.js)
-   * with the `vertical-item`.
-   */
   tagName: 'vertical-collection',
-  boxStyle: htmlSafe(''),
 
   key: '@identity',
 
   // –––––––––––––– Required Settings
 
-  minHeight: 75,
+  minHeight: null,
 
   // usable via {{#vertical-collection <items-array>}}
   items: null,
+
+  // deprecated, only for use in Ember 1.11
+  content: null,
 
   // –––––––––––––– Optional Settings
   staticHeight: false,
@@ -70,13 +69,6 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– Initial Scroll State
   /*
-   *  If set, this will be used to set
-   *  the scroll position at which the
-   *  component initially renders.
-   */
-  scrollPosition: 0,
-
-  /*
    * If set, upon initialization the scroll
    * position will be set such that the item
    * with the provided id is at the top left
@@ -101,6 +93,8 @@ const VerticalCollection = Component.extend({
   _minHeight: computed('minHeight', function() {
     const minHeight = this.get('minHeight');
 
+    assert('Must provide a `minHeight` value to vertical-collection', minHeight !== null);
+
     if (typeof minHeight === 'string') {
       return estimateElementHeight(this.element, minHeight);
     } else {
@@ -108,14 +102,9 @@ const VerticalCollection = Component.extend({
     }
   }),
 
+  supportsInverse: SUPPORTS_INVERSE_BLOCK,
+
   isEmpty: computed.empty('_items'),
-
-  supportsInverse: computed(function() {
-    // This is not a direct semver comparison, just a standard JS String comparison.
-    // It happens to work for the cases we need to compare (since we don't support < 1.11)
-    return VERSION >= '1.13.0';
-  }),
-
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
 
   _sendActions() {
@@ -209,18 +198,6 @@ const VerticalCollection = Component.extend({
     this._initializeRadar();
     this._initializeScrollState();
     this._initializeEventHandlers();
-
-    console.timeEnd('vertical-collection-init'); // eslint-disable-line no-console
-  },
-
-  _isEarthquake(top) {
-    if (Math.abs(this._lastEarthquake - top) > this.get('_minHeight') / 2) {
-      this._lastEarthquake = top;
-
-      return true;
-    }
-
-    return false;
   },
 
   /*
@@ -242,50 +219,47 @@ const VerticalCollection = Component.extend({
   },
 
   _initializeScrollState() {
-    let scrollPosition = this.get('scrollPosition');
-
     const renderFromLast = this.get('renderFromLast');
     const idForFirstItem = this.get('idForFirstItem');
     const key = this.get('key');
 
     const minHeight = this.get('_minHeight');
     const items = this.get('_items');
-    const maxIndex = get(items, 'length') - 1;
+    const totalItems = get(items, 'length');
 
-    let index = 0;
+    let visibleTop = 0;
 
     if (idForFirstItem) {
-      for (let i = 0; i < maxIndex; i++) {
+      for (let i = 0; i < totalItems - 1; i++) {
         if (keyForItem(objectAt(items, i), key, i) == idForFirstItem) {
-          index = i;
+          visibleTop = i * minHeight;
           break;
         }
       }
 
-      scrollPosition = index * minHeight;
     } else if (renderFromLast) {
       // If no id was set and `renderFromLast` is true, start from the bottom
-      scrollPosition = maxIndex * minHeight;
+      visibleTop = (totalItems - 1) * minHeight;
     }
 
     if (renderFromLast) {
-      scrollPosition -= (this._radar.scrollContainerHeight - minHeight);
+      visibleTop -= (this._radar.scrollContainerHeight - minHeight);
     }
 
     // The container element needs to have some height in order for us to set the scroll position
     // on initialization, so we set this min-height property to radar's total
-    this.element.style.minHeight = `${this._radar.total}px`;
+    this.element.style.minHeight = `${minHeight * totalItems}px`;
 
-    this._radar.visibleTop = scrollPosition;
-
-    this._scrollContainer.scrollTop = this._radar.scrollTop;
-    this._lastEarthquake = this._radar.scrollTop;
+    this._radar.visibleTop = visibleTop;
   },
 
   _initializeEventHandlers() {
+    this._lastEarthquake = this._radar.scrollTop;
+
     this._scrollHandler = ({ top }) => {
-      if (this._isEarthquake(top)) {
+      if (Math.abs(this._lastEarthquake - top) > this.get('_minHeight') / 2) {
         this._radar.scheduleUpdate();
+        this._lastEarthquake = top;
       }
     };
 
@@ -306,13 +280,11 @@ const VerticalCollection = Component.extend({
   },
 
   init() {
-    console.time('vertical-collection-init'); // eslint-disable-line no-console
     this._super();
 
     const RadarClass = this.get('staticHeight') ? StaticRadar : DynamicRadar;
 
     this._radar = new RadarClass();
-
     this._radar.didUpdate = () => {
       this._nextSendActions = run.schedule('afterRender', () => this._sendActions());
     };
