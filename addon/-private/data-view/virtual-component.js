@@ -5,7 +5,15 @@ import { assert } from 'vertical-collection/-debug/helpers';
 
 const { set } = Ember;
 
-const doc = document;
+let notFastBoot = () => {
+  return typeof FastBoot === 'undefined' ? true : false;
+};
+
+let doc = null;
+if (notFastBoot()) {
+  doc = document;
+}
+
 let VC_IDENTITY = 0;
 
 export default class VirtualComponent {
