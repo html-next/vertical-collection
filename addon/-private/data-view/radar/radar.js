@@ -25,6 +25,7 @@ export default class Radar {
 
     this._itemContainer = null;
     this._scrollContainer = null;
+    this.didUpdate = () => {};
 
     this.minHeight = 0;
     this.bufferSize = 0;

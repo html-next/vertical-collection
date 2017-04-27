@@ -91,7 +91,7 @@ const VerticalCollection = Component.extend({
   _items: computed.or('items', 'content'),
 
   _calculateMinHeight() {
-    const minHeight = this.minHeight;
+    const { minHeight } = this;
 
     assert('Must provide a `minHeight` value to vertical-collection', minHeight !== null);
 
@@ -305,7 +305,11 @@ const VerticalCollection = Component.extend({
       };
 
       this._radar.didUpdate = () => {
-        this._nextSendActions = setTimeout(() => { run(() => { this._sendActions(); }); }, 0);
+        this._nextSendActions = setTimeout(() => {
+          run(() => {
+            this._sendActions();
+          });
+        }, 0);
       };
     }
   }
