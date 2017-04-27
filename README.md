@@ -1,9 +1,9 @@
 vertical-collection
 =================
 
-[![npm version](https://badge.fury.io/js/smoke-and-mirrors.svg)](http://badge.fury.io/js/smoke-and-mirrors)
 [![Build Status](https://travis-ci.org/html-next/vertical-collection.svg)](https://travis-ci.org/html-next/vertical-collection)
-[![Ember Observer Score](http://emberobserver.com/badges/vertical-collection.svg)](http://emberobserver.com/addons/vertical-collection)
+
+Infinite Scroll and Occlusion at > 60FPS
 
 `vertical-collection` is an `ember-addon` that is part of the `smoke-and-mirrors` framework. It
 focuses on improving initial and re-render performance in high-stress situations by providing a
