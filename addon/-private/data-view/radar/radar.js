@@ -89,7 +89,7 @@ export default class Radar {
       const delta = this._updateIndexes();
       this._updateVirtualComponents(delta);
 
-      this.schedule('affect', () => {
+      this.schedule('measure', () => {
         if (this._prependOffset !== 0) {
           this.scrollTop += this._prependOffset;
           this._prependOffset = 0;
