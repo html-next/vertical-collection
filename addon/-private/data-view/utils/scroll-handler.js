@@ -1,6 +1,8 @@
 import scheduler from '../../scheduler';
 import SUPPORTS_PASSIVE from './supports-passive';
+import Ember from 'ember';
 
+const { run } = Ember;
 const DEFAULT_ARRAY_SIZE = 10;
 const UNDEFINED_VALUE = Object.create(null);
 
@@ -103,9 +105,11 @@ export class ScrollHandler {
     let event = { top: cachedTop, left: cachedLeft };
 
     if (topChanged || leftChanged) {
+      run.begin();
       for (let j = 0; j < meta.handlers.length; j++) {
         meta.handlers[j](event);
       }
+      run.end();
     }
   }
 
