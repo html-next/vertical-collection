@@ -286,7 +286,7 @@ const VerticalCollection = Component.extend({
 
     this._radar = new RadarClass();
     this._radar.didUpdate = () => {
-      this._nextSendActions = run.schedule('afterRender', () => this._sendActions());
+      this._nextSendActions = run.next(this, this._sendActions);
     };
   }
 });
