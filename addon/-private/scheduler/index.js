@@ -19,11 +19,13 @@ export class Scheduler {
     this.layout = [];
     this.measure = [];
     this.affect = [];
+    this.jobs = 0;
     this._nextFlush = null;
     this.ticks = 0;
   }
 
   schedule(queueName, cb, parent) {
+    this.jobs++;
     let token = new Token(parent);
 
     this[queueName].push(job(cb, token));
@@ -44,7 +46,6 @@ export class Scheduler {
     }
 
     this._nextFlush = requestAnimationFrame(() => {
-      this._nextFlush = null;
       this.flush();
     });
   }
@@ -52,6 +53,7 @@ export class Scheduler {
   flush() {
     let i, q;
     let hasDomWork = this.sync.length > 0 || this.layout.length > 0;
+    this.jobs = 0;
 
     if (hasDomWork) {
       run.begin();
@@ -93,6 +95,11 @@ export class Scheduler {
         q[i]();
       }
       run.end();
+    }
+
+    this._nextFlush = null;
+    if (this.jobs > 0) {
+      this._flush();
     }
   }
 }
