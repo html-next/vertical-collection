@@ -90,8 +90,8 @@ const VerticalCollection = Component.extend({
 
   _items: computed.or('items', 'content'),
 
-  _minHeight: computed('minHeight', function() {
-    const minHeight = this.get('minHeight');
+  _calculateMinHeight() {
+    const { minHeight } = this;
 
     assert('Must provide a `minHeight` value to vertical-collection', minHeight !== null);
 
@@ -100,7 +100,7 @@ const VerticalCollection = Component.extend({
     } else {
       return minHeight;
     }
-  }),
+  },
 
   supportsInverse: SUPPORTS_INVERSE_BLOCK,
 
@@ -111,6 +111,7 @@ const VerticalCollection = Component.extend({
     const items = this.get('_items');
     const itemsLength = get(items, 'length');
 
+    // TODO don't thrash the prototype
     const {
       _prevFirstItemIndex,
       _prevLastItemIndex,
@@ -125,24 +126,25 @@ const VerticalCollection = Component.extend({
       lastVisibleIndex
     } = this._radar;
 
+    const hasAction = this._hasAction;
     this._prevFirstItemIndex = firstItemIndex;
     this._prevLastItemIndex = lastItemIndex;
     this._prevFirstVisibleIndex = firstVisibleIndex;
     this._prevLastVisibleIndex = lastVisibleIndex;
 
-    if (firstItemIndex === 0 && firstItemIndex !== _prevFirstItemIndex) {
+    if (hasAction.firstReached && firstItemIndex === 0 && firstItemIndex !== _prevFirstItemIndex) {
       this.sendAction('firstReached', objectAt(items, firstItemIndex), firstItemIndex);
     }
 
-    if (lastItemIndex === itemsLength - 1 && lastItemIndex !== _prevLastItemIndex) {
+    if (hasAction.lastReached && lastItemIndex === itemsLength - 1 && lastItemIndex !== _prevLastItemIndex) {
       this.sendAction('lastReached', objectAt(items, lastItemIndex), lastItemIndex);
     }
 
-    if (firstVisibleIndex !== _prevFirstVisibleIndex) {
+    if (hasAction.firstVisibleChanged && firstVisibleIndex !== _prevFirstVisibleIndex) {
       this.sendAction('firstVisibleChanged', objectAt(items, firstVisibleIndex), firstVisibleIndex);
     }
 
-    if (lastVisibleIndex !== _prevLastVisibleIndex) {
+    if (hasAction.lastVisibleChanged && lastVisibleIndex !== _prevLastVisibleIndex) {
       this.sendAction('lastVisibleChanged', objectAt(items, lastVisibleIndex), lastVisibleIndex);
     }
   },
@@ -282,12 +284,34 @@ const VerticalCollection = Component.extend({
   init() {
     this._super();
 
+    this._minHeight = this._calculateMinHeight();
+    this._hasAction = null;
     const RadarClass = this.get('staticHeight') ? StaticRadar : DynamicRadar;
 
+    let a = !!this.lastReached;
+    let b = !!this.firstReached;
+    let c = !!this.lastVisibleChanged;
+    let d = !!this.firstVisibleChanged;
+    let any = a || b || c || d;
+
     this._radar = new RadarClass();
-    this._radar.didUpdate = () => {
-      this._nextSendActions = run.schedule('afterRender', () => this._sendActions());
-    };
+
+    if (any) {
+      this._hasAction = {
+        lastReached: a,
+        firstReached: b,
+        lastVisibleChanged: c,
+        firstVisibleChanged: d
+      };
+
+      this._radar.didUpdate = () => {
+        this._nextSendActions = setTimeout(() => {
+          run(() => {
+            this._sendActions();
+          });
+        }, 0);
+      };
+    }
   }
 });
 

@@ -25,6 +25,7 @@ export default class Radar {
 
     this._itemContainer = null;
     this._scrollContainer = null;
+    this.didUpdate = () => {};
 
     this.minHeight = 0;
     this.bufferSize = 0;
@@ -89,7 +90,7 @@ export default class Radar {
       const delta = this._updateIndexes();
       this._updateVirtualComponents(delta);
 
-      this.schedule('affect', () => {
+      this.schedule('measure', () => {
         if (this._prependOffset !== 0) {
           this.scrollTop += this._prependOffset;
           this._prependOffset = 0;

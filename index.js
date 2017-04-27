@@ -22,8 +22,9 @@ module.exports = {
       return;
     }
 
-    this.options.babel = {
+    let opts = this.options.babel = {
       loose: true,
+      plugins: [],
       postTransformPlugins: [StripClassCallCheck]
     };
 
@@ -39,11 +40,15 @@ module.exports = {
         ]
       };
 
-      this.options.babel.plugins = [
+      opts.plugins.push(
         [FilterImports, strippedImports],
         [RemoveImports, 'vertical-collection/-debug/helpers']
-      ];
+      );
     }
+
+    opts.plugins.push(
+      ['transform-es2015-block-scoping', { 'throwIfClosureRequired': true }]
+    );
 
     this._hasSetupBabelOptions = true;
   },

@@ -19,11 +19,13 @@ export class Scheduler {
     this.layout = [];
     this.measure = [];
     this.affect = [];
+    this.jobs = 0;
     this._nextFlush = null;
     this.ticks = 0;
   }
 
   schedule(queueName, cb, parent) {
+    this.jobs++;
     let token = new Token(parent);
 
     this[queueName].push(job(cb, token));
@@ -44,36 +46,38 @@ export class Scheduler {
     }
 
     this._nextFlush = requestAnimationFrame(() => {
-      this._nextFlush = null;
       this.flush();
     });
   }
 
   flush() {
     let i, q;
+    let hasDomWork = this.sync.length > 0 || this.layout.length > 0;
+    this.jobs = 0;
 
-    run.begin();
-    if (this.sync.length) {
-      q = this.sync;
-      this.sync = [];
+    if (hasDomWork) {
+      run.begin();
+      if (this.sync.length > 0) {
+        q = this.sync;
+        this.sync = [];
 
-      for (i = 0; i < q.length; i++) {
-        q[i]();
+        for (i = 0; i < q.length; i++) {
+          q[i]();
+        }
       }
+
+      if (this.layout.length > 0) {
+        q = this.layout;
+        this.layout = [];
+
+        for (i = 0; i < q.length; i++) {
+          q[i]();
+        }
+      }
+      run.end();
     }
 
-    if (this.layout.length) {
-      q = this.layout;
-      this.layout = [];
-
-      for (i = 0; i < q.length; i++) {
-        q[i]();
-      }
-    }
-    run.end();
-
-    run.begin();
-    if (this.measure.length) {
+    if (this.measure.length > 0) {
       q = this.measure;
       this.measure = [];
 
@@ -82,15 +86,21 @@ export class Scheduler {
       }
     }
 
-    if (this.affect.length) {
+    if (this.affect.length > 0) {
+      run.begin();
       q = this.affect;
       this.affect = [];
 
       for (i = 0; i < q.length; i++) {
         q[i]();
       }
+      run.end();
     }
-    run.end();
+
+    this._nextFlush = null;
+    if (this.jobs > 0) {
+      this._flush();
+    }
   }
 }
 
