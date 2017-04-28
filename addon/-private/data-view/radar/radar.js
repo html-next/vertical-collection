@@ -289,21 +289,6 @@ export default class Radar {
     }
   }
 
-  _updatePoolContents() {
-    const {
-      orderedComponents,
-      firstItemIndex,
-      items
-    } = this;
-
-    for (let i = 0; i < orderedComponents.length; i++) {
-      let component = orderedComponents[i];
-      let newContent = objectAt(items, firstItemIndex + i);
-
-      set(component, 'content', newContent);
-    }
-  }
-
   prepend(items, numPrepended) {
     this.items = items;
     this.firstItemIndex += numPrepended;
@@ -329,9 +314,8 @@ export default class Radar {
       this.firstItemIndex = null;
       this.lastItemIndex = null;
       this._updateVirtualComponentPool();
-      this.scheduleUpdate();
-    } else {
-      this._updatePoolContents();
     }
+
+    this.scheduleUpdate();
   }
 }
