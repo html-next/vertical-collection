@@ -266,7 +266,7 @@ test('Dynamic collection maintains state if the same list is passed in twice', f
 
     return wait();
   }).then(() => {
-    assert.equal(scrollContainer.find('div:first').text().trim(), '1 1', 'first item rendered correctly after same items set');
+    assert.equal(scrollContainer.find('div:first').text().trim(), '1 1', 'first item rendered correctly after initial scroll set');
     assert.equal(paddingBefore(itemContainer), 40, 'itemContainer padding correct before same items set');
 
     this.set('items', items.slice());
