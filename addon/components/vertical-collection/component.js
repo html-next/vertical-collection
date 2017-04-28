@@ -2,21 +2,21 @@
 import Ember from 'ember';
 import layout from './template';
 
-import keyForItem from 'vertical-collection/-private/ember/utils/key-for-item';
-import { SUPPORTS_INVERSE_BLOCK } from 'vertical-collection/-private/ember/compatibility';
+import keyForItem from '../../-private/ember/utils/key-for-item';
+import { SUPPORTS_INVERSE_BLOCK } from '../../-private/ember/compatibility';
 
-import estimateElementHeight from 'vertical-collection/-private/utils/element/estimate-element-height';
-import closestElement from 'vertical-collection/-private/utils/element/closest';
+import estimateElementHeight from '../../-private/utils/element/estimate-element-height';
+import closestElement from '../../-private/utils/element/closest';
 
-import DynamicRadar from 'vertical-collection/-private/data-view/radar/dynamic-radar';
-import StaticRadar from 'vertical-collection/-private/data-view/radar/static-radar';
+import DynamicRadar from '../../-private/data-view/radar/dynamic-radar';
+import StaticRadar from '../../-private/data-view/radar/static-radar';
 
-import Container from 'vertical-collection/-private/data-view/container';
-import objectAt from 'vertical-collection/-private/data-view/utils/object-at';
+import Container from '../../-private/data-view/container';
+import objectAt from '../../-private/data-view/utils/object-at';
 import {
   addScrollHandler,
   removeScrollHandler
-} from 'vertical-collection/-private/data-view/utils/scroll-handler';
+} from '../../-private/data-view/utils/scroll-handler';
 
 import { assert } from 'vertical-collection/-debug/helpers';
 
@@ -179,8 +179,9 @@ const VerticalCollection = Component.extend({
       _radar.prepend(items, lenDiff);
     } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
       _radar.append(items, lenDiff);
-    } else if (!isSameArray(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
-      _radar.resetItems(items);
+    } else {
+      const isReset = !isSameArray(lenDiff, items, key, _prevFirstKey, _prevLastKey);
+      _radar.updateItems(items, isReset);
     }
 
     return this._radar;

@@ -7,7 +7,6 @@ const {
   } = Ember;
 
 export default Route.extend({
-
   numRows: 100,
   _nextLoad: null,
 

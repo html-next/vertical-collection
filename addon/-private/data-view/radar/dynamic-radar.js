@@ -203,8 +203,8 @@ export default class DynamicRadar extends Radar {
     this.skipList.append(numAppended);
   }
 
-  resetItems(items) {
-    super.resetItems(items);
+  updateItems(items, isReset) {
+    super.updateItems(items, isReset);
 
     this.skipList = new SkipList(this.totalItems, this.minHeight);
   }
