@@ -92,6 +92,7 @@ export default class Radar {
 
       this.schedule('measure', () => {
         if (this._prependOffset !== 0) {
+          console.log('setting offset for prepend');
           this.scrollTop += this._prependOffset;
           this._prependOffset = 0;
         }
@@ -307,10 +308,13 @@ export default class Radar {
     this.scheduleUpdate();
   }
 
-  resetItems(items) {
+  updateItems(items, isReset = false) {
     this.items = items;
-    this.firstItemIndex = null;
-    this.lastItemIndex = null;
+
+    if (isReset) {
+      this.firstItemIndex = null;
+      this.lastItemIndex = null;
+    }
 
     this._updateVirtualComponentPool();
     this.scheduleUpdate();
