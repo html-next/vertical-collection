@@ -1,15 +1,18 @@
 const VENDOR_MATCH_FNS = ['matches', 'webkitMatchesSelector', 'mozMatchesSelector', 'msMatchesSelector', 'oMatchesSelector'];
 let ELEMENT_MATCH_FN;
 
-VENDOR_MATCH_FNS.some((fn) => {
-  if (typeof document.body[fn] === 'function') {
-    ELEMENT_MATCH_FN = fn;
-    return true;
-  }
-  return false;
-});
+function setElementMatchFn(el) {
+  VENDOR_MATCH_FNS.forEach((fn) => {
+    if ((ELEMENT_MATCH_FN === undefined) && (typeof el[fn] === 'function')) {
+      ELEMENT_MATCH_FN = fn;
+    }
+  });
+}
 
 export default function closest(el, selector) {
+  if (ELEMENT_MATCH_FN === undefined) {
+    setElementMatchFn(el);
+  }
   while (el) {
     if (el[ELEMENT_MATCH_FN](selector)) {
       return el;
