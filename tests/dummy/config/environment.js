@@ -24,16 +24,6 @@ module.exports = function(environment) {
     }
   };
 
-  ENV.contentSecurityPolicy = {
-    'default-src': "'self'",
-    'script-src': "'self' 'unsafe-inline' 'unsafe-eval'",
-    'font-src': "'self'",
-    'connect-src': "'self'",
-    'img-src': "'self' data: http://lorempixel.com",
-    'style-src': "'self' 'unsafe-inline'",
-    'media-src': "'self' data: http://lorempixel.com"
-  };
-
   // debugging
   if (DEBUG) {
     ENV.APP.LOG_LFANIMATION_RESOLUTION = true;

@@ -2,21 +2,18 @@
 import Ember from 'ember';
 import layout from './template';
 
-import keyForItem from '../../-private/ember/utils/key-for-item';
-import { SUPPORTS_INVERSE_BLOCK } from '../../-private/ember/compatibility';
-
-import estimateElementHeight from '../../-private/utils/element/estimate-element-height';
-import closestElement from '../../-private/utils/element/closest';
-
-import DynamicRadar from '../../-private/data-view/radar/dynamic-radar';
-import StaticRadar from '../../-private/data-view/radar/static-radar';
-
-import Container from '../../-private/data-view/container';
-import objectAt from '../../-private/data-view/utils/object-at';
 import {
+  keyForItem,
+  SUPPORTS_INVERSE_BLOCK,
+  estimateElementHeight,
+  closestElement,
+  DynamicRadar,
+  StaticRadar,
+  Container,
+  objectAt,
   addScrollHandler,
   removeScrollHandler
-} from '../../-private/data-view/utils/scroll-handler';
+} from '../../-private';
 
 import { assert } from 'vertical-collection/-debug/helpers';
 

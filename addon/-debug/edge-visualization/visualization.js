@@ -1,5 +1,5 @@
 /* global document */
-import Container from '../../-private/data-view/container';
+import Container from '../../-private';
 
 const SYS_WIDTH = 250;
 

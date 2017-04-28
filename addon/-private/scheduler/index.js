@@ -1,9 +1,23 @@
 import Ember from 'ember';
-import Token from './token';
 
 const {
   run
 } = Ember;
+
+export class Token {
+  constructor(parent) {
+    this._parent = parent;
+    this._cancelled = false;
+  }
+
+  get cancelled() {
+    return this._cancelled || (this._cancelled = this._parent ? this._parent.cancelled : false);
+  }
+
+  cancel() {
+    this._cancelled = true;
+  }
+}
 
 function job(cb, token) {
   return function execJob() {
@@ -104,4 +118,6 @@ export class Scheduler {
   }
 }
 
-export default new Scheduler();
+export const scheduler = new Scheduler();
+
+export default scheduler;

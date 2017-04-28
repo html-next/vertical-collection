@@ -1,8 +1,6 @@
 {
-  "name": "smoke-and-mirrors",
-  "dependencies": {
-    "animation-frame": "~0.2.4"
-  },
+  "name": "vertical-collection",
+  "dependencies": {},
   "devDependencies": {
     "bootstrap": "~3.3.5"
   }

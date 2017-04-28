@@ -12,9 +12,6 @@
     "test": "ember try:each"
   },
   "repository": "https://github.com/html-next/vertical-collection.git",
-  "engines": {
-    "node": ">= 0.10.0"
-  },
   "homepage": "https://github.com/html-next/vertical-collection",
   "bugs": "https://github.com/html-next/vertical-collection/issues",
   "author": {
@@ -32,7 +29,7 @@
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.5",
     "broccoli-string-replace": "^0.1.2",
-    "ember-cli": "2.12.1",
+    "ember-cli": "^2.12.2",
     "ember-cli-app-version": "^1.0.0",
     "ember-cli-changelog": "0.3.4",
     "ember-cli-dependency-checker": "^1.3.0",
@@ -58,6 +55,23 @@
     "eslint-plugin-ember-suave": "^1.0.0",
     "loader.js": "^4.2.3"
   },
+  "dependencies": {
+    "babel-plugin-filter-imports": "^0.3.1",
+    "babel-plugin-transform-es2015-block-scoping": "^6.24.1",
+    "babel6-plugin-strip-class-callcheck": "^6.0.0",
+    "broccoli-funnel": "^1.2.0",
+    "broccoli-merge-trees": "^2.0.0",
+    "broccoli-rollup": "^1.2.0",
+    "chalk": "^1.1.3",
+    "ember-cli-babel": "^6.0.0-beta.10",
+    "ember-cli-htmlbars": "^1.1.1"
+  },
+  "engines": {
+    "node": ">= 4"
+  },
+  "ember-addon": {
+    "configPath": "tests/dummy/config"
+  },
   "keywords": [
     "occlusion",
     "infinite",
@@ -70,17 +84,5 @@
     "performance",
     "lists",
     "ember-addon"
-  ],
-  "dependencies": {
-    "babel-plugin-filter-imports": "^0.3.1",
-    "babel-plugin-transform-es2015-block-scoping": "^6.24.1",
-    "babel6-plugin-strip-class-callcheck": "^6.0.0",
-    "broccoli-funnel": "^1.0.7",
-    "chalk": "^1.1.3",
-    "ember-cli-babel": "^6.0.0-beta.9",
-    "ember-cli-htmlbars": "^1.1.1"
-  },
-  "ember-addon": {
-    "configPath": "tests/dummy/config"
-  }
+  ]
 }
