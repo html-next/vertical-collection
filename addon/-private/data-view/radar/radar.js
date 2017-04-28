@@ -274,7 +274,11 @@ export default class Radar {
 
       for (let i = 0; i < delta; i++) {
         let component = new VirtualComponent();
-        set(component, 'content', objectAt(items, firstItemIndex + i));
+        let itemIndex = firstItemIndex + i;
+
+        // TODO for initial create we likely don't need `set`
+        set(component, 'content', objectAt(items, itemIndex));
+        set(component, 'index', itemIndex);
 
         virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
         orderedComponents.push(component);
