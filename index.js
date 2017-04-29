@@ -86,6 +86,7 @@ module.exports = {
       postTransformPlugins: [StripClassCallCheck],
       exclude: [
         'transform-es2015-block-scoping',
+        'transform-es2015-typeof-symbol'
       ]
     };
 
