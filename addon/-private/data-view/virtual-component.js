@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import { IS_GLIMMER_2 } from 'vertical-collection/-private/ember/compatibility';
+import { IS_GLIMMER_2 } from '../ember-internals/compatibility';
 
 import { assert } from 'vertical-collection/-debug/helpers';
 

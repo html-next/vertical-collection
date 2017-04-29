@@ -1,11 +1,10 @@
 import Ember from 'ember';
 
-import scheduler from 'vertical-collection/-private/scheduler';
-import Token from 'vertical-collection/-private/scheduler/token';
+import { Token, scheduler } from '../../scheduler/index';
 
-import VirtualComponent from 'vertical-collection/-private/data-view/virtual-component';
-import insertRangeBefore from 'vertical-collection/-private/data-view/utils/insert-range-before';
-import objectAt from 'vertical-collection/-private/data-view/utils/object-at';
+import VirtualComponent from '../virtual-component';
+import insertRangeBefore from '../utils/insert-range-before';
+import objectAt from '../utils/object-at';
 
 import { assert } from 'vertical-collection/-debug/helpers';
 

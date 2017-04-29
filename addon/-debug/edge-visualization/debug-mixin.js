@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import Visualization from './visualization';
-import Container from '../../-private/data-view/container';
+import Container from '../../-private';
 
 const {
   assert,

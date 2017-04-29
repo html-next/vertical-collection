@@ -1,8 +1,8 @@
 import { module, test } from 'qunit';
 import {
-  ScrollHandler
-} from 'vertical-collection/-private/data-view/utils/scroll-handler';
-import scheduler from 'vertical-collection/-private/scheduler';
+  ScrollHandler,
+  scheduler
+} from 'vertical-collection/-private';
 
 const dom = document;
 

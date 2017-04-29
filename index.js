@@ -6,6 +6,15 @@ var StripClassCallCheck = require('babel6-plugin-strip-class-callcheck');
 var FilterImports = require('babel-plugin-filter-imports');
 var RemoveImports = require('./lib/babel-plugin-remove-imports');
 var Funnel = require('broccoli-funnel');
+var Rollup = require('broccoli-rollup');
+var merge   = require('broccoli-merge-trees');
+
+function isProductionEnv() {
+  var isProd = /production/.test(process.env.EMBER_ENV);
+  var isTest = process.env.EMBER_CLI_TEST_COMMAND;
+
+  return isProd && !isTest;
+}
 
 module.exports = {
   name: 'vertical-collection',
@@ -16,19 +25,71 @@ module.exports = {
     this.options = this.options || {};
   },
 
-  _hasSetupBabelOptions: false,
-  _setupBabelOptions: function(env) {
-    if (this._hasSetupBabelOptions) {
-      return;
-    }
+  treeForAddon: function(tree) {
+    let babel = this.addons.find(addon => addon.name === 'ember-cli-babel');
+    let withPrivate    = new Funnel(tree, { include: ['-private/**'] });
+    let withoutPrivate = new Funnel(tree, {
+      exclude: [
+        '**/**.hbs',
+        '-private',
+        isProductionEnv() ? '-debug' : false
+      ].filter(Boolean),
 
-    let opts = this.options.babel = {
+      destDir: 'vertical-collection'
+    });
+
+    var privateTree = babel.transpileTree(withPrivate, {
+      babel: this.buildBabelOptions(),
+      'ember-cli-babel': {
+        compileModules: false
+      }
+    });
+
+    var templateTree = new Funnel(tree, {
+      include: ['**/**.hbs']
+    });
+
+    // use the default options
+    var addonTemplateTree = this._super(templateTree);
+    var publicTree = babel.transpileTree(withoutPrivate);
+
+    privateTree = new Rollup(privateTree, {
+      rollup: {
+        entry: '-private/index.js',
+        targets: [
+          { dest: 'vertical-collection/-private.js', format: 'amd', moduleId: 'vertical-collection/-private' }
+        ],
+        external: [
+          'ember',
+          'vertical-collection/-debug/helpers'
+        ],
+        // cache: true|false Defaults to true
+      }
+    });
+
+    // the output of treeForAddon is required to be modules/<your files>
+    publicTree  = new Funnel(publicTree,  { destDir: 'modules' });
+    privateTree = new Funnel(privateTree, { destDir: 'modules' });
+
+    return merge([
+      addonTemplateTree,
+      publicTree,
+      privateTree
+    ]);
+  },
+
+  _hasSetupBabelOptions: false,
+  buildBabelOptions() {
+    let opts = {
       loose: true,
       plugins: [],
-      postTransformPlugins: [StripClassCallCheck]
+      postTransformPlugins: [StripClassCallCheck],
+      exclude: [
+        'transform-es2015-block-scoping',
+      ]
     };
 
-    if (/production/.test(env) || (/test/.test(env) && !this.isDevelopingAddon())) {
+    if (isProductionEnv()) {
       var strippedImports = {
         'vertical-collection/-debug/helpers': [
           'assert',
@@ -49,6 +110,15 @@ module.exports = {
     opts.plugins.push(
       ['transform-es2015-block-scoping', { 'throwIfClosureRequired': true }]
     );
+
+    return opts;
+  },
+  _setupBabelOptions: function() {
+    if (this._hasSetupBabelOptions) {
+      return;
+    }
+
+    this.options.babel = this.buildBabelOptions();
 
     this._hasSetupBabelOptions = true;
   },
@@ -81,16 +151,6 @@ module.exports = {
 
       app.import('./vendor/debug.css');
     }
-  },
-
-  treeForAddon: function() {
-    var tree = this._super.treeForAddon.apply(this, arguments);
-
-    if (/production/.test(this._env) || (/test/.test(this._env) && !this.isDevelopingAddon())) {
-      tree = new Funnel(tree, { exclude: [ /-debug/ ] });
-    }
-
-    return tree;
   },
 
   treeForApp: function() {
