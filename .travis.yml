@@ -3,8 +3,8 @@ language: node_js
 node_js:
   - "stable"
 
-sudo: required
 dist: trusty
+sudo: false
 
 addons:
   apt:
