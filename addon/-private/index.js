@@ -10,7 +10,10 @@ export { default as StaticRadar } from './data-view/radar/static-radar';
 export { default as Container } from './data-view/container';
 export { default as objectAt } from './data-view/utils/object-at';
 
+export { scheduler } from './scheduler/index';
+
 export {
   addScrollHandler,
-  removeScrollHandler
+  removeScrollHandler,
+  ScrollHandler
 } from './data-view/utils/scroll-handler';

@@ -1,7 +1,7 @@
 import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 
-import { SUPPORTS_INVERSE_BLOCK } from 'vertical-collection/-private/ember/compatibility';
+import { SUPPORTS_INVERSE_BLOCK } from 'vertical-collection/-private';
 
 import wait from 'dummy/tests/helpers/wait';
 
