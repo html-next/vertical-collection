@@ -105,8 +105,11 @@ const VerticalCollection = Component.extend({
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
 
   _sendActions() {
+    if (this.isDestroying) {
+      return;
+    }
     const items = this.get('_items');
-    const itemsLength = get(items, 'length');
+    const itemsLength = items !== undefined ? get(items, 'length') : 0;
 
     // TODO don't thrash the prototype
     const {
