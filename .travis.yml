@@ -6,7 +6,9 @@ node_js:
 sudo: false
 
 cache:
+  yarn: true
   directories:
+    - node_modules
     - $HOME/.npm
     - $HOME/.cache # includes bowers cache
 
@@ -32,8 +34,7 @@ before_install:
   - sh -e /etc/init.d/xvfb start
 
 install:
-  - npm install
-  - bower install
+  - yarn install
 
 script:
   # Usually, it's ok to finish the test scenario without reverting
