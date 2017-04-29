@@ -5,7 +5,6 @@ import { assert } from 'vertical-collection/-debug/helpers';
 
 const { set } = Ember;
 
-const doc = document;
 let VC_IDENTITY = 0;
 
 export default class VirtualComponent {
@@ -14,8 +13,8 @@ export default class VirtualComponent {
 
     this._element = element;
 
-    this._upperBound = doc.createTextNode('');
-    this._lowerBound = doc.createTextNode('');
+    this._upperBound = document.createTextNode('');
+    this._lowerBound = document.createTextNode('');
 
     this.content = null;
   }
@@ -41,7 +40,7 @@ export default class VirtualComponent {
   }
 
   getBoundingClientRect() {
-    const range = doc.createRange();
+    const range = document.createRange();
 
     range.setStartBefore(this._upperBound);
     range.setEndAfter(this._lowerBound);
