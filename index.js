@@ -8,7 +8,6 @@ var RemoveImports = require('./lib/babel-plugin-remove-imports');
 var Funnel = require('broccoli-funnel');
 var Rollup = require('broccoli-rollup');
 var merge   = require('broccoli-merge-trees');
-var stew = require('broccoli-stew');
 
 function isProductionEnv() {
   var isProd = /production/.test(process.env.EMBER_ENV);
