@@ -41,7 +41,7 @@ export default Component.extend({
     let styleStr = `background: rgba(0,125,255,${opacity});`;
 
     if (isDynamic) {
-      styleStr += `height:${height}px;`;
+      styleStr += `height: ${Math.round(height / 2)}px; box-sizing: content-box; padding-bottom: ${Math.round(height / 10)}%;`;
     }
 
     return htmlSafe(styleStr);

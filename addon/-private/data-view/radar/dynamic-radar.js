@@ -113,7 +113,7 @@ export default class DynamicRadar extends Radar {
         margin = Math.round(currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore);
       }
 
-      assert(`item height must always be above minimum value. Item ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minHeight);
+      assert(`item height + margin must always be above the minimum value ${this.minHeight}px. The item at index ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minHeight);
 
       const itemDelta = skipList.set(itemIndex, currentItemHeight + margin);
 
