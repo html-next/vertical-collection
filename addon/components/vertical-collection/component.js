@@ -104,51 +104,6 @@ const VerticalCollection = Component.extend({
   isEmpty: computed.empty('_items'),
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
 
-  _sendActions() {
-    if (this.isDestroying) {
-      return;
-    }
-    const items = this.get('_items');
-    const itemsLength = items !== undefined ? get(items, 'length') : 0;
-
-    // TODO don't thrash the prototype
-    const {
-      _prevFirstItemIndex,
-      _prevLastItemIndex,
-      _prevFirstVisibleIndex,
-      _prevLastVisibleIndex
-    } = this;
-
-    const {
-      firstItemIndex,
-      lastItemIndex,
-      firstVisibleIndex,
-      lastVisibleIndex
-    } = this._radar;
-
-    const hasAction = this._hasAction;
-    this._prevFirstItemIndex = firstItemIndex;
-    this._prevLastItemIndex = lastItemIndex;
-    this._prevFirstVisibleIndex = firstVisibleIndex;
-    this._prevLastVisibleIndex = lastVisibleIndex;
-
-    if (hasAction.firstReached && firstItemIndex === 0 && firstItemIndex !== _prevFirstItemIndex) {
-      this.sendAction('firstReached', objectAt(items, firstItemIndex), firstItemIndex);
-    }
-
-    if (hasAction.lastReached && lastItemIndex === itemsLength - 1 && lastItemIndex !== _prevLastItemIndex) {
-      this.sendAction('lastReached', objectAt(items, lastItemIndex), lastItemIndex);
-    }
-
-    if (hasAction.firstVisibleChanged && firstVisibleIndex !== _prevFirstVisibleIndex) {
-      this.sendAction('firstVisibleChanged', objectAt(items, firstVisibleIndex), firstVisibleIndex);
-    }
-
-    if (hasAction.lastVisibleChanged && lastVisibleIndex !== _prevLastVisibleIndex) {
-      this.sendAction('lastVisibleChanged', objectAt(items, lastVisibleIndex), lastVisibleIndex);
-    }
-  },
-
   radar: computed('_items.[]', function() {
     const {
       _radar,
@@ -173,9 +128,6 @@ const VerticalCollection = Component.extend({
     }
 
     if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
-      this._prevFirstItemIndex += lenDiff;
-      this._prevFirstVisibleIndex += lenDiff;
-
       _radar.prepend(items, lenDiff);
     } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
       _radar.append(items, lenDiff);
@@ -186,6 +138,21 @@ const VerticalCollection = Component.extend({
 
     return this._radar;
   }),
+
+  _scheduleSendAction(...action) {
+    this._scheduledActions.push(action);
+
+    if (this._nextSendActions === null) {
+      this._nextSendActions = setTimeout(() => {
+        this._nextSendActions = null;
+
+        run(() => {
+          this._scheduledActions.forEach((action) => this.sendAction(...action));
+          this._scheduledActions.length = 0;
+        });
+      });
+    }
+  },
 
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
@@ -212,13 +179,14 @@ const VerticalCollection = Component.extend({
     const minHeight = this.get('_minHeight');
     const bufferSize = this.get('bufferSize');
     const renderFromLast = this.get('renderFromLast');
+    const keyProperty = this.get('key');
 
     const {
       element,
       _scrollContainer
     } = this;
 
-    this._radar.init(element, _scrollContainer, minHeight, bufferSize, renderFromLast);
+    this._radar.init(element, _scrollContainer, minHeight, bufferSize, renderFromLast, keyProperty);
   },
 
   _initializeScrollState() {
@@ -276,7 +244,7 @@ const VerticalCollection = Component.extend({
 
   willDestroy() {
     this._radar.destroy();
-    run.cancel(this._nextSendActions);
+    clearTimeout(this._nextSendActions);
 
     removeScrollHandler(this._scrollContainer, this._scrollHandler);
     Container.removeEventListener('resize', this._resizeHandler);
@@ -286,32 +254,26 @@ const VerticalCollection = Component.extend({
     this._super();
 
     this._minHeight = this._calculateMinHeight();
-    this._hasAction = null;
     const RadarClass = this.get('staticHeight') ? StaticRadar : DynamicRadar;
 
-    let a = !!this.lastReached;
-    let b = !!this.firstReached;
-    let c = !!this.lastVisibleChanged;
-    let d = !!this.firstVisibleChanged;
-    let any = a || b || c || d;
-
     this._radar = new RadarClass();
+    this._scheduledActions = [];
+    this._nextSendActions = null;
 
-    if (any) {
-      this._hasAction = {
-        lastReached: a,
-        firstReached: b,
-        lastVisibleChanged: c,
-        firstVisibleChanged: d
-      };
+    if (this.firstVisibleChanged !== undefined) {
+      this._radar.firstVisibleChanged = this._scheduleSendAction.bind(this, 'firstVisibleChanged');
+    }
 
-      this._radar.didUpdate = () => {
-        this._nextSendActions = setTimeout(() => {
-          run(() => {
-            this._sendActions();
-          });
-        }, 0);
-      };
+    if (this.lastVisibleChanged !== undefined) {
+      this._radar.lastVisibleChanged = this._scheduleSendAction.bind(this, 'lastVisibleChanged');
+    }
+
+    if (this.firstReached !== undefined) {
+      this._radar.firstReached = this._scheduleSendAction.bind(this, 'firstReached');
+    }
+
+    if (this.lastReached !== undefined) {
+      this._radar.lastReached = this._scheduleSendAction.bind(this, 'lastReached');
     }
   }
 });
