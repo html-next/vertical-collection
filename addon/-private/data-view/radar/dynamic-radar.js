@@ -1,14 +1,27 @@
-import Radar from './radar';
+import { default as Radar, NULL_INDEX } from './radar';
 import SkipList from '../skip-list';
 
 import { assert } from 'vertical-collection/-debug/helpers';
 
 export default class DynamicRadar extends Radar {
+  constructor() {
+    super();
+
+    this._firstItemIndex = NULL_INDEX;
+    this._lastItemIndex = NULL_INDEX;
+
+    this._totalBefore = 0;
+    this._totalAfter = 0;
+
+    this._firstRender = true;
+
+    this.skipList = null;
+  }
+
   init(...args) {
     super.init(...args);
 
     this.skipList = new SkipList(this.totalItems, this.minHeight);
-    this._firstRender = true;
   }
 
   destroy() {
@@ -21,14 +34,14 @@ export default class DynamicRadar extends Radar {
     const { values } = this.skipList;
     const maxIndex = this.totalItems - 1;
     const numComponents = this.orderedComponents.length;
-    const prevFirstItemIndex = this.firstItemIndex;
-    const prevLastItemIndex = this.lastItemIndex;
+    const prevFirstItemIndex = this._prevFirstItemIndex;
+    const prevLastItemIndex = this._prevLastItemIndex;
     const middleVisibleValue = this.visibleTop + ((this.visibleBottom - this.visibleTop) / 2);
 
     // Don't measure if the radar has just been instantiated or reset, as we are rendering with a
     // completely new set of items and won't get an accurate measurement until after they render the
     // first time.
-    if (prevFirstItemIndex !== null) {
+    if (prevFirstItemIndex !== NULL_INDEX) {
       // We only need to measure the components that were rendered last time, extra components
       // haven't rendered yet.
       this._measure(0, prevLastItemIndex - prevFirstItemIndex);
@@ -80,8 +93,6 @@ export default class DynamicRadar extends Radar {
     this._lastItemIndex = lastItemIndex;
     this._totalBefore = totalBefore;
     this._totalAfter = totalAfter;
-
-    return itemDelta;
   }
 
   _measure(firstComponentIndex, lastComponentIndex) {
@@ -154,6 +165,10 @@ export default class DynamicRadar extends Radar {
   }
 
   get firstVisibleIndex() {
+    if (this.firstItemIndex === NULL_INDEX) {
+      return NULL_INDEX;
+    }
+
     const { values } = this.skipList;
 
     let {
@@ -173,6 +188,10 @@ export default class DynamicRadar extends Radar {
   }
 
   get lastVisibleIndex() {
+    if (this.lastItemIndex === NULL_INDEX) {
+      return NULL_INDEX;
+    }
+
     const { total, values } = this.skipList;
 
     let {

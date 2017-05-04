@@ -79,9 +79,9 @@ testScenarios(
 
     this.on('firstVisibleChanged', (item, index) => {
       if (count === 0) {
-        assert.equal(index, 0, 'the first last visible changed should be item 0');
+        assert.equal(index, 0, 'the first visible item should be item 0');
       } else {
-        assert.equal(index, 10, 'after scroll the last visible change should be item 10');
+        assert.equal(index, 10, 'after scroll the first visible item should be item 10');
       }
       count++;
       called();
@@ -110,7 +110,7 @@ testScenarios(
       called();
     });
 
-    wait().then(() => this.$('.scrollable').scrollTop(200));
+    return wait().then(() => this.$('.scrollable').scrollTop(200));
   }
 );
 
@@ -146,7 +146,7 @@ testScenarios(
       }
     });
 
-    wait().then(() => this.$('.scrollable').scrollTop(800));
+    return wait().then(() => this.$('.scrollable').scrollTop(800));
   }
 );
 
@@ -178,6 +178,60 @@ testScenarios(
     this.on('lastReached', ({ number }) => {
       append(this, getNumbers(number + 1, 10));
       called();
+    });
+  }
+);
+
+testScenarios(
+  'Does not send the firstReached action twice for the same item',
+  standardTemplate,
+  scenariosFor(getNumbers(0, 50), { firstReached: 'firstReached' }),
+
+  function(assert) {
+    assert.expect(0);
+    const called = assert.async(1);
+
+    this.on('firstReached', () => {
+      called();
+    });
+
+    return wait().then(() => {
+      this.$('.scrollable').scrollTop(800);
+
+      return wait();
+    }).then(() => {
+      this.$('.scrollable').scrollTop(0);
+
+      return wait();
+    });
+  }
+);
+
+testScenarios(
+  'Does not send the lastReached action twice for the same item',
+  standardTemplate,
+  scenariosFor(getNumbers(0, 50), { lastReached: 'lastReached' }),
+
+  function(assert) {
+    assert.expect(0);
+    const called = assert.async(1);
+
+    this.on('lastReached', () => {
+      called();
+    });
+
+    return wait().then(() => {
+      this.$('.scrollable').scrollTop(800);
+
+      return wait();
+    }).then(() => {
+      this.$('.scrollable').scrollTop(0);
+
+      return wait();
+    }).then(() => {
+      this.$('.scrollable').scrollTop(800);
+
+      return wait();
     });
   }
 );

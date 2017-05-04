@@ -1,11 +1,14 @@
-import Radar from './radar';
+import { default as Radar, NULL_INDEX } from './radar';
 
 export default class StaticRadar extends Radar {
-  _updateIndexes() {
-    const {
-      _firstItemIndex: prevFirstItemIndex
-    } = this;
+  constructor() {
+    super();
 
+    this._firstItemIndex = NULL_INDEX;
+    this._lastItemIndex = NULL_INDEX;
+  }
+
+  _updateIndexes() {
     const totalIndexes = this.orderedComponents.length;
     const maxIndex = this.totalItems - 1;
 
@@ -27,8 +30,6 @@ export default class StaticRadar extends Radar {
 
     this._firstItemIndex = firstItemIndex;
     this._lastItemIndex = lastItemIndex;
-
-    return firstItemIndex - prevFirstItemIndex;
   }
 
   get total() {
@@ -60,10 +61,14 @@ export default class StaticRadar extends Radar {
   }
 
   get firstVisibleIndex() {
-    return Math.ceil(this.visibleTop / this.minHeight);
+    const firstVisibleIndex = Math.ceil(this.visibleTop / this.minHeight);
+
+    return this.firstItemIndex === NULL_INDEX ? NULL_INDEX : firstVisibleIndex;
   }
 
   get lastVisibleIndex() {
-    return Math.ceil(this.visibleBottom / this.minHeight);
+    const lastVisibleIndex = Math.min(Math.ceil(this.visibleBottom / this.minHeight), this.totalItems - 1);
+
+    return this.firstItemIndex === NULL_INDEX ? NULL_INDEX : lastVisibleIndex;
   }
 }
