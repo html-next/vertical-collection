@@ -7,8 +7,11 @@
           {{#vertical-collection model.numbers
             minHeight=90
             staticHeight=true
+            bufferSize=5
+
             firstReached="loadAbove"
             lastReached="loadBelow"
+
             as |item index|
           }}
             {{number-slide item=item index=index}}

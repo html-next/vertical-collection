@@ -10,9 +10,9 @@ test('RecordArrays render correctly', function(assert) {
 
   andThen(function() {
     return wait().then(() => {
-      assert.equal(find('number-slide').length, 31, 'correct number of items rendered');
+      assert.equal(find('number-slide').length, 21, 'correct number of items rendered');
       assert.equal(find('number-slide:first').text().replace(/\s/g, ''), '0(0)', 'correct first item rendered');
-      assert.equal(find('number-slide:last').text().replace(/\s/g, ''), '30(30)', 'correct last item rendered');
+      assert.equal(find('number-slide:last').text().replace(/\s/g, ''), '20(20)', 'correct last item rendered');
     });
   });
 });

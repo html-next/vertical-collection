@@ -54,6 +54,22 @@ testScenarios(
   }
 );
 
+testScenarios(
+  'The collection renders correct number of components with bufferSize set',
+  standardTemplate,
+  scenariosFor(getNumbers(0, 10), { minHeight: 200, bufferSize: 1 }),
+
+  function(assert) {
+    assert.expect(1);
+
+    return wait().then(() => {
+      // Should render 2 components to be able to cover the whole scroll space, and 1
+      // extra buffer component on either side
+      assert.equal(this.$('.scrollable').find('div').length, 4);
+    });
+  }
+);
+
 test('The collection renders with containerSelector set', function(assert) {
   assert.expect(1);
 

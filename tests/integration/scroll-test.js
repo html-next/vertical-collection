@@ -160,7 +160,7 @@ testScenarios(
     const called = assert.async(2);
 
     this.on('firstReached', ({ number }) => {
-      prepend(this, getNumbers(number - 10, 10));
+      prepend(this, getNumbers(number - 5, 5));
       called();
     });
   }
@@ -169,14 +169,14 @@ testScenarios(
 testScenarios(
   'Sends the lastReached action after append',
   standardTemplate,
-  standardScenariosFor(getNumbers(0, 20), { lastReached: 'lastReached' }),
+  standardScenariosFor(getNumbers(0, 10), { lastReached: 'lastReached' }),
 
   function(assert) {
     assert.expect(0);
     const called = assert.async(2);
 
     this.on('lastReached', ({ number }) => {
-      append(this, getNumbers(number + 1, 10));
+      append(this, getNumbers(number + 1, 8));
       called();
     });
   }
@@ -268,7 +268,8 @@ testScenarios(
     const scrollContainer = this.$('.scrollable');
 
     return wait().then(() => {
-      scrollContainer.scrollTop(407);
+      // Occlude one item
+      scrollContainer.scrollTop(38);
 
       return wait();
     }).then(() => {

@@ -42,16 +42,11 @@ export default
   staticHeight: false,
 
   // The size of the buffer before and after the
-  // collection. Works as a multiplier against the
-  // height of the scrollContainer, e.g. if the
-  // scrollContainer is 200px, and bufferSize is 1,
-  // there will be a 200px buffer before and a 200px
-  // buffer after the scrollContainer. This along with
-  // scrollContainer height determines the number of
-  // components that render at once:
+  // collection. Represents a static number of components
+  // that will be added, such that:
   //
-  // numComponents === (containerHeight + (2 * bufferSize * containerHeight)) / minHeight
-  bufferSize: 1,
+  // numComponents === Math.ceil(containerHeight / minHeight) + (bufferSize * 2) + 1
+  bufferSize: 0,
 
 // actions
 

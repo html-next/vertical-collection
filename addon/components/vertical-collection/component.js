@@ -62,7 +62,7 @@ const VerticalCollection = Component.extend({
    * how much extra room to keep visible and invisible on
    * either side of the viewport.
    */
-  bufferSize: 1,
+  bufferSize: 0,
 
   // –––––––––––––– Initial Scroll State
   /*
