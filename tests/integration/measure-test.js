@@ -85,3 +85,34 @@ test('The collection correctly remeasures items when scrolling up', function(ass
     assert.equal(paddingAfter(itemContainer), 1810, 'itemContainer padding has the height of the modified last element');
   });
 });
+
+test('Can scroll correctly in dynamic list of items that has non-integer heights', function(assert) {
+  assert.expect(2);
+
+  this.set('items', getNumbers(0, 21));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection ${'items'}
+      minHeight=20
+
+      as |item i|}}
+      <div style="height: 33.333px;">{{item.number}} {{i}}</div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  const scrollable = this.$('.scrollable');
+  const itemContainer = this.$('vertical-collection');
+
+  return wait()
+    .then(() => scrollable.scrollTop(scrollable.get(0).scrollHeight))
+    .then(wait)
+    .then(() => {
+      // Floats aren't perfect, neither is browser rendering/measuring, but any subpixel errors
+      // should be amplified to the point where they are very noticeable at this point, so rounding
+      // should provide some safety.
+      assert.equal(Math.round(paddingBefore(itemContainer)), 333, 'Occluded content has the correct height before');
+      assert.equal(paddingAfter(itemContainer), 0, 'Occluded content has the correct height after');
+    });
+});

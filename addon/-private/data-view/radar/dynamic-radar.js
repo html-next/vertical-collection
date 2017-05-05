@@ -119,9 +119,9 @@ export default class DynamicRadar extends Radar {
       let margin;
 
       if (previousItem) {
-        margin = Math.round(currentItemTop - previousItem.getBoundingClientRect().bottom);
+        margin = currentItemTop - previousItem.getBoundingClientRect().bottom;
       } else {
-        margin = Math.round(currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore);
+        margin = currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore;
       }
 
       assert(`item height + margin must always be above the minimum value ${this.minHeight}px. The item at index ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minHeight);
