@@ -13,9 +13,7 @@ module.exports = {
   },
   globals: {
     ArrayBuffer: true,
-    Uint32Array: true,
-    Uint16Array: true,
-    Uint8Array: true
+    Float32Array: true
   },
   rules: {
     'quotes': ['error', 'single', {  "allowTemplateLiterals": true, "avoidEscape": true }],

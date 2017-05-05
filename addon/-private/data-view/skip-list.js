@@ -15,7 +15,7 @@ import { assert } from 'vertical-collection/-debug/helpers';
  *
  * This data structure acts somewhat like a Binary Search Tree. Given a list of size n, the
  * retreival time for the index is O(log n) and the update time should any values change is
- * O(log n). The space complexity is O(n log n) in bytes (using Uint16/32Arrays helps a lot
+ * O(log n). The space complexity is O(n log n) in bytes (using Float32Arrays helps a lot
  * here), and the initialization time is O(n log n).
  *
  * It works by constructing layer arrays, each of which is setup such that
@@ -26,7 +26,7 @@ import { assert } from 'vertical-collection/-debug/helpers';
 
 export default class SkipList {
   constructor(length, defaultValue) {
-    const values = new Uint16Array(new ArrayBuffer(length * 2));
+    const values = new Float32Array(new ArrayBuffer(length * 4));
 
     values.fill(defaultValue);
 
@@ -38,7 +38,7 @@ export default class SkipList {
 
   _initializeLayers(values, defaultValue) {
     const layers = [values];
-    let i, length, buffer, layer, prevLayer, left, right;
+    let i, length, layer, prevLayer, left, right;
 
     prevLayer = layer = values;
     length = values.length;
@@ -46,8 +46,7 @@ export default class SkipList {
     while (length > 2) {
       length = Math.ceil(length / 2);
 
-      buffer = new ArrayBuffer(length * 4);
-      layer = new Uint32Array(buffer);
+      layer = new Float32Array(new ArrayBuffer(length * 4));
 
       if (defaultValue) {
         // If given a default value we assume that we can fill each
@@ -166,7 +165,7 @@ export default class SkipList {
 
     const newLength = numPrepended + oldLength;
 
-    const newValues = new Uint16Array(new ArrayBuffer(newLength * 2));
+    const newValues = new Float32Array(new ArrayBuffer(newLength * 4));
 
     newValues.set(oldValues, numPrepended);
     newValues.fill(defaultValue, 0, numPrepended);
@@ -184,7 +183,7 @@ export default class SkipList {
 
     const newLength = numAppended + oldLength;
 
-    const newValues = new Uint16Array(new ArrayBuffer(newLength * 2));
+    const newValues = new Float32Array(new ArrayBuffer(newLength * 4));
 
     newValues.set(oldValues);
     newValues.fill(defaultValue, oldLength);
