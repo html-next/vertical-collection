@@ -38,7 +38,7 @@ test('The collection correctly remeasures items when scrolling down', function(a
     assert.equal(paddingBefore(itemContainer), 0, 'itemContainer padding is correct on initial render');
     this.$('.item:first').height(50);
 
-    scrollContainer.scrollTop(251);
+    scrollContainer.scrollTop(51);
 
     return wait();
   }).then(() => {
@@ -71,17 +71,17 @@ test('The collection correctly remeasures items when scrolling up', function(ass
   const itemContainer = this.$('vertical-collection');
 
   return wait().then(() => {
-    assert.equal(paddingAfter(itemContainer), 1380, 'itemContainer padding is correct on initial render');
-    scrollContainer.scrollTop(221);
+    assert.equal(paddingAfter(itemContainer), 1780, 'itemContainer padding is correct on initial render');
+    scrollContainer.scrollTop(21);
 
     return wait();
   }).then(() => {
-    assert.equal(paddingAfter(itemContainer), 1360, 'itemContainer padding is correct after scrolling down');
+    assert.equal(paddingAfter(itemContainer), 1760, 'itemContainer padding is correct after scrolling down');
     this.$('.item:last').height(50);
     scrollContainer.scrollTop(0);
 
     return wait();
   }).then(() => {
-    assert.equal(paddingAfter(itemContainer), 1410, 'itemContainer padding has the height of the modified last element');
+    assert.equal(paddingAfter(itemContainer), 1810, 'itemContainer padding has the height of the modified last element');
   });
 });

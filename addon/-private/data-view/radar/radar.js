@@ -348,10 +348,10 @@ export default class Radar {
     } = this;
 
     // The total number of components is determined by the minimum number required to span the
-    // container with its buffers. Combined with the above rendering strategy this is fairly
+    // container plus its buffers. Combined with the above rendering strategy this is fairly
     // performant, even if mean item size is above the minimum.
-    const totalHeight = scrollContainerHeight + (scrollContainerHeight * bufferSize * 2);
-    const totalComponents = Math.min(totalItems, Math.ceil(totalHeight / minHeight) + 1);
+    const calculatedComponents = Math.ceil(scrollContainerHeight / minHeight) + 1 + (bufferSize * 2);
+    const totalComponents = Math.min(totalItems, calculatedComponents);
     const delta = totalComponents - orderedComponents.length;
 
     if (delta > 0) {

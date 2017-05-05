@@ -110,7 +110,7 @@ export const standardTemplate = hbs`
     {{#vertical-collection ${'items'}
       minHeight=(either-or minHeight 20)
       staticHeight=staticHeight
-      bufferSize=(either-or bufferSize 1)
+      bufferSize=(either-or bufferSize 5)
 
       renderFromLast=renderFromLast
       idForFirstItem=idForFirstItem
