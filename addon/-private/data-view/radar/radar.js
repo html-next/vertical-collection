@@ -6,8 +6,6 @@ import VirtualComponent from '../virtual-component';
 import insertRangeBefore from '../utils/insert-range-before';
 import objectAt from '../utils/object-at';
 
-import keyForItem from '../../ember-internals/utils/key-for-item';
-
 import { assert } from 'vertical-collection/-debug/helpers';
 
 const {
@@ -40,19 +38,16 @@ export default class Radar {
     this._prevFirstVisibleIndex = NULL_INDEX;
     this._prevLastVisibleIndex = NULL_INDEX;
 
-    this.firstVisibleChanged = () => {};
-    this.lastVisibleChanged = () => {};
-    this.firstReached = () => {};
-    this.lastReached = () => {};
+    this._firstReached = false;
+    this._lastReached = false;
+
+    this.sendAction = () => {};
 
     this._occludedContentBefore = new VirtualComponent(document.createElement('occluded-content'));
     this._occludedContentAfter = new VirtualComponent(document.createElement('occluded-content'));
 
     this.virtualComponents = A([this._occludedContentBefore, this._occludedContentAfter]);
     this.orderedComponents = [];
-
-    this._firstReachedMap = Object.create(null);
-    this._lastReachedMap = Object.create(null);
   }
 
   init(itemContainer, scrollContainer, minHeight, bufferSize, renderFromLast, keyProperty) {
@@ -130,57 +125,36 @@ export default class Radar {
 
   _sendActions() {
     const {
-      items,
-      keyProperty,
-
       firstItemIndex,
       lastItemIndex,
       firstVisibleIndex,
       lastVisibleIndex,
 
-      _prevFirstItemIndex,
-      _prevLastItemIndex,
       _prevFirstVisibleIndex,
       _prevLastVisibleIndex,
 
       totalItems,
 
-      _firstReachedMap,
-      _lastReachedMap
+      _firstReached,
+      _lastReached
     } = this;
 
     if (firstVisibleIndex !== _prevFirstVisibleIndex) {
-      const firstVisibleItem = objectAt(items, firstVisibleIndex);
-      const firstVisibleKey = keyForItem(firstVisibleItem, keyProperty, firstVisibleIndex);
-
-      this.firstVisibleChanged(firstVisibleItem, firstVisibleIndex, firstVisibleKey);
+      this.sendAction('firstVisibleChanged', firstVisibleIndex);
     }
 
     if (lastVisibleIndex !== _prevLastVisibleIndex) {
-      const lastVisibleItem = objectAt(items, lastVisibleIndex);
-      const lastVisibleKey = keyForItem(lastVisibleItem, keyProperty, lastVisibleIndex);
-
-      this.lastVisibleChanged(lastVisibleItem, lastVisibleIndex, lastVisibleKey);
+      this.sendAction('lastVisibleChanged', lastVisibleIndex);
     }
 
-    if (firstItemIndex === 0 && firstItemIndex !== _prevFirstItemIndex) {
-      const firstItem = objectAt(items, firstItemIndex);
-      const firstItemKey = keyForItem(firstItem, keyProperty, firstItemIndex);
-
-      if (_firstReachedMap[firstItemKey] !== true) {
-        _firstReachedMap[firstItemKey] = true;
-        this.firstReached(firstItem, firstItemIndex, firstItemKey);
-      }
+    if (_firstReached === false && firstItemIndex === 0) {
+      this.sendAction('firstReached', firstItemIndex);
+      this._firstReached = true;
     }
 
-    if (lastItemIndex === totalItems - 1 && lastItemIndex !== _prevLastItemIndex) {
-      const lastItem = objectAt(items, lastItemIndex);
-      const lastItemKey = keyForItem(lastItem, keyProperty, lastItemIndex);
-
-      if (_lastReachedMap[lastItemKey] !== true) {
-        _lastReachedMap[lastItemKey] = true;
-        this.lastReached(lastItem, lastItemIndex, lastItemKey);
-      }
+    if (_lastReached === false && lastItemIndex === totalItems - 1) {
+      this.sendAction('lastReached', lastItemIndex);
+      this._lastReached = true;
     }
   }
 
@@ -383,6 +357,8 @@ export default class Radar {
     this.firstItemIndex += numPrepended;
     this.lastItemIndex += numPrepended;
 
+    this._firstReached = false;
+
     this._updateVirtualComponentPool();
     this.scheduleUpdate();
 
@@ -391,6 +367,8 @@ export default class Radar {
 
   append(items) {
     this.items = items;
+
+    this._lastReached = false;
 
     this._updateVirtualComponentPool();
     this.scheduleUpdate();
@@ -403,8 +381,8 @@ export default class Radar {
       this.firstItemIndex = NULL_INDEX;
       this.lastItemIndex = NULL_INDEX;
 
-      this._firstReachedMap = Object.create(null);
-      this._lastReachedMap = Object.create(null);
+      this._firstReached = false;
+      this._lastReached = false;
 
       this._updateVirtualComponentPool();
     }

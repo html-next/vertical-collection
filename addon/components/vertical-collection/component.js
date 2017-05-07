@@ -139,15 +139,23 @@ const VerticalCollection = Component.extend({
     return this._radar;
   }),
 
-  _scheduleSendAction(...action) {
-    this._scheduledActions.push(action);
+  _scheduleSendAction(action, index) {
+    this._scheduledActions.push([action, index]);
 
     if (this._nextSendActions === null) {
       this._nextSendActions = setTimeout(() => {
         this._nextSendActions = null;
 
         run(() => {
-          this._scheduledActions.forEach((action) => this.sendAction(...action));
+          const items = this.get('_items');
+          const keyPath = this.get('key');
+
+          this._scheduledActions.forEach(([action, index]) => {
+            const item = objectAt(items, index);
+            const key = keyForItem(item, keyPath, index);
+
+            this.sendAction(action, item, index, key);
+          });
           this._scheduledActions.length = 0;
         });
       });
@@ -257,23 +265,30 @@ const VerticalCollection = Component.extend({
     const RadarClass = this.get('staticHeight') ? StaticRadar : DynamicRadar;
 
     this._radar = new RadarClass();
+
+    this._hasAction = null;
     this._scheduledActions = [];
     this._nextSendActions = null;
 
-    if (this.firstVisibleChanged !== undefined) {
-      this._radar.firstVisibleChanged = this._scheduleSendAction.bind(this, 'firstVisibleChanged');
-    }
+    let a = !!this.lastReached;
+    let b = !!this.firstReached;
+    let c = !!this.lastVisibleChanged;
+    let d = !!this.firstVisibleChanged;
+    let any = a || b || c || d;
 
-    if (this.lastVisibleChanged !== undefined) {
-      this._radar.lastVisibleChanged = this._scheduleSendAction.bind(this, 'lastVisibleChanged');
-    }
+    if (any) {
+      this._hasAction = {
+        lastReached: a,
+        firstReached: b,
+        lastVisibleChanged: c,
+        firstVisibleChanged: d
+      };
 
-    if (this.firstReached !== undefined) {
-      this._radar.firstReached = this._scheduleSendAction.bind(this, 'firstReached');
-    }
-
-    if (this.lastReached !== undefined) {
-      this._radar.lastReached = this._scheduleSendAction.bind(this, 'lastReached');
+      this._radar.sendAction = (action, index) => {
+        if (this._hasAction[action]) {
+          this._scheduleSendAction(action, index);
+        }
+      };
     }
   }
 });
