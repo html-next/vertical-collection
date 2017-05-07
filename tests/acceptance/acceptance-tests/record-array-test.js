@@ -6,7 +6,6 @@ moduleForAcceptance('Acceptance | Record Array');
 
 test('RecordArrays render correctly', function(assert) {
   visit('/acceptance-tests/record-array');
-  server.createList('number-item', 100);
 
   andThen(function() {
     return wait().then(() => {
