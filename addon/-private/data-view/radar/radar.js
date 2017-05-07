@@ -249,13 +249,13 @@ export default class Radar {
    * in this exact order.
    */
   get visibleTop() {
-    return this.scrollTop + this._prependOffset + this.scrollTopOffset;
+    return this.scrollTop - this.scrollTopOffset + this._prependOffset;
   }
 
   set visibleTop(visibleTop) {
     assert('Must set visibleTop to a number', typeof visibleTop === 'number');
 
-    this.scrollTop = visibleTop - this._prependOffset - this.scrollTopOffset;
+    this.scrollTop = visibleTop + this.scrollTopOffset - this._prependOffset;
   }
 
   get visibleBottom() {
