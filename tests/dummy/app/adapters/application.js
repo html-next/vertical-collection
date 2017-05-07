@@ -1,5 +1,9 @@
 import DS from 'ember-data';
-import RSVP from 'rsvp';
+import Ember from 'ember';
+
+const {
+  RSVP
+} = Ember;
 
 const NUMBERS = {
   data: []
