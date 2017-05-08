@@ -139,7 +139,7 @@ const VerticalCollection = Component.extend({
         this._nextSendActions = null;
 
         run(() => {
-          const items = this.get('_items');
+          const items = this.get('items');
           const keyPath = this.get('key');
 
           this._scheduledActions.forEach(([action, index]) => {
