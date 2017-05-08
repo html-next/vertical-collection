@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import { stripInProduction } from 'vertical-collection/-debug/helpers';
 
 const {
   run
@@ -8,6 +9,10 @@ export class Token {
   constructor(parent) {
     this._parent = parent;
     this._cancelled = false;
+
+    stripInProduction(() => {
+      Object.freeze(this);
+    });
   }
 
   get cancelled() {

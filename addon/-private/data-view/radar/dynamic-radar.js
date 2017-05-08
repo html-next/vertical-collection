@@ -1,7 +1,7 @@
 import { default as Radar, NULL_INDEX } from './radar';
 import SkipList from '../skip-list';
 
-import { assert } from 'vertical-collection/-debug/helpers';
+import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
 
 export default class DynamicRadar extends Radar {
   constructor() {
@@ -16,6 +16,10 @@ export default class DynamicRadar extends Radar {
     this._firstRender = true;
 
     this.skipList = null;
+
+    stripInProduction(() => {
+      Object.freeze(this);
+    });
   }
 
   init(...args) {

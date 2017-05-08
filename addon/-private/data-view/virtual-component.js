@@ -1,7 +1,7 @@
 import Ember from 'ember';
 import { IS_GLIMMER_2 } from '../ember-internals/compatibility';
 
-import { assert } from 'vertical-collection/-debug/helpers';
+import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
 
 const { set } = Ember;
 
@@ -17,6 +17,10 @@ export default class VirtualComponent {
     this._lowerBound = document.createTextNode('');
 
     this.content = null;
+
+    stripInProduction(() => {
+      Object.freeze(this);
+    });
   }
 
   get element() {

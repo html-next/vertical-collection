@@ -1,4 +1,4 @@
-import { assert } from 'vertical-collection/-debug/helpers';
+import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
 
 /*
  * `SkipList` is a data structure designed with two main uses in mind:
@@ -34,6 +34,10 @@ export default class SkipList {
     this.defaultValue = defaultValue;
 
     this._initializeLayers(values, defaultValue);
+
+    stripInProduction(() => {
+      Object.freeze(this);
+    });
   }
 
   _initializeLayers(values, defaultValue) {

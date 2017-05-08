@@ -1,4 +1,5 @@
 import { default as Radar, NULL_INDEX } from './radar';
+import { stripInProduction } from 'vertical-collection/-debug/helpers';
 
 export default class StaticRadar extends Radar {
   constructor() {
@@ -6,6 +7,10 @@ export default class StaticRadar extends Radar {
 
     this._firstItemIndex = NULL_INDEX;
     this._lastItemIndex = NULL_INDEX;
+
+    stripInProduction(() => {
+      Object.freeze(this);
+    });
   }
 
   _updateIndexes() {

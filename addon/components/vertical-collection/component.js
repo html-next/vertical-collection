@@ -15,7 +15,7 @@ import {
   removeScrollHandler
 } from '../../-private';
 
-import { assert } from 'vertical-collection/-debug/helpers';
+import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
 
 const {
   computed,
@@ -291,6 +291,10 @@ const VerticalCollection = Component.extend({
         }
       };
     }
+
+    stripInProduction(() => {
+      Object.freeze(this);
+    });
   }
 });
 
