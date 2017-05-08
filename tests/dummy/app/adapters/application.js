@@ -5,46 +5,24 @@ const {
   RSVP
 } = Ember;
 
-let Adapter;
+const NUMBERS = {
+  data: []
+};
 
-// Pre 1.13, the JSONAPIAdapter doesn't exist
-if (DS.JSONAPIAdapter) {
-  const NUMBERS = {
-    data: []
-  };
-
-  for (let i = 0; i < 100; i++) {
-    NUMBERS.data.push({
-      type: 'number-item',
-      id: `${i}`,
-      attributes: {
-        number: i
-      }
-    });
-  }
-
-  Adapter = DS.JSONAPIAdapter.extend({
-    findAll() {
-      return RSVP.Promise.resolve(NUMBERS);
-    }
-  });
-} else {
-  const NUMBERS = {
-    numberItems: []
-  };
-
-  for (let i = 0; i < 100; i++) {
-    NUMBERS.numberItems.push({
-      id: `${i}`,
+for (let i = 0; i < 100; i++) {
+  NUMBERS.data.push({
+    type: 'number-item',
+    id: `${i}`,
+    attributes: {
       number: i
-    });
-  }
-
-  Adapter = DS.RESTAdapter.extend({
-    findAll() {
-      return RSVP.Promise.resolve(NUMBERS);
     }
   });
 }
 
-export default Adapter;
+// Pre 1.13, the JSONAPIAdapter doesn't exist, but we test 1.11
+//  we still treat this as a JSONAPIAdapter
+export default DS.RESTAdapter.extend({
+  findAll() {
+    return RSVP.Promise.resolve(NUMBERS);
+  }
+});
