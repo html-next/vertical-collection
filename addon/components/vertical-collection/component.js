@@ -296,10 +296,6 @@ const VerticalCollection = Component.extend({
         }
       };
     }
-
-    stripInProduction(() => {
-      Object.seal(this);
-    });
   }
 });
 
