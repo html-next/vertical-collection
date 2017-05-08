@@ -11,7 +11,7 @@ export class Token {
     this._cancelled = false;
 
     stripInProduction(() => {
-      Object.freeze(this);
+      Object.preventExtensions(this);
     });
   }
 

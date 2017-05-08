@@ -17,9 +17,10 @@ export default class VirtualComponent {
     this._lowerBound = document.createTextNode('');
 
     this.content = null;
+    this.index = 0;
 
     stripInProduction(() => {
-      Object.freeze(this);
+      Object.preventExtensions(this);
     });
   }
 

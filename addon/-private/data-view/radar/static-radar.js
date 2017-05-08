@@ -9,7 +9,7 @@ export default class StaticRadar extends Radar {
     this._lastItemIndex = NULL_INDEX;
 
     stripInProduction(() => {
-      Object.freeze(this);
+      Object.preventExtensions(this);
     });
   }
 

@@ -18,7 +18,7 @@ export default class DynamicRadar extends Radar {
     this.skipList = null;
 
     stripInProduction(() => {
-      Object.freeze(this);
+      Object.preventExtensions(this);
     });
   }
 

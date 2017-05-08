@@ -92,15 +92,12 @@ const VerticalCollection = Component.extend({
     }
   },
 
-  supportsInverse: SUPPORTS_INVERSE_BLOCK,
-
   isEmpty: computed.empty('items'),
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
 
   radar: computed('items.[]', function() {
     const {
       _radar,
-
       _prevItemsLength,
       _prevFirstKey,
       _prevLastKey
@@ -110,14 +107,14 @@ const VerticalCollection = Component.extend({
     const itemsLength = get(items, 'length');
 
     const key = this.get('key');
-    const lenDiff = itemsLength - (_prevItemsLength || 0);
+    const lenDiff = itemsLength - _prevItemsLength;
 
     if (itemsLength > 0) {
       this._prevItemsLength = itemsLength;
       this._prevFirstKey = keyForItem(objectAt(items, 0), key, 0);
       this._prevLastKey = keyForItem(objectAt(items, itemsLength - 1), key, itemsLength - 1);
     } else {
-      this._prevItemsLength = this._prevFirstKey = this._prevLastKey = null;
+      this._prevItemsLength = this._prevFirstKey = this._prevLastKey = 0;
     }
 
     // TODO add explicit test
@@ -265,6 +262,14 @@ const VerticalCollection = Component.extend({
     this._minHeight = this._calculateMinHeight();
     const RadarClass = this.get('staticHeight') ? StaticRadar : DynamicRadar;
 
+    this.supportsInverse = SUPPORTS_INVERSE_BLOCK;
+    this._prevItemsLength = 0;
+    this._prevFirstKey = null;
+    this._prevLastKey = null;
+    this._lastEarthquake = null;
+    this._scrollContainer = null;
+    this._scrollHandler = null;
+    this._resizeHandler = null;
     this._radar = new RadarClass();
 
     this._hasAction = null;
@@ -293,7 +298,7 @@ const VerticalCollection = Component.extend({
     }
 
     stripInProduction(() => {
-      Object.freeze(this);
+      Object.seal(this);
     });
   }
 });

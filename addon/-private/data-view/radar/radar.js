@@ -20,6 +20,7 @@ export const NULL_INDEX = -2;
 export default class Radar {
   constructor() {
     this.token = new Token();
+    this.items = null;
 
     this._scrollTop = 0;
     this._prependOffset = 0;
@@ -38,6 +39,7 @@ export default class Radar {
     this._prevLastItemIndex = NULL_INDEX;
     this._prevFirstVisibleIndex = NULL_INDEX;
     this._prevLastVisibleIndex = NULL_INDEX;
+    this.scrollContainerHeight = 0;
 
     this._firstReached = false;
     this._lastReached = false;

@@ -36,7 +36,7 @@ export default class SkipList {
     this._initializeLayers(values, defaultValue);
 
     stripInProduction(() => {
-      Object.freeze(this);
+      Object.preventExtensions(this);
     });
   }
 
