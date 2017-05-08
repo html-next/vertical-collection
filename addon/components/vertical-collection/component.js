@@ -15,7 +15,7 @@ import {
   removeScrollHandler
 } from '../../-private';
 
-import { assert } from 'vertical-collection/-debug/helpers';
+import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
 
 const {
   computed,
@@ -95,7 +95,7 @@ const VerticalCollection = Component.extend({
   isEmpty: computed.empty('items'),
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
 
-  radar: computed('items.[]', function() {
+  virtualComponents: computed('items.[]', function() {
     const {
       _radar,
       _prevItemsLength,
@@ -128,7 +128,7 @@ const VerticalCollection = Component.extend({
       _radar.updateItems(items, isReset);
     }
 
-    return this._radar;
+    return this._radar.virtualComponents;
   }),
 
   _scheduleSendAction(action, index) {

@@ -16,6 +16,10 @@ export default class VirtualComponent {
     this._upperBound = document.createTextNode('');
     this._lowerBound = document.createTextNode('');
 
+    // In older versions of Ember, binding anything on an object in the template
+    // adds observers which creates __ember_meta__
+    this.__ember_meta__ = null; // eslint-disable-line camelcase
+
     this.content = null;
     this.index = 0;
 
