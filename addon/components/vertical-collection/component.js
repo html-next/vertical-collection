@@ -38,10 +38,6 @@ const VerticalCollection = Component.extend({
   // usable via {{#vertical-collection <items-array>}}
   items: null,
 
-  // deprecated, only for use in Ember 1.11
-  // TODO remove this
-  content: null,
-
   // –––––––––––––– Optional Settings
   staticHeight: false,
 
@@ -84,10 +80,6 @@ const VerticalCollection = Component.extend({
    */
   renderFromLast: false,
 
-  // –––––––––––––– @private
-  // TODO remove this
-  _items: computed.or('items', 'content'),
-
   _calculateMinHeight() {
     const { minHeight } = this;
 
@@ -102,10 +94,10 @@ const VerticalCollection = Component.extend({
 
   supportsInverse: SUPPORTS_INVERSE_BLOCK,
 
-  isEmpty: computed.empty('_items'),
+  isEmpty: computed.empty('items'),
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
 
-  radar: computed('_items.[]', function() {
+  radar: computed('items.[]', function() {
     const {
       _radar,
 
@@ -114,7 +106,7 @@ const VerticalCollection = Component.extend({
       _prevLastKey
     } = this;
 
-    const items = this.get('_items');
+    const items = this.get('items');
     const itemsLength = get(items, 'length');
 
     const key = this.get('key');
@@ -206,7 +198,7 @@ const VerticalCollection = Component.extend({
     const key = this.get('key');
 
     const minHeight = this._minHeight;
-    const items = this.get('_items');
+    const items = this.get('items');
     const totalItems = get(items, 'length');
 
     let visibleTop = 0;
