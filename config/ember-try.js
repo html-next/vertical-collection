@@ -18,12 +18,10 @@ module.exports = {
       npm: {
         devDependencies: {
           'ember-cli-shims': null,
+          'ember-cli-fastboot': null,
           'ember-data': '1.0.0-beta.16.1',
           'ember-source': null,
           'fastboot': null
-        },
-        dependencies: {
-          'ember-cli-fastboot': null
         }
       }
     },

@@ -19,7 +19,9 @@ for (let i = 0; i < 100; i++) {
   });
 }
 
-export default DS.JSONAPIAdapter.extend({
+// Pre 1.13, the JSONAPIAdapter doesn't exist, but we test 1.11
+//  we still treat this as a JSONAPIAdapter
+export default DS.RESTAdapter.extend({
   findAll() {
     return RSVP.Promise.resolve(NUMBERS);
   }
