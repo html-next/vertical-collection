@@ -15,7 +15,7 @@ import {
   removeScrollHandler
 } from '../../-private';
 
-import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
+import { assert } from 'vertical-collection/-debug/helpers';
 
 const {
   computed,
