@@ -48,6 +48,7 @@ export default class SkipList {
 
       layer = new Float32Array(new ArrayBuffer(length * 4));
 
+      // TODO add explicit test
       if (defaultValue) {
         // If given a default value we assume that we can fill each
         // layer of the skip list with the previous layer's value * 2.

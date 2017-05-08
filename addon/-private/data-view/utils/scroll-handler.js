@@ -37,6 +37,7 @@ export class ScrollHandler {
         left: element.scrollLeft,
         handlers
       };
+      // TODO add explicit test
       if (SUPPORTS_PASSIVE) {
         cache.passiveHandler = function() {
           ScrollHandler.triggerElementHandlers(element, cache);
@@ -50,8 +51,11 @@ export class ScrollHandler {
       handlers.push(handler);
     }
 
+    // TODO add explicit test
     if (this.isUsingPassive && handlers.length === 1) {
       element.addEventListener('scroll', cache.passiveHandler, { capture: true, passive: true });
+
+    // TODO add explicit test
     } else if (!this.isPolling) {
       this.poll();
     }
@@ -60,7 +64,7 @@ export class ScrollHandler {
   removeScrollHandler(element, handler) {
     let index = this.elements.indexOf(element);
     let elementCache = this.handlers[index];
-
+    // TODO add explicit test
     if (elementCache && elementCache.handlers) {
       let index = elementCache.handlers.indexOf(handler);
 
@@ -71,6 +75,7 @@ export class ScrollHandler {
       elementCache.handlers.splice(index, 1);
 
       // cleanup element entirely if needed
+      // TODO add explicit test
       if (!elementCache.handlers.length) {
         index = this.elements.indexOf(element);
         this.handlers.splice(index, 1);
@@ -83,6 +88,7 @@ export class ScrollHandler {
           this.isPolling = false;
         }
 
+        // TODO add explicit test
         if (this.isUsingPassive) {
           element.removeEventListener('scroll', elementCache.passiveHandler, { capture: true, passive: true });
         }
@@ -104,6 +110,7 @@ export class ScrollHandler {
 
     let event = { top: cachedTop, left: cachedLeft };
 
+    // TODO add explicit test
     if (topChanged || leftChanged) {
       run.begin();
       for (let j = 0; j < meta.handlers.length; j++) {
@@ -117,6 +124,7 @@ export class ScrollHandler {
     this.isPolling = true;
 
     scheduler.schedule('sync', () => {
+      // TODO add explicit test
       if (!this.isPolling) {
         return;
       }
@@ -129,6 +137,7 @@ export class ScrollHandler {
       }
 
       this.isPolling = this.length > 0;
+      // TODO add explicit test
       if (this.isPolling) {
         this.poll();
       }

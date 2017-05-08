@@ -14,6 +14,8 @@ export default function getWidth(dims, withMargins) {
       width = dims.width;
       break;
   }
+
+  // TODO add explicit test
   if (withMargins) {
     width += dims.marginLeft + dims.marginRight;
   }

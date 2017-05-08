@@ -49,6 +49,7 @@ export class Scheduler {
   }
 
   forget(token) {
+    // TODO add explicit test
     if (token) {
       token.cancel();
     }
@@ -69,6 +70,7 @@ export class Scheduler {
     let hasDomWork = this.sync.length > 0 || this.layout.length > 0;
     this.jobs = 0;
 
+    // TODO add explicit test
     if (hasDomWork) {
       run.begin();
       if (this.sync.length > 0) {

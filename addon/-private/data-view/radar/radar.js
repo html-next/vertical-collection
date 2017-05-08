@@ -92,7 +92,7 @@ export default class Radar {
    * @private
    */
   scheduleUpdate() {
-    if (this._nextUpdate) {
+    if (this._nextUpdate !== null) {
       return;
     }
 
@@ -377,7 +377,7 @@ export default class Radar {
   updateItems(items, isReset = false) {
     this.items = items;
 
-    if (isReset) {
+    if (isReset === true) {
       this.firstItemIndex = NULL_INDEX;
       this.lastItemIndex = NULL_INDEX;
 

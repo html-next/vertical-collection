@@ -83,7 +83,7 @@ export default class DynamicRadar extends Radar {
     const itemDelta = (prevFirstItemIndex !== null) ? firstItemIndex - prevFirstItemIndex : 0;
     const numCulled = Math.abs(itemDelta % numComponents);
 
-    if (itemDelta < 0 || this._firstRender) {
+    if (itemDelta < 0 || this._firstRender === true) {
       // schedule a measurement for items that could affect scrollTop
       this.schedule('measure', () => {
         const staticVisibleIndex = this.renderFromLast ? this.lastVisibleIndex + 1 : this.firstVisibleIndex;
@@ -124,6 +124,7 @@ export default class DynamicRadar extends Radar {
 
       let margin;
 
+      // TODO add explicit test
       if (previousItem) {
         margin = currentItemTop - previousItem.getBoundingClientRect().bottom;
       } else {
@@ -231,7 +232,7 @@ export default class DynamicRadar extends Radar {
   updateItems(items, isReset) {
     super.updateItems(items, isReset);
 
-    if (isReset) {
+    if (isReset === true) {
       this.skipList = new SkipList(this.totalItems, this.minHeight);
     }
   }

@@ -39,6 +39,7 @@ const VerticalCollection = Component.extend({
   items: null,
 
   // deprecated, only for use in Ember 1.11
+  // TODO remove this
   content: null,
 
   // –––––––––––––– Optional Settings
@@ -84,7 +85,7 @@ const VerticalCollection = Component.extend({
   renderFromLast: false,
 
   // –––––––––––––– @private
-
+  // TODO remove this
   _items: computed.or('items', 'content'),
 
   _calculateMinHeight() {
@@ -127,8 +128,10 @@ const VerticalCollection = Component.extend({
       this._prevItemsLength = this._prevFirstKey = this._prevLastKey = null;
     }
 
+    // TODO add explicit test
     if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
       _radar.prepend(items, lenDiff);
+      // TODO add explicit test
     } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
       _radar.append(items, lenDiff);
     } else {
@@ -184,7 +187,7 @@ const VerticalCollection = Component.extend({
    * @private
    */
   _initializeRadar() {
-    const minHeight = this.get('_minHeight');
+    const minHeight = this._minHeight;
     const bufferSize = this.get('bufferSize');
     const renderFromLast = this.get('renderFromLast');
     const keyProperty = this.get('key');
@@ -202,25 +205,29 @@ const VerticalCollection = Component.extend({
     const idForFirstItem = this.get('idForFirstItem');
     const key = this.get('key');
 
-    const minHeight = this.get('_minHeight');
+    const minHeight = this._minHeight;
     const items = this.get('_items');
     const totalItems = get(items, 'length');
 
     let visibleTop = 0;
 
+    // TODO add explicit test
     if (idForFirstItem) {
       for (let i = 0; i < totalItems - 1; i++) {
+        // TODO strict equality
         if (keyForItem(objectAt(items, i), key, i) == idForFirstItem) {
           visibleTop = i * minHeight;
           break;
         }
       }
 
+      // TODO add explicit test
     } else if (renderFromLast) {
       // If no id was set and `renderFromLast` is true, start from the bottom
       visibleTop = (totalItems - 1) * minHeight;
     }
 
+    // TODO add explicit test
     if (renderFromLast) {
       visibleTop -= (this._radar.scrollContainerHeight - minHeight);
     }
@@ -238,7 +245,7 @@ const VerticalCollection = Component.extend({
     this._lastEarthquake = this._radar.scrollTop;
 
     this._scrollHandler = ({ top }) => {
-      if (Math.abs(this._lastEarthquake - top) > this.get('_minHeight') / 2) {
+      if (Math.abs(this._lastEarthquake - top) > this._minHeight / 2) {
         this._radar.scheduleUpdate();
         this._lastEarthquake = top;
       }
