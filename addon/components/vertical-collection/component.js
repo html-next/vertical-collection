@@ -229,6 +229,8 @@ const VerticalCollection = Component.extend({
     // on initialization, so we set this min-height property to radar's total
     this.element.style.minHeight = `${minHeight * totalItems}px`;
 
+    visibleTop -= this._radar.scrollTopOffset;
+
     this._radar.visibleTop = visibleTop;
   },
 
