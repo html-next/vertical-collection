@@ -75,7 +75,6 @@ export default class Radar {
 
     this.orderedComponents = null;
     set(this, 'virtualComponents', null);
-
   }
 
   schedule(queueName, job) {

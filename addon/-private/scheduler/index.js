@@ -11,7 +11,7 @@ export class Token {
     this._cancelled = false;
 
     stripInProduction(() => {
-      Object.preventExtensions(this);
+      Object.seal(this);
     });
   }
 
@@ -41,6 +41,10 @@ export class Scheduler {
     this.jobs = 0;
     this._nextFlush = null;
     this.ticks = 0;
+
+    stripInProduction(() => {
+      Object.seal(this);
+    });
   }
 
   schedule(queueName, cb, parent) {
