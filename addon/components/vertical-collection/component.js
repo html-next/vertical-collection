@@ -15,7 +15,7 @@ import {
   removeScrollHandler
 } from '../../-private';
 
-import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
+import { assert } from 'vertical-collection/-debug/helpers';
 
 const {
   computed,
@@ -260,7 +260,7 @@ const VerticalCollection = Component.extend({
     this._super();
 
     this._minHeight = this._calculateMinHeight();
-    const RadarClass = this.get('staticHeight') ? StaticRadar : DynamicRadar;
+    const RadarClass = this.staticHeight ? StaticRadar : DynamicRadar;
 
     this.supportsInverse = SUPPORTS_INVERSE_BLOCK;
     this._prevItemsLength = 0;
