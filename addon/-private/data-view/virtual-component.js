@@ -11,48 +11,36 @@ export default class VirtualComponent {
   constructor(element) {
     this.id = VC_IDENTITY++;
 
-    this._element = element;
+    this.element = element;
 
-    this._upperBound = document.createTextNode('');
-    this._lowerBound = document.createTextNode('');
+    this.upperBound = document.createTextNode('');
+    this.lowerBound = document.createTextNode('');
+
+    this.content = null;
+    this.index = 0;
 
     // In older versions of Ember, binding anything on an object in the template
     // adds observers which creates __ember_meta__
     this.__ember_meta__ = null; // eslint-disable-line camelcase
-
-    this.content = null;
-    this.index = 0;
 
     stripInProduction(() => {
       Object.preventExtensions(this);
     });
   }
 
-  get element() {
-    return this._element;
-  }
-
-  get upperBound() {
-    return this._upperBound;
-  }
-
   get realUpperBound() {
-    return IS_GLIMMER_2 ? this._upperBound : this._upperBound.previousSibling;
-  }
-
-  get lowerBound() {
-    return this._lowerBound;
+    return IS_GLIMMER_2 ? this.upperBound : this.upperBound.previousSibling;
   }
 
   get realLowerBound() {
-    return IS_GLIMMER_2 ? this._lowerBound : this._lowerBound.nextSibling;
+    return IS_GLIMMER_2 ? this.lowerBound : this.lowerBound.nextSibling;
   }
 
   getBoundingClientRect() {
     const range = document.createRange();
 
-    range.setStartBefore(this._upperBound);
-    range.setEndAfter(this._lowerBound);
+    range.setStartBefore(this.upperBound);
+    range.setEndAfter(this.lowerBound);
 
     const rect = range.getBoundingClientRect();
 
@@ -74,9 +62,10 @@ export default class VirtualComponent {
   }
 
   destroy() {
-    this._element = null;
-    this._upperBound = null;
-    this._lowerBound = null;
+    set(this, 'element', null);
+    set(this, 'upperBound', null);
+    set(this, 'lowerBound', null);
     set(this, 'content', null);
+    set(this, 'index', null);
   }
 }
