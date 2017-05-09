@@ -6,20 +6,18 @@ module.exports = {
       bower: {
         dependencies: {
           'ember': '~1.11.0',
-          'ember-cli-shims': 'ember-cli/ember-cli-shims#0.0.3',
-          'ember-data': '~1.13.0'
+          'ember-cli-shims': 'ember-cli/ember-cli-shims#0.0.3'
         },
         resolutions: {
           'ember': '~1.11.0',
-          'ember-cli-shims': '0.0.3',
-          'ember-data': '~1.13.0'
+          'ember-cli-shims': '0.0.3'
         }
       },
       npm: {
         devDependencies: {
           'ember-cli-shims': null,
           'ember-cli-fastboot': null,
-          'ember-data': '~1.13.0',
+          'ember-data': null,
           'ember-source': null,
           'fastboot': null
         }
