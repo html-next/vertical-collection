@@ -24,7 +24,7 @@ export default class VirtualComponent {
     this.__ember_meta__ = null; // eslint-disable-line camelcase
 
     stripInProduction(() => {
-      Object.seal(this);
+      Object.preventExtensions(this);
     });
   }
 
