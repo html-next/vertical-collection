@@ -104,6 +104,12 @@ const VerticalCollection = Component.extend({
     } = this;
 
     const items = this.get('items');
+
+    if (items === null || items === undefined) {
+      _radar.updateItems([], true);
+      return this._radar.virtualComponents;
+    }
+
     const itemsLength = get(items, 'length');
 
     const key = this.get('key');
