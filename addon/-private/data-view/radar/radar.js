@@ -39,6 +39,10 @@ export default class Radar {
     this._prevLastItemIndex = NULL_INDEX;
     this._prevFirstVisibleIndex = NULL_INDEX;
     this._prevLastVisibleIndex = NULL_INDEX;
+    this.firstItemIndex = NULL_INDEX;
+    this.lastItemIndex = NULL_INDEX;
+    this.firstVisibleIndex = NULL_INDEX;
+    this.lastVisibleIndex = NULL_INDEX;
     this.scrollContainerHeight = 0;
 
     this._firstReached = false;
@@ -61,6 +65,10 @@ export default class Radar {
     this._prevLastItemIndex = NULL_INDEX;
     this._prevFirstVisibleIndex = NULL_INDEX;
     this._prevLastVisibleIndex = NULL_INDEX;
+    this.firstItemIndex = NULL_INDEX;
+    this.lastItemIndex = NULL_INDEX;
+    this.firstVisibleIndex = NULL_INDEX;
+    this.lastVisibleIndex = NULL_INDEX;
 
     this.minHeight = minHeight;
     this.bufferSize = bufferSize;
@@ -384,9 +392,7 @@ export default class Radar {
   updateItems(items, isReset = false) {
     this.items = items;
 
-    if (isReset === true) {
-      this.firstItemIndex = NULL_INDEX;
-      this.lastItemIndex = NULL_INDEX;
+    if (isReset === true) {init
 
       this._firstReached = false;
       this._lastReached = false;
