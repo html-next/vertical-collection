@@ -388,7 +388,7 @@ export default class Radar {
   updateItems(items, isReset = false) {
     this.items = items;
 
-    if (isReset === true) {init
+    if (isReset === true) {
 
       this._firstReached = false;
       this._lastReached = false;
