@@ -57,6 +57,11 @@ export default class Radar {
     this.itemContainer = itemContainer;
     this.scrollContainer = scrollContainer;
 
+    this._prevFirstItemIndex = NULL_INDEX;
+    this._prevLastItemIndex = NULL_INDEX;
+    this._prevFirstVisibleIndex = NULL_INDEX;
+    this._prevLastVisibleIndex = NULL_INDEX;
+
     this.minHeight = minHeight;
     this.bufferSize = bufferSize;
     this.renderFromLast = renderFromLast;
