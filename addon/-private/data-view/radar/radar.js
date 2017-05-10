@@ -389,6 +389,8 @@ export default class Radar {
     this.items = items;
 
     if (isReset === true) {
+      this.firstItemIndex = NULL_INDEX;
+      this.lastItemIndex = NULL_INDEX;
 
       this._firstReached = false;
       this._lastReached = false;
