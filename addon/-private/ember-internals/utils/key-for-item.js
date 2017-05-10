@@ -21,6 +21,7 @@ export default function keyForItem(item, keyPath, index) {
       key = identity(item);
       break;
     default:
+      // TODO add explicit test
       if (keyPath) {
         key = get(item, keyPath);
       } else {

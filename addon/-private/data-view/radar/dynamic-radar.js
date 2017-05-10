@@ -1,7 +1,7 @@
 import { default as Radar, NULL_INDEX } from './radar';
 import SkipList from '../skip-list';
 
-import { assert } from 'vertical-collection/-debug/helpers';
+import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
 
 export default class DynamicRadar extends Radar {
   constructor() {
@@ -16,6 +16,10 @@ export default class DynamicRadar extends Radar {
     this._firstRender = true;
 
     this.skipList = null;
+
+    stripInProduction(() => {
+      Object.preventExtensions(this);
+    });
   }
 
   init(...args) {
@@ -36,7 +40,13 @@ export default class DynamicRadar extends Radar {
     const numComponents = this.orderedComponents.length;
     const prevFirstItemIndex = this._prevFirstItemIndex;
     const prevLastItemIndex = this._prevLastItemIndex;
-    const middleVisibleValue = this.visibleTop + ((this.visibleBottom - this.visibleTop) / 2);
+    let top = this.visibleTop;
+
+    if (top < 0) {
+      top = 0;
+    }
+
+    const middleVisibleValue = top + (this.scrollContainerHeight / 2);
 
     // Don't measure if the radar has just been instantiated or reset, as we are rendering with a
     // completely new set of items and won't get an accurate measurement until after they render the
@@ -77,7 +87,7 @@ export default class DynamicRadar extends Radar {
     const itemDelta = (prevFirstItemIndex !== null) ? firstItemIndex - prevFirstItemIndex : 0;
     const numCulled = Math.abs(itemDelta % numComponents);
 
-    if (itemDelta < 0 || this._firstRender) {
+    if (itemDelta < 0 || this._firstRender === true) {
       // schedule a measurement for items that could affect scrollTop
       this.schedule('measure', () => {
         const staticVisibleIndex = this.renderFromLast ? this.lastVisibleIndex + 1 : this.firstVisibleIndex;
@@ -118,6 +128,7 @@ export default class DynamicRadar extends Radar {
 
       let margin;
 
+      // TODO add explicit test
       if (previousItem) {
         margin = currentItemTop - previousItem.getBoundingClientRect().bottom;
       } else {
@@ -225,7 +236,7 @@ export default class DynamicRadar extends Radar {
   updateItems(items, isReset) {
     super.updateItems(items, isReset);
 
-    if (isReset) {
+    if (isReset === true) {
       this.skipList = new SkipList(this.totalItems, this.minHeight);
     }
   }

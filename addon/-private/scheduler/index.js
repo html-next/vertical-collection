@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import { stripInProduction } from 'vertical-collection/-debug/helpers';
 
 const {
   run
@@ -8,6 +9,10 @@ export class Token {
   constructor(parent) {
     this._parent = parent;
     this._cancelled = false;
+
+    stripInProduction(() => {
+      Object.seal(this);
+    });
   }
 
   get cancelled() {
@@ -36,6 +41,10 @@ export class Scheduler {
     this.jobs = 0;
     this._nextFlush = null;
     this.ticks = 0;
+
+    stripInProduction(() => {
+      Object.seal(this);
+    });
   }
 
   schedule(queueName, cb, parent) {
@@ -49,6 +58,7 @@ export class Scheduler {
   }
 
   forget(token) {
+    // TODO add explicit test
     if (token) {
       token.cancel();
     }
@@ -69,6 +79,7 @@ export class Scheduler {
     let hasDomWork = this.sync.length > 0 || this.layout.length > 0;
     this.jobs = 0;
 
+    // TODO add explicit test
     if (hasDomWork) {
       run.begin();
       if (this.sync.length > 0) {

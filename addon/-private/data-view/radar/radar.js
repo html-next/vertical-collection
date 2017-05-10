@@ -20,6 +20,7 @@ export const NULL_INDEX = -2;
 export default class Radar {
   constructor() {
     this.token = new Token();
+    this.items = null;
 
     this._scrollTop = 0;
     this._prependOffset = 0;
@@ -27,6 +28,7 @@ export default class Radar {
 
     this._itemContainer = null;
     this._scrollContainer = null;
+    this._nextUpdate = null;
 
     this.minHeight = 0;
     this.bufferSize = 0;
@@ -37,6 +39,9 @@ export default class Radar {
     this._prevLastItemIndex = NULL_INDEX;
     this._prevFirstVisibleIndex = NULL_INDEX;
     this._prevLastVisibleIndex = NULL_INDEX;
+    this._firstItemIndex = NULL_INDEX;
+    this._lastItemIndex = NULL_INDEX;
+    this.scrollContainerHeight = 0;
 
     this._firstReached = false;
     this._lastReached = false;
@@ -53,6 +58,13 @@ export default class Radar {
   init(itemContainer, scrollContainer, minHeight, bufferSize, renderFromLast, keyProperty) {
     this.itemContainer = itemContainer;
     this.scrollContainer = scrollContainer;
+
+    this._prevFirstItemIndex = NULL_INDEX;
+    this._prevLastItemIndex = NULL_INDEX;
+    this._prevFirstVisibleIndex = NULL_INDEX;
+    this._prevLastVisibleIndex = NULL_INDEX;
+    this._firstItemIndex = NULL_INDEX;
+    this._lastItemIndex = NULL_INDEX;
 
     this.minHeight = minHeight;
     this.bufferSize = bufferSize;
@@ -72,7 +84,6 @@ export default class Radar {
 
     this.orderedComponents = null;
     set(this, 'virtualComponents', null);
-
   }
 
   schedule(queueName, job) {
@@ -92,7 +103,7 @@ export default class Radar {
    * @private
    */
   scheduleUpdate() {
-    if (this._nextUpdate) {
+    if (this._nextUpdate !== null) {
       return;
     }
 
@@ -377,7 +388,7 @@ export default class Radar {
   updateItems(items, isReset = false) {
     this.items = items;
 
-    if (isReset) {
+    if (isReset === true) {
       this.firstItemIndex = NULL_INDEX;
       this.lastItemIndex = NULL_INDEX;
 

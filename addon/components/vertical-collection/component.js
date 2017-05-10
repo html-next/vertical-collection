@@ -38,9 +38,6 @@ const VerticalCollection = Component.extend({
   // usable via {{#vertical-collection <items-array>}}
   items: null,
 
-  // deprecated, only for use in Ember 1.11
-  content: null,
-
   // –––––––––––––– Optional Settings
   staticHeight: false,
 
@@ -83,10 +80,6 @@ const VerticalCollection = Component.extend({
    */
   renderFromLast: false,
 
-  // –––––––––––––– @private
-
-  _items: computed.or('items', 'content'),
-
   _calculateMinHeight() {
     const { minHeight } = this;
 
@@ -99,36 +92,41 @@ const VerticalCollection = Component.extend({
     }
   },
 
-  supportsInverse: SUPPORTS_INVERSE_BLOCK,
-
-  isEmpty: computed.empty('_items'),
+  isEmpty: computed.empty('items'),
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
 
-  radar: computed('_items.[]', function() {
+  virtualComponents: computed('items.[]', function() {
     const {
       _radar,
-
       _prevItemsLength,
       _prevFirstKey,
       _prevLastKey
     } = this;
 
-    const items = this.get('_items');
+    const items = this.get('items');
+
+    if (items === null || items === undefined) {
+      _radar.updateItems([], true);
+      return this._radar.virtualComponents;
+    }
+
     const itemsLength = get(items, 'length');
 
     const key = this.get('key');
-    const lenDiff = itemsLength - (_prevItemsLength || 0);
+    const lenDiff = itemsLength - _prevItemsLength;
 
     if (itemsLength > 0) {
       this._prevItemsLength = itemsLength;
       this._prevFirstKey = keyForItem(objectAt(items, 0), key, 0);
       this._prevLastKey = keyForItem(objectAt(items, itemsLength - 1), key, itemsLength - 1);
     } else {
-      this._prevItemsLength = this._prevFirstKey = this._prevLastKey = null;
+      this._prevItemsLength = this._prevFirstKey = this._prevLastKey = 0;
     }
 
+    // TODO add explicit test
     if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
       _radar.prepend(items, lenDiff);
+      // TODO add explicit test
     } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
       _radar.append(items, lenDiff);
     } else {
@@ -136,7 +134,7 @@ const VerticalCollection = Component.extend({
       _radar.updateItems(items, isReset);
     }
 
-    return this._radar;
+    return this._radar.virtualComponents;
   }),
 
   _scheduleSendAction(action, index) {
@@ -147,7 +145,7 @@ const VerticalCollection = Component.extend({
         this._nextSendActions = null;
 
         run(() => {
-          const items = this.get('_items');
+          const items = this.get('items');
           const keyPath = this.get('key');
 
           this._scheduledActions.forEach(([action, index]) => {
@@ -184,7 +182,7 @@ const VerticalCollection = Component.extend({
    * @private
    */
   _initializeRadar() {
-    const minHeight = this.get('_minHeight');
+    const minHeight = this._minHeight;
     const bufferSize = this.get('bufferSize');
     const renderFromLast = this.get('renderFromLast');
     const keyProperty = this.get('key');
@@ -202,25 +200,29 @@ const VerticalCollection = Component.extend({
     const idForFirstItem = this.get('idForFirstItem');
     const key = this.get('key');
 
-    const minHeight = this.get('_minHeight');
-    const items = this.get('_items');
+    const minHeight = this._minHeight;
+    const items = this.get('items');
     const totalItems = get(items, 'length');
 
     let visibleTop = 0;
 
+    // TODO add explicit test
     if (idForFirstItem) {
       for (let i = 0; i < totalItems - 1; i++) {
+        // TODO strict equality
         if (keyForItem(objectAt(items, i), key, i) == idForFirstItem) {
           visibleTop = i * minHeight;
           break;
         }
       }
 
+      // TODO add explicit test
     } else if (renderFromLast) {
       // If no id was set and `renderFromLast` is true, start from the bottom
       visibleTop = (totalItems - 1) * minHeight;
     }
 
+    // TODO add explicit test
     if (renderFromLast) {
       visibleTop -= (this._radar.scrollContainerHeight - minHeight);
     }
@@ -229,6 +231,8 @@ const VerticalCollection = Component.extend({
     // on initialization, so we set this min-height property to radar's total
     this.element.style.minHeight = `${minHeight * totalItems}px`;
 
+    visibleTop -= this._radar.scrollTopOffset;
+
     this._radar.visibleTop = visibleTop;
   },
 
@@ -236,7 +240,7 @@ const VerticalCollection = Component.extend({
     this._lastEarthquake = this._radar.scrollTop;
 
     this._scrollHandler = ({ top }) => {
-      if (Math.abs(this._lastEarthquake - top) > this.get('_minHeight') / 2) {
+      if (Math.abs(this._lastEarthquake - top) > this._minHeight / 2) {
         this._radar.scheduleUpdate();
         this._lastEarthquake = top;
       }
@@ -262,8 +266,16 @@ const VerticalCollection = Component.extend({
     this._super();
 
     this._minHeight = this._calculateMinHeight();
-    const RadarClass = this.get('staticHeight') ? StaticRadar : DynamicRadar;
+    const RadarClass = this.staticHeight ? StaticRadar : DynamicRadar;
 
+    this.supportsInverse = SUPPORTS_INVERSE_BLOCK;
+    this._prevItemsLength = 0;
+    this._prevFirstKey = null;
+    this._prevLastKey = null;
+    this._lastEarthquake = null;
+    this._scrollContainer = null;
+    this._scrollHandler = null;
+    this._resizeHandler = null;
     this._radar = new RadarClass();
 
     this._hasAction = null;

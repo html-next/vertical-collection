@@ -14,6 +14,8 @@ export default function getHeight(dims, withMargins) {
       height = dims.height;
       break;
   }
+
+  // TODO add explicit test
   if (withMargins) {
     height += dims.marginTop + dims.marginBottom;
   }

@@ -129,6 +129,35 @@ test('The collection renders in the correct initial position', function(assert) 
   });
 });
 
+test('The collection renders in the correct initial position with dynamic heights', function(assert) {
+  assert.expect(3);
+
+  this.set('items', getNumbers(0, 100));
+
+  this.render(hbs`
+  <div style="position: relative; background: red; box-sizing: content-box; height: 100px; overflow-y: scroll;" class="scrollable">
+    <div style="padding: 200px;">
+      {{#vertical-collection ${'items'}
+        containerSelector=".scrollable"
+        minHeight=20
+
+        as |item i|}}
+        <vertical-item style="height: 28px">
+          {{item.number}} {{i}}
+        </vertical-item>
+      {{/vertical-collection}}
+    </div>
+  </div>
+  `);
+
+  return wait().then(() => {
+    let occludedBoundaries = this.$().find('occluded-content');
+    assert.equal(occludedBoundaries.get(0).getAttribute('style'), 'height: 0px;', 'Occluded height above is 0');
+    assert.equal(occludedBoundaries.get(1).getAttribute('style'), 'height: 1880px;', 'Occluded height below is 20 * 94 items');
+    assert.equal(this.$().find('vertical-item').length, 6, 'We rendered 100/20 + 1 items');
+  });
+});
+
 test('The collection renders when yielded item has conditional', function(assert) {
   assert.expect(1);
   const items = [{

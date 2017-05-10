@@ -4,7 +4,7 @@
           <h3>Demo</h3>
           <div class="table-wrapper dark">
             {{#vertical-collection
-              content=model.filtered
+              items=model.filtered
               defaultHeight=270
               useContentProxy=false
               as |item index|
@@ -16,7 +16,7 @@
           </div>
         </div>
         <div class="col-sm-7">
-            <h3>Redcue Debug</h3>
+            <h3>Reduce Debug</h3>
             <p>
                 Ensure we can shrink the array safely.
             </p>
