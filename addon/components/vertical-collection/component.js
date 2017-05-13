@@ -206,25 +206,20 @@ const VerticalCollection = Component.extend({
 
     let visibleTop = 0;
 
-    // TODO add explicit test
-    if (idForFirstItem) {
+    if (idForFirstItem !== null) {
       for (let i = 0; i < totalItems - 1; i++) {
-        // TODO strict equality
-        if (keyForItem(objectAt(items, i), key, i) == idForFirstItem) {
+        if (keyForItem(objectAt(items, i), key, i) === idForFirstItem) {
           visibleTop = i * minHeight;
           break;
         }
       }
 
-      // TODO add explicit test
-    } else if (renderFromLast) {
+      if (renderFromLast === true) {
+        visibleTop -= (this._radar.scrollContainerHeight - minHeight);
+      }
+    } else if (renderFromLast === true) {
       // If no id was set and `renderFromLast` is true, start from the bottom
       visibleTop = (totalItems - 1) * minHeight;
-    }
-
-    // TODO add explicit test
-    if (renderFromLast) {
-      visibleTop -= (this._radar.scrollContainerHeight - minHeight);
     }
 
     // The container element needs to have some height in order for us to set the scroll position
@@ -233,7 +228,9 @@ const VerticalCollection = Component.extend({
 
     visibleTop -= this._radar.scrollTopOffset;
 
-    this._radar.visibleTop = visibleTop;
+    if (this._radar.visibleTop !== visibleTop) {
+      this._radar.visibleTop = visibleTop;
+    }
   },
 
   _initializeEventHandlers() {
@@ -247,7 +244,7 @@ const VerticalCollection = Component.extend({
     };
 
     this._resizeHandler = () => {
-      this._initializeRadar();
+      this._radar._scrollContainerHeight = null;
     };
 
     addScrollHandler(this._scrollContainer, this._scrollHandler);

@@ -41,7 +41,7 @@ export default class Radar {
     this._prevLastVisibleIndex = NULL_INDEX;
     this._firstItemIndex = NULL_INDEX;
     this._lastItemIndex = NULL_INDEX;
-    this.scrollContainerHeight = 0;
+    this._scrollContainerHeight = 0;
 
     this._firstReached = false;
     this._lastReached = false;
@@ -71,7 +71,6 @@ export default class Radar {
     this.renderFromLast = renderFromLast;
     this.keyProperty = keyProperty;
 
-    this._updateVirtualComponentPool();
     this.scheduleUpdate();
   }
 
@@ -118,6 +117,7 @@ export default class Radar {
 
       this._scrollTop = this.scrollContainer.scrollTop;
 
+      this._updateVirtualComponentPool();
       this._updateIndexes();
       this._updateVirtualComponents();
 
@@ -184,8 +184,16 @@ export default class Radar {
 
   set scrollContainer(scrollContainer) {
     this._scrollContainer = scrollContainer;
+    this._scrollContainerHeight = null;
     this._scrollTopOffset = null;
-    this.scrollContainerHeight = scrollContainer.getBoundingClientRect().height;
+  }
+
+  get scrollContainerHeight() {
+    if (this._scrollContainerHeight === null) {
+      this._scrollContainerHeight = this.scrollContainer.getBoundingClientRect().height;
+    }
+
+    return this._scrollContainerHeight;
   }
 
   get scrollContainer() {
@@ -267,7 +275,8 @@ export default class Radar {
       totalAfter
     } = this;
 
-    const itemDelta = firstItemIndex - _prevFirstItemIndex;
+
+    const itemDelta = _prevFirstItemIndex !== NULL_INDEX ? firstItemIndex - _prevFirstItemIndex : 0;
     const offsetAmount = Math.abs(itemDelta % orderedComponents.length);
 
     if (offsetAmount > 0) {
@@ -370,7 +379,6 @@ export default class Radar {
 
     this._firstReached = false;
 
-    this._updateVirtualComponentPool();
     this.scheduleUpdate();
 
     this._prependOffset = numPrepended * this.minHeight;
@@ -381,7 +389,6 @@ export default class Radar {
 
     this._lastReached = false;
 
-    this._updateVirtualComponentPool();
     this.scheduleUpdate();
   }
 
@@ -394,8 +401,6 @@ export default class Radar {
 
       this._firstReached = false;
       this._lastReached = false;
-
-      this._updateVirtualComponentPool();
     }
 
     this.scheduleUpdate();
