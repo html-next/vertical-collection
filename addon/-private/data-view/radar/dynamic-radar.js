@@ -46,7 +46,7 @@ export default class DynamicRadar extends Radar {
       top = 0;
     }
 
-    const middleVisibleValue = top + (this.scrollContainerHeight / 2);
+    const middleVisibleValue = this.visibleMiddle;
 
     // Don't measure if the radar has just been instantiated or reset, as we are rendering with a
     // completely new set of items and won't get an accurate measurement until after they render the

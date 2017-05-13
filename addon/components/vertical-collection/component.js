@@ -228,13 +228,13 @@ const VerticalCollection = Component.extend({
 
     visibleTop -= this._radar.scrollTopOffset;
 
-    if (this._radar.visibleTop !== visibleTop) {
-      this._radar.visibleTop = visibleTop;
-    }
+    // if (this._radar.visibleTop !== visibleTop) {
+    //   this._radar.visibleTop = visibleTop;
+    // }
   },
 
   _initializeEventHandlers() {
-    this._lastEarthquake = this._radar.scrollTop;
+    this._lastEarthquake = 0;
 
     this._scrollHandler = ({ top }) => {
       if (Math.abs(this._lastEarthquake - top) > this._minHeight / 2) {
@@ -244,7 +244,7 @@ const VerticalCollection = Component.extend({
     };
 
     this._resizeHandler = () => {
-      this._radar._scrollContainerHeight = null;
+      this._radar.scheduleUpdate();
     };
 
     addScrollHandler(this._scrollContainer, this._scrollHandler);

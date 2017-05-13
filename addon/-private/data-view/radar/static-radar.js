@@ -17,7 +17,7 @@ export default class StaticRadar extends Radar {
     const totalIndexes = this.orderedComponents.length;
     const maxIndex = this.totalItems - 1;
 
-    const middleVisibleValue = this.visibleTop + ((this.visibleBottom - this.visibleTop)  / 2);
+    const middleVisibleValue = this.visibleMiddle;
     const middleItemIndex = Math.floor(middleVisibleValue / this.minHeight);
 
     let firstItemIndex = middleItemIndex - Math.floor((totalIndexes - 1) / 2);

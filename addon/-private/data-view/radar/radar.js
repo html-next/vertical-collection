@@ -26,8 +26,8 @@ export default class Radar {
     this._prependOffset = 0;
     this._scrollTopOffset = null;
 
-    this._itemContainer = null;
-    this._scrollContainer = null;
+    this.itemContainer = null;
+    this.scrollContainer = null;
     this._nextUpdate = null;
 
     this.minHeight = 0;
@@ -89,6 +89,8 @@ export default class Radar {
     return scheduler.schedule(queueName, job, this.token);
   }
 
+  // scheduleCalculate
+
   /*
    * Schedules an update for the next RAF
    *
@@ -106,7 +108,7 @@ export default class Radar {
       return;
     }
 
-    this._nextUpdate = this.schedule('sync', () => {
+    this._nextUpdate = this.schedule('layout', () => {
       this._nextUpdate = null;
 
       // cache previous values
@@ -117,13 +119,14 @@ export default class Radar {
 
       this._scrollTop = this.scrollContainer.scrollTop;
 
+      this._updateConstants();
       this._updateVirtualComponentPool();
       this._updateIndexes();
       this._updateVirtualComponents();
 
       this.schedule('measure', () => {
         if (this._prependOffset !== 0) {
-          this.scrollTop += this._prependOffset;
+          this.scrollContainer.scrollTop += this._prependOffset;
           this._prependOffset = 0;
         }
 
@@ -132,6 +135,21 @@ export default class Radar {
         }
       });
     });
+  }
+
+  _updateConstants() {
+    const {
+      top: itemContainerTop
+    } = this.itemContainer.getBoundingClientRect();
+    const {
+      top: scrollContainerTop,
+      height: scrollContainerHeight
+    } = this.scrollContainer.getBoundingClientRect();
+
+    const maxHeight = this.scrollContainer.style ? parseInt(this.scrollContainer.style.maxHeight || 0) : 0;
+
+    this._scrollTopOffset = this._scrollTop + itemContainerTop - scrollContainerTop;
+    this._scrollContainerHeight = Math.max(scrollContainerHeight, maxHeight);
   }
 
   _sendActions() {
@@ -169,65 +187,6 @@ export default class Radar {
     }
   }
 
-  get totalItems() {
-    return this.items ? get(this.items, 'length') : 0;
-  }
-
-  set itemContainer(itemContainer) {
-    this._itemContainer = itemContainer;
-    this._scrollTopOffset = null;
-  }
-
-  get itemContainer() {
-    return this._itemContainer;
-  }
-
-  set scrollContainer(scrollContainer) {
-    this._scrollContainer = scrollContainer;
-    this._scrollContainerHeight = null;
-    this._scrollTopOffset = null;
-  }
-
-  get scrollContainerHeight() {
-    if (this._scrollContainerHeight === null) {
-      this._scrollContainerHeight = this.scrollContainer.getBoundingClientRect().height;
-    }
-
-    return this._scrollContainerHeight;
-  }
-
-  get scrollContainer() {
-    return this._scrollContainer;
-  }
-
-  get scrollTop() {
-    return this._scrollTop;
-  }
-
-  set scrollTop(scrollTop) {
-    this.scrollContainer.scrollTop = this._scrollTop = scrollTop;
-  }
-
-  /*
-   * Represents the offset between the top of the itemContainer and the top of scrollContainer
-   * when `scrollTop === 0`. Basically, the item container could "begin" anywhere in the
-   * scrollContainer. There could be some header or other element _before_ the itemContainer that
-   * pushes it down a little bit. In this case, the true position of the scrollContainer's top
-   * relative to our measurements, which begin at 0, is `scrollTop - scrollTopOffset`. In other
-   * words, while we _can't_ have a negative `scrollTop`, we _can_ have a negative `visibleTop`.
-   */
-  get scrollTopOffset() {
-    if (this._scrollTopOffset === null) {
-      const marginTop = parseInt(this.itemContainer.style.marginTop || 0);
-      const itemContainerTop = this.itemContainer ? this.itemContainer.getBoundingClientRect().top : 0;
-      const scrollContainerTop = this.scrollContainer ? this.scrollContainer.getBoundingClientRect().top : 0;
-
-      this._scrollTopOffset = (this.scrollTop + (itemContainerTop - marginTop)) - scrollContainerTop;
-    }
-
-    return this._scrollTopOffset;
-  }
-
   /*
    * `prependOffset` exists because there are times when we need to do the following in this exact
    * order:
@@ -242,18 +201,36 @@ export default class Radar {
    * in this exact order.
    */
   get visibleTop() {
-    return this.scrollTop - this.scrollTopOffset + this._prependOffset;
-  }
-
-  set visibleTop(visibleTop) {
-    assert('Must set visibleTop to a number', typeof visibleTop === 'number');
-
-    this.scrollTop = visibleTop + this.scrollTopOffset - this._prependOffset;
+    return this._scrollTop - this._scrollTopOffset + this._prependOffset;
   }
 
   get visibleBottom() {
-    return this.visibleTop + this.scrollContainerHeight;
+    return this.visibleTop + this._scrollContainerHeight;
   }
+
+  get visibleMiddle() {
+    return this.visibleTop + (this._scrollContainerHeight / 2);
+  }
+
+  get totalItems() {
+    return this.items ? get(this.items, 'length') : 0;
+  }
+
+  /*
+   * Represents the offset between the top of the itemContainer and the top of scrollContainer
+   * when `scrollTop === 0`. Basically, the item container could "begin" anywhere in the
+   * scrollContainer. There could be some header or other element _before_ the itemContainer that
+   * pushes it down a little bit. In this case, the true position of the scrollContainer's top
+   * relative to our measurements, which begin at 0, is `scrollTop - scrollTopOffset`. In other
+   * words, while we _can't_ have a negative `scrollTop`, we _can_ have a negative `visibleTop`.
+   */
+  // get scrollTopOffset() {
+  //   if (this._scrollTopOffset === null) {
+
+  //   }
+
+  //   return this._scrollTopOffset;
+  // }
 
   /*
    * Update the VirtualComponents state based on current scroll position
@@ -332,7 +309,7 @@ export default class Radar {
    */
   _updateVirtualComponentPool() {
     const {
-      scrollContainerHeight,
+      _scrollContainerHeight,
       bufferSize,
       minHeight,
       virtualComponents,
@@ -344,7 +321,7 @@ export default class Radar {
     // The total number of components is determined by the minimum number required to span the
     // container plus its buffers. Combined with the above rendering strategy this is fairly
     // performant, even if mean item size is above the minimum.
-    const calculatedComponents = Math.ceil(scrollContainerHeight / minHeight) + 1 + (bufferSize * 2);
+    const calculatedComponents = Math.ceil(_scrollContainerHeight / minHeight) + 1 + (bufferSize * 2);
     const totalComponents = Math.min(totalItems, calculatedComponents);
     const delta = totalComponents - orderedComponents.length;
 
