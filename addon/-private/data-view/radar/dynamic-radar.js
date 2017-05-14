@@ -40,12 +40,6 @@ export default class DynamicRadar extends Radar {
     const numComponents = this.orderedComponents.length;
     const prevFirstItemIndex = this._prevFirstItemIndex;
     const prevLastItemIndex = this._prevLastItemIndex;
-    let top = this.visibleTop;
-
-    if (top < 0) {
-      top = 0;
-    }
-
     const middleVisibleValue = this.visibleMiddle;
 
     // Don't measure if the radar has just been instantiated or reset, as we are rendering with a
@@ -93,7 +87,7 @@ export default class DynamicRadar extends Radar {
         const staticVisibleIndex = this.renderFromLast ? this.lastVisibleIndex + 1 : this.firstVisibleIndex;
         const numBeforeStatic = staticVisibleIndex - firstItemIndex;
 
-        const lastIndex = this._firstRender ? numBeforeStatic - 1 : Math.min(numCulled, numBeforeStatic - 1);
+        const lastIndex = this._firstRender ? numBeforeStatic - 1 : Math.max(Math.min(numCulled, numBeforeStatic - 1), 0);
         this._prependOffset += this._measure(0, lastIndex);
         this._firstRender = false;
       });
@@ -233,11 +227,9 @@ export default class DynamicRadar extends Radar {
     this.skipList.append(numAppended);
   }
 
-  updateItems(items, isReset) {
-    super.updateItems(items, isReset);
+  reset(items) {
+    super.reset(items);
 
-    if (isReset === true) {
-      this.skipList = new SkipList(this.totalItems, this.minHeight);
-    }
+    this.skipList = new SkipList(this.totalItems, this.minHeight);
   }
 }

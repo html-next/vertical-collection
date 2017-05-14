@@ -5,17 +5,16 @@ import layout from './template';
 import {
   keyForItem,
   SUPPORTS_INVERSE_BLOCK,
-  estimateElementHeight,
   closestElement,
   DynamicRadar,
   StaticRadar,
   Container,
   objectAt,
   addScrollHandler,
-  removeScrollHandler
+  removeScrollHandler,
+  Token,
+  scheduler
 } from '../../-private';
-
-import { assert } from 'vertical-collection/-debug/helpers';
 
 const {
   computed,
@@ -80,22 +79,10 @@ const VerticalCollection = Component.extend({
    */
   renderFromLast: false,
 
-  _calculateMinHeight() {
-    const { minHeight } = this;
-
-    assert('Must provide a `minHeight` value to vertical-collection', minHeight !== null);
-
-    if (typeof minHeight === 'string') {
-      return estimateElementHeight(this.element, minHeight);
-    } else {
-      return minHeight;
-    }
-  },
-
   isEmpty: computed.empty('items'),
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
 
-  virtualComponents: computed('items.[]', function() {
+  virtualComponents: computed('items.[]', 'minHeight', 'bufferSize', function() {
     const {
       _radar,
       _prevItemsLength,
@@ -103,39 +90,44 @@ const VerticalCollection = Component.extend({
       _prevLastKey
     } = this;
 
+    _radar.minHeight = this.get('minHeight');
+    _radar.bufferSize = this.get('bufferSize');
+
     const items = this.get('items');
-
-    if (items === null || items === undefined) {
-      _radar.updateItems([], true);
-      return this._radar.virtualComponents;
-    }
-
     const itemsLength = get(items, 'length');
+
+    if (items === null || items === undefined || itemsLength === 0) {
+      _radar.reset([]);
+      _radar.scheduleUpdate();
+
+      this._prevItemsLength = this._prevFirstKey = this._prevLastKey = 0;
+
+      return _radar.virtualComponents;
+    }
 
     const key = this.get('key');
     const lenDiff = itemsLength - _prevItemsLength;
 
-    if (itemsLength > 0) {
-      this._prevItemsLength = itemsLength;
-      this._prevFirstKey = keyForItem(objectAt(items, 0), key, 0);
-      this._prevLastKey = keyForItem(objectAt(items, itemsLength - 1), key, itemsLength - 1);
-    } else {
-      this._prevItemsLength = this._prevFirstKey = this._prevLastKey = 0;
-    }
+    this._prevItemsLength = itemsLength;
+    this._prevFirstKey = keyForItem(objectAt(items, 0), key, 0);
+    this._prevLastKey = keyForItem(objectAt(items, itemsLength - 1), key, itemsLength - 1);
 
-    // TODO add explicit test
-    if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
+    if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey) === true) {
       _radar.prepend(items, lenDiff);
-      // TODO add explicit test
-    } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey)) {
+    } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey) === true) {
       _radar.append(items, lenDiff);
-    } else {
-      const isReset = !isSameArray(lenDiff, items, key, _prevFirstKey, _prevLastKey);
-      _radar.updateItems(items, isReset);
+    } else if (isSameArray(lenDiff, items, key, _prevFirstKey, _prevLastKey) === false) {
+      _radar.reset(items);
     }
 
-    return this._radar.virtualComponents;
+    _radar.scheduleUpdate();
+
+    return _radar.virtualComponents;
   }),
+
+  schedule(queueName, job) {
+    return scheduler.schedule(queueName, job, this.token);
+  },
 
   _scheduleSendAction(action, index) {
     this._scheduledActions.push([action, index]);
@@ -174,6 +166,10 @@ const VerticalCollection = Component.extend({
     this._initializeRadar();
     this._initializeScrollState();
     this._initializeEventHandlers();
+
+    this.schedule('layout', () => {
+      this._radar.start();
+    });
   },
 
   /*
@@ -182,17 +178,15 @@ const VerticalCollection = Component.extend({
    * @private
    */
   _initializeRadar() {
-    const minHeight = this._minHeight;
-    const bufferSize = this.get('bufferSize');
-    const renderFromLast = this.get('renderFromLast');
-    const keyProperty = this.get('key');
-
     const {
+      _radar,
+
       element,
       _scrollContainer
     } = this;
 
-    this._radar.init(element, _scrollContainer, minHeight, bufferSize, renderFromLast, keyProperty);
+    _radar.itemContainer = element;
+    _radar.scrollContainer = _scrollContainer;
   },
 
   _initializeScrollState() {
@@ -204,40 +198,26 @@ const VerticalCollection = Component.extend({
     const items = this.get('items');
     const totalItems = get(items, 'length');
 
-    let visibleTop = 0;
+    let startingScrollTop = 0;
 
     if (idForFirstItem !== null) {
       for (let i = 0; i < totalItems - 1; i++) {
         if (keyForItem(objectAt(items, i), key, i) === idForFirstItem) {
-          visibleTop = i * minHeight;
+          startingScrollTop = i * minHeight;
           break;
         }
       }
-
-      if (renderFromLast === true) {
-        visibleTop -= (this._radar.scrollContainerHeight - minHeight);
-      }
     } else if (renderFromLast === true) {
       // If no id was set and `renderFromLast` is true, start from the bottom
-      visibleTop = (totalItems - 1) * minHeight;
+      startingScrollTop = (totalItems - 1) * minHeight;
     }
 
-    // The container element needs to have some height in order for us to set the scroll position
-    // on initialization, so we set this min-height property to radar's total
-    this.element.style.minHeight = `${minHeight * totalItems}px`;
-
-    visibleTop -= this._radar.scrollTopOffset;
-
-    // if (this._radar.visibleTop !== visibleTop) {
-    //   this._radar.visibleTop = visibleTop;
-    // }
+    this._radar.startingScrollTop = startingScrollTop;
   },
 
   _initializeEventHandlers() {
-    this._lastEarthquake = 0;
-
     this._scrollHandler = ({ top }) => {
-      if (Math.abs(this._lastEarthquake - top) > this._minHeight / 2) {
+      if (Math.abs(this._lastEarthquake - top) > this._radar._minHeight / 2) {
         this._radar.scheduleUpdate();
         this._lastEarthquake = top;
       }
@@ -252,6 +232,7 @@ const VerticalCollection = Component.extend({
   },
 
   willDestroy() {
+    this.token.cancel();
     this._radar.destroy();
     clearTimeout(this._nextSendActions);
 
@@ -262,18 +243,20 @@ const VerticalCollection = Component.extend({
   init() {
     this._super();
 
-    this._minHeight = this._calculateMinHeight();
+    this.token = new Token();
     const RadarClass = this.staticHeight ? StaticRadar : DynamicRadar;
+
+    this._radar = new RadarClass(this.token);
+    this._radar.renderFromLast = this.get('renderFromLast');
 
     this.supportsInverse = SUPPORTS_INVERSE_BLOCK;
     this._prevItemsLength = 0;
     this._prevFirstKey = null;
     this._prevLastKey = null;
-    this._lastEarthquake = null;
+    this._lastEarthquake = 0;
     this._scrollContainer = null;
     this._scrollHandler = null;
     this._resizeHandler = null;
-    this._radar = new RadarClass();
 
     this._hasAction = null;
     this._scheduledActions = [];
