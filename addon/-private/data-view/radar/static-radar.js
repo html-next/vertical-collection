@@ -14,23 +14,23 @@ export default class StaticRadar extends Radar {
   }
 
   _updateIndexes() {
-    const totalIndexes = this.orderedComponents.length;
+    const { totalComponents } = this;
     const maxIndex = this.totalItems - 1;
 
     const middleVisibleValue = this.visibleMiddle;
     const middleItemIndex = Math.floor(middleVisibleValue / this.minHeight);
 
-    let firstItemIndex = middleItemIndex - Math.floor((totalIndexes - 1) / 2);
-    let lastItemIndex = middleItemIndex + Math.ceil((totalIndexes - 1) / 2);
+    let firstItemIndex = middleItemIndex - Math.floor((totalComponents - 1) / 2);
+    let lastItemIndex = middleItemIndex + Math.ceil((totalComponents - 1) / 2);
 
     if (firstItemIndex < 0) {
       firstItemIndex = 0;
-      lastItemIndex = totalIndexes - 1;
+      lastItemIndex = totalComponents - 1;
     }
 
     if (lastItemIndex > maxIndex) {
       lastItemIndex = maxIndex;
-      firstItemIndex = maxIndex - (totalIndexes - 1);
+      firstItemIndex = maxIndex - (totalComponents - 1);
     }
 
     this._firstItemIndex = firstItemIndex;

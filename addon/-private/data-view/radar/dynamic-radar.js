@@ -37,10 +37,10 @@ export default class DynamicRadar extends Radar {
   _updateIndexes() {
     const { values } = this.skipList;
     const maxIndex = this.totalItems - 1;
-    const numComponents = this.orderedComponents.length;
     const prevFirstItemIndex = this._prevFirstItemIndex;
     const prevLastItemIndex = this._prevLastItemIndex;
     const middleVisibleValue = this.visibleMiddle;
+    const { totalComponents } = this;
 
     // Don't measure if the radar has just been instantiated or reset, as we are rendering with a
     // completely new set of items and won't get an accurate measurement until after they render the
@@ -57,17 +57,17 @@ export default class DynamicRadar extends Radar {
       index: middleItemIndex
     } = this.skipList.find(middleVisibleValue);
 
-    let firstItemIndex = middleItemIndex - Math.floor((numComponents - 1) / 2);
-    let lastItemIndex = middleItemIndex + Math.ceil((numComponents - 1) / 2);
+    let firstItemIndex = middleItemIndex - Math.floor((totalComponents - 1) / 2);
+    let lastItemIndex = middleItemIndex + Math.ceil((totalComponents - 1) / 2);
 
     if (firstItemIndex < 0) {
       firstItemIndex = 0;
-      lastItemIndex = numComponents - 1;
+      lastItemIndex = totalComponents - 1;
     }
 
     if (lastItemIndex > maxIndex) {
       lastItemIndex = maxIndex;
-      firstItemIndex = maxIndex - (numComponents - 1);
+      firstItemIndex = maxIndex - (totalComponents - 1);
     }
 
     for (let i = middleItemIndex - 1; i >= firstItemIndex; i--) {
@@ -79,7 +79,7 @@ export default class DynamicRadar extends Radar {
     }
 
     const itemDelta = (prevFirstItemIndex !== null) ? firstItemIndex - prevFirstItemIndex : 0;
-    const numCulled = Math.abs(itemDelta % numComponents);
+    const numCulled = Math.abs(itemDelta % totalComponents);
 
     if (itemDelta < 0 || this._firstRender === true) {
       // schedule a measurement for items that could affect scrollTop

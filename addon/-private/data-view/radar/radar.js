@@ -196,20 +196,12 @@ export default class Radar {
    */
   _updateVirtualComponentPool() {
     const {
-      _scrollContainerHeight,
-      _minHeight,
-      bufferSize,
       virtualComponents,
       orderedComponents,
-      totalItems,
-      items
+      items,
+      totalComponents
     } = this;
 
-    // The total number of components is determined by the minimum number required to span the
-    // container plus its buffers. Combined with the above rendering strategy this is fairly
-    // performant, even if mean item size is above the minimum.
-    const calculatedComponents = Math.ceil(_scrollContainerHeight / _minHeight) + 1 + (bufferSize * 2);
-    const totalComponents = Math.min(totalItems, calculatedComponents);
     const delta = totalComponents - orderedComponents.length;
 
     if (delta > 0) {
@@ -399,5 +391,20 @@ export default class Radar {
 
   get totalItems() {
     return this.items ? get(this.items, 'length') : 0;
+  }
+
+  get totalComponents() {
+    const {
+      _scrollContainerHeight,
+      _minHeight,
+      bufferSize,
+      totalItems
+    } = this;
+
+    // The total number of components is determined by the minimum number required to span the
+    // container plus its buffers. Combined with the above rendering strategy this is fairly
+    // performant, even if mean item size is above the minimum.
+    const calculatedComponents = Math.ceil(_scrollContainerHeight / _minHeight) + 1 + (bufferSize * 2);
+    return Math.min(totalItems, calculatedComponents);
   }
 }
