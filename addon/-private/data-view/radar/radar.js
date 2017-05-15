@@ -129,7 +129,6 @@ export default class Radar {
       this._updateConstants();
       this._updateIndexes();
       this._updateVirtualComponents();
-      // this._updateVirtualComponentPool();
 
       this.schedule('measure', () => {
         if (this.scrollContainer.scrollTop - this._scrollTopOffset !== this.visibleTop) {
@@ -178,7 +177,7 @@ export default class Radar {
   }
 
   /*
-   * Sets up _virtualComponents, which is meant to be a static pool of components that we render to.
+   * Updates virtualComponents, which is meant to be a static pool of components that we render to.
    * In order to decrease the time spent rendering and diffing, we pull the {{each}} out of the DOM
    * and only replace the content of _virtualComponents which are removed/added.
    *
@@ -194,12 +193,6 @@ export default class Radar {
    * things in _virtualComponents, we track the visually ordered components in the
    * _orderedComponents array. This is possible because all of our operations are relatively simple,
    * popping some number of components off one end and pushing them onto the other.
-   *
-   * @private
-   */
-
-  /*
-   * Update the VirtualComponents state based on current scroll position
    *
    * @private
    */
@@ -221,12 +214,16 @@ export default class Radar {
       totalComponents
     } = this;
 
-    // const itemDelta = _prevFirstItemIndex !== NULL_INDEX ? firstItemIndex - _prevFirstItemIndex : 0;
-    // const offsetAmount = Math.abs(itemDelta % orderedComponents.length);
+    const itemDelta = totalComponents - orderedComponents.length;
 
     const componentPool = [];
 
-    // Remove components that no longer need to be rendered
+    // Add new components to the pool
+    for (let i = 0; i < itemDelta; i++) {
+      componentPool.push(new VirtualComponent());
+    }
+
+    // Add components to be recycled to the pool
     while (orderedComponents.length > 0 && orderedComponents[0].index < firstItemIndex) {
       componentPool.push(orderedComponents.shift());
     }
@@ -235,59 +232,61 @@ export default class Radar {
       componentPool.unshift(orderedComponents.pop());
     }
 
-    // Add back components wherever they're needed
-    if (componentPool.length > 0) {
-      if (orderedComponents.length === 0) {
-        const component = componentPool.pop();
-        component.recycle(objectAt(items, firstItemIndex), firstItemIndex);
+    // If rendered components are empty, add one back so the rest of the logic remains the same
+    if (orderedComponents.length === 0 && totalComponents > 0) {
+      const component = componentPool.pop();
+      component.recycle(objectAt(items, firstItemIndex), firstItemIndex);
 
-        orderedComponents.push(component);
-      }
-
-      while (componentPool.length > 0 && orderedComponents[0].index > firstItemIndex) {
-        const component = componentPool.pop();
-        const itemIndex = orderedComponents[0].index - 1;
-        component.recycle(objectAt(items, itemIndex), itemIndex);
-
+      if (component.rendered === true) {
         insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, component.realUpperBound, component.realLowerBound);
-        orderedComponents.unshift(component);
+      } else {
+        virtualComponents.insertAt(1, component);
+        component.rendered = true;
       }
-
-      while (componentPool.length > 0 && orderedComponents[orderedComponents.length - 1].index < lastItemIndex) {
-        const component = componentPool.pop();
-        const itemIndex = orderedComponents[orderedComponents.length - 1].index + 1;
-        component.recycle(objectAt(items, itemIndex), itemIndex);
-
-        insertRangeBefore(_occludedContentAfter.realUpperBound, component.realUpperBound, component.realLowerBound);
-        orderedComponents.push(component);
-      }
-    }
-
-    if (orderedComponents.length === 0) {
-      // No components exist yet, add one so the pooling logic later remains the same
-      const component = new VirtualComponent(objectAt(items, firstItemIndex), firstItemIndex);
-
-      orderedComponents.push(component);
-      virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
-    }
-
-    // Add more components if necessary
-    while (orderedComponents.length < totalComponents && orderedComponents[0].index > firstItemIndex) {
-      const itemIndex = orderedComponents[0].index - 1;
-      const component = new VirtualComponent(objectAt(items, itemIndex), itemIndex);
 
       orderedComponents.unshift(component);
-      virtualComponents.insertAt(1, component);
     }
 
+    // Prepend as many items as needed to the rendered components
+    while (orderedComponents.length < totalComponents && orderedComponents[0].index > firstItemIndex) {
+      const component = componentPool.pop();
+
+      const itemIndex = orderedComponents[0].index - 1;
+      component.recycle(objectAt(items, itemIndex), itemIndex);
+
+      if (component.rendered === true) {
+        insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, component.realUpperBound, component.realLowerBound);
+      } else {
+        virtualComponents.insertAt(1, component);
+        component.rendered = true;
+      }
+
+      orderedComponents.unshift(component);
+    }
+
+    // Append as many items as needed to the rendered components
     while (orderedComponents.length < totalComponents && orderedComponents[orderedComponents.length - 1].index < lastItemIndex) {
+      const component = componentPool.pop();
+
       const itemIndex = orderedComponents[orderedComponents.length - 1].index + 1;
-      const component = new VirtualComponent(objectAt(items, itemIndex), itemIndex);
+      component.recycle(objectAt(items, itemIndex), itemIndex);
+
+      if (component.rendered === true) {
+        insertRangeBefore(_occludedContentAfter.realUpperBound, component.realUpperBound, component.realLowerBound);
+      } else {
+        virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
+        component.rendered = true;
+      }
 
       orderedComponents.push(component);
-      virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
     }
 
+    // If there are any items remaining in the pool, remove them
+    if (componentPool.length > 0) {
+      virtualComponents.removeObjects(componentPool);
+    }
+
+    // Set padding element heights, unset itemContainer's minHeight
     _occludedContentBefore.element.style.height = `${totalBefore}px`;
     _occludedContentAfter.element.style.height = `${totalAfter}px`;
     itemContainer.style.minHeight = '';
