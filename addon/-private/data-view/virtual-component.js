@@ -8,16 +8,15 @@ const { set } = Ember;
 let VC_IDENTITY = 0;
 
 export default class VirtualComponent {
-  constructor(element) {
+  constructor(content = null, index = null) {
     this.id = VC_IDENTITY++;
 
-    this.element = element;
+    this.content = content;
+    this.index = index;
 
     this.upperBound = document.createTextNode('');
     this.lowerBound = document.createTextNode('');
-
-    this.content = null;
-    this.index = 0;
+    this.element = null;
 
     // In older versions of Ember, binding anything on an object in the template
     // adds observers which creates __ember_meta__

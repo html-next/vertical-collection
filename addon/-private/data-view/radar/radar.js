@@ -13,8 +13,7 @@ import { assert } from 'vertical-collection/-debug/helpers';
 const {
   A,
   get,
-  set,
-  run
+  set
 } = Ember;
 
 // Whenever a
@@ -53,8 +52,11 @@ export default class Radar {
 
     this.sendAction = () => {};
 
-    this._occludedContentBefore = new VirtualComponent(document.createElement('occluded-content'));
-    this._occludedContentAfter = new VirtualComponent(document.createElement('occluded-content'));
+    this._occludedContentBefore = new VirtualComponent();
+    this._occludedContentAfter = new VirtualComponent();
+
+    this._occludedContentBefore.element = document.createElement('occluded-content');
+    this._occludedContentAfter.element = document.createElement('occluded-content');
 
     this.virtualComponents = A([this._occludedContentBefore, this._occludedContentAfter]);
     this.orderedComponents = [];
@@ -125,15 +127,16 @@ export default class Radar {
       this._scrollTop = this.scrollContainer.scrollTop;
 
       this._updateConstants();
-      this._updateVirtualComponentPool();
       this._updateIndexes();
       this._updateVirtualComponents();
+      // this._updateVirtualComponentPool();
 
       this.schedule('measure', () => {
-        if (this._prependOffset !== 0) {
+        if (this.scrollContainer.scrollTop - this._scrollTopOffset !== this.visibleTop) {
           this.scrollContainer.scrollTop += this._prependOffset;
-          this._prependOffset = 0;
         }
+
+        this._prependOffset = 0;
 
         if (this.totalItems !== 0) {
           this._sendActions();
@@ -194,60 +197,6 @@ export default class Radar {
    *
    * @private
    */
-  _updateVirtualComponentPool() {
-    const {
-      virtualComponents,
-      orderedComponents,
-      items,
-      totalComponents
-    } = this;
-
-    const delta = totalComponents - orderedComponents.length;
-
-    if (delta > 0) {
-      const firstItemIndex = orderedComponents.length > 0 ? orderedComponents[orderedComponents.length - 1].index + 1 : 0;
-
-      // new VCs need to be rendered before we can move them around. This runloop can be removed
-      // if we can make it so that whenever we add new components, it's guaranteed that we will _not_
-      // need to move DOM manually.
-      run(() => {
-        for (let i = 0; i < delta; i++) {
-          let component = new VirtualComponent();
-          let itemIndex = firstItemIndex + i;
-
-          // TODO for initial create we likely don't need `set`
-          set(component, 'content', objectAt(items, itemIndex));
-          set(component, 'index', itemIndex);
-
-          virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
-          orderedComponents.push(component);
-        }
-      });
-    } else if (delta < 0) {
-      for (let i = delta; i < 0; i++) {
-        let component = orderedComponents.pop();
-
-        virtualComponents.removeObject(component);
-        component.destroy();
-      }
-    }
-  }
-
-  /*
-   * Represents the offset between the top of the itemContainer and the top of scrollContainer
-   * when `scrollTop === 0`. Basically, the item container could "begin" anywhere in the
-   * scrollContainer. There could be some header or other element _before_ the itemContainer that
-   * pushes it down a little bit. In this case, the true position of the scrollContainer's top
-   * relative to our measurements, which begin at 0, is `scrollTop - scrollTopOffset`. In other
-   * words, while we _can't_ have a negative `scrollTop`, we _can_ have a negative `visibleTop`.
-   */
-  // get scrollTopOffset() {
-  //   if (this._scrollTopOffset === null) {
-
-  //   }
-
-  //   return this._scrollTopOffset;
-  // }
 
   /*
    * Update the VirtualComponents state based on current scroll position
@@ -258,44 +207,85 @@ export default class Radar {
     const {
       items,
       orderedComponents,
+      virtualComponents,
+
       itemContainer,
       _occludedContentBefore,
       _occludedContentAfter,
 
-      _prevFirstItemIndex,
       firstItemIndex,
       lastItemIndex,
       totalBefore,
-      totalAfter
+      totalAfter,
+
+      totalComponents
     } = this;
 
-    const itemDelta = _prevFirstItemIndex !== NULL_INDEX ? firstItemIndex - _prevFirstItemIndex : 0;
-    const offsetAmount = Math.abs(itemDelta % orderedComponents.length);
+    // const itemDelta = _prevFirstItemIndex !== NULL_INDEX ? firstItemIndex - _prevFirstItemIndex : 0;
+    // const offsetAmount = Math.abs(itemDelta % orderedComponents.length);
 
-    if (offsetAmount > 0) {
-      if (itemDelta < 0) {
-        // Scrolling up
-        let movedComponents = orderedComponents.splice(-offsetAmount);
-        orderedComponents.unshift(...movedComponents);
+    const componentPool = [];
 
-        const firstNode = movedComponents[0].realUpperBound;
-        const lastNode = movedComponents[movedComponents.length - 1].realLowerBound;
+    // Remove components that no longer need to be rendered
+    while (orderedComponents.length > 0 && orderedComponents[0].index < firstItemIndex) {
+      componentPool.push(orderedComponents.shift());
+    }
 
-        insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, firstNode, lastNode);
-      } else if (itemDelta > 0) {
-        // Scrolling down
-        let movedComponents = orderedComponents.splice(0, offsetAmount);
-        orderedComponents.push(...movedComponents);
+    while (orderedComponents.length > 0 && orderedComponents[orderedComponents.length - 1].index > lastItemIndex) {
+      componentPool.unshift(orderedComponents.pop());
+    }
 
-        const firstNode = movedComponents[0].realUpperBound;
-        const lastNode = movedComponents[movedComponents.length - 1].realLowerBound;
+    // Add back components wherever they're needed
+    if (componentPool.length > 0) {
+      if (orderedComponents.length === 0) {
+        const component = componentPool.pop();
+        component.recycle(objectAt(items, firstItemIndex), firstItemIndex);
 
-        insertRangeBefore(_occludedContentAfter.realUpperBound, firstNode, lastNode);
+        orderedComponents.push(component);
+      }
+
+      while (componentPool.length > 0 && orderedComponents[0].index > firstItemIndex) {
+        const component = componentPool.pop();
+        const itemIndex = orderedComponents[0].index - 1;
+        component.recycle(objectAt(items, itemIndex), itemIndex);
+
+        insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, component.realUpperBound, component.realLowerBound);
+        orderedComponents.unshift(component);
+      }
+
+      while (componentPool.length > 0 && orderedComponents[orderedComponents.length - 1].index < lastItemIndex) {
+        const component = componentPool.pop();
+        const itemIndex = orderedComponents[orderedComponents.length - 1].index + 1;
+        component.recycle(objectAt(items, itemIndex), itemIndex);
+
+        insertRangeBefore(_occludedContentAfter.realUpperBound, component.realUpperBound, component.realLowerBound);
+        orderedComponents.push(component);
       }
     }
 
-    for (let i = 0, itemIndex = firstItemIndex; itemIndex <= lastItemIndex; i++, itemIndex++) {
-      orderedComponents[i].recycle(objectAt(items, itemIndex), itemIndex);
+    if (orderedComponents.length === 0) {
+      // No components exist yet, add one so the pooling logic later remains the same
+      const component = new VirtualComponent(objectAt(items, firstItemIndex), firstItemIndex);
+
+      orderedComponents.push(component);
+      virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
+    }
+
+    // Add more components if necessary
+    while (orderedComponents.length < totalComponents && orderedComponents[0].index > firstItemIndex) {
+      const itemIndex = orderedComponents[0].index - 1;
+      const component = new VirtualComponent(objectAt(items, itemIndex), itemIndex);
+
+      orderedComponents.unshift(component);
+      virtualComponents.insertAt(1, component);
+    }
+
+    while (orderedComponents.length < totalComponents && orderedComponents[orderedComponents.length - 1].index < lastItemIndex) {
+      const itemIndex = orderedComponents[orderedComponents.length - 1].index + 1;
+      const component = new VirtualComponent(objectAt(items, itemIndex), itemIndex);
+
+      orderedComponents.push(component);
+      virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
     }
 
     _occludedContentBefore.element.style.height = `${totalBefore}px`;
@@ -342,6 +332,10 @@ export default class Radar {
     this.items = items;
     this._prevFirstItemIndex += numPrepended;
     this._prevLastItemIndex += numPrepended;
+
+    this.schedule('sync', () => {
+      this.orderedComponents.forEach((c) => set(c, 'index', get(c, 'index') + numPrepended));
+    });
 
     this._firstReached = false;
 
