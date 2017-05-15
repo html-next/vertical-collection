@@ -180,9 +180,8 @@ const VerticalCollection = Component.extend({
   _initializeRadar() {
     const {
       _radar,
-
-      element,
-      _scrollContainer
+      _scrollContainer,
+      element
     } = this;
 
     _radar.itemContainer = element;
@@ -194,25 +193,24 @@ const VerticalCollection = Component.extend({
     const idForFirstItem = this.get('idForFirstItem');
     const key = this.get('key');
 
-    const minHeight = this._minHeight;
     const items = this.get('items');
     const totalItems = get(items, 'length');
 
-    let startingScrollTop = 0;
+    let startingIndex = 0;
 
-    if (idForFirstItem !== null) {
+    if (idForFirstItem !== undefined) {
       for (let i = 0; i < totalItems - 1; i++) {
         if (keyForItem(objectAt(items, i), key, i) === idForFirstItem) {
-          startingScrollTop = i * minHeight;
+          startingIndex = i;
           break;
         }
       }
     } else if (renderFromLast === true) {
       // If no id was set and `renderFromLast` is true, start from the bottom
-      startingScrollTop = (totalItems - 1) * minHeight;
+      startingIndex = totalItems - 1;
     }
 
-    this._radar.startingScrollTop = startingScrollTop;
+    this._radar.startingIndex = startingIndex;
   },
 
   _initializeEventHandlers() {

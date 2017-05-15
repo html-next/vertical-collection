@@ -26,7 +26,7 @@ export default class Radar {
     this.items = null;
     this.minHeight = 0;
     this.bufferSize = 0;
-    this.startingScrollTop = 0;
+    this.startingIndex = 0;
     this.renderFromLast = false;
     this.itemContainer = null;
     this.scrollContainer = null;
@@ -78,25 +78,28 @@ export default class Radar {
   }
 
   start() {
-    let { startingScrollTop } = this;
+    let { startingIndex } = this;
 
-    if (this.startingScrollTop !== 0) {
+    if (startingIndex !== 0) {
       this._updateConstants();
 
       const {
-        minHeight,
         totalItems,
         renderFromLast,
-        _scrollTopOffset
+        _minHeight,
+        _scrollTopOffset,
+        _scrollContainerHeight
       } = this;
 
+      let startingScrollTop = startingIndex * _minHeight;
+
       if (renderFromLast) {
-        startingScrollTop -= (this._radar.scrollContainerHeight - minHeight);
+        startingScrollTop -= (_scrollContainerHeight - _minHeight);
       }
 
       // The container element needs to have some height in order for us to set the scroll position
       // on initialization, so we set this min-height property to radar's total
-      this.itemContainer.style.minHeight = `${minHeight * totalItems}px`;
+      this.itemContainer.style.minHeight = `${_minHeight * totalItems}px`;
       this.scrollContainer.scrollTop = startingScrollTop + _scrollTopOffset;
     }
 

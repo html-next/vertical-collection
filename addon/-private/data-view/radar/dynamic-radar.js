@@ -35,27 +35,42 @@ export default class DynamicRadar extends Radar {
   }
 
   _updateIndexes() {
-    const { values } = this.skipList;
-    const maxIndex = this.totalItems - 1;
-    const prevFirstItemIndex = this._prevFirstItemIndex;
-    const prevLastItemIndex = this._prevLastItemIndex;
-    const middleVisibleValue = this.visibleMiddle;
-    const { totalComponents } = this;
+    const {
+      skipList,
+      visibleMiddle,
+      totalItems,
+      totalComponents,
+
+      _prevFirstItemIndex,
+      _prevLastItemIndex
+    } = this;
+
+    if (totalItems === 0) {
+      this._firstItemIndex = NULL_INDEX;
+      this._lastItemIndex = NULL_INDEX;
+      this._totalBefore = 0;
+      this._totalAfter = 0;
+
+      return;
+    }
+
+    const { values } = skipList;
+    const maxIndex = totalItems - 1;
 
     // Don't measure if the radar has just been instantiated or reset, as we are rendering with a
     // completely new set of items and won't get an accurate measurement until after they render the
     // first time.
-    if (prevFirstItemIndex !== NULL_INDEX) {
+    if (_prevFirstItemIndex !== NULL_INDEX) {
       // We only need to measure the components that were rendered last time, extra components
       // haven't rendered yet.
-      this._measure(0, prevLastItemIndex - prevFirstItemIndex);
+      this._measure(0, _prevLastItemIndex - _prevFirstItemIndex);
     }
 
     let {
       totalBefore,
       totalAfter,
       index: middleItemIndex
-    } = this.skipList.find(middleVisibleValue);
+    } = this.skipList.find(visibleMiddle);
 
     let firstItemIndex = middleItemIndex - Math.floor((totalComponents - 1) / 2);
     let lastItemIndex = middleItemIndex + Math.ceil((totalComponents - 1) / 2);
@@ -78,7 +93,7 @@ export default class DynamicRadar extends Radar {
       totalAfter -= values[i];
     }
 
-    const itemDelta = (prevFirstItemIndex !== null) ? firstItemIndex - prevFirstItemIndex : 0;
+    const itemDelta = (_prevFirstItemIndex !== null) ? firstItemIndex - _prevFirstItemIndex : 0;
     const numCulled = Math.abs(itemDelta % totalComponents);
 
     if (itemDelta < 0 || this._firstRender === true) {
