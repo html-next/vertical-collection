@@ -157,16 +157,8 @@ export default class DynamicRadar extends Radar {
     return this._firstItemIndex;
   }
 
-  set firstItemIndex(index) {
-    this._firstItemIndex = index;
-  }
-
   get lastItemIndex() {
     return this._lastItemIndex;
-  }
-
-  set lastItemIndex(index) {
-    this._lastItemIndex = index;
   }
 
   get firstVisibleIndex() {

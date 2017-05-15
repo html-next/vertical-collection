@@ -122,12 +122,6 @@ export default class Radar {
     this._nextUpdate = this.schedule('layout', () => {
       this._nextUpdate = null;
 
-      // cache previous values
-      this._prevFirstItemIndex = this.firstItemIndex;
-      this._prevLastItemIndex = this.lastItemIndex;
-      this._prevFirstVisibleIndex = this.firstVisibleIndex;
-      this._prevLastVisibleIndex = this.lastVisibleIndex;
-
       this._scrollTop = this.scrollContainer.scrollTop;
 
       this._updateConstants();
@@ -144,6 +138,12 @@ export default class Radar {
         if (this.totalItems !== 0) {
           this._sendActions();
         }
+
+        // cache previous values
+        this._prevFirstItemIndex = this.firstItemIndex;
+        this._prevLastItemIndex = this.lastItemIndex;
+        this._prevFirstVisibleIndex = this.firstVisibleIndex;
+        this._prevLastVisibleIndex = this.lastVisibleIndex;
       });
     });
   }
@@ -348,8 +348,8 @@ export default class Radar {
 
   prepend(items, numPrepended) {
     this.items = items;
-    this.firstItemIndex += numPrepended;
-    this.lastItemIndex += numPrepended;
+    this._prevFirstItemIndex += numPrepended;
+    this._prevLastItemIndex += numPrepended;
 
     this._firstReached = false;
 
@@ -365,8 +365,8 @@ export default class Radar {
   reset(items) {
     this.items = items;
 
-    this.firstItemIndex = NULL_INDEX;
-    this.lastItemIndex = NULL_INDEX;
+    this._prevFirstItemIndex = NULL_INDEX;
+    this._prevLastItemIndex = NULL_INDEX;
 
     this._firstReached = false;
     this._lastReached = false;
