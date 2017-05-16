@@ -76,30 +76,26 @@ export class Scheduler {
 
   flush() {
     let i, q;
-    let hasDomWork = this.sync.length > 0 || this.layout.length > 0;
     this.jobs = 0;
 
-    // TODO add explicit test
-    if (hasDomWork) {
+    if (this.sync.length > 0) {
       run.begin();
-      if (this.sync.length > 0) {
-        q = this.sync;
-        this.sync = [];
+      q = this.sync;
+      this.sync = [];
 
-        for (i = 0; i < q.length; i++) {
-          q[i]();
-        }
-      }
-
-      if (this.layout.length > 0) {
-        q = this.layout;
-        this.layout = [];
-
-        for (i = 0; i < q.length; i++) {
-          q[i]();
-        }
+      for (i = 0; i < q.length; i++) {
+        q[i]();
       }
       run.end();
+    }
+
+    if (this.layout.length > 0) {
+      q = this.layout;
+      this.layout = [];
+
+      for (i = 0; i < q.length; i++) {
+        q[i]();
+      }
     }
 
     if (this.measure.length > 0) {
@@ -109,17 +105,6 @@ export class Scheduler {
       for (i = 0; i < q.length; i++) {
         q[i]();
       }
-    }
-
-    if (this.affect.length > 0) {
-      run.begin();
-      q = this.affect;
-      this.affect = [];
-
-      for (i = 0; i < q.length; i++) {
-        q[i]();
-      }
-      run.end();
     }
 
     this._nextFlush = null;

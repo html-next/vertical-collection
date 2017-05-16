@@ -16,7 +16,8 @@ const {
   set
 } = Ember;
 
-// Whenever a
+// Used to represent null numbers, while still setting those properties to
+// numbers in the constructor so the shape of an object is consistent
 export const NULL_INDEX = -2;
 
 export default class Radar {
@@ -38,6 +39,7 @@ export default class Radar {
     this._scrollContainerHeight = 0;
 
     this._nextUpdate = null;
+    this._nextLayout = null;
     this._started = false;
 
     this._prevFirstItemIndex = NULL_INDEX;
@@ -60,6 +62,8 @@ export default class Radar {
 
     this.virtualComponents = A([this._occludedContentBefore, this._occludedContentAfter]);
     this.orderedComponents = [];
+    this._componentPool = [];
+    this._prependComponentPool = [];
   }
 
   destroy() {
@@ -124,7 +128,7 @@ export default class Radar {
       return;
     }
 
-    this._nextUpdate = this.schedule('layout', () => {
+    this._nextUpdate = this.schedule('sync', () => {
       this._nextUpdate = null;
 
       this._scrollTop = this.scrollContainer.scrollTop;
@@ -204,6 +208,7 @@ export default class Radar {
       items,
       orderedComponents,
       virtualComponents,
+      _componentPool,
 
       itemContainer,
       _occludedContentBefore,
@@ -217,82 +222,102 @@ export default class Radar {
       totalComponents
     } = this;
 
-    const itemDelta = totalComponents - orderedComponents.length;
-
-    const componentPool = [];
-
-    // Add new components to the pool
-    for (let i = 0; i < itemDelta; i++) {
-      componentPool.push(new VirtualComponent());
-    }
-
     // Add components to be recycled to the pool
     while (orderedComponents.length > 0 && orderedComponents[0].index < firstItemIndex) {
-      componentPool.push(orderedComponents.shift());
+      _componentPool.push(orderedComponents.shift());
     }
 
     while (orderedComponents.length > 0 && orderedComponents[orderedComponents.length - 1].index > lastItemIndex) {
-      componentPool.unshift(orderedComponents.pop());
+      _componentPool.unshift(orderedComponents.pop());
     }
 
     // If rendered components are empty, add one back so the rest of the logic remains the same
     if (orderedComponents.length === 0 && totalComponents > 0) {
-      const component = componentPool.pop();
+      const component = _componentPool.pop() || new VirtualComponent();
+
       component.recycle(objectAt(items, firstItemIndex), firstItemIndex);
+      this._appendComponent(component);
 
-      if (component.rendered === true) {
-        insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, component.realUpperBound, component.realLowerBound);
-      } else {
-        virtualComponents.insertAt(1, component);
-        component.rendered = true;
-      }
-
-      orderedComponents.unshift(component);
+      orderedComponents.push(component);
     }
 
     // Prepend as many items as needed to the rendered components
     while (orderedComponents.length < totalComponents && orderedComponents[0].index > firstItemIndex) {
-      const component = componentPool.pop();
-
+      const component = _componentPool.pop() || new VirtualComponent();
       const itemIndex = orderedComponents[0].index - 1;
-      component.recycle(objectAt(items, itemIndex), itemIndex);
 
-      if (component.rendered === true) {
-        insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, component.realUpperBound, component.realLowerBound);
-      } else {
-        virtualComponents.insertAt(1, component);
-        component.rendered = true;
-      }
+      component.recycle(objectAt(items, itemIndex), itemIndex);
+      this._prependComponent(component);
 
       orderedComponents.unshift(component);
     }
 
     // Append as many items as needed to the rendered components
     while (orderedComponents.length < totalComponents && orderedComponents[orderedComponents.length - 1].index < lastItemIndex) {
-      const component = componentPool.pop();
-
+      const component = _componentPool.pop() || new VirtualComponent();
       const itemIndex = orderedComponents[orderedComponents.length - 1].index + 1;
-      component.recycle(objectAt(items, itemIndex), itemIndex);
 
-      if (component.rendered === true) {
-        insertRangeBefore(_occludedContentAfter.realUpperBound, component.realUpperBound, component.realLowerBound);
-      } else {
-        virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
-        component.rendered = true;
-      }
+      component.recycle(objectAt(items, itemIndex), itemIndex);
+      this._appendComponent(component);
 
       orderedComponents.push(component);
     }
 
     // If there are any items remaining in the pool, remove them
-    if (componentPool.length > 0) {
-      virtualComponents.removeObjects(componentPool);
+    if (_componentPool.length > 0) {
+      virtualComponents.removeObjects(_componentPool);
+      _componentPool.length = 0;
     }
 
     // Set padding element heights, unset itemContainer's minHeight
     _occludedContentBefore.element.style.height = `${totalBefore}px`;
     _occludedContentAfter.element.style.height = `${totalAfter}px`;
     itemContainer.style.minHeight = '';
+  }
+
+  _appendComponent(component) {
+    const {
+      virtualComponents,
+      _occludedContentAfter
+    } = this;
+
+    if (component.rendered === true) {
+      insertRangeBefore(_occludedContentAfter.realUpperBound, component.realUpperBound, component.realLowerBound);
+    } else {
+      virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
+      component.rendered = true;
+    }
+  }
+
+  _prependComponent(component) {
+    const {
+      virtualComponents,
+      _occludedContentBefore,
+      _prependComponentPool
+    } = this;
+
+    if (component.rendered === true) {
+      insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, component.realUpperBound, component.realLowerBound);
+    } else {
+      virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
+      component.rendered = true;
+
+      // Components that are both new and prepended still need to be rendered at the end because Glimmer.
+      // We have to move them _after_ they render, so we schedule that if they exist
+      _prependComponentPool.unshift(component);
+
+      if (this._nextLayout === null) {
+        this._nextLayout = this.schedule('layout', () => {
+          this._nextLayout = null;
+
+          while (_prependComponentPool.length > 0) {
+            const component = _prependComponentPool.pop();
+
+            insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, component.realUpperBound, component.realLowerBound);
+          }
+        });
+      }
+    }
   }
 
   _sendActions() {

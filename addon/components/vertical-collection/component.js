@@ -167,7 +167,7 @@ const VerticalCollection = Component.extend({
     this._initializeScrollState();
     this._initializeEventHandlers();
 
-    this.schedule('layout', () => {
+    this.schedule('sync', () => {
       this._radar.start();
     });
   },
