@@ -97,13 +97,16 @@ const VerticalCollection = Component.extend({
     const itemsLength = get(items, 'length');
 
     if (items === null || items === undefined || itemsLength === 0) {
-      _radar.reset([]);
+      _radar.items = [];
+      _radar.reset();
       _radar.scheduleUpdate();
 
       this._prevItemsLength = this._prevFirstKey = this._prevLastKey = 0;
 
       return _radar.virtualComponents;
     }
+
+    _radar.items = items;
 
     const key = this.get('key');
     const lenDiff = itemsLength - _prevItemsLength;

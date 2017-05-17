@@ -355,8 +355,7 @@ export default class Radar {
     }
   }
 
-  prepend(items, numPrepended) {
-    this.items = items;
+  prepend(numPrepended) {
     this._prevFirstItemIndex += numPrepended;
     this._prevLastItemIndex += numPrepended;
 
@@ -369,14 +368,13 @@ export default class Radar {
     this._prependOffset = numPrepended * this.minHeight;
   }
 
-  append(items) {
-    this.items = items;
-
+  append() {
     this._lastReached = false;
   }
 
-  reset(items) {
-    this.items = items;
+  reset() {
+    this._componentPool.push(...this.orderedComponents);
+    this.orderedComponents.length = 0;
 
     this._prevFirstItemIndex = NULL_INDEX;
     this._prevLastItemIndex = NULL_INDEX;

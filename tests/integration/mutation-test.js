@@ -240,6 +240,30 @@ testScenarios(
   }
 );
 
+testScenarios(
+  'Collection will rerender items after reset',
+  standardTemplate,
+  scenariosFor(getNumbers(0, 10)),
+
+  function(assert) {
+    assert.expect(4);
+
+    const scrollContainer = this.$('.scrollable');
+
+    return wait().then(() => {
+      assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly before append');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly before append');
+
+      this.set('items', getNumbers(10, 10));
+
+      return wait();
+    }).then(() => {
+      assert.equal(scrollContainer.find('div:first').text().trim(), '10 0', 'first item rendered correctly after reset');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '19 9', 'last item rendered correctly after reset');
+    });
+  }
+);
+
 test('Dynamic collection maintains state if the same list is passed in twice', function(assert) {
   assert.expect(4);
   const items = getNumbers(0, 100);

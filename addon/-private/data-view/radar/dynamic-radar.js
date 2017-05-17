@@ -222,20 +222,20 @@ export default class DynamicRadar extends Radar {
     }
   }
 
-  prepend(items, numPrepended) {
-    super.prepend(items, numPrepended);
+  prepend(numPrepended) {
+    super.prepend(numPrepended);
 
     this.skipList.prepend(numPrepended);
   }
 
-  append(items, numAppended) {
-    super.append(items, numAppended);
+  append(numAppended) {
+    super.append(numAppended);
 
     this.skipList.append(numAppended);
   }
 
-  reset(items) {
-    super.reset(items);
+  reset() {
+    super.reset();
 
     this.skipList = new SkipList(this.totalItems, this.minHeight);
   }
