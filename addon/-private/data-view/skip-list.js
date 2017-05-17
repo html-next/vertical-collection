@@ -28,7 +28,11 @@ export default class SkipList {
   constructor(length, defaultValue) {
     const values = new Float32Array(new ArrayBuffer(length * 4));
 
-    values.fill(defaultValue);
+    if (typeof values.fill === 'function') {
+      values.fill(defaultValue);
+    } else {
+      Array.prototype.fill.call(values, defaultValue);
+    }
 
     this.length = length;
     this.defaultValue = defaultValue;
@@ -173,7 +177,12 @@ export default class SkipList {
     const newValues = new Float32Array(new ArrayBuffer(newLength * 4));
 
     newValues.set(oldValues, numPrepended);
-    newValues.fill(defaultValue, 0, numPrepended);
+
+    if (typeof newValues.fill === 'function') {
+      newValues.fill(defaultValue, 0, numPrepended);
+    } else {
+      Array.prototype.fill.call(newValues, defaultValue, 0, numPrepended);
+    }
 
     this.length = newLength;
     this._initializeLayers(newValues);
@@ -191,7 +200,12 @@ export default class SkipList {
     const newValues = new Float32Array(new ArrayBuffer(newLength * 4));
 
     newValues.set(oldValues);
-    newValues.fill(defaultValue, oldLength);
+
+    if (typeof newValues.fill === 'function') {
+      newValues.fill(defaultValue, oldLength);
+    } else {
+      Array.prototype.fill.call(newValues, defaultValue, oldLength);
+    }
 
     this.length = newLength;
     this._initializeLayers(newValues);

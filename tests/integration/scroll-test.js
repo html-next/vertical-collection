@@ -37,7 +37,7 @@ testScenarios(
 testScenarios(
   'Setting idForFirstItem starts it with the first item at the top',
   standardTemplate,
-  standardScenariosFor(getNumbers(0, 50), { idForFirstItem: 25, key: '@index' }),
+  standardScenariosFor(getNumbers(0, 50), { idForFirstItem: '25', key: '@index' }),
 
   function(assert) {
     assert.expect(1);
@@ -54,7 +54,7 @@ testScenarios(
 testScenarios(
   'Setting renderFromLast and idForFirstItem starts it with the first item at the bottom',
   standardTemplate,
-  standardScenariosFor(getNumbers(0, 50), { renderFromLast: true, idForFirstItem: 25, key: '@index' }),
+  standardScenariosFor(getNumbers(0, 50), { renderFromLast: true, idForFirstItem: '25', key: '@index' }),
 
   function(assert) {
     assert.expect(1);
@@ -87,7 +87,7 @@ testScenarios(
       called();
     });
 
-    wait().then(() => this.$('.scrollable').scrollTop(200));
+    return wait().then(() => this.$('.scrollable').scrollTop(200));
   }
 );
 

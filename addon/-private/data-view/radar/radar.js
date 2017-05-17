@@ -6,6 +6,8 @@ import VirtualComponent from '../virtual-component';
 import insertRangeBefore from '../utils/insert-range-before';
 import objectAt from '../utils/object-at';
 
+import estimateElementHeight from '../../utils/element/estimate-element-height';
+
 import { assert } from 'vertical-collection/-debug/helpers';
 
 const {
@@ -14,26 +16,31 @@ const {
   set
 } = Ember;
 
-// Whenever a
+// Used to represent null numbers, while still setting those properties to
+// numbers in the constructor so the shape of an object is consistent
 export const NULL_INDEX = -2;
 
 export default class Radar {
-  constructor() {
-    this.token = new Token();
+  constructor(parentToken) {
+    this.token = new Token(parentToken);
+
     this.items = null;
+    this.minHeight = 0;
+    this.bufferSize = 0;
+    this.startingIndex = 0;
+    this.renderFromLast = false;
+    this.itemContainer = null;
+    this.scrollContainer = null;
 
     this._scrollTop = 0;
     this._prependOffset = 0;
-    this._scrollTopOffset = null;
+    this._minHeight = 0;
+    this._scrollTopOffset = 0;
+    this._scrollContainerHeight = 0;
 
-    this._itemContainer = null;
-    this._scrollContainer = null;
     this._nextUpdate = null;
-
-    this.minHeight = 0;
-    this.bufferSize = 0;
-    this.renderFromLast = 0;
-    this.keyProperty = '';
+    this._nextLayout = null;
+    this._started = false;
 
     this._prevFirstItemIndex = NULL_INDEX;
     this._prevLastItemIndex = NULL_INDEX;
@@ -41,38 +48,22 @@ export default class Radar {
     this._prevLastVisibleIndex = NULL_INDEX;
     this._firstItemIndex = NULL_INDEX;
     this._lastItemIndex = NULL_INDEX;
-    this.scrollContainerHeight = 0;
 
     this._firstReached = false;
     this._lastReached = false;
 
     this.sendAction = () => {};
 
-    this._occludedContentBefore = new VirtualComponent(document.createElement('occluded-content'));
-    this._occludedContentAfter = new VirtualComponent(document.createElement('occluded-content'));
+    this._occludedContentBefore = new VirtualComponent();
+    this._occludedContentAfter = new VirtualComponent();
+
+    this._occludedContentBefore.element = document.createElement('occluded-content');
+    this._occludedContentAfter.element = document.createElement('occluded-content');
 
     this.virtualComponents = A([this._occludedContentBefore, this._occludedContentAfter]);
     this.orderedComponents = [];
-  }
-
-  init(itemContainer, scrollContainer, minHeight, bufferSize, renderFromLast, keyProperty) {
-    this.itemContainer = itemContainer;
-    this.scrollContainer = scrollContainer;
-
-    this._prevFirstItemIndex = NULL_INDEX;
-    this._prevLastItemIndex = NULL_INDEX;
-    this._prevFirstVisibleIndex = NULL_INDEX;
-    this._prevLastVisibleIndex = NULL_INDEX;
-    this._firstItemIndex = NULL_INDEX;
-    this._lastItemIndex = NULL_INDEX;
-
-    this.minHeight = minHeight;
-    this.bufferSize = bufferSize;
-    this.renderFromLast = renderFromLast;
-    this.keyProperty = keyProperty;
-
-    this._updateVirtualComponentPool();
-    this.scheduleUpdate();
+    this._componentPool = [];
+    this._prependComponentPool = [];
   }
 
   destroy() {
@@ -90,6 +81,36 @@ export default class Radar {
     return scheduler.schedule(queueName, job, this.token);
   }
 
+  start() {
+    let { startingIndex } = this;
+
+    if (startingIndex !== 0) {
+      this._updateConstants();
+
+      const {
+        totalItems,
+        renderFromLast,
+        _minHeight,
+        _scrollTopOffset,
+        _scrollContainerHeight
+      } = this;
+
+      let startingScrollTop = startingIndex * _minHeight;
+
+      if (renderFromLast) {
+        startingScrollTop -= (_scrollContainerHeight - _minHeight);
+      }
+
+      // The container element needs to have some height in order for us to set the scroll position
+      // on initialization, so we set this min-height property to radar's total
+      this.itemContainer.style.minHeight = `${_minHeight * totalItems}px`;
+      this.scrollContainer.scrollTop = startingScrollTop + _scrollTopOffset;
+    }
+
+    this._started = true;
+    this.scheduleUpdate();
+  }
+
   /*
    * Schedules an update for the next RAF
    *
@@ -103,35 +124,200 @@ export default class Radar {
    * @private
    */
   scheduleUpdate() {
-    if (this._nextUpdate !== null) {
+    if (this._nextUpdate !== null || this._started === false) {
       return;
     }
 
     this._nextUpdate = this.schedule('sync', () => {
       this._nextUpdate = null;
 
-      // cache previous values
-      this._prevFirstItemIndex = this.firstItemIndex;
-      this._prevLastItemIndex = this.lastItemIndex;
-      this._prevFirstVisibleIndex = this.firstVisibleIndex;
-      this._prevLastVisibleIndex = this.lastVisibleIndex;
-
       this._scrollTop = this.scrollContainer.scrollTop;
 
+      this._updateConstants();
       this._updateIndexes();
       this._updateVirtualComponents();
 
       this.schedule('measure', () => {
-        if (this._prependOffset !== 0) {
-          this.scrollTop += this._prependOffset;
-          this._prependOffset = 0;
+        if (this.scrollContainer.scrollTop - this._scrollTopOffset !== this.visibleTop) {
+          this.scrollContainer.scrollTop += this._prependOffset;
         }
+
+        this._prependOffset = 0;
 
         if (this.totalItems !== 0) {
           this._sendActions();
         }
+
+        // cache previous values
+        this._prevFirstItemIndex = this.firstItemIndex;
+        this._prevLastItemIndex = this.lastItemIndex;
+        this._prevFirstVisibleIndex = this.firstVisibleIndex;
+        this._prevLastVisibleIndex = this.lastVisibleIndex;
       });
     });
+  }
+
+  _updateConstants() {
+    const {
+      minHeight,
+      itemContainer,
+      scrollContainer
+    } = this;
+
+    assert('Must provide a `minHeight` value to vertical-collection', minHeight !== null);
+    assert('itemContainer must be set on Radar before scheduling an update', itemContainer !== null);
+    assert('scrollContainer must be set on Radar before scheduling an update', scrollContainer !== null);
+
+    const {
+      top: itemContainerTop
+    } = itemContainer.getBoundingClientRect();
+    const {
+      top: scrollContainerTop,
+      height: scrollContainerHeight
+    } = scrollContainer.getBoundingClientRect();
+
+    const maxHeight = scrollContainer.style ? parseInt(scrollContainer.style.maxHeight || 0) : 0;
+
+    this._minHeight = typeof minHeight === 'string' ? estimateElementHeight(itemContainer, minHeight) : minHeight;
+    this._scrollTopOffset = this._scrollTop + itemContainerTop - scrollContainerTop;
+    this._scrollContainerHeight = Math.max(scrollContainerHeight, maxHeight);
+  }
+
+  /*
+   * Updates virtualComponents, which is meant to be a static pool of components that we render to.
+   * In order to decrease the time spent rendering and diffing, we pull the {{each}} out of the DOM
+   * and only replace the content of _virtualComponents which are removed/added.
+   *
+   * For instance, if we start with the following and scroll down, items 2 and 3 do not need to be
+   * rerendered, only item 1 needs to be removed and only item 4 needs to be added. So we replace
+   * item 1 with item 4, and then manually move the DOM:
+   *
+   *   1                        4                         2
+   *   2 -> replace 1 with 4 -> 2 -> manually move DOM -> 3
+   *   3                        3                         4
+   *
+   * However, _virtualComponents is still out of order. Rather than keep track of the state of
+   * things in _virtualComponents, we track the visually ordered components in the
+   * _orderedComponents array. This is possible because all of our operations are relatively simple,
+   * popping some number of components off one end and pushing them onto the other.
+   *
+   * @private
+   */
+  _updateVirtualComponents() {
+    const {
+      items,
+      orderedComponents,
+      virtualComponents,
+      _componentPool,
+
+      itemContainer,
+      _occludedContentBefore,
+      _occludedContentAfter,
+
+      firstItemIndex,
+      lastItemIndex,
+      totalBefore,
+      totalAfter,
+
+      totalComponents
+    } = this;
+
+    // Add components to be recycled to the pool
+    while (orderedComponents.length > 0 && orderedComponents[0].index < firstItemIndex) {
+      _componentPool.push(orderedComponents.shift());
+    }
+
+    while (orderedComponents.length > 0 && orderedComponents[orderedComponents.length - 1].index > lastItemIndex) {
+      _componentPool.unshift(orderedComponents.pop());
+    }
+
+    // If the underlying array has changed, the indexes could be the same but the content may have changed,
+    // so recycle the remaining components just in case. If content has not changed, this is a no-op.
+    for (let i = 0; i < orderedComponents.length; i++) {
+      const component = orderedComponents[i];
+      component.recycle(objectAt(items, component.index), component.index);
+    }
+
+    let firstRenderedIndex = orderedComponents[0] ? orderedComponents[0].index : firstItemIndex;
+    let lastRenderedIndex = orderedComponents[orderedComponents.length - 1] ? orderedComponents[orderedComponents.length - 1].index : firstItemIndex - 1;
+
+    // Append as many items as needed to the rendered components
+    while (orderedComponents.length < totalComponents && lastRenderedIndex < lastItemIndex) {
+      const component = _componentPool.pop() || new VirtualComponent();
+      const itemIndex = ++lastRenderedIndex;
+
+      component.recycle(objectAt(items, itemIndex), itemIndex);
+      this._appendComponent(component);
+
+      orderedComponents.push(component);
+    }
+
+    // Prepend as many items as needed to the rendered components
+    while (orderedComponents.length < totalComponents && firstRenderedIndex > firstItemIndex) {
+      const component = _componentPool.pop() || new VirtualComponent();
+      const itemIndex = --firstRenderedIndex;
+
+      component.recycle(objectAt(items, itemIndex), itemIndex);
+      this._prependComponent(component);
+
+      orderedComponents.unshift(component);
+    }
+
+    // If there are any items remaining in the pool, remove them
+    if (_componentPool.length > 0) {
+      virtualComponents.removeObjects(_componentPool);
+      _componentPool.length = 0;
+    }
+
+    // Set padding element heights, unset itemContainer's minHeight
+    _occludedContentBefore.element.style.height = `${totalBefore}px`;
+    _occludedContentAfter.element.style.height = `${totalAfter}px`;
+    itemContainer.style.minHeight = '';
+  }
+
+  _appendComponent(component) {
+    const {
+      virtualComponents,
+      _occludedContentAfter
+    } = this;
+
+    if (component.rendered === true) {
+      insertRangeBefore(_occludedContentAfter.realUpperBound, component.realUpperBound, component.realLowerBound);
+    } else {
+      virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
+      component.rendered = true;
+    }
+  }
+
+  _prependComponent(component) {
+    const {
+      virtualComponents,
+      _occludedContentBefore,
+      _prependComponentPool
+    } = this;
+
+    if (component.rendered === true) {
+      insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, component.realUpperBound, component.realLowerBound);
+    } else {
+      virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
+      component.rendered = true;
+
+      // Components that are both new and prepended still need to be rendered at the end because Glimmer.
+      // We have to move them _after_ they render, so we schedule that if they exist
+      _prependComponentPool.unshift(component);
+
+      if (this._nextLayout === null) {
+        this._nextLayout = this.schedule('layout', () => {
+          this._nextLayout = null;
+
+          while (_prependComponentPool.length > 0) {
+            const component = _prependComponentPool.pop();
+
+            insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, component.realUpperBound, component.realLowerBound);
+          }
+        });
+      }
+    }
   }
 
   _sendActions() {
@@ -169,55 +355,29 @@ export default class Radar {
     }
   }
 
-  get totalItems() {
-    return this.items ? get(this.items, 'length') : 0;
+  prepend(numPrepended) {
+    this._prevFirstItemIndex += numPrepended;
+    this._prevLastItemIndex += numPrepended;
+
+    this.schedule('sync', () => {
+      this.orderedComponents.forEach((c) => set(c, 'index', get(c, 'index') + numPrepended));
+    });
+
+    this._firstReached = false;
+
+    this._prependOffset = numPrepended * this.minHeight;
   }
 
-  set itemContainer(itemContainer) {
-    this._itemContainer = itemContainer;
-    this._scrollTopOffset = null;
+  append() {
+    this._lastReached = false;
   }
 
-  get itemContainer() {
-    return this._itemContainer;
-  }
+  reset() {
+    this._prevFirstItemIndex = NULL_INDEX;
+    this._prevLastItemIndex = NULL_INDEX;
 
-  set scrollContainer(scrollContainer) {
-    this._scrollContainer = scrollContainer;
-    this._scrollTopOffset = null;
-    this.scrollContainerHeight = scrollContainer.getBoundingClientRect().height;
-  }
-
-  get scrollContainer() {
-    return this._scrollContainer;
-  }
-
-  get scrollTop() {
-    return this._scrollTop;
-  }
-
-  set scrollTop(scrollTop) {
-    this.scrollContainer.scrollTop = this._scrollTop = scrollTop;
-  }
-
-  /*
-   * Represents the offset between the top of the itemContainer and the top of scrollContainer
-   * when `scrollTop === 0`. Basically, the item container could "begin" anywhere in the
-   * scrollContainer. There could be some header or other element _before_ the itemContainer that
-   * pushes it down a little bit. In this case, the true position of the scrollContainer's top
-   * relative to our measurements, which begin at 0, is `scrollTop - scrollTopOffset`. In other
-   * words, while we _can't_ have a negative `scrollTop`, we _can_ have a negative `visibleTop`.
-   */
-  get scrollTopOffset() {
-    if (this._scrollTopOffset === null) {
-      const marginTop = parseInt(this.itemContainer.style.marginTop || 0);
-      const itemContainerTop = this.itemContainer ? this.itemContainer.getBoundingClientRect().top : 0;
-      const scrollContainerTop = this.scrollContainer ? this.scrollContainer.getBoundingClientRect().top : 0;
-
-      this._scrollTopOffset = (this.scrollTop + (itemContainerTop - marginTop)) - scrollContainerTop;
-    }
-
-    return this._scrollTopOffset;
+    this._firstReached = false;
+    this._lastReached = false;
   }
 
   /*
@@ -234,170 +394,33 @@ export default class Radar {
    * in this exact order.
    */
   get visibleTop() {
-    return this.scrollTop - this.scrollTopOffset + this._prependOffset;
-  }
-
-  set visibleTop(visibleTop) {
-    assert('Must set visibleTop to a number', typeof visibleTop === 'number');
-
-    this.scrollTop = visibleTop + this.scrollTopOffset - this._prependOffset;
+    return this._scrollTop - this._scrollTopOffset + this._prependOffset;
   }
 
   get visibleBottom() {
-    return this.visibleTop + this.scrollContainerHeight;
+    return this.visibleTop + this._scrollContainerHeight;
   }
 
-  /*
-   * Update the VirtualComponents state based on current scroll position
-   *
-   * @private
-   */
-  _updateVirtualComponents() {
-    const {
-      items,
-      orderedComponents,
-      itemContainer,
-      _occludedContentBefore,
-      _occludedContentAfter,
-
-      _prevFirstItemIndex,
-      firstItemIndex,
-      lastItemIndex,
-      totalBefore,
-      totalAfter
-    } = this;
-
-    const itemDelta = firstItemIndex - _prevFirstItemIndex;
-    const offsetAmount = Math.abs(itemDelta % orderedComponents.length);
-
-    if (offsetAmount > 0) {
-      if (itemDelta < 0) {
-        // Scrolling up
-        let movedComponents = orderedComponents.splice(-offsetAmount);
-        orderedComponents.unshift(...movedComponents);
-
-        const firstNode = movedComponents[0].realUpperBound;
-        const lastNode = movedComponents[movedComponents.length - 1].realLowerBound;
-
-        insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, firstNode, lastNode);
-      } else if (itemDelta > 0) {
-        // Scrolling down
-        let movedComponents = orderedComponents.splice(0, offsetAmount);
-        orderedComponents.push(...movedComponents);
-
-        const firstNode = movedComponents[0].realUpperBound;
-        const lastNode = movedComponents[movedComponents.length - 1].realLowerBound;
-
-        insertRangeBefore(_occludedContentAfter.realUpperBound, firstNode, lastNode);
-      }
-    }
-
-    for (let i = 0, itemIndex = firstItemIndex; itemIndex <= lastItemIndex; i++, itemIndex++) {
-      orderedComponents[i].recycle(objectAt(items, itemIndex), itemIndex);
-    }
-
-    _occludedContentBefore.element.style.height = `${totalBefore}px`;
-    _occludedContentAfter.element.style.height = `${totalAfter}px`;
-    itemContainer.style.minHeight = '';
+  get visibleMiddle() {
+    return Math.max(this.visibleTop, 0) + (this._scrollContainerHeight / 2);
   }
 
-  /*
-   * Sets up _virtualComponents, which is meant to be a static pool of components that we render to.
-   * In order to decrease the time spent rendering and diffing, we pull the {{each}} out of the DOM
-   * and only replace the content of _virtualComponents which are removed/added.
-   *
-   * For instance, if we start with the following and scroll down, items 2 and 3 do not need to be
-   * rerendered, only item 1 needs to be removed and only item 4 needs to be added. So we replace
-   * item 1 with item 4, and then manually move the DOM:
-   *
-   *   1                        4                         2
-   *   2 -> replace 1 with 4 -> 2 -> manually move DOM -> 3
-   *   3                        3                         4
-   *
-   * However, _virtualComponents is still out of order. Rather than keep track of the state of
-   * things in _virtualComponents, we track the visually ordered components in the
-   * _orderedComponents array. This is possible because all of our operations are relatively simple,
-   * popping some number of components off one end and pushing them onto the other.
-   *
-   * @private
-   */
-  _updateVirtualComponentPool() {
+  get totalItems() {
+    return this.items ? get(this.items, 'length') : 0;
+  }
+
+  get totalComponents() {
     const {
-      scrollContainerHeight,
+      _scrollContainerHeight,
+      _minHeight,
       bufferSize,
-      minHeight,
-      virtualComponents,
-      orderedComponents,
-      totalItems,
-      items
+      totalItems
     } = this;
 
     // The total number of components is determined by the minimum number required to span the
     // container plus its buffers. Combined with the above rendering strategy this is fairly
     // performant, even if mean item size is above the minimum.
-    const calculatedComponents = Math.ceil(scrollContainerHeight / minHeight) + 1 + (bufferSize * 2);
-    const totalComponents = Math.min(totalItems, calculatedComponents);
-    const delta = totalComponents - orderedComponents.length;
-
-    if (delta > 0) {
-      const firstItemIndex = orderedComponents.length > 0 ? orderedComponents[orderedComponents.length - 1].index + 1 : 0;
-
-      for (let i = 0; i < delta; i++) {
-        let component = new VirtualComponent();
-        let itemIndex = firstItemIndex + i;
-
-        // TODO for initial create we likely don't need `set`
-        set(component, 'content', objectAt(items, itemIndex));
-        set(component, 'index', itemIndex);
-
-        virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
-        orderedComponents.push(component);
-      }
-    } else if (delta < 0) {
-      for (let i = delta; i < 0; i++) {
-        let component = orderedComponents.pop();
-
-        virtualComponents.removeObject(component);
-        component.destroy();
-      }
-    }
-  }
-
-  prepend(items, numPrepended) {
-    this.items = items;
-    this.firstItemIndex += numPrepended;
-    this.lastItemIndex += numPrepended;
-
-    this._firstReached = false;
-
-    this._updateVirtualComponentPool();
-    this.scheduleUpdate();
-
-    this._prependOffset = numPrepended * this.minHeight;
-  }
-
-  append(items) {
-    this.items = items;
-
-    this._lastReached = false;
-
-    this._updateVirtualComponentPool();
-    this.scheduleUpdate();
-  }
-
-  updateItems(items, isReset = false) {
-    this.items = items;
-
-    if (isReset === true) {
-      this.firstItemIndex = NULL_INDEX;
-      this.lastItemIndex = NULL_INDEX;
-
-      this._firstReached = false;
-      this._lastReached = false;
-
-      this._updateVirtualComponentPool();
-    }
-
-    this.scheduleUpdate();
+    const calculatedComponents = Math.ceil(_scrollContainerHeight / _minHeight) + 1 + (bufferSize * 2);
+    return Math.min(totalItems, calculatedComponents);
   }
 }

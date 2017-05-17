@@ -35,45 +35,54 @@ export default class DynamicRadar extends Radar {
   }
 
   _updateIndexes() {
-    const { values } = this.skipList;
-    const maxIndex = this.totalItems - 1;
-    const numComponents = this.orderedComponents.length;
-    const prevFirstItemIndex = this._prevFirstItemIndex;
-    const prevLastItemIndex = this._prevLastItemIndex;
-    let top = this.visibleTop;
+    const {
+      skipList,
+      visibleMiddle,
+      totalItems,
+      totalComponents,
 
-    if (top < 0) {
-      top = 0;
+      _prevFirstItemIndex,
+      _prevLastItemIndex
+    } = this;
+
+    if (totalItems === 0) {
+      this._firstItemIndex = NULL_INDEX;
+      this._lastItemIndex = NULL_INDEX;
+      this._totalBefore = 0;
+      this._totalAfter = 0;
+
+      return;
     }
 
-    const middleVisibleValue = top + (this.scrollContainerHeight / 2);
+    const { values } = skipList;
+    const maxIndex = totalItems - 1;
 
     // Don't measure if the radar has just been instantiated or reset, as we are rendering with a
     // completely new set of items and won't get an accurate measurement until after they render the
     // first time.
-    if (prevFirstItemIndex !== NULL_INDEX) {
+    if (_prevFirstItemIndex !== NULL_INDEX) {
       // We only need to measure the components that were rendered last time, extra components
       // haven't rendered yet.
-      this._measure(0, prevLastItemIndex - prevFirstItemIndex);
+      this._measure(0, _prevLastItemIndex - _prevFirstItemIndex);
     }
 
     let {
       totalBefore,
       totalAfter,
       index: middleItemIndex
-    } = this.skipList.find(middleVisibleValue);
+    } = this.skipList.find(visibleMiddle);
 
-    let firstItemIndex = middleItemIndex - Math.floor((numComponents - 1) / 2);
-    let lastItemIndex = middleItemIndex + Math.ceil((numComponents - 1) / 2);
+    let firstItemIndex = middleItemIndex - Math.floor((totalComponents - 1) / 2);
+    let lastItemIndex = middleItemIndex + Math.ceil((totalComponents - 1) / 2);
 
     if (firstItemIndex < 0) {
       firstItemIndex = 0;
-      lastItemIndex = numComponents - 1;
+      lastItemIndex = totalComponents - 1;
     }
 
     if (lastItemIndex > maxIndex) {
       lastItemIndex = maxIndex;
-      firstItemIndex = maxIndex - (numComponents - 1);
+      firstItemIndex = maxIndex - (totalComponents - 1);
     }
 
     for (let i = middleItemIndex - 1; i >= firstItemIndex; i--) {
@@ -84,8 +93,8 @@ export default class DynamicRadar extends Radar {
       totalAfter -= values[i];
     }
 
-    const itemDelta = (prevFirstItemIndex !== null) ? firstItemIndex - prevFirstItemIndex : 0;
-    const numCulled = Math.abs(itemDelta % numComponents);
+    const itemDelta = (_prevFirstItemIndex !== null) ? firstItemIndex - _prevFirstItemIndex : 0;
+    const numCulled = Math.abs(itemDelta % totalComponents);
 
     if (itemDelta < 0 || this._firstRender === true) {
       // schedule a measurement for items that could affect scrollTop
@@ -93,7 +102,7 @@ export default class DynamicRadar extends Radar {
         const staticVisibleIndex = this.renderFromLast ? this.lastVisibleIndex + 1 : this.firstVisibleIndex;
         const numBeforeStatic = staticVisibleIndex - firstItemIndex;
 
-        const lastIndex = this._firstRender ? numBeforeStatic - 1 : Math.min(numCulled, numBeforeStatic - 1);
+        const lastIndex = this._firstRender ? numBeforeStatic - 1 : Math.max(Math.min(numCulled, numBeforeStatic - 1), 0);
         this._prependOffset += this._measure(0, lastIndex);
         this._firstRender = false;
       });
@@ -163,16 +172,8 @@ export default class DynamicRadar extends Radar {
     return this._firstItemIndex;
   }
 
-  set firstItemIndex(index) {
-    this._firstItemIndex = index;
-  }
-
   get lastItemIndex() {
     return this._lastItemIndex;
-  }
-
-  set lastItemIndex(index) {
-    this._lastItemIndex = index;
   }
 
   get firstVisibleIndex() {
@@ -221,23 +222,21 @@ export default class DynamicRadar extends Radar {
     }
   }
 
-  prepend(items, numPrepended) {
-    super.prepend(items, numPrepended);
+  prepend(numPrepended) {
+    super.prepend(numPrepended);
 
     this.skipList.prepend(numPrepended);
   }
 
-  append(items, numAppended) {
-    super.append(items, numAppended);
+  append(numAppended) {
+    super.append(numAppended);
 
     this.skipList.append(numAppended);
   }
 
-  updateItems(items, isReset) {
-    super.updateItems(items, isReset);
+  reset() {
+    super.reset();
 
-    if (isReset === true) {
-      this.skipList = new SkipList(this.totalItems, this.minHeight);
-    }
+    this.skipList = new SkipList(this.totalItems, this.minHeight);
   }
 }

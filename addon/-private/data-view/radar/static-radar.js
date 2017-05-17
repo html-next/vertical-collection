@@ -14,23 +14,34 @@ export default class StaticRadar extends Radar {
   }
 
   _updateIndexes() {
-    const totalIndexes = this.orderedComponents.length;
-    const maxIndex = this.totalItems - 1;
+    const {
+      totalComponents,
+      totalItems,
+      visibleMiddle,
+      _minHeight
+    } = this;
 
-    const middleVisibleValue = this.visibleTop + ((this.visibleBottom - this.visibleTop)  / 2);
-    const middleItemIndex = Math.floor(middleVisibleValue / this.minHeight);
+    if (totalItems === 0) {
+      this._firstItemIndex = NULL_INDEX;
+      this._lastItemIndex = NULL_INDEX;
 
-    let firstItemIndex = middleItemIndex - Math.floor((totalIndexes - 1) / 2);
-    let lastItemIndex = middleItemIndex + Math.ceil((totalIndexes - 1) / 2);
+      return;
+    }
+
+    const maxIndex = totalItems - 1;
+    const middleItemIndex = Math.floor(visibleMiddle / _minHeight);
+
+    let firstItemIndex = middleItemIndex - Math.floor((totalComponents - 1) / 2);
+    let lastItemIndex = middleItemIndex + Math.ceil((totalComponents - 1) / 2);
 
     if (firstItemIndex < 0) {
       firstItemIndex = 0;
-      lastItemIndex = totalIndexes - 1;
+      lastItemIndex = totalComponents - 1;
     }
 
     if (lastItemIndex > maxIndex) {
       lastItemIndex = maxIndex;
-      firstItemIndex = maxIndex - (totalIndexes - 1);
+      firstItemIndex = maxIndex - (totalComponents - 1);
     }
 
     this._firstItemIndex = firstItemIndex;
@@ -38,41 +49,33 @@ export default class StaticRadar extends Radar {
   }
 
   get total() {
-    return this.totalItems * this.minHeight;
+    return this.totalItems * this._minHeight;
   }
 
   get totalBefore() {
-    return this.firstItemIndex * this.minHeight;
+    return this.firstItemIndex * this._minHeight;
   }
 
   get totalAfter() {
-    return this.total - ((this.lastItemIndex + 1) * this.minHeight);
+    return this.total - ((this.lastItemIndex + 1) * this._minHeight);
   }
 
   get firstItemIndex() {
     return this._firstItemIndex;
   }
 
-  set firstItemIndex(index) {
-    this._firstItemIndex = index;
-  }
-
   get lastItemIndex() {
     return this._lastItemIndex;
   }
 
-  set lastItemIndex(index) {
-    this._lastItemIndex = index;
-  }
-
   get firstVisibleIndex() {
-    const firstVisibleIndex = Math.ceil(this.visibleTop / this.minHeight);
+    const firstVisibleIndex = Math.ceil(this.visibleTop / this._minHeight);
 
     return this.firstItemIndex === NULL_INDEX ? NULL_INDEX : firstVisibleIndex;
   }
 
   get lastVisibleIndex() {
-    const lastVisibleIndex = Math.min(Math.ceil(this.visibleBottom / this.minHeight), this.totalItems - 1);
+    const lastVisibleIndex = Math.min(Math.ceil(this.visibleBottom / this._minHeight), this.totalItems - 1);
 
     return this.firstItemIndex === NULL_INDEX ? NULL_INDEX : lastVisibleIndex;
   }
