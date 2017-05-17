@@ -231,6 +231,13 @@ export default class Radar {
       _componentPool.unshift(orderedComponents.pop());
     }
 
+    // If the underlying array has changed, the indexes could be the same but the content may have changed,
+    // so recycle the remaining components just in case. If content has not changed, this is a no-op.
+    for (let i = 0; i < orderedComponents.length; i++) {
+      const component = orderedComponents[i];
+      component.recycle(objectAt(items, component.index), component.index);
+    }
+
     // If rendered components are empty, add one back so the rest of the logic remains the same
     if (orderedComponents.length === 0 && totalComponents > 0) {
       const component = _componentPool.pop() || new VirtualComponent();
@@ -373,9 +380,6 @@ export default class Radar {
   }
 
   reset() {
-    this._componentPool.push(...this.orderedComponents);
-    this.orderedComponents.length = 0;
-
     this._prevFirstItemIndex = NULL_INDEX;
     this._prevLastItemIndex = NULL_INDEX;
 
