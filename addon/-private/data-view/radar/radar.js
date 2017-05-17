@@ -238,36 +238,29 @@ export default class Radar {
       component.recycle(objectAt(items, component.index), component.index);
     }
 
-    // If rendered components are empty, add one back so the rest of the logic remains the same
-    if (orderedComponents.length === 0 && totalComponents > 0) {
-      const component = _componentPool.pop() || new VirtualComponent();
+    let firstRenderedIndex = orderedComponents[0] ? orderedComponents[0].index : firstItemIndex;
+    let lastRenderedIndex = orderedComponents[orderedComponents.length - 1] ? orderedComponents[orderedComponents.length - 1].index : firstItemIndex - 1;
 
-      component.recycle(objectAt(items, firstItemIndex), firstItemIndex);
+    // Append as many items as needed to the rendered components
+    while (orderedComponents.length < totalComponents && lastRenderedIndex < lastItemIndex) {
+      const component = _componentPool.pop() || new VirtualComponent();
+      const itemIndex = ++lastRenderedIndex;
+
+      component.recycle(objectAt(items, itemIndex), itemIndex);
       this._appendComponent(component);
 
       orderedComponents.push(component);
     }
 
     // Prepend as many items as needed to the rendered components
-    while (orderedComponents.length < totalComponents && orderedComponents[0].index > firstItemIndex) {
+    while (orderedComponents.length < totalComponents && firstRenderedIndex > firstItemIndex) {
       const component = _componentPool.pop() || new VirtualComponent();
-      const itemIndex = orderedComponents[0].index - 1;
+      const itemIndex = --firstRenderedIndex;
 
       component.recycle(objectAt(items, itemIndex), itemIndex);
       this._prependComponent(component);
 
       orderedComponents.unshift(component);
-    }
-
-    // Append as many items as needed to the rendered components
-    while (orderedComponents.length < totalComponents && orderedComponents[orderedComponents.length - 1].index < lastItemIndex) {
-      const component = _componentPool.pop() || new VirtualComponent();
-      const itemIndex = orderedComponents[orderedComponents.length - 1].index + 1;
-
-      component.recycle(objectAt(items, itemIndex), itemIndex);
-      this._appendComponent(component);
-
-      orderedComponents.push(component);
     }
 
     // If there are any items remaining in the pool, remove them
