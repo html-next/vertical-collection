@@ -24,15 +24,18 @@ import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
  * traverse to get the total value before and after the final index.
  */
 
+function fill(array, ...args) {
+  if (typeof array.fill === 'function') {
+    array.fill(...args);
+  } else {
+    Array.prototype.fill.call(array, args);
+  }
+}
+
 export default class SkipList {
   constructor(length, defaultValue) {
     const values = new Float32Array(new ArrayBuffer(length * 4));
-
-    if (typeof values.fill === 'function') {
-      values.fill(defaultValue);
-    } else {
-      Array.prototype.fill.call(values, defaultValue);
-    }
+    fill(values, defaultValue);
 
     this.length = length;
     this.defaultValue = defaultValue;
@@ -63,7 +66,7 @@ export default class SkipList {
         // This allows us to use the `fill` method on Typed arrays, which
         // an order of magnitude faster than manually calculating each value.
         defaultValue = defaultValue * 2;
-        layer.fill(defaultValue);
+        fill(layer, defaultValue);
 
         left = prevLayer[(length - 1) * 2] || 0;
         right = prevLayer[((length - 1) * 2) + 1] || 0;
@@ -177,12 +180,7 @@ export default class SkipList {
     const newValues = new Float32Array(new ArrayBuffer(newLength * 4));
 
     newValues.set(oldValues, numPrepended);
-
-    if (typeof newValues.fill === 'function') {
-      newValues.fill(defaultValue, 0, numPrepended);
-    } else {
-      Array.prototype.fill.call(newValues, defaultValue, 0, numPrepended);
-    }
+    fill(newValues, defaultValue, 0, numPrepended);
 
     this.length = newLength;
     this._initializeLayers(newValues);
@@ -200,12 +198,7 @@ export default class SkipList {
     const newValues = new Float32Array(new ArrayBuffer(newLength * 4));
 
     newValues.set(oldValues);
-
-    if (typeof newValues.fill === 'function') {
-      newValues.fill(defaultValue, oldLength);
-    } else {
-      Array.prototype.fill.call(newValues, defaultValue, oldLength);
-    }
+    fill(newValues, defaultValue, oldLength);
 
     this.length = newLength;
     this._initializeLayers(newValues);
