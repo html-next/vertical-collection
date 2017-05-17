@@ -116,11 +116,11 @@ const VerticalCollection = Component.extend({
     this._prevLastKey = keyForItem(objectAt(items, itemsLength - 1), key, itemsLength - 1);
 
     if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey) === true) {
-      _radar.prepend(items, lenDiff);
+      _radar.prepend(lenDiff);
     } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey) === true) {
-      _radar.append(items, lenDiff);
+      _radar.append(lenDiff);
     } else if (isSameArray(lenDiff, items, key, _prevFirstKey, _prevLastKey) === false) {
-      _radar.reset(items);
+      _radar.reset();
     }
 
     _radar.scheduleUpdate();
