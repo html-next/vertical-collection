@@ -168,9 +168,9 @@ const VerticalCollection = Component.extend({
     // Initialize the Radar and set the scroll state
     this._initializeRadar();
     this._initializeScrollState();
-    this._initializeEventHandlers();
 
     this.schedule('sync', () => {
+      this._initializeEventHandlers();
       this._radar.start();
     });
   },
