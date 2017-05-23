@@ -138,7 +138,10 @@ export default class Radar {
       this._updateVirtualComponents();
 
       this.schedule('measure', () => {
-        if (this.scrollContainer.scrollTop - this._scrollTopOffset !== this.visibleTop) {
+        // If there is a prependOffset of some kind _and_ the scrollTop has changed. Chrome will
+        // automatically change the scrollTop for us in certain situations, which is why we need
+        // to check the cache.
+        if (this._prependOffset !== 0 && this._scrollTop === this.scrollContainer.scrollTop) {
           this.scrollContainer.scrollTop += this._prependOffset;
         }
 
