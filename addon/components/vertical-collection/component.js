@@ -202,7 +202,7 @@ const VerticalCollection = Component.extend({
     let startingIndex = 0;
 
     if (idForFirstItem !== undefined) {
-      for (let i = 0; i < totalItems - 1; i++) {
+      for (let i = 0; i < totalItems; i++) {
         if (keyForItem(objectAt(items, i), key, i) === idForFirstItem) {
           startingIndex = i;
           break;

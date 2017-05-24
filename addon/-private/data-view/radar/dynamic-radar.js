@@ -41,8 +41,7 @@ export default class DynamicRadar extends Radar {
       totalItems,
       totalComponents,
 
-      _prevFirstItemIndex,
-      _prevLastItemIndex
+      _prevFirstItemIndex
     } = this;
 
     if (totalItems === 0) {
@@ -61,9 +60,7 @@ export default class DynamicRadar extends Radar {
     // completely new set of items and won't get an accurate measurement until after they render the
     // first time.
     if (_prevFirstItemIndex !== NULL_INDEX) {
-      // We only need to measure the components that were rendered last time, extra components
-      // haven't rendered yet.
-      this._measure(0, _prevLastItemIndex - _prevFirstItemIndex);
+      this._measure(_prevFirstItemIndex);
     }
 
     let {
@@ -94,7 +91,6 @@ export default class DynamicRadar extends Radar {
     }
 
     const itemDelta = (_prevFirstItemIndex !== null) ? firstItemIndex - _prevFirstItemIndex : 0;
-    const numCulled = Math.abs(itemDelta % totalComponents);
 
     if (itemDelta < 0 || this._firstRender === true) {
       // schedule a measurement for items that could affect scrollTop
@@ -102,8 +98,9 @@ export default class DynamicRadar extends Radar {
         const staticVisibleIndex = this.renderFromLast ? this.lastVisibleIndex + 1 : this.firstVisibleIndex;
         const numBeforeStatic = staticVisibleIndex - firstItemIndex;
 
-        const lastIndex = this._firstRender ? numBeforeStatic - 1 : Math.max(Math.min(numCulled, numBeforeStatic - 1), 0);
-        this._prependOffset += this._measure(0, lastIndex);
+        const measureLimit = this._firstRender ? numBeforeStatic : Math.max(Math.min(Math.abs(itemDelta), numBeforeStatic), 1);
+
+        this._prependOffset += Math.round(this._measure(firstItemIndex, measureLimit));
         this._firstRender = false;
       });
     }
@@ -114,18 +111,19 @@ export default class DynamicRadar extends Radar {
     this._totalAfter = totalAfter;
   }
 
-  _measure(firstComponentIndex, lastComponentIndex) {
+  _measure(firstItemIndex, measureLimit = null) {
     const {
-      firstItemIndex,
       orderedComponents,
       itemContainer,
       totalBefore,
       skipList
     } = this;
 
+    const numToMeasure = measureLimit !== null ? measureLimit : orderedComponents.length;
+
     let totalDelta = 0;
 
-    for (let i = firstComponentIndex; i <= lastComponentIndex; i++) {
+    for (let i = 0; i < numToMeasure; i++) {
       const itemIndex = firstItemIndex + i;
       const currentItem = orderedComponents[i];
       const previousItem = orderedComponents[i - 1];

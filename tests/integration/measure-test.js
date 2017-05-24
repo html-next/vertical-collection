@@ -3,8 +3,10 @@ import hbs from 'htmlbars-inline-precompile';
 import Ember from 'ember';
 
 import wait from 'dummy/tests/helpers/wait';
-import { paddingBefore, paddingAfter } from 'dummy/tests/helpers/measurement';
 import getNumbers from 'dummy/lib/get-numbers';
+
+import { paddingBefore, paddingAfter } from 'dummy/tests/helpers/measurement';
+import { prepend } from 'dummy/tests/helpers/array';
 
 moduleForComponent('vertical-collection', 'Integration | Measure Tests', {
   integration: true
@@ -114,5 +116,60 @@ test('Can scroll correctly in dynamic list of items that has non-integer heights
       // should provide some safety.
       assert.equal(Math.round(paddingBefore(itemContainer)), 333, 'Occluded content has the correct height before');
       assert.equal(paddingAfter(itemContainer), 0, 'Occluded content has the correct height after');
+    });
+});
+
+test('Can measure and affect correctly in list of items with non-integer heights', function(assert) {
+  assert.expect(1);
+
+  this.set('items', getNumbers(0, 21));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection ${'items'}
+      minHeight=20
+      key="@index"
+      idForFirstItem="10"
+      bufferSize=1
+
+      as |item i|}}
+      <div style="height: 30.1px;">{{item.number}} {{i}}</div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  const scrollable = this.$('.scrollable');
+
+  return wait().then(() => {
+    assert.equal(scrollable.scrollTop(), 230, 'scrollTop set to correct value');
+  });
+});
+
+test('Measurements are correct after a prepend', function(assert) {
+  assert.expect(3);
+
+  this.set('items', getNumbers(0, 21));
+
+  this.render(hbs`
+  <div style="height: 200px; width: 100px;" class="scrollable">
+    {{#vertical-collection ${'items'}
+      minHeight=20
+
+      as |item i|}}
+      <div style="height: 30px;">{{item.number}} {{i}}</div>
+    {{/vertical-collection}}
+  </div>
+  `);
+
+  const scrollable = this.$('.scrollable');
+  const itemContainer = this.$('vertical-collection');
+
+  return wait()
+    .then(() => prepend(this, getNumbers(-20, 20)))
+    .then(wait)
+    .then(() => {
+      assert.equal(scrollable.scrollTop(), 420, 'scrollTop set to correct value');
+      assert.equal(paddingBefore(itemContainer), 360, 'Occluded content has the correct height before');
+      assert.equal(paddingAfter(itemContainer), 260, 'Occluded content has the correct height after');
     });
 });
