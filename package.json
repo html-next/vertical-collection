@@ -1,6 +1,6 @@
 {
   "name": "@html-next/vertical-collection",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "infinite-scroll, done right. done.",
   "directories": {
     "doc": "doc",
@@ -20,7 +20,7 @@
   },
   "contributors": [
     {
-      "name": "Chris Garret (@pzuraq)",
+      "name": "Chris Garrett (@pzuraq)",
       "email": "me@pzuraq.com",
       "url": "https://github.com/pzuraq"
     }
