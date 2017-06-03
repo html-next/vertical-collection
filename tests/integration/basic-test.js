@@ -185,6 +185,97 @@ test('The collection renders when yielded item has conditional', function(assert
   });
 });
 
+test('The collection renders the initialRenderCount correctly', function(assert) {
+  assert.expect(5);
+  this.set('items', getNumbers(0, 100));
+
+  this.render(hbs`
+    <div style="height: 500px; width: 500px;" class="scrollable">
+      {{#vertical-collection ${'items'}
+        minHeight=50
+        initialRenderCount=1
+        as |item i|
+      }}
+        <vertical-item style="height: 50px">
+          {{item.number}} {{i}}
+        </vertical-item>
+      {{/vertical-collection}}
+    </div>
+  `);
+
+  requestAnimationFrame(() => {
+    assert.equal(this.$('vertical-item').length, 1, 'correct number of items rendered on initial pass');
+    assert.equal(this.$('vertical-item').text().trim(), '0 0', 'correct item rendered');
+  });
+
+  return wait().then(() => {
+    assert.equal(this.$('vertical-item').length, 11, 'correctly updates the number of items rendered on second pass');
+    assert.equal(this.$('vertical-item:eq(0)').text().trim(), '0 0', 'correct first item rendered');
+    assert.equal(this.$('vertical-item:eq(10)').text().trim(), '10 10', 'correct last item rendered');
+  });
+});
+
+test('The collection renders the initialRenderCount correctly if idForFirstItem is set', function(assert) {
+  assert.expect(5);
+  this.set('items', getNumbers(0, 100));
+
+  this.render(hbs`
+    <div style="height: 500px; width: 500px;" class="scrollable">
+      {{#vertical-collection ${'items'}
+        minHeight=50
+        initialRenderCount=1
+        idForFirstItem="20"
+        key="number"
+        as |item i|
+      }}
+        <vertical-item style="height: 50px">
+          {{item.number}} {{i}}
+        </vertical-item>
+      {{/vertical-collection}}
+    </div>
+  `);
+
+  requestAnimationFrame(() => {
+    assert.equal(this.$('vertical-item').length, 1, 'correct number of items rendered on initial pass');
+    assert.equal(this.$('vertical-item').text().trim(), '20 20', 'correct item rendered');
+  });
+
+  return wait().then(() => {
+    assert.equal(this.$('vertical-item').length, 11, 'correctly updates the number of items rendered on second pass');
+    assert.equal(this.$('vertical-item:eq(0)').text().trim(), '20 20', 'correct first item rendered');
+    assert.equal(this.$('vertical-item:eq(10)').text().trim(), '30 30', 'correct last item rendered');
+  });
+});
+
+test('The collection renders the initialRenderCount correctly if the count is more than the number of items', function(assert) {
+  assert.expect(4);
+  this.set('items', getNumbers(0, 1));
+
+  this.render(hbs`
+    <div style="height: 500px; width: 500px;" class="scrollable">
+      {{#vertical-collection ${'items'}
+        minHeight=50
+        initialRenderCount=5
+        as |item i|
+      }}
+        <vertical-item style="height: 50px">
+          {{item.number}} {{i}}
+        </vertical-item>
+      {{/vertical-collection}}
+    </div>
+  `);
+
+  requestAnimationFrame(() => {
+    assert.equal(this.$('vertical-item').length, 1, 'correct number of items rendered on initial pass');
+    assert.equal(this.$('vertical-item').text().trim(), '0 0', 'correct item rendered');
+  });
+
+  return wait().then(() => {
+    assert.equal(this.$('vertical-item').length, 1, 'correctly updates the number of items rendered on second pass');
+    assert.equal(this.$('vertical-item').text().trim(), '0 0', 'correct first item rendered');
+  });
+});
+
 /*
 test("The Collection Reveals it's children when `renderAllInitially` is true.", function(assert) {
   assert.expect(1);
