@@ -21,13 +21,13 @@ const {
 export const NULL_INDEX = -2;
 
 export default class Radar {
-  constructor(parentToken) {
+  constructor(parentToken, initialItems, initialRenderCount, startingIndex) {
     this.token = new Token(parentToken);
 
-    this.items = null;
+    this.items = initialItems;
     this.minHeight = 0;
     this.bufferSize = 0;
-    this.startingIndex = 0;
+    this.startingIndex = startingIndex;
     this.renderFromLast = false;
     this.itemContainer = null;
     this.scrollContainer = null;
@@ -60,8 +60,25 @@ export default class Radar {
     this._occludedContentBefore.element = document.createElement('occluded-content');
     this._occludedContentAfter.element = document.createElement('occluded-content');
 
-    this.virtualComponents = A([this._occludedContentBefore, this._occludedContentAfter]);
-    this.orderedComponents = [];
+    const virtualComponents = [this._occludedContentBefore];
+    const orderedComponents = [];
+
+    const lastIndex = Math.min(startingIndex + initialRenderCount, get(initialItems, 'length'));
+    const firstIndex = Math.max(0, lastIndex - initialRenderCount);
+
+    for (let i = firstIndex; i < lastIndex; i++) {
+      const component = new VirtualComponent;
+      component.recycle(objectAt(initialItems, i), i);
+      component.rendered = true;
+
+      virtualComponents.push(component);
+      orderedComponents.push(component);
+    }
+
+    virtualComponents.push(this._occludedContentAfter);
+
+    this.virtualComponents = A(virtualComponents);
+    this.orderedComponents = orderedComponents;
     this._componentPool = [];
     this._prependComponentPool = [];
   }
@@ -105,6 +122,8 @@ export default class Radar {
       // on initialization, so we set this min-height property to radar's total
       this.itemContainer.style.minHeight = `${_minHeight * totalItems}px`;
       this.scrollContainer.scrollTop = startingScrollTop + _scrollTopOffset;
+
+      this._occludedContentBefore.element.style.height = `${startingIndex * _minHeight}px`;
     }
 
     this._started = true;

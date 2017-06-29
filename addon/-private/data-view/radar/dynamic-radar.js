@@ -4,8 +4,8 @@ import SkipList from '../skip-list';
 import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
 
 export default class DynamicRadar extends Radar {
-  constructor() {
-    super();
+  constructor(parentToken, initialItems, initialRenderCount, startingIndex) {
+    super(parentToken, initialItems, initialRenderCount, startingIndex);
 
     this._firstItemIndex = NULL_INDEX;
     this._lastItemIndex = NULL_INDEX;

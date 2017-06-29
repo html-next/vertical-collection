@@ -166,54 +166,13 @@ const VerticalCollection = Component.extend({
     }
 
     // Initialize the Radar and set the scroll state
-    this._initializeRadar();
-    this._initializeScrollState();
+    this._radar.itemContainer = this.element;
+    this._radar.scrollContainer = this._scrollContainer;
 
     this.schedule('sync', () => {
       this._initializeEventHandlers();
       this._radar.start();
     });
-  },
-
-  /*
-   * Set all of the Radar's base properties.
-   *
-   * @private
-   */
-  _initializeRadar() {
-    const {
-      _radar,
-      _scrollContainer,
-      element
-    } = this;
-
-    _radar.itemContainer = element;
-    _radar.scrollContainer = _scrollContainer;
-  },
-
-  _initializeScrollState() {
-    const renderFromLast = this.get('renderFromLast');
-    const idForFirstItem = this.get('idForFirstItem');
-    const key = this.get('key');
-
-    const items = this.get('items');
-    const totalItems = get(items, 'length');
-
-    let startingIndex = 0;
-
-    if (idForFirstItem !== undefined) {
-      for (let i = 0; i < totalItems; i++) {
-        if (keyForItem(objectAt(items, i), key, i) === idForFirstItem) {
-          startingIndex = i;
-          break;
-        }
-      }
-    } else if (renderFromLast === true) {
-      // If no id was set and `renderFromLast` is true, start from the bottom
-      startingIndex = totalItems - 1;
-    }
-
-    this._radar.startingIndex = startingIndex;
   },
 
   _initializeEventHandlers() {
@@ -247,8 +206,16 @@ const VerticalCollection = Component.extend({
     this.token = new Token();
     const RadarClass = this.staticHeight ? StaticRadar : DynamicRadar;
 
-    this._radar = new RadarClass(this.token);
-    this._radar.renderFromLast = this.get('renderFromLast');
+    const items = this.get('items') || [];
+    const initialRenderCount = this.get('initialRenderCount');
+    const renderFromLast = this.get('renderFromLast');
+    const idForFirstItem = this.get('idForFirstItem');
+    const key = this.get('key');
+
+    const startingIndex = calculateStartingIndex(items, idForFirstItem, key, renderFromLast);
+
+    this._radar = new RadarClass(this.token, items, initialRenderCount, startingIndex);
+    this._radar.renderFromLast = renderFromLast;
 
     this.supportsInverse = SUPPORTS_INVERSE_BLOCK;
     this._prevItemsLength = 0;
@@ -289,6 +256,26 @@ const VerticalCollection = Component.extend({
 VerticalCollection.reopenClass({
   positionalParams: ['items']
 });
+
+function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {
+  const totalItems = get(items, 'length');
+
+  let startingIndex = 0;
+
+  if (idForFirstItem !== undefined) {
+    for (let i = 0; i < totalItems; i++) {
+      if (keyForItem(objectAt(items, i), key, i) === idForFirstItem) {
+        startingIndex = i;
+        break;
+      }
+    }
+  } else if (renderFromLast === true) {
+    // If no id was set and `renderFromLast` is true, start from the bottom
+    startingIndex = totalItems - 1;
+  }
+
+  return startingIndex;
+}
 
 function isPrepend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
   const newItemsLength = get(newItems, 'length');
