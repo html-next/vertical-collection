@@ -1,7 +1,6 @@
 /* eslint-env node */
 'use strict';
 
-var chalk = require('chalk');
 var StripClassCallCheck = require('babel6-plugin-strip-class-callcheck');
 var FilterImports = require('babel-plugin-filter-imports');
 var RemoveImports = require('./lib/babel-plugin-remove-imports');
@@ -140,16 +139,6 @@ module.exports = {
     this._setupBabelOptions(app.env);
 
     if (!/production/.test(app.env) && !/test/.test(app.env)) {
-      this.ui.write(
-        chalk.grey("\n===================================================================\n") +
-        chalk.cyan("\tVertical Collection\n") +
-        chalk.grey("\t:: Including CSS for Visual Debugger\n") +
-        chalk.grey("\t:: (included in non production builds only)\n") +
-        chalk.grey("\t:: To use, set ") + chalk.yellow("{{#vertical-collection debug=true}}\n") +
-        chalk.grey("\t:: To debug your applied CSS rules, set ") + chalk.yellow("{{#vertical-collection debugCSS=true}}") +
-        chalk.grey("\n===================================================================\n")
-      );
-
       app.import('./vendor/debug.css');
     }
   },
