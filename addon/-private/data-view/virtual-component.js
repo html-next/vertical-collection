@@ -38,16 +38,35 @@ export default class VirtualComponent {
   }
 
   getBoundingClientRect() {
-    const range = document.createRange();
+    let { upperBound, lowerBound } = this;
 
-    range.setStartBefore(this.upperBound);
-    range.setEndAfter(this.lowerBound);
+    let top = Infinity;
+    let bottom = -Infinity;
 
-    const rect = range.getBoundingClientRect();
+    while (upperBound !== lowerBound) {
+      upperBound = upperBound.nextSibling;
 
-    range.detach();
+      if (upperBound instanceof Element) {
+        top = Math.min(top, upperBound.getBoundingClientRect().top);
+        bottom = Math.max(bottom, upperBound.getBoundingClientRect().bottom);
+      }
 
-    return rect;
+      stripInProduction(() => {
+        if (upperBound instanceof Element) {
+          return;
+        }
+
+        const text = upperBound.textContent;
+
+        assert(`All content inside of vertical-collection must be wrapped in an element. Detected a text node with content: ${text}`, text === '' || text.match(/^\s+$/));
+      });
+    }
+
+    assert('Items in a vertical collection require atleast one element in them', top !== Infinity && bottom !== -Infinity);
+
+    const height = bottom - top;
+
+    return { top, bottom, height };
   }
 
   recycle(newContent, newIndex) {
