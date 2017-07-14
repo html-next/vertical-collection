@@ -10,6 +10,9 @@ occluded-content {
   display: block;
   position: relative;
   width: 100%;
+
+  /* prevents margin overflow on item container */
+  min-height: 0.001px;
 }
 
 table > occluded-content,

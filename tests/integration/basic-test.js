@@ -60,12 +60,24 @@ testScenarios(
   scenariosFor(getNumbers(0, 10), { estimateHeight: 200, bufferSize: 1 }),
 
   function(assert) {
-    assert.expect(1);
+    assert.expect(3);
+
+    const scrollable = this.$('.scrollable');
 
     return wait().then(() => {
       // Should render 2 components to be able to cover the whole scroll space, and 1
-      // extra buffer component on either side
-      assert.equal(this.$('.scrollable').find('div').length, 4);
+      // extra buffer component on the bottom
+      assert.equal(scrollable.find('div').length, 2);
+      scrollable.scrollTop(200);
+      return wait();
+    }).then(() => {
+      // Should render a buffer on both sides
+      assert.equal(scrollable.find('div').length, 3);
+      scrollable.scrollTop(2000);
+      return wait();
+    }).then(() => {
+      // Back to 3 items because at the bottom
+      assert.equal(scrollable.find('div').length, 2);
     });
   }
 );
@@ -94,11 +106,11 @@ test('The collection renders with containerSelector set', function(assert) {
   `);
 
   return wait().then(() => {
-    assert.equal(this.$().find('vertical-item').length, 6);
+    assert.equal(this.$().find('vertical-item').length, 5);
   });
 });
 
-test('The collection renders in the correct initial position', function(assert) {
+test('The collection renders in the correct initial position when offset', function(assert) {
   assert.expect(3);
 
   this.set('items', getNumbers(0, 100));
@@ -124,8 +136,8 @@ test('The collection renders in the correct initial position', function(assert) 
   return wait().then(() => {
     let occludedBoundaries = this.$().find('occluded-content');
     assert.equal(occludedBoundaries.get(0).getAttribute('style'), 'height: 0px;', 'Occluded height above is 0');
-    assert.equal(occludedBoundaries.get(1).getAttribute('style'), 'height: 1880px;', 'Occluded height below is 20 * 94 items');
-    assert.equal(this.$().find('vertical-item').length, 6, 'We rendered 100/20 + 1 items');
+    assert.equal(occludedBoundaries.get(1).getAttribute('style'), 'height: 1940px;', 'Occluded height below is 20 * 94 items');
+    assert.equal(this.$().find('vertical-item').length, 3, 'We rendered 50/20 items');
   });
 });
 
@@ -140,6 +152,7 @@ test('The collection renders in the correct initial position with dynamic height
       {{#vertical-collection ${'items'}
         containerSelector=".scrollable"
         estimateHeight=20
+        bufferSize=0
 
         as |item i|}}
         <vertical-item style="height: 28px">
@@ -153,8 +166,8 @@ test('The collection renders in the correct initial position with dynamic height
   return wait().then(() => {
     let occludedBoundaries = this.$().find('occluded-content');
     assert.equal(occludedBoundaries.get(0).getAttribute('style'), 'height: 0px;', 'Occluded height above is 0');
-    assert.equal(occludedBoundaries.get(1).getAttribute('style'), 'height: 1880px;', 'Occluded height below is 20 * 94 items');
-    assert.equal(this.$().find('vertical-item').length, 6, 'We rendered 100/20 + 1 items');
+    assert.equal(occludedBoundaries.get(1).getAttribute('style'), 'height: 1940px;', 'Occluded height below is 20 * 94 items');
+    assert.equal(this.$().find('vertical-item').length, 3, 'We rendered 50/20 items');
   });
 });
 
@@ -241,9 +254,9 @@ test('The collection renders the initialRenderCount correctly if idForFirstItem 
   });
 
   return wait().then(() => {
-    assert.equal(this.$('vertical-item').length, 11, 'correctly updates the number of items rendered on second pass');
-    assert.equal(this.$('vertical-item:eq(0)').text().trim(), '20 20', 'correct first item rendered');
-    assert.equal(this.$('vertical-item:eq(10)').text().trim(), '30 30', 'correct last item rendered');
+    assert.equal(this.$('vertical-item').length, 12, 'correctly updates the number of items rendered on second pass');
+    assert.equal(this.$('vertical-item:eq(0)').text().trim(), '19 19', 'correct first item rendered');
+    assert.equal(this.$('vertical-item:eq(11)').text().trim(), '30 30', 'correct last item rendered');
   });
 });
 

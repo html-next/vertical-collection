@@ -15,9 +15,10 @@ export default class StaticRadar extends Radar {
 
   _updateIndexes() {
     const {
-      totalComponents,
+      bufferSize,
       totalItems,
-      visibleMiddle,
+      visibleTop,
+      visibleBottom,
       _estimateHeight
     } = this;
 
@@ -29,20 +30,12 @@ export default class StaticRadar extends Radar {
     }
 
     const maxIndex = totalItems - 1;
-    const middleItemIndex = Math.floor(visibleMiddle / _estimateHeight);
 
-    let firstItemIndex = middleItemIndex - Math.floor((totalComponents - 1) / 2);
-    let lastItemIndex = middleItemIndex + Math.ceil((totalComponents - 1) / 2);
+    let firstItemIndex = Math.floor(visibleTop / _estimateHeight);
+    firstItemIndex = Math.max(0, firstItemIndex - bufferSize);
 
-    if (firstItemIndex < 0) {
-      firstItemIndex = 0;
-      lastItemIndex = totalComponents - 1;
-    }
-
-    if (lastItemIndex > maxIndex) {
-      lastItemIndex = maxIndex;
-      firstItemIndex = maxIndex - (totalComponents - 1);
-    }
+    let lastItemIndex = Math.ceil(visibleBottom / _estimateHeight) - 1;
+    lastItemIndex = Math.min(maxIndex, lastItemIndex + bufferSize);
 
     this._firstItemIndex = firstItemIndex;
     this._lastItemIndex = lastItemIndex;
@@ -75,8 +68,23 @@ export default class StaticRadar extends Radar {
   }
 
   get lastVisibleIndex() {
-    const lastVisibleIndex = Math.min(Math.ceil(this.visibleBottom / this._estimateHeight), this.totalItems - 1);
+    const lastVisibleIndex = Math.min(Math.ceil(this.visibleBottom / this._estimateHeight), this.totalItems) - 1;
 
     return this.firstItemIndex === NULL_INDEX ? NULL_INDEX : lastVisibleIndex;
+  }
+
+  get totalComponents() {
+    const {
+      _scrollContainerHeight,
+      _estimateHeight,
+      bufferSize,
+      totalItems
+    } = this;
+
+    // The total number of components is determined by the minimum number required to span the
+    // container plus its buffers. Combined with the above rendering strategy this is fairly
+    // performant, even if mean item size is above the minimum.
+    const calculatedComponents = Math.ceil(_scrollContainerHeight / _estimateHeight) + 1 + (bufferSize * 2);
+    return Math.min(totalItems, calculatedComponents);
   }
 }

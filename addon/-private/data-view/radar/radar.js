@@ -387,7 +387,7 @@ export default class Radar {
 
     this._firstReached = false;
 
-    this._prependOffset = numPrepended * this.estimateHeight;
+    this._prependOffset = numPrepended * this._estimateHeight;
   }
 
   append() {
@@ -432,17 +432,6 @@ export default class Radar {
   }
 
   get totalComponents() {
-    const {
-      _scrollContainerHeight,
-      _estimateHeight,
-      bufferSize,
-      totalItems
-    } = this;
-
-    // The total number of components is determined by the minimum number required to span the
-    // container plus its buffers. Combined with the above rendering strategy this is fairly
-    // performant, even if mean item size is above the minimum.
-    const calculatedComponents = Math.ceil(_scrollContainerHeight / _estimateHeight) + 1 + (bufferSize * 2);
-    return Math.min(totalItems, calculatedComponents);
+    return Math.min(this.totalItems, (this._lastItemIndex - this._firstItemIndex) + 1);
   }
 }

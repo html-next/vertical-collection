@@ -24,6 +24,7 @@ test('The collection correctly remeasures items when scrolling down', function(a
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       estimateHeight=20
+      bufferSize=0
 
       as |item|}}
       <div class="item" style="height: 20px;">
@@ -60,6 +61,7 @@ test('The collection correctly remeasures items when scrolling up', function(ass
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       estimateHeight=20
+      bufferSize=0
 
       as |item|}}
       <div class="item" style="height: 20px;">
@@ -73,18 +75,18 @@ test('The collection correctly remeasures items when scrolling up', function(ass
   const itemContainer = this.$('vertical-collection');
 
   return wait().then(() => {
-    assert.equal(paddingAfter(itemContainer), 1780, 'itemContainer padding is correct on initial render');
-    scrollContainer.scrollTop(21);
+    assert.equal(paddingAfter(itemContainer), 1800, 'itemContainer padding is correct on initial render');
+    scrollContainer.scrollTop(20);
 
     return wait();
   }).then(() => {
-    assert.equal(paddingAfter(itemContainer), 1760, 'itemContainer padding is correct after scrolling down');
+    assert.equal(paddingAfter(itemContainer), 1780, 'itemContainer padding is correct after scrolling down');
     this.$('.item:last').height(50);
     scrollContainer.scrollTop(0);
 
     return wait();
   }).then(() => {
-    assert.equal(paddingAfter(itemContainer), 1810, 'itemContainer padding has the height of the modified last element');
+    assert.equal(paddingAfter(itemContainer), 1830, 'itemContainer padding has the height of the modified last element');
   });
 });
 
@@ -141,7 +143,7 @@ test('Can measure and affect correctly in list of items with non-integer heights
   const scrollable = this.$('.scrollable');
 
   return wait().then(() => {
-    assert.equal(scrollable.scrollTop(), 230, 'scrollTop set to correct value');
+    assert.equal(scrollable.scrollTop(), 210, 'scrollTop set to correct value');
   });
 });
 
@@ -154,6 +156,7 @@ test('Measurements are correct after a prepend', function(assert) {
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
       estimateHeight=20
+      bufferSize=1
 
       as |item i|}}
       <div style="height: 30px;">{{item.number}} {{i}}</div>
@@ -168,8 +171,8 @@ test('Measurements are correct after a prepend', function(assert) {
     .then(() => prepend(this, getNumbers(-20, 20)))
     .then(wait)
     .then(() => {
-      assert.equal(scrollable.scrollTop(), 420, 'scrollTop set to correct value');
-      assert.equal(paddingBefore(itemContainer), 360, 'Occluded content has the correct height before');
-      assert.equal(paddingAfter(itemContainer), 260, 'Occluded content has the correct height after');
+      assert.equal(scrollable.scrollTop(), 410, 'scrollTop set to correct value');
+      assert.equal(paddingBefore(itemContainer), 380, 'Occluded content has the correct height before');
+      assert.equal(paddingAfter(itemContainer), 290, 'Occluded content has the correct height after');
     });
 });

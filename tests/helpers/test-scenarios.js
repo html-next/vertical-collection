@@ -110,7 +110,7 @@ export const standardTemplate = hbs`
     {{#vertical-collection ${'items'}
       estimateHeight=(either-or estimateHeight 20)
       staticHeight=staticHeight
-      bufferSize=(either-or bufferSize 5)
+      bufferSize=(either-or bufferSize 0)
 
       renderFromLast=renderFromLast
       idForFirstItem=idForFirstItem
