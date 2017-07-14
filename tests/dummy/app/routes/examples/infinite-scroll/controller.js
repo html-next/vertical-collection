@@ -31,7 +31,7 @@ export default Controller.extend({
       this.set('model.last', last + 20);
     },
 
-    setMinHeight() {
+    setEstimateHeight() {
       this.set('someProperty', 90);
     }
   }

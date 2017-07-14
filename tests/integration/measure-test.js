@@ -23,7 +23,7 @@ test('The collection correctly remeasures items when scrolling down', function(a
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      minHeight=20
+      estimateHeight=20
 
       as |item|}}
       <div class="item" style="height: 20px;">
@@ -59,7 +59,7 @@ test('The collection correctly remeasures items when scrolling up', function(ass
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      minHeight=20
+      estimateHeight=20
 
       as |item|}}
       <div class="item" style="height: 20px;">
@@ -96,7 +96,7 @@ test('Can scroll correctly in dynamic list of items that has non-integer heights
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      minHeight=20
+      estimateHeight=20
 
       as |item i|}}
       <div style="height: 33.333px;">{{item.number}} {{i}}</div>
@@ -127,7 +127,7 @@ test('Can measure and affect correctly in list of items with non-integer heights
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      minHeight=20
+      estimateHeight=20
       key="@index"
       idForFirstItem="10"
       bufferSize=1
@@ -153,7 +153,7 @@ test('Measurements are correct after a prepend', function(assert) {
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      minHeight=20
+      estimateHeight=20
 
       as |item i|}}
       <div style="height: 30px;">{{item.number}} {{i}}</div>

@@ -1,7 +1,7 @@
 import { default as Radar, NULL_INDEX } from './radar';
 import SkipList from '../skip-list';
 
-import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
+import { stripInProduction } from 'vertical-collection/-debug/helpers';
 
 export default class DynamicRadar extends Radar {
   constructor(parentToken, initialItems, initialRenderCount, startingIndex) {
@@ -20,12 +20,6 @@ export default class DynamicRadar extends Radar {
     stripInProduction(() => {
       Object.preventExtensions(this);
     });
-  }
-
-  init(...args) {
-    super.init(...args);
-
-    this.skipList = new SkipList(this.totalItems, this.minHeight);
   }
 
   destroy() {
@@ -142,8 +136,6 @@ export default class DynamicRadar extends Radar {
         margin = currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore;
       }
 
-      assert(`item height + margin must always be above the minimum value ${this.minHeight}px. The item at index ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minHeight);
-
       const itemDelta = skipList.set(itemIndex, currentItemHeight + margin);
 
       if (itemDelta !== 0) {
@@ -235,6 +227,6 @@ export default class DynamicRadar extends Radar {
   reset() {
     super.reset();
 
-    this.skipList = new SkipList(this.totalItems, this.minHeight);
+    this.skipList = new SkipList(this.totalItems, this.estimateHeight);
   }
 }

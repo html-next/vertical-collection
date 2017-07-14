@@ -108,7 +108,7 @@ export function scenariosFor(items, options) {
 export const standardTemplate = hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      minHeight=(either-or minHeight 20)
+      estimateHeight=(either-or estimateHeight 20)
       staticHeight=staticHeight
       bufferSize=(either-or bufferSize 5)
 
@@ -123,7 +123,7 @@ export const standardTemplate = hbs`
       key=key
 
       as |item i|}}
-      <div style={{html-safe (join-strings "height:" (either-or itemHeight (either-or minHeight 20)) "px;")}}>
+      <div style={{html-safe (join-strings "height:" (either-or itemHeight (either-or estimateHeight 20)) "px;")}}>
         {{item.number}} {{i}}
       </div>
     {{/vertical-collection}}

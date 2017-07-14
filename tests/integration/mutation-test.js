@@ -272,7 +272,7 @@ test('Dynamic collection maintains state if the same list is passed in twice', f
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      minHeight=20
+      estimateHeight=20
 
       as |item i|}}
       <div style="height:40px;">

@@ -244,7 +244,7 @@ testScenarios(
       {{#vertical-collection ${'items'}
         containerSelector=".scrollable"
         tagName="tbody"
-        minHeight=37
+        estimateHeight=37
         staticHeight=staticHeight
 
         as |item i|}}
@@ -292,7 +292,7 @@ test('Collection measures correctly when it\'s scroll parent has scrolled', func
   <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
     <div style="height: 400px; width: 100px;" class="scroll-child scrollable">
       {{#vertical-collection ${'items'}
-        minHeight=20
+        estimateHeight=20
 
         as |item i|}}
         <div style="height:20px;">
@@ -321,7 +321,7 @@ test('Can scroll to last item when actual item sizes are significantly larger th
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      minHeight=10
+      estimateHeight=10
 
       as |item i|}}
       <div style="height: 100px;">{{item.number}} {{i}}</div>

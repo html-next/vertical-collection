@@ -32,7 +32,7 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– Required Settings
 
-  minHeight: null,
+  estimateHeight: null,
 
   // usable via {{#vertical-collection <items-array>}}
   items: null,
@@ -82,7 +82,7 @@ const VerticalCollection = Component.extend({
   isEmpty: computed.empty('items'),
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
 
-  virtualComponents: computed('items.[]', 'minHeight', 'bufferSize', function() {
+  virtualComponents: computed('items.[]', 'estimateHeight', 'bufferSize', function() {
     const {
       _radar,
       _prevItemsLength,
@@ -90,7 +90,7 @@ const VerticalCollection = Component.extend({
       _prevLastKey
     } = this;
 
-    _radar.minHeight = this.get('minHeight');
+    _radar.estimateHeight = this.get('estimateHeight');
     _radar.bufferSize = this.get('bufferSize');
 
     const items = this.get('items');
@@ -177,7 +177,7 @@ const VerticalCollection = Component.extend({
 
   _initializeEventHandlers() {
     this._scrollHandler = ({ top }) => {
-      if (Math.abs(this._lastEarthquake - top) > this._radar._minHeight / 2) {
+      if (Math.abs(this._lastEarthquake - top) > this._radar._estimateHeight / 2) {
         this._radar.scheduleUpdate();
         this._lastEarthquake = top;
       }

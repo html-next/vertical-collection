@@ -57,7 +57,7 @@ testScenarios(
 testScenarios(
   'The collection renders correct number of components with bufferSize set',
   standardTemplate,
-  scenariosFor(getNumbers(0, 10), { minHeight: 200, bufferSize: 1 }),
+  scenariosFor(getNumbers(0, 10), { estimateHeight: 200, bufferSize: 1 }),
 
   function(assert) {
     assert.expect(1);
@@ -80,7 +80,7 @@ test('The collection renders with containerSelector set', function(assert) {
     <div>
       {{#vertical-collection ${'items'}
         containerSelector=".scrollable"
-        minHeight=20
+        estimateHeight=20
         staticHeight=true
         bufferSize=0
 
@@ -108,7 +108,7 @@ test('The collection renders in the correct initial position', function(assert) 
     <div>
       {{#vertical-collection ${'items'}
         containerSelector=".scrollable"
-        minHeight=20
+        estimateHeight=20
         staticHeight=true
         bufferSize=0
 
@@ -139,7 +139,7 @@ test('The collection renders in the correct initial position with dynamic height
     <div style="padding: 200px;">
       {{#vertical-collection ${'items'}
         containerSelector=".scrollable"
-        minHeight=20
+        estimateHeight=20
 
         as |item i|}}
         <vertical-item style="height: 28px">
@@ -167,7 +167,7 @@ test('The collection renders when yielded item has conditional', function(assert
   this.render(hbs`
     <div style="height: 500px; width: 500px;">
       {{#vertical-collection ${'items'}
-        minHeight=10
+        estimateHeight=10
         containerSelector="body"
         as |item|
       }}
@@ -192,7 +192,7 @@ test('The collection renders the initialRenderCount correctly', function(assert)
   this.render(hbs`
     <div style="height: 500px; width: 500px;" class="scrollable">
       {{#vertical-collection ${'items'}
-        minHeight=50
+        estimateHeight=50
         initialRenderCount=1
         as |item i|
       }}
@@ -222,7 +222,7 @@ test('The collection renders the initialRenderCount correctly if idForFirstItem 
   this.render(hbs`
     <div style="height: 500px; width: 500px;" class="scrollable">
       {{#vertical-collection ${'items'}
-        minHeight=50
+        estimateHeight=50
         initialRenderCount=1
         idForFirstItem="20"
         key="number"
@@ -254,7 +254,7 @@ test('The collection renders the initialRenderCount correctly if the count is mo
   this.render(hbs`
     <div style="height: 500px; width: 500px;" class="scrollable">
       {{#vertical-collection ${'items'}
-        minHeight=50
+        estimateHeight=50
         initialRenderCount=5
         as |item i|
       }}

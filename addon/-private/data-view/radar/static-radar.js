@@ -18,7 +18,7 @@ export default class StaticRadar extends Radar {
       totalComponents,
       totalItems,
       visibleMiddle,
-      _minHeight
+      _estimateHeight
     } = this;
 
     if (totalItems === 0) {
@@ -29,7 +29,7 @@ export default class StaticRadar extends Radar {
     }
 
     const maxIndex = totalItems - 1;
-    const middleItemIndex = Math.floor(visibleMiddle / _minHeight);
+    const middleItemIndex = Math.floor(visibleMiddle / _estimateHeight);
 
     let firstItemIndex = middleItemIndex - Math.floor((totalComponents - 1) / 2);
     let lastItemIndex = middleItemIndex + Math.ceil((totalComponents - 1) / 2);
@@ -49,15 +49,15 @@ export default class StaticRadar extends Radar {
   }
 
   get total() {
-    return this.totalItems * this._minHeight;
+    return this.totalItems * this._estimateHeight;
   }
 
   get totalBefore() {
-    return this.firstItemIndex * this._minHeight;
+    return this.firstItemIndex * this._estimateHeight;
   }
 
   get totalAfter() {
-    return this.total - ((this.lastItemIndex + 1) * this._minHeight);
+    return this.total - ((this.lastItemIndex + 1) * this._estimateHeight);
   }
 
   get firstItemIndex() {
@@ -69,13 +69,13 @@ export default class StaticRadar extends Radar {
   }
 
   get firstVisibleIndex() {
-    const firstVisibleIndex = Math.ceil(this.visibleTop / this._minHeight);
+    const firstVisibleIndex = Math.ceil(this.visibleTop / this._estimateHeight);
 
     return this.firstItemIndex === NULL_INDEX ? NULL_INDEX : firstVisibleIndex;
   }
 
   get lastVisibleIndex() {
-    const lastVisibleIndex = Math.min(Math.ceil(this.visibleBottom / this._minHeight), this.totalItems - 1);
+    const lastVisibleIndex = Math.min(Math.ceil(this.visibleBottom / this._estimateHeight), this.totalItems - 1);
 
     return this.firstItemIndex === NULL_INDEX ? NULL_INDEX : lastVisibleIndex;
   }
