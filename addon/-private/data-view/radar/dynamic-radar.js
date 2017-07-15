@@ -1,5 +1,6 @@
 import { default as Radar, NULL_INDEX } from './radar';
 import SkipList from '../skip-list';
+import roundTo from '../utils/round-to';
 
 import { stripInProduction } from 'vertical-collection/-debug/helpers';
 
@@ -139,14 +140,13 @@ export default class DynamicRadar extends Radar {
 
       let margin;
 
-      // TODO add explicit test
-      if (previousItem) {
+      if (previousItem !== undefined) {
         margin = currentItemTop - previousItem.getBoundingClientRect().bottom;
       } else {
         margin = currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore;
       }
 
-      const itemDelta = skipList.set(itemIndex, currentItemHeight + margin);
+      const itemDelta = skipList.set(itemIndex, roundTo(currentItemHeight + margin));
 
       if (itemDelta !== 0) {
         totalDelta += itemDelta;
