@@ -25,7 +25,7 @@ export default class Radar {
     this.token = new Token(parentToken);
 
     this.items = initialItems;
-    this.minHeight = 0;
+    this.estimateHeight = 0;
     this.bufferSize = 0;
     this.startingIndex = startingIndex;
     this.renderFromLast = false;
@@ -34,7 +34,7 @@ export default class Radar {
 
     this._scrollTop = 0;
     this._prependOffset = 0;
-    this._minHeight = 0;
+    this._estimateHeight = 0;
     this._scrollTopOffset = 0;
     this._scrollContainerHeight = 0;
 
@@ -107,23 +107,23 @@ export default class Radar {
       const {
         totalItems,
         renderFromLast,
-        _minHeight,
+        _estimateHeight,
         _scrollTopOffset,
         _scrollContainerHeight
       } = this;
 
-      let startingScrollTop = startingIndex * _minHeight;
+      let startingScrollTop = startingIndex * _estimateHeight;
 
       if (renderFromLast) {
-        startingScrollTop -= (_scrollContainerHeight - _minHeight);
+        startingScrollTop -= (_scrollContainerHeight - _estimateHeight);
       }
 
       // The container element needs to have some height in order for us to set the scroll position
       // on initialization, so we set this min-height property to radar's total
-      this.itemContainer.style.minHeight = `${_minHeight * totalItems}px`;
+      this.itemContainer.style.minHeight = `${_estimateHeight * totalItems}px`;
       this.scrollContainer.scrollTop = startingScrollTop + _scrollTopOffset;
 
-      this._occludedContentBefore.element.style.height = `${startingIndex * _minHeight}px`;
+      this._occludedContentBefore.element.style.height = `${startingIndex * _estimateHeight}px`;
     }
 
     this._started = true;
@@ -181,12 +181,12 @@ export default class Radar {
 
   _updateConstants() {
     const {
-      minHeight,
+      estimateHeight,
       itemContainer,
       scrollContainer
     } = this;
 
-    assert('Must provide a `minHeight` value to vertical-collection', minHeight !== null);
+    assert('Must provide a `estimateHeight` value to vertical-collection', estimateHeight !== null);
     assert('itemContainer must be set on Radar before scheduling an update', itemContainer !== null);
     assert('scrollContainer must be set on Radar before scheduling an update', scrollContainer !== null);
 
@@ -200,7 +200,7 @@ export default class Radar {
 
     const maxHeight = scrollContainer.style ? parseInt(scrollContainer.style.maxHeight || 0) : 0;
 
-    this._minHeight = typeof minHeight === 'string' ? estimateElementHeight(itemContainer, minHeight) : minHeight;
+    this._estimateHeight = typeof estimateHeight === 'string' ? estimateElementHeight(itemContainer, estimateHeight) : estimateHeight;
     this._scrollTopOffset = this._scrollTop + itemContainerTop - scrollContainerTop;
     this._scrollContainerHeight = Math.max(scrollContainerHeight, maxHeight);
   }
@@ -387,7 +387,7 @@ export default class Radar {
 
     this._firstReached = false;
 
-    this._prependOffset = numPrepended * this.minHeight;
+    this._prependOffset = numPrepended * this._estimateHeight;
   }
 
   append() {
@@ -406,7 +406,7 @@ export default class Radar {
    * `prependOffset` exists because there are times when we need to do the following in this exact
    * order:
    *
-   * 1. Prepend, which means we need to adjust the scroll position by `minHeight * numPrepended`
+   * 1. Prepend, which means we need to adjust the scroll position by `estimateHeight * numPrepended`
    * 2. Calculate the items that will be displayed after the prepend, and move VCs around as
    *    necessary (`scheduleUpdate`).
    * 3. Actually add the amount prepended to `scrollContainer.scrollTop`
@@ -432,17 +432,6 @@ export default class Radar {
   }
 
   get totalComponents() {
-    const {
-      _scrollContainerHeight,
-      _minHeight,
-      bufferSize,
-      totalItems
-    } = this;
-
-    // The total number of components is determined by the minimum number required to span the
-    // container plus its buffers. Combined with the above rendering strategy this is fairly
-    // performant, even if mean item size is above the minimum.
-    const calculatedComponents = Math.ceil(_scrollContainerHeight / _minHeight) + 1 + (bufferSize * 2);
-    return Math.min(totalItems, calculatedComponents);
+    return Math.min(this.totalItems, (this._lastItemIndex - this._firstItemIndex) + 1);
   }
 }

@@ -19,7 +19,7 @@ export default
   // Can be an integer, but also attempts to work
   // with em, rem, px, and percentage values for things
   // like flex.
-  minHeight: null,
+  estimateHeight: null,
 
 // performance
 
@@ -45,7 +45,7 @@ export default
   // collection. Represents a static number of components
   // that will be added, such that:
   //
-  // numComponents === Math.ceil(containerHeight / minHeight) + (bufferSize * 2) + 1
+  // numComponents === Math.ceil(containerHeight / estimateHeight) + (bufferSize * 2) + 1
   bufferSize: 0,
 
 // actions

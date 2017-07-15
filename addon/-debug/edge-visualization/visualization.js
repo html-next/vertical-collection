@@ -6,7 +6,7 @@ const SYS_WIDTH = 250;
 export default class Visualization {
   constructor(component) {
     this.component = component;
-    this.minimumMovement = Math.floor(component.get('_minHeight') / 2);
+    this.minimumMovement = Math.floor(component.get('_estimateHeight') / 2);
     this.radar = component._radar;
     this.satellites = [];
     this.cache = [];

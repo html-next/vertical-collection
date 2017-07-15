@@ -1,7 +1,7 @@
 import { default as Radar, NULL_INDEX } from './radar';
 import SkipList from '../skip-list';
 
-import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
+import { stripInProduction } from 'vertical-collection/-debug/helpers';
 
 export default class DynamicRadar extends Radar {
   constructor(parentToken, initialItems, initialRenderCount, startingIndex) {
@@ -22,12 +22,6 @@ export default class DynamicRadar extends Radar {
     });
   }
 
-  init(...args) {
-    super.init(...args);
-
-    this.skipList = new SkipList(this.totalItems, this.minHeight);
-  }
-
   destroy() {
     super.destroy();
 
@@ -36,10 +30,12 @@ export default class DynamicRadar extends Radar {
 
   _updateIndexes() {
     const {
+      bufferSize,
       skipList,
+      visibleTop,
       visibleMiddle,
+      visibleBottom,
       totalItems,
-      totalComponents,
 
       _prevFirstItemIndex
     } = this;
@@ -53,9 +49,6 @@ export default class DynamicRadar extends Radar {
       return;
     }
 
-    const { values } = skipList;
-    const maxIndex = totalItems - 1;
-
     // Don't measure if the radar has just been instantiated or reset, as we are rendering with a
     // completely new set of items and won't get an accurate measurement until after they render the
     // first time.
@@ -63,31 +56,42 @@ export default class DynamicRadar extends Radar {
       this._measure(_prevFirstItemIndex);
     }
 
+    const { total, values } = skipList;
+
     let {
       totalBefore,
-      totalAfter,
       index: middleItemIndex
     } = this.skipList.find(visibleMiddle);
 
-    let firstItemIndex = middleItemIndex - Math.floor((totalComponents - 1) / 2);
-    let lastItemIndex = middleItemIndex + Math.ceil((totalComponents - 1) / 2);
+    // Going down, totalBeforeBottom tracks the bottom of the current item, so add the height
+    // of the initial item
+    let totalBeforeBottom =  totalBefore + values[middleItemIndex];
 
-    if (firstItemIndex < 0) {
-      firstItemIndex = 0;
-      lastItemIndex = totalComponents - 1;
+    let firstItemIndex = middleItemIndex;
+    let lastItemIndex = middleItemIndex;
+
+    const maxIndex = totalItems - 1;
+
+    // Get exact indexes based on current measurements
+    while (totalBefore > visibleTop && firstItemIndex > 0) {
+      firstItemIndex--;
+      totalBefore -= values[firstItemIndex];
     }
 
-    if (lastItemIndex > maxIndex) {
-      lastItemIndex = maxIndex;
-      firstItemIndex = maxIndex - (totalComponents - 1);
+    while (totalBeforeBottom < visibleBottom && lastItemIndex < maxIndex) {
+      lastItemIndex++;
+      totalBeforeBottom += values[lastItemIndex];
     }
 
-    for (let i = middleItemIndex - 1; i >= firstItemIndex; i--) {
-      totalBefore -= values[i];
+    // Add buffers
+    for (let i = bufferSize; i > 0 && firstItemIndex > 0; i--) {
+      firstItemIndex--;
+      totalBefore -= values[firstItemIndex];
     }
 
-    for (let i = middleItemIndex; i <= lastItemIndex; i++) {
-      totalAfter -= values[i];
+    for (let i = bufferSize; i > 0 && lastItemIndex < maxIndex; i--) {
+      lastItemIndex++;
+      totalBeforeBottom += values[lastItemIndex];
     }
 
     const itemDelta = (_prevFirstItemIndex !== null) ? firstItemIndex - _prevFirstItemIndex : 0;
@@ -108,7 +112,7 @@ export default class DynamicRadar extends Radar {
     this._firstItemIndex = firstItemIndex;
     this._lastItemIndex = lastItemIndex;
     this._totalBefore = totalBefore;
-    this._totalAfter = totalAfter;
+    this._totalAfter = total - totalBeforeBottom;
   }
 
   _measure(firstItemIndex, measureLimit = null) {
@@ -141,8 +145,6 @@ export default class DynamicRadar extends Radar {
       } else {
         margin = currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore;
       }
-
-      assert(`item height + margin must always be above the minimum value ${this.minHeight}px. The item at index ${itemIndex} measured: ${currentItemHeight + margin}`, currentItemHeight + margin >= this.minHeight);
 
       const itemDelta = skipList.set(itemIndex, currentItemHeight + margin);
 
@@ -235,6 +237,6 @@ export default class DynamicRadar extends Radar {
   reset() {
     super.reset();
 
-    this.skipList = new SkipList(this.totalItems, this.minHeight);
+    this.skipList = new SkipList(this.totalItems, this.estimateHeight);
   }
 }

@@ -107,13 +107,12 @@ export default class SkipList {
     const numLayers = layers.length;
 
     if (length === 0) {
-      return { index: 0, totalBefore: 0, totalAfter: 0 };
+      return { index: 0, totalBefore: 0 };
     }
 
     let i, layer, left, leftIndex, rightIndex;
     let index = 0;
     let totalBefore = 0;
-    let totalAfter = 0;
 
     targetValue = Math.min(total - 1, targetValue);
 
@@ -139,12 +138,10 @@ export default class SkipList {
 
     index = index / 2;
 
-    totalAfter = total - totalBefore;
-
     assert('index must be a number', typeof index === 'number');
     assert('index must be within bounds', index >= 0 && index < this.values.length);
 
-    return { index, totalBefore, totalAfter };
+    return { index, totalBefore };
   }
 
   set(index, value) {

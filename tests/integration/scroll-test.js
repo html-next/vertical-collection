@@ -79,9 +79,9 @@ testScenarios(
 
     this.on('firstVisibleChanged', (item, index) => {
       if (count === 0) {
-        assert.equal(index, 0, 'the first visible item should be item 0');
+        assert.equal(index, 0, 'the first visible item is correct');
       } else {
-        assert.equal(index, 10, 'after scroll the first visible item should be item 10');
+        assert.equal(index, 10, 'after scroll the first visible item is correct');
       }
       count++;
       called();
@@ -102,9 +102,9 @@ testScenarios(
 
     this.on('lastVisibleChanged', (item, index) => {
       if (count === 0) {
-        assert.equal(index, 10, 'the first last visible changed should be item 10');
+        assert.equal(index, 9, 'the first last visible changed is correct');
       } else {
-        assert.equal(index, 20, 'after scroll the last visible change should be item 20');
+        assert.equal(index, 19, 'after scroll the last visible change is correct');
       }
       count++;
       called();
@@ -124,7 +124,7 @@ testScenarios(
 
     this.on('firstReached', (item, index) => {
       if (index === 0) {
-        assert.ok(true, 'the firstReached item should be item 0');
+        assert.ok(true, 'the firstReached item is correct');
         called();
       }
     });
@@ -141,7 +141,7 @@ testScenarios(
 
     this.on('lastReached', (item, index) => {
       if (index === 49) {
-        assert.ok(true, 'the lastReached item should be item 49');
+        assert.ok(true, 'the lastReached item is correct');
         called();
       }
     });
@@ -153,14 +153,14 @@ testScenarios(
 testScenarios(
   'Sends the firstReached action after prepend',
   standardTemplate,
-  standardScenariosFor(getNumbers(0, 20), { firstReached: 'firstReached' }),
+  standardScenariosFor(getNumbers(0, 20), { firstReached: 'firstReached', bufferSize: 5 }),
 
   function(assert) {
     assert.expect(0);
     const called = assert.async(2);
 
     this.on('firstReached', ({ number }) => {
-      prepend(this, getNumbers(number - 5, 5));
+      prepend(this, getNumbers(number - 3, 5));
       called();
     });
   }
@@ -169,14 +169,14 @@ testScenarios(
 testScenarios(
   'Sends the lastReached action after append',
   standardTemplate,
-  standardScenariosFor(getNumbers(0, 10), { lastReached: 'lastReached' }),
+  standardScenariosFor(getNumbers(0, 10), { lastReached: 'lastReached', bufferSize: 5 }),
 
   function(assert) {
     assert.expect(0);
     const called = assert.async(2);
 
     this.on('lastReached', ({ number }) => {
-      append(this, getNumbers(number + 1, 8));
+      append(this, getNumbers(number + 1, 5));
       called();
     });
   }
@@ -244,8 +244,9 @@ testScenarios(
       {{#vertical-collection ${'items'}
         containerSelector=".scrollable"
         tagName="tbody"
-        minHeight=37
+        estimateHeight=37
         staticHeight=staticHeight
+        bufferSize=0
 
         as |item i|}}
         <tr>
@@ -285,17 +286,18 @@ testScenarios(
 );
 
 test('Collection measures correctly when it\'s scroll parent has scrolled', function(assert) {
-  assert.expect(0);
+  assert.expect(1);
   this.set('items', Ember.A(getNumbers(0, 100)));
 
   this.render(hbs`
   <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
     <div style="height: 400px; width: 100px;" class="scroll-child scrollable">
       {{#vertical-collection ${'items'}
-        minHeight=20
+        estimateHeight=20
+        bufferSize=0
 
         as |item i|}}
-        <div style="height:20px;">
+        <div style="height:40px;">
           {{item.number}} {{i}}
         </div>
       {{/vertical-collection}}
@@ -308,8 +310,11 @@ test('Collection measures correctly when it\'s scroll parent has scrolled', func
 
   return wait().then(() => {
     scrollParent.scrollTop(200);
-    scrollChild.scrollTop(600);
-    // An assertion will be thrown if the scroll parent affects the measurement
+    scrollChild.scrollTop(400);
+
+    return wait();
+  }).then(() => {
+    assert.equal(scrollChild.find('div:first').html().trim(), '10 10', 'correct first item rendered');
   });
 });
 
@@ -321,7 +326,7 @@ test('Can scroll to last item when actual item sizes are significantly larger th
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      minHeight=10
+      estimateHeight=10
 
       as |item i|}}
       <div style="height: 100px;">{{item.number}} {{i}}</div>

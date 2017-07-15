@@ -29,7 +29,7 @@ testScenarios(
 
     return wait().then(() => {
       assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly before prepend');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '20 20', 'last item rendered correctly before prepnd');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly before prepnd');
       assert.equal(scrollContainer.scrollTop(), 0, 'scrollTop is correct before prepend');
       assert.equal(containerHeight(itemContainer), 2000, 'itemContainer height is correct before prepend');
 
@@ -37,8 +37,8 @@ testScenarios(
 
       return wait();
     }).then(() => {
-      assert.equal(scrollContainer.find('div:first').text().trim(), '-5 15', 'first item rendered correctly after prepend');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '15 35', 'last item rendered correctly after prepend');
+      assert.equal(scrollContainer.find('div:first').text().trim(), '0 20', 'first item rendered correctly after prepend');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '9 29', 'last item rendered correctly after prepend');
       assert.equal(scrollContainer.scrollTop(), 400, 'scrollTop is correct after prepend');
       assert.equal(containerHeight(itemContainer), 2400, 'itemContainer height is correct after prepend');
     });
@@ -58,7 +58,7 @@ testScenarios(
 
     return wait().then(() => {
       assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly before append');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '20 20', 'last item rendered correctly before append');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly before append');
       assert.equal(scrollContainer.scrollTop(), 0, 'scrollTop is correct before append');
       assert.equal(containerHeight(itemContainer), 2000, 'itemContainer height is correct after append');
 
@@ -67,7 +67,7 @@ testScenarios(
       return wait();
     }).then(() => {
       assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly after append');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '20 20', 'last item rendered correctly after append');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly after append');
       assert.equal(scrollContainer.scrollTop(), 0, 'scrollTop is correct after append');
       assert.equal(containerHeight(itemContainer), 2400, 'itemContainer height is correct after append');
     });
@@ -77,28 +77,25 @@ testScenarios(
 testScenarios(
   'Collection prepends correctly if prepend would cause more VCs to be shown',
   standardTemplate,
-  scenariosFor(getNumbers(0, 20)),
+  scenariosFor(getNumbers(0, 10), { bufferSize: 5 }),
 
   function(assert) {
-    assert.expect(8);
+    assert.expect(6);
 
     const scrollContainer = this.$('.scrollable');
-    const itemContainer = this.$('vertical-collection');
 
     return wait().then(() => {
       assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly before prepend');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '19 19', 'last item rendered correctly before prepend');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly before prepend');
       assert.equal(scrollContainer.scrollTop(), 0, 'scrollTop is correct before prepend');
-      assert.equal(containerHeight(itemContainer), 400, 'itemContainer height is correct before prepend');
 
-      prepend(this, getNumbers(-20, 20));
+      prepend(this, getNumbers(-5, 5));
 
       return wait();
     }).then(() => {
-      assert.equal(scrollContainer.find('div:first').text().trim(), '-5 15', 'first item rendered correctly after prepend');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '15 35', 'last item rendered correctly after prepend');
-      assert.equal(scrollContainer.scrollTop(), 400, 'scrollTop is correct after prepend');
-      assert.equal(containerHeight(itemContainer), 800, 'itemContainer height is correct after prepend');
+      assert.equal(scrollContainer.find('div:first').text().trim(), '-5 0', 'first item rendered correctly after prepend');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '9 14', 'last item rendered correctly after prepend');
+      assert.equal(scrollContainer.scrollTop(), 100, 'scrollTop is correct after prepend');
     });
   }
 );
@@ -106,28 +103,25 @@ testScenarios(
 testScenarios(
   'Collection appends correctly if append would cause more VCs to be shown',
   standardTemplate,
-  scenariosFor(getNumbers(0, 10)),
+  scenariosFor(getNumbers(0, 5)),
 
   function(assert) {
-    assert.expect(8);
+    assert.expect(6);
 
     const scrollContainer = this.$('.scrollable');
-    const itemContainer = this.$('vertical-collection');
 
     return wait().then(() => {
       assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly before append');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly before append');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '4 4', 'last item rendered correctly before append');
       assert.equal(scrollContainer.scrollTop(), 0, 'scrollTop is correct before append');
-      assert.equal(containerHeight(itemContainer), 200, 'itemContainer height is correct before append');
 
-      append(this, getNumbers(10, 20));
+      append(this, getNumbers(5, 5));
 
       return wait();
     }).then(() => {
       assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly after append');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '20 20', 'last item rendered correctly after append');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly after append');
       assert.equal(scrollContainer.scrollTop(), 0, 'scrollTop is correct after append');
-      assert.equal(containerHeight(itemContainer), 600, 'itemContainer height is correct after append');
     });
   }
 );
@@ -135,7 +129,7 @@ testScenarios(
 testScenarios(
   'Collection can shrink number of items if would cause fewer VCs to be shown',
   standardTemplate,
-  scenariosFor(getNumbers(0, 100)),
+  scenariosFor(getNumbers(0, 10)),
 
   function(assert) {
     assert.expect(6);
@@ -143,17 +137,17 @@ testScenarios(
     const scrollContainer = this.$('.scrollable');
 
     return wait().then(() => {
-      assert.equal(scrollContainer.find('div').length, 21, 'correct number of VCs rendered before reset');
+      assert.equal(scrollContainer.find('div').length, 10, 'correct number of VCs rendered before reset');
       assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly before reset');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '20 20', 'last item rendered correctly before reset');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly before reset');
 
-      this.set('items', getNumbers(0, 10));
+      this.set('items', getNumbers(0, 5));
 
       return wait();
     }).then(() => {
-      assert.equal(scrollContainer.find('div').length, 10, 'correct number of VCs rendered after reset');
+      assert.equal(scrollContainer.find('div').length, 5, 'correct number of VCs rendered after reset');
       assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly after reset');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly after reset');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '4 4', 'last item rendered correctly after reset');
     });
   }
 );
@@ -161,7 +155,7 @@ testScenarios(
 testScenarios(
   'Collection can shrink number of items if would cause fewer VCs to be shown and scroll would change',
   standardTemplate,
-  scenariosFor(getNumbers(0, 100)),
+  scenariosFor(getNumbers(0, 20)),
 
   function(assert) {
     assert.expect(6);
@@ -169,21 +163,21 @@ testScenarios(
     const scrollContainer = this.$('.scrollable');
 
     return wait().then(() => {
-      scrollContainer.scrollTop(1000);
+      scrollContainer.scrollTop(200);
 
       return wait();
     }).then(() => {
-      assert.equal(scrollContainer.find('div').length, 21, 'correct number of VCs rendered before reset');
-      assert.equal(scrollContainer.find('div:first').text().trim(), '45 45', 'first item rendered correctly before reset');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '65 65', 'last item rendered correctly before reset');
+      assert.equal(scrollContainer.find('div').length, 10, 'correct number of VCs rendered before reset');
+      assert.equal(scrollContainer.find('div:first').text().trim(), '10 10', 'first item rendered correctly before reset');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '19 19', 'last item rendered correctly before reset');
 
-      this.set('items', getNumbers(0, 10));
+      this.set('items', getNumbers(0, 5));
 
       return wait();
     }).then(() => {
-      assert.equal(scrollContainer.find('div').length, 10, 'correct number of VCs rendered after reset');
+      assert.equal(scrollContainer.find('div').length, 5, 'correct number of VCs rendered after reset');
       assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly before reset');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly before reset');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '4 4', 'last item rendered correctly before reset');
     });
   }
 );
@@ -191,7 +185,7 @@ testScenarios(
 testScenarios(
   'Collection can shrink number of items to empty collection',
   standardTemplate,
-  scenariosFor(getNumbers(0, 100)),
+  scenariosFor(getNumbers(0, 10)),
 
   function(assert) {
     assert.expect(4);
@@ -199,9 +193,9 @@ testScenarios(
     const scrollContainer = this.$('.scrollable');
 
     return wait().then(() => {
-      assert.equal(scrollContainer.find('div').length, 21, 'correct number of VCs rendered before reset');
+      assert.equal(scrollContainer.find('div').length, 10, 'correct number of VCs rendered before reset');
       assert.equal(scrollContainer.find('div:first').text().trim(), '0 0', 'first item rendered correctly before reset');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '20 20', 'last item rendered correctly before reset');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '9 9', 'last item rendered correctly before reset');
 
       emptyArray(this);
 
@@ -215,7 +209,7 @@ testScenarios(
 testScenarios(
   'Collection can shrink number of items to empty collection (after scroll has changed)',
   standardTemplate,
-  scenariosFor(getNumbers(0, 100)),
+  scenariosFor(getNumbers(0, 20)),
 
   function(assert) {
     assert.expect(4);
@@ -223,13 +217,13 @@ testScenarios(
     const scrollContainer = this.$('.scrollable');
 
     return wait().then(() => {
-      scrollContainer.scrollTop(1000);
+      scrollContainer.scrollTop(200);
 
       return wait();
     }).then(() => {
-      assert.equal(scrollContainer.find('div').length, 21, 'correct number of VCs rendered before reset');
-      assert.equal(scrollContainer.find('div:first').text().trim(), '45 45', 'first item rendered correctly before reset');
-      assert.equal(scrollContainer.find('div:last').text().trim(), '65 65', 'last item rendered correctly before reset');
+      assert.equal(scrollContainer.find('div').length, 10, 'correct number of VCs rendered before reset');
+      assert.equal(scrollContainer.find('div:first').text().trim(), '10 10', 'first item rendered correctly before reset');
+      assert.equal(scrollContainer.find('div:last').text().trim(), '19 19', 'last item rendered correctly before reset');
 
       emptyArray(this);
 
@@ -272,7 +266,8 @@ test('Dynamic collection maintains state if the same list is passed in twice', f
   this.render(hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
     {{#vertical-collection ${'items'}
-      minHeight=20
+      estimateHeight=20
+      bufferSize=0
 
       as |item i|}}
       <div style="height:40px;">
@@ -287,7 +282,7 @@ test('Dynamic collection maintains state if the same list is passed in twice', f
 
   return wait().then(() => {
     // Occlude a single item
-    scrollContainer.scrollTop(140);
+    scrollContainer.scrollTop(40);
 
     return wait();
   }).then(() => {

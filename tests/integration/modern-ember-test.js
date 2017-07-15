@@ -16,7 +16,7 @@ if (SUPPORTS_INVERSE_BLOCK) {
 
     this.render(hbs`
       {{#vertical-collection ${'items'}
-        minHeight=20
+        estimateHeight=20
         staticHeight=true
       }}
         {{else}}
