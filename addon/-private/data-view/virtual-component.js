@@ -20,7 +20,7 @@ export default class VirtualComponent {
 
     this.rendered = false;
 
-    // In older versions of Ember, binding anything on an object in the template
+    // In older versions of Ember/IE, binding anything on an object in the template
     // adds observers which creates __ember_meta__
     this.__ember_meta__ = null; // eslint-disable-line camelcase
 
@@ -38,16 +38,35 @@ export default class VirtualComponent {
   }
 
   getBoundingClientRect() {
-    const range = document.createRange();
+    let { upperBound, lowerBound } = this;
 
-    range.setStartBefore(this.upperBound);
-    range.setEndAfter(this.lowerBound);
+    let top = Infinity;
+    let bottom = -Infinity;
 
-    const rect = range.getBoundingClientRect();
+    while (upperBound !== lowerBound) {
+      upperBound = upperBound.nextSibling;
 
-    range.detach();
+      if (upperBound instanceof Element) {
+        top = Math.min(top, upperBound.getBoundingClientRect().top);
+        bottom = Math.max(bottom, upperBound.getBoundingClientRect().bottom);
+      }
 
-    return rect;
+      stripInProduction(() => {
+        if (upperBound instanceof Element) {
+          return;
+        }
+
+        const text = upperBound.textContent;
+
+        assert(`All content inside of vertical-collection must be wrapped in an element. Detected a text node with content: ${text}`, text === '' || text.match(/^\s+$/));
+      });
+    }
+
+    assert('Items in a vertical collection require atleast one element in them', top !== Infinity && bottom !== -Infinity);
+
+    const height = bottom - top;
+
+    return { top, bottom, height };
   }
 
   recycle(newContent, newIndex) {

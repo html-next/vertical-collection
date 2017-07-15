@@ -5,6 +5,7 @@ import { Token, scheduler } from '../../scheduler/index';
 import VirtualComponent from '../virtual-component';
 import insertRangeBefore from '../utils/insert-range-before';
 import objectAt from '../utils/object-at';
+import roundTo from '../utils/round-to';
 
 import estimateElementHeight from '../../utils/element/estimate-element-height';
 
@@ -81,6 +82,10 @@ export default class Radar {
     this.orderedComponents = orderedComponents;
     this._componentPool = [];
     this._prependComponentPool = [];
+
+    // In older versions of Ember/IE, binding anything on an object in the template
+    // adds observers which creates __ember_meta__
+    this.__ember_meta__ = null; // eslint-disable-line camelcase
   }
 
   destroy() {
@@ -201,8 +206,8 @@ export default class Radar {
     const maxHeight = scrollContainer.style ? parseInt(scrollContainer.style.maxHeight || 0) : 0;
 
     this._estimateHeight = typeof estimateHeight === 'string' ? estimateElementHeight(itemContainer, estimateHeight) : estimateHeight;
-    this._scrollTopOffset = this._scrollTop + itemContainerTop - scrollContainerTop;
-    this._scrollContainerHeight = Math.max(scrollContainerHeight, maxHeight);
+    this._scrollTopOffset = roundTo(this._scrollTop + itemContainerTop - scrollContainerTop);
+    this._scrollContainerHeight = Math.max(roundTo(scrollContainerHeight), maxHeight);
   }
 
   /*

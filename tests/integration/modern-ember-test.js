@@ -25,7 +25,7 @@ if (SUPPORTS_INVERSE_BLOCK) {
     `);
     return wait().then(() => {
       const el = this.$('vertical-collection');
-      assert.equal(el.html().includes('Foobar'), true);
+      assert.equal(el.html().indexOf('Foobar') !== -1, true);
     });
   });
 }

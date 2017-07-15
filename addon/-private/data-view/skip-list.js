@@ -24,15 +24,12 @@ import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
  * traverse to get the total value before and after the final index.
  */
 
-function fill(array, value, start, end) {
+function fill(array, value, start = 0, end = array.length) {
   if (typeof array.fill === 'function') {
     array.fill(value, start, end);
   } else {
-    let s = start || 0;
-    const e = end || array.length;
-
-    for (; s < e; s++) {
-      array[s] = value;
+    for (; start < end; start++) {
+      array[start] = value;
     }
 
     return array;

@@ -133,14 +133,14 @@ export const standardTemplate = hbs`
 export function mergeScenarios(...scenariosToCombine) {
   const scenarios = {};
 
-  Object.assign(scenarios, ...scenariosToCombine);
+  Ember.merge(scenarios, ...scenariosToCombine);
 
   return scenarios;
 }
 
 function assignOptions(scenarios, options) {
   for (let scenario in scenarios) {
-    Object.assign(scenarios[scenario], options);
+    Ember.merge(scenarios[scenario], options);
   }
 }
 
