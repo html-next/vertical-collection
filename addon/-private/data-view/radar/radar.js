@@ -203,7 +203,8 @@ export default class Radar {
       height: scrollContainerHeight
     } = scrollContainer.getBoundingClientRect();
 
-    const maxHeight = scrollContainer.style ? parseInt(scrollContainer.style.maxHeight || 0) : 0;
+    let maxHeight = scrollContainer instanceof Element ? parseInt(window.getComputedStyle(scrollContainer).maxHeight) : 0;
+    maxHeight = isNaN(maxHeight) ? 0 : maxHeight;
 
     this._estimateHeight = typeof estimateHeight === 'string' ? estimateElementHeight(itemContainer, estimateHeight) : estimateHeight;
     this._scrollTopOffset = roundTo(this._scrollTop + itemContainerTop - scrollContainerTop);

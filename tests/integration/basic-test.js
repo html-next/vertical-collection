@@ -290,6 +290,33 @@ test('The collection renders the initialRenderCount correctly if the count is mo
   assert.equal(find('vertical-item').textContent.trim(), '0 0', 'correct first item rendered');
 });
 
+testScenarios(
+  'The collection renders based on max height of the scroll parent',
+  simpleScenariosFor(getNumbers(0, 10)),
+
+  hbs`
+    <div class="scrollable with-max-height">
+      <div>
+        {{#vertical-collection ${'items'}
+          containerSelector=".scrollable"
+          estimateHeight=20
+          staticHeight=true
+          bufferSize=0
+
+          as |item i|}}
+          <vertical-item style="height: 20px">
+            {{item.number}} {{i}}
+          </vertical-item>
+        {{/vertical-collection}}
+      </div>
+    </div>
+  `,
+
+  function(assert) {
+    assert.equal(findAll('vertical-item').length, 10);
+  }
+);
+
 /*
 test("The Collection Reveals it's children when `renderAllInitially` is true.", function(assert) {
   assert.expect(1);
