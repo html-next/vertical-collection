@@ -1,11 +1,11 @@
 export function containerHeight(itemContainer) {
-  return itemContainer.outerHeight();
+  return itemContainer.getBoundingClientRect().height;
 }
 
 export function paddingBefore(itemContainer) {
-  return itemContainer.find('occluded-content:first').outerHeight();
+  return itemContainer.firstElementChild.getBoundingClientRect().height;
 }
 
 export function paddingAfter(itemContainer) {
-  return itemContainer.find('occluded-content:last').outerHeight();
+  return itemContainer.lastElementChild.getBoundingClientRect().height;
 }

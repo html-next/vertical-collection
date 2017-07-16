@@ -113,7 +113,7 @@ export default class DynamicRadar extends Radar {
     this._firstItemIndex = firstItemIndex;
     this._lastItemIndex = lastItemIndex;
     this._totalBefore = totalBefore;
-    this._totalAfter = total - totalBeforeBottom;
+    this._totalAfter = Math.max(total - totalBeforeBottom, 0);
   }
 
   _measure(firstItemIndex, measureLimit = null) {

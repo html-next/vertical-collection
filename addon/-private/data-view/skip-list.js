@@ -1,4 +1,5 @@
 import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
+import roundTo from './utils/round-to';
 
 /*
  * `SkipList` is a data structure designed with two main uses in mind:
@@ -148,7 +149,7 @@ export default class SkipList {
 
     const { layers } = this;
     const oldValue = layers[layers.length - 1][index];
-    const delta = value - oldValue;
+    const delta = roundTo(value - oldValue);
 
     if (delta === 0) {
       return delta;
