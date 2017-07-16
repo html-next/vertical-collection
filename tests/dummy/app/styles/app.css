@@ -39,13 +39,17 @@ nav a {
 
 .table-wrapper, .scrollable {
   display: block;
-  height: 1000px;
-  max-height: 500px;
+  height: 500px;
   overflow: scroll;
   -webkit-overflow-scrolling: touch;
   overflow-scrolling: touch;
   position: relative;
   background: #fff;
+}
+
+.scrollable.with-max-height {
+  height: initial;
+  max-height: 200px;
 }
 
 .table-wrapper.dark, .bg-dark {
