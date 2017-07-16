@@ -1,3 +1,11 @@
+import Ember from 'ember';
+import waitForRender from './wait-for-render';
+
+const {
+  A,
+  run
+} = Ember;
+
 export function prepend(context, itemsToPrepend) {
   const items = context.get('items');
 
@@ -6,6 +14,8 @@ export function prepend(context, itemsToPrepend) {
   } else {
     context.set('items', itemsToPrepend.concat(items));
   }
+
+  return waitForRender();
 }
 
 export function append(context, itemsToAppend) {
@@ -16,14 +26,32 @@ export function append(context, itemsToAppend) {
   } else {
     context.set('items', items.concat(itemsToAppend));
   }
+
+  return waitForRender();
 }
 
 export function emptyArray(context) {
   const items = context.get('items');
 
-  if (items.clear) {
-    items.clear();
+  run(() => {
+    if (items.clear) {
+      items.clear();
+    } else {
+      context.set('items', []);
+    }
+  });
+
+  return waitForRender();
+}
+
+export function replaceArray(context, items) {
+  const oldItems = context.get('items');
+
+  if (Ember.Array.detect(oldItems)) {
+    context.set('items', A(items));
   } else {
-    context.set('items', []);
+    context.set('items', items);
   }
+
+  return waitForRender();
 }

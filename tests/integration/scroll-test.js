@@ -1,11 +1,13 @@
-import { moduleForComponent, test } from 'ember-qunit';
+import { moduleForComponent } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
-import Ember from 'ember';
+
+import { find, scrollTo } from 'ember-native-dom-helpers';
 
 import getNumbers from 'dummy/lib/get-numbers';
-import wait from 'dummy/tests/helpers/wait';
+import waitForRender from 'dummy/tests/helpers/wait-for-render';
 import {
-  default as testScenarios,
+  testScenarios,
+  dynamicSimpleScenarioFor,
   scenariosFor,
   standardScenariosFor,
   standardTemplate
@@ -19,61 +21,47 @@ moduleForComponent('vertical-collection', 'Integration | Scroll Tests', {
 
 testScenarios(
   'Setting renderFromLast starts at the bottom of the collection',
-  standardTemplate,
   standardScenariosFor(getNumbers(0, 50), { renderFromLast: true }),
+  standardTemplate,
 
   function(assert) {
     assert.expect(1);
 
-    const scrollable = this.$('.scrollable');
-
-    return wait()
-      .then(() => {
-        assert.equal(scrollable.find('div:last').text().trim(), '49 49', 'the last item in the list should be rendered');
-      });
+    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '49 49', 'the last item in the list should be rendered');
   }
 );
 
 testScenarios(
   'Setting idForFirstItem starts it with the first item at the top',
-  standardTemplate,
   standardScenariosFor(getNumbers(0, 50), { idForFirstItem: '25', key: '@index' }),
+  standardTemplate,
 
   function(assert) {
     assert.expect(1);
 
-    const scrollable = this.$('.scrollable');
-
-    return wait()
-      .then(() => {
-        assert.equal(scrollable.scrollTop(), 500, 'the scroll container offset is correct');
-      });
+    assert.equal(find('.scrollable').scrollTop, 500, 'the scroll container offset is correct');
   }
 );
 
 testScenarios(
   'Setting renderFromLast and idForFirstItem starts it with the first item at the bottom',
-  standardTemplate,
   standardScenariosFor(getNumbers(0, 50), { renderFromLast: true, idForFirstItem: '25', key: '@index' }),
+  standardTemplate,
 
   function(assert) {
     assert.expect(1);
 
-    const scrollable = this.$('.scrollable');
-
-    return wait()
-      .then(() => {
-        assert.equal(scrollable.scrollTop(), 320, 'the scroll container offset is correct');
-      });
+    assert.equal(find('.scrollable').scrollTop, 320, 'the scroll container offset is correct');
   }
 );
 
 testScenarios(
   'Sends the firstVisibleChanged action',
-  standardTemplate,
   scenariosFor(getNumbers(0, 50), { firstVisibleChanged: 'firstVisibleChanged' }),
+  standardTemplate,
 
-  function(assert) {
+  false, // Run test function before render
+  async function(assert) {
     const called = assert.async(2);
     let count = 0;
 
@@ -87,16 +75,18 @@ testScenarios(
       called();
     });
 
-    return wait().then(() => this.$('.scrollable').scrollTop(200));
+    await waitForRender();
+    await scrollTo('.scrollable', 0, 200);
   }
 );
 
 testScenarios(
   'Sends the lastVisibleChanged action',
-  standardTemplate,
   scenariosFor(getNumbers(0, 50), { lastVisibleChanged: 'lastVisibleChanged' }),
+  standardTemplate,
 
-  function(assert) {
+  false, // Run test function before render
+  async function(assert) {
     const called = assert.async(2);
     let count = 0;
 
@@ -110,51 +100,54 @@ testScenarios(
       called();
     });
 
-    return wait().then(() => this.$('.scrollable').scrollTop(200));
+    await waitForRender();
+    await scrollTo('.scrollable', 0, 200);
   }
 );
 
 testScenarios(
   'Sends the firstReached action',
-  standardTemplate,
   scenariosFor(getNumbers(0, 50), { firstReached: 'firstReached' }),
+  standardTemplate,
 
-  function(assert) {
+  false, // Run test function before render
+  async function(assert) {
     const called = assert.async(1);
 
     this.on('firstReached', (item, index) => {
-      if (index === 0) {
-        assert.ok(true, 'the firstReached item is correct');
-        called();
-      }
+      assert.equal(index, 0, 'the firstReached item is correct');
+      called();
     });
+
+    await waitForRender();
   }
 );
 
 testScenarios(
   'Sends the lastReached action',
-  standardTemplate,
   scenariosFor(getNumbers(0, 50), { lastReached: 'lastReached' }),
+  standardTemplate,
 
-  function(assert) {
+  false, // Run test function before render
+  async function(assert) {
     const called = assert.async(1);
 
     this.on('lastReached', (item, index) => {
-      if (index === 49) {
-        assert.ok(true, 'the lastReached item is correct');
-        called();
-      }
+      assert.equal(index, 49, 'the lastReached item is correct');
+      called();
     });
 
-    return wait().then(() => this.$('.scrollable').scrollTop(800));
+    await waitForRender();
+    await scrollTo('.scrollable', 0, 800);
   }
 );
 
 testScenarios(
   'Sends the firstReached action after prepend',
-  standardTemplate,
   standardScenariosFor(getNumbers(0, 20), { firstReached: 'firstReached', bufferSize: 5 }),
+  standardTemplate,
 
+  false, // Run test function before render
   function(assert) {
     assert.expect(0);
     const called = assert.async(2);
@@ -168,10 +161,11 @@ testScenarios(
 
 testScenarios(
   'Sends the lastReached action after append',
-  standardTemplate,
   standardScenariosFor(getNumbers(0, 10), { lastReached: 'lastReached', bufferSize: 5 }),
+  standardTemplate,
 
-  function(assert) {
+  false, // Run test function before render
+  async function(assert) {
     assert.expect(0);
     const called = assert.async(2);
 
@@ -179,15 +173,18 @@ testScenarios(
       append(this, getNumbers(number + 1, 5));
       called();
     });
+
+    await waitForRender();
   }
 );
 
 testScenarios(
   'Does not send the firstReached action twice for the same item',
-  standardTemplate,
   scenariosFor(getNumbers(0, 50), { firstReached: 'firstReached' }),
+  standardTemplate,
 
-  function(assert) {
+  false, // Run test function before render
+  async function(assert) {
     assert.expect(0);
     const called = assert.async(1);
 
@@ -195,24 +192,19 @@ testScenarios(
       called();
     });
 
-    return wait().then(() => {
-      this.$('.scrollable').scrollTop(800);
-
-      return wait();
-    }).then(() => {
-      this.$('.scrollable').scrollTop(0);
-
-      return wait();
-    });
+    await waitForRender();
+    await scrollTo('.scrollable', 0, 800);
+    await scrollTo('.scrollable', 0, 0);
   }
 );
 
 testScenarios(
   'Does not send the lastReached action twice for the same item',
-  standardTemplate,
   scenariosFor(getNumbers(0, 50), { lastReached: 'lastReached' }),
+  standardTemplate,
 
-  function(assert) {
+  false, // Run test function before render
+  async function(assert) {
     assert.expect(0);
     const called = assert.async(1);
 
@@ -220,24 +212,20 @@ testScenarios(
       called();
     });
 
-    return wait().then(() => {
-      this.$('.scrollable').scrollTop(800);
-
-      return wait();
-    }).then(() => {
-      this.$('.scrollable').scrollTop(0);
-
-      return wait();
-    }).then(() => {
-      this.$('.scrollable').scrollTop(800);
-
-      return wait();
-    });
+    await waitForRender();
+    await scrollTo('.scrollable', 0, 800);
+    await scrollTo('.scrollable', 0, 0);
+    await scrollTo('.scrollable', 0, 800);
   }
 );
 
 testScenarios(
   'Collection scrolls and measures correctly when parent is a table',
+  {
+    staticScenario: { items: getNumbers(0, 100), staticHeight: true },
+    dynamicScenario: { items: getNumbers(0, 100), staticHeight: false }
+  },
+
   hbs`
   <div style="height: 370px; width: 200px;" class="scrollable">
     <table class="table table-striped latest-data">
@@ -258,93 +246,61 @@ testScenarios(
   </div>
   `,
 
-  {
-    staticScenario: { items: getNumbers(0, 100), staticHeight: true },
-    dynamicScenario: { items: getNumbers(0, 100), staticHeight: false }
-  },
-
-  function(assert) {
+  async function(assert) {
     assert.expect(2);
 
-    const scrollContainer = this.$('.scrollable');
+    // Occlude one item
+    await scrollTo('.scrollable', 0, 38);
 
-    return wait().then(() => {
-      // Occlude one item
-      scrollContainer.scrollTop(38);
+    const tableTop = find('table').getBoundingClientRect().top;
 
-      return wait();
-    }).then(() => {
-      const tableTop = this.$('table')[0].getBoundingClientRect().top;
+    const row = find('tr:first-of-type');
+    const rowTop = row.getBoundingClientRect().top;
 
-      const row = this.$('tr:first');
-      const rowTop = row[0].getBoundingClientRect().top;
-
-      assert.equal(row.text().replace(/\s/g, ''), '11', 'correct first row is rendered');
-      assert.equal(rowTop - tableTop, 37, 'first row offset is correct');
-    });
+    assert.equal(row.textContent.replace(/\s/g, ''), '11', 'correct first row is rendered');
+    assert.equal(rowTop - tableTop, 37, 'first row offset is correct');
   }
 );
 
-test('Collection measures correctly when it\'s scroll parent has scrolled', function(assert) {
-  assert.expect(1);
-  this.set('items', Ember.A(getNumbers(0, 100)));
+testScenarios(
+  'Collection measures correctly when it\'s scroll parent has scrolled',
+  dynamicSimpleScenarioFor(getNumbers(0, 100)),
+  hbs`
+    <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
+      <div style="height: 400px; width: 100px;" class="scroll-child scrollable">
+        {{#vertical-collection ${'items'}
+          estimateHeight=20
+          bufferSize=0
 
-  this.render(hbs`
-  <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
-    <div style="height: 400px; width: 100px;" class="scroll-child scrollable">
-      {{#vertical-collection ${'items'}
-        estimateHeight=20
-        bufferSize=0
-
-        as |item i|}}
-        <div style="height:40px;">
-          {{item.number}} {{i}}
-        </div>
-      {{/vertical-collection}}
+          as |item i|}}
+          <div class="vertical-item" style="height:40px;">
+            {{item.number}} {{i}}
+          </div>
+        {{/vertical-collection}}
+      </div>
     </div>
-  </div>
-  `);
+  `,
 
-  const scrollChild = this.$('.scroll-child');
-  const scrollParent = this.$('.scroll-parent');
+  async function(assert) {
+    assert.expect(1);
 
-  return wait().then(() => {
-    scrollParent.scrollTop(200);
-    scrollChild.scrollTop(400);
+    await scrollTo('.scroll-parent', 0, 200);
+    await scrollTo('.scroll-child', 0, 400);
 
-    return wait();
-  }).then(() => {
-    assert.equal(scrollChild.find('div:first').html().trim(), '10 10', 'correct first item rendered');
-  });
-});
+    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '10 10', 'correct first item rendered');
+  }
+);
 
-test('Can scroll to last item when actual item sizes are significantly larger than default item size.', function(assert) {
-  assert.expect(1);
+testScenarios(
+  'Can scroll to last item when actual item sizes are significantly larger than default item size.',
+  dynamicSimpleScenarioFor(getNumbers(0, 50), { itemHeight: 100 }),
+  standardTemplate,
 
-  this.set('items', getNumbers(0, 50));
+  async function(assert) {
+    assert.expect(1);
 
-  this.render(hbs`
-  <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection ${'items'}
-      estimateHeight=10
+    await scrollTo('.scrollable', 0, 10000);
 
-      as |item i|}}
-      <div style="height: 100px;">{{item.number}} {{i}}</div>
-    {{/vertical-collection}}
-  </div>
-  `);
-
-  const scrollable = this.$('.scrollable');
-  const waitForScroll = new Ember.RSVP.Promise((resolve) => scrollable.scroll(resolve));
-
-  return wait()
-    .then(() => {
-      // Jump to bottom.
-      scrollable.scrollTop(scrollable.get(0).scrollHeight);
-    })
-    .then(waitForScroll)
-    .then(wait)
-    .then(() => {
-      assert.equal(scrollable.find('div:last').html(), '49 49', 'the last item in the list should be rendered');
-    });
-});
+    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '49 49', 'the last item in the list should be rendered');
+  }
+);

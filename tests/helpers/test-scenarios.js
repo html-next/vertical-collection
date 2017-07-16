@@ -3,6 +3,8 @@ import Ember from 'ember';
 import DS from 'ember-data';
 import hbs from 'htmlbars-inline-precompile';
 
+import waitForRender from 'dummy/tests/helpers/wait-for-render';
+
 const {
   A,
   ArrayProxy,
@@ -15,11 +17,11 @@ const {
   PromiseArray
 } = DS;
 
-export default function testScenarios(description, template, scenarios, testFn) {
+export function testScenarios(description, scenarios, template, testFn, preRenderTestFn) {
   for (const scenarioName in scenarios) {
     const scenario = scenarios[scenarioName];
 
-    test(`${description} | ${scenarioName}`, function(assert) {
+    test(`${description} | ${scenarioName}`, async function(assert) {
       for (let key in scenario) {
         const value = typeof scenario[key] === 'function' ? scenario[key]() : scenario[key];
         this.set(key, value);
@@ -27,83 +29,52 @@ export default function testScenarios(description, template, scenarios, testFn) 
 
       this.render(template);
 
-      return testFn.call(this, assert);
+      if (preRenderTestFn) {
+        await preRenderTestFn.call(this, assert);
+      } else {
+        await waitForRender();
+        await testFn.call(this, assert);
+      }
     });
   }
 }
 
-export function standardDynamicScenariosFor(items, options = { }) {
-  const scenarios = {
-    dynamicStandardArray: { items: items.slice() },
-    dynamicEmberArray: { items: A(items.slice()) },
-    dynamicArrayProxy: { items: ArrayProxy.create({ content: A(items.slice()) }) }
-  };
+export const dynamicSimpleScenarioFor = generateScenario('Dynamic Standard Array', {});
+export const dynamicEmberArrayScenarioFor = generateScenario('Dynamic Ember Array', {}, A);
+export const dynamicArrayProxyScenarioFor = generateScenario('Dynamic ArrayProxy', {}, createArrayProxy);
+export const dynamicPromiseArrayScenarioFor = generateScenario('Dynamic PromiseArray', {}, createPromiseArrayFunction);
 
-  assignOptions(scenarios, options);
+export const staticSimpleScenarioFor = generateScenario('Static Standard Array', { staticHeight: true });
+export const staticEmberArrayScenarioFor = generateScenario('Static Standard Array', { staticHeight: true }, A);
+export const staticArrayProxyScenarioFor = generateScenario('Static ArrayProxy', { staticHeight: true }, createArrayProxy);
+export const staticPromiseArrayScenarioFor = generateScenario('Static PromiseArray', { staticHeight: true }, createPromiseArrayFunction);
 
-  return scenarios;
-}
+export const simpleScenariosFor = mergeScenarioGenerators(
+  dynamicSimpleScenarioFor,
+  staticSimpleScenarioFor
+);
 
-export function promiseDynamicScenariosFor(items, options = { }) {
-  const scenarios = {
-    dynamicPromiseArray: {
-      items() {
-        return PromiseArray.create({ promise: new Promise((resolve) => setTimeout(() => resolve(A(items.slice())), 10)) });
-      }
-    }
-  };
+export const standardScenariosFor = mergeScenarioGenerators(
+  dynamicSimpleScenarioFor,
+  dynamicEmberArrayScenarioFor,
+  dynamicArrayProxyScenarioFor,
 
-  assignOptions(scenarios, options);
+  staticSimpleScenarioFor,
+  staticEmberArrayScenarioFor,
+  staticArrayProxyScenarioFor
+);
 
-  return scenarios;
-}
+export const scenariosFor = mergeScenarioGenerators(
+  dynamicSimpleScenarioFor,
+  dynamicEmberArrayScenarioFor,
+  dynamicArrayProxyScenarioFor,
+  dynamicPromiseArrayScenarioFor,
 
-export function standardStaticScenariosFor(items, options = { }) {
-  const scenarios = {
-    staticStandardArray: { items: items.slice(), staticHeight: true },
-    staticEmberArray: { items: A(items.slice()), staticHeight: true },
-    staticArrayProxy: { items: ArrayProxy.create({ content: A(items.slice()) }), staticHeight: true }
-  };
-
-  assignOptions(scenarios, options);
-
-  return scenarios;
-}
-
-export function promiseStaticScenariosFor(items, options = { }) {
-  const scenarios = {
-    staticPromiseArray: {
-      items() {
-        return PromiseArray.create({ promise: new Promise((resolve) => setTimeout(() => resolve(A(items.slice())), 10)) });
-      },
-      staticHeight: true
-    }
-  };
-
-  assignOptions(scenarios, options);
-
-  return scenarios;
-}
-
-export function dynamicScenariosFor(items, options) {
-  return mergeScenarios(standardDynamicScenariosFor(items, options), promiseDynamicScenariosFor(items, options));
-}
-
-export function staticScenariosFor(items, options) {
-  return mergeScenarios(standardStaticScenariosFor(items, options), promiseStaticScenariosFor(items, options));
-}
-
-export function standardScenariosFor(items, options) {
-  return mergeScenarios(standardDynamicScenariosFor(items, options), standardStaticScenariosFor(items, options));
-}
-
-export function promiseScenariosFor(items, options) {
-  return mergeScenarios(promiseDynamicScenariosFor(items, options), promiseStaticScenariosFor(items, options));
-}
-
-export function scenariosFor(items, options) {
-  return mergeScenarios(dynamicScenariosFor(items, options), staticScenariosFor(items, options));
-}
+  staticSimpleScenarioFor,
+  staticEmberArrayScenarioFor,
+  staticArrayProxyScenarioFor,
+  staticPromiseArrayScenarioFor
+);
 
 export const standardTemplate = hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
@@ -123,24 +94,43 @@ export const standardTemplate = hbs`
       key=key
 
       as |item i|}}
-      <div style={{html-safe (join-strings "height:" (either-or itemHeight (either-or estimateHeight 20)) "px;")}}>
+      <div
+        class="vertical-item"
+        style={{html-safe (join-strings "height:" (either-or itemHeight (either-or estimateHeight 20)) "px;")}}
+      >
         {{item.number}} {{i}}
       </div>
     {{/vertical-collection}}
   </div>
 `;
 
-export function mergeScenarios(...scenariosToCombine) {
-  const scenarios = {};
-
-  Ember.merge(scenarios, ...scenariosToCombine);
-
-  return scenarios;
+function createArrayProxy(items) {
+  return ArrayProxy.create({ content: A(items) });
 }
 
-function assignOptions(scenarios, options) {
-  for (let scenario in scenarios) {
-    Ember.merge(scenarios[scenario], options);
-  }
+function createPromiseArrayFunction(items) {
+  return function() {
+    const promise = new Promise((resolve) => setTimeout(() => resolve(A(items.slice())), 10));
+
+    return PromiseArray.create({ promise });
+  };
 }
 
+function generateScenario(name, defaultOptions, initializer) {
+  return function(baseItems, options) {
+    const items = initializer ? initializer(baseItems.slice()) : baseItems.slice();
+    const scenario = { items };
+
+    Ember.merge(scenario, options, defaultOptions);
+
+    return { [name]: scenario };
+  };
+}
+
+function mergeScenarioGenerators(...scenarioGenerators) {
+  return function(items, options) {
+    const scenariosToCombine = scenarioGenerators.map((generator) => generator(items, options));
+
+    return Ember.merge(...scenariosToCombine);
+  };
+}
