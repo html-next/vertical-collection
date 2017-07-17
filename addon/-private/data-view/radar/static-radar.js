@@ -2,8 +2,8 @@ import { default as Radar, NULL_INDEX } from './radar';
 import { stripInProduction } from 'vertical-collection/-debug/helpers';
 
 export default class StaticRadar extends Radar {
-  constructor(parentToken, initialItems, initialRenderCount, startingIndex) {
-    super(parentToken, initialItems, initialRenderCount, startingIndex);
+  constructor(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle) {
+    super(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle);
 
     this._firstItemIndex = NULL_INDEX;
     this._lastItemIndex = NULL_INDEX;
