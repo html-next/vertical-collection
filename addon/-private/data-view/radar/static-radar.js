@@ -1,12 +1,12 @@
-import { default as Radar, NULL_INDEX } from './radar';
+import Radar from './radar';
 import { stripInProduction } from 'vertical-collection/-debug/helpers';
 
 export default class StaticRadar extends Radar {
   constructor(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle) {
     super(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle);
 
-    this._firstItemIndex = NULL_INDEX;
-    this._lastItemIndex = NULL_INDEX;
+    this._firstItemIndex = 0;
+    this._lastItemIndex = 0;
 
     stripInProduction(() => {
       Object.preventExtensions(this);
@@ -23,8 +23,8 @@ export default class StaticRadar extends Radar {
     } = this;
 
     if (totalItems === 0) {
-      this._firstItemIndex = NULL_INDEX;
-      this._lastItemIndex = NULL_INDEX;
+      this._firstItemIndex = 0;
+      this._lastItemIndex = -1;
 
       return;
     }
@@ -62,14 +62,10 @@ export default class StaticRadar extends Radar {
   }
 
   get firstVisibleIndex() {
-    const firstVisibleIndex = Math.ceil(this.visibleTop / this._estimateHeight);
-
-    return this.firstItemIndex === NULL_INDEX ? NULL_INDEX : firstVisibleIndex;
+    return Math.ceil(this.visibleTop / this._estimateHeight);
   }
 
   get lastVisibleIndex() {
-    const lastVisibleIndex = Math.min(Math.ceil(this.visibleBottom / this._estimateHeight), this.totalItems) - 1;
-
-    return this.firstItemIndex === NULL_INDEX ? NULL_INDEX : lastVisibleIndex;
+    return Math.min(Math.ceil(this.visibleBottom / this._estimateHeight), this.totalItems) - 1;
   }
 }

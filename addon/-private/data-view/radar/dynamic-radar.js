@@ -1,4 +1,4 @@
-import { default as Radar, NULL_INDEX } from './radar';
+import Radar from './radar';
 import SkipList from '../skip-list';
 import roundTo from '../utils/round-to';
 
@@ -8,8 +8,8 @@ export default class DynamicRadar extends Radar {
   constructor(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle) {
     super(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle);
 
-    this._firstItemIndex = NULL_INDEX;
-    this._lastItemIndex = NULL_INDEX;
+    this._firstItemIndex = 0;
+    this._lastItemIndex = 0;
 
     this._totalBefore = 0;
     this._totalAfter = 0;
@@ -34,16 +34,16 @@ export default class DynamicRadar extends Radar {
       bufferSize,
       skipList,
       visibleTop,
-      visibleMiddle,
       visibleBottom,
       totalItems,
 
-      _prevFirstItemIndex
+      _prevFirstItemIndex,
+      _didReset
     } = this;
 
     if (totalItems === 0) {
-      this._firstItemIndex = NULL_INDEX;
-      this._lastItemIndex = NULL_INDEX;
+      this._firstItemIndex = 0;
+      this._lastItemIndex = -1;
       this._totalBefore = 0;
       this._totalAfter = 0;
 
@@ -53,36 +53,16 @@ export default class DynamicRadar extends Radar {
     // Don't measure if the radar has just been instantiated or reset, as we are rendering with a
     // completely new set of items and won't get an accurate measurement until after they render the
     // first time.
-    if (_prevFirstItemIndex !== NULL_INDEX) {
+    if (_didReset === false) {
       this._measure();
     }
 
-    const { total, values } = skipList;
+    const { values } = skipList;
 
-    let {
-      totalBefore,
-      index: middleItemIndex
-    } = this.skipList.find(visibleMiddle);
-
-    // Going down, totalBeforeBottom tracks the bottom of the current item, so add the height
-    // of the initial item
-    let totalBeforeBottom =  totalBefore + values[middleItemIndex];
-
-    let firstItemIndex = middleItemIndex;
-    let lastItemIndex = middleItemIndex;
+    let { totalBefore, index: firstItemIndex } = this.skipList.find(visibleTop);
+    let { totalAfter, index: lastItemIndex } = this.skipList.find(visibleBottom);
 
     const maxIndex = totalItems - 1;
-
-    // Get exact indexes based on current measurements
-    while (totalBefore > visibleTop && firstItemIndex > 0) {
-      firstItemIndex--;
-      totalBefore -= values[firstItemIndex];
-    }
-
-    while (totalBeforeBottom < visibleBottom && lastItemIndex < maxIndex) {
-      lastItemIndex++;
-      totalBeforeBottom += values[lastItemIndex];
-    }
 
     // Add buffers
     for (let i = bufferSize; i > 0 && firstItemIndex > 0; i--) {
@@ -92,7 +72,7 @@ export default class DynamicRadar extends Radar {
 
     for (let i = bufferSize; i > 0 && lastItemIndex < maxIndex; i--) {
       lastItemIndex++;
-      totalBeforeBottom += values[lastItemIndex];
+      totalAfter -= values[lastItemIndex];
     }
 
     const itemDelta = (_prevFirstItemIndex !== null) ? firstItemIndex - _prevFirstItemIndex : 0;
@@ -113,7 +93,7 @@ export default class DynamicRadar extends Radar {
     this._firstItemIndex = firstItemIndex;
     this._lastItemIndex = lastItemIndex;
     this._totalBefore = totalBefore;
-    this._totalAfter = Math.max(total - totalBeforeBottom, 0);
+    this._totalAfter = totalAfter;
   }
 
   _measure(measureLimit = null) {
@@ -177,49 +157,24 @@ export default class DynamicRadar extends Radar {
   }
 
   get firstVisibleIndex() {
-    if (this.firstItemIndex === NULL_INDEX) {
-      return NULL_INDEX;
-    }
-
-    const { values } = this.skipList;
-
-    let {
-      firstItemIndex,
-      lastItemIndex,
-      totalBefore,
+    const {
       visibleTop
     } = this;
 
-    for (let i = firstItemIndex; i <= lastItemIndex; i++) {
-      totalBefore += values[i];
+    const { index } = this.skipList.find(visibleTop);
 
-      if (totalBefore > visibleTop) {
-        return i;
-      }
-    }
+    return index;
   }
 
   get lastVisibleIndex() {
-    if (this.lastItemIndex === NULL_INDEX) {
-      return NULL_INDEX;
-    }
-
-    const { total, values } = this.skipList;
-
-    let {
-      firstItemIndex,
-      lastItemIndex,
-      totalAfter,
-      visibleBottom
+    const {
+      visibleBottom,
+      totalItems
     } = this;
 
-    for (let i = lastItemIndex; i >= firstItemIndex; i--) {
-      totalAfter += values[i];
+    const { index } = this.skipList.find(visibleBottom);
 
-      if (total - totalAfter <= visibleBottom) {
-        return i;
-      }
-    }
+    return Math.min(index, totalItems - 1);
   }
 
   prepend(numPrepended) {
