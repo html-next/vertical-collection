@@ -220,6 +220,170 @@ testScenarios(
 );
 
 testScenarios(
+  'Sends the firstVisibleChanged action with renderAll set to true',
+  scenariosFor(getNumbers(0, 50), { firstVisibleChanged: 'firstVisibleChanged', renderAll: true }),
+  standardTemplate,
+
+  false, // Run test function before render
+  async function(assert) {
+    const called = assert.async(2);
+    let count = 0;
+
+    this.on('firstVisibleChanged', (item, index) => {
+      if (count === 0) {
+        assert.equal(index, 0, 'the first visible item is correct');
+      } else {
+        assert.equal(index, 10, 'after scroll the first visible item is correct');
+      }
+      count++;
+      called();
+    });
+
+    await waitForRender();
+    await scrollTo('.scrollable', 0, 200);
+  }
+);
+
+testScenarios(
+  'Sends the lastVisibleChanged action with renderAll set to true',
+  scenariosFor(getNumbers(0, 50), { lastVisibleChanged: 'lastVisibleChanged', renderAll: true }),
+  standardTemplate,
+
+  false, // Run test function before render
+  async function(assert) {
+    const called = assert.async(2);
+    let count = 0;
+
+    this.on('lastVisibleChanged', (item, index) => {
+      if (count === 0) {
+        assert.equal(index, 9, 'the first last visible changed is correct');
+      } else {
+        assert.equal(index, 19, 'after scroll the last visible change is correct');
+      }
+      count++;
+      called();
+    });
+
+    await waitForRender();
+    await scrollTo('.scrollable', 0, 200);
+  }
+);
+
+testScenarios(
+  'Sends the firstReached action with renderAll set to true',
+  scenariosFor(getNumbers(0, 50), { firstReached: 'firstReached', renderAll: true }),
+  standardTemplate,
+
+  false, // Run test function before render
+  async function(assert) {
+    const called = assert.async(1);
+
+    this.on('firstReached', (item, index) => {
+      assert.equal(index, 0, 'the firstReached item is correct');
+      called();
+    });
+
+    await waitForRender();
+  }
+);
+
+testScenarios(
+  'Sends the lastReached action with renderAll set to true',
+  scenariosFor(getNumbers(0, 50), { lastReached: 'lastReached', renderAll: true }),
+  standardTemplate,
+
+  false, // Run test function before render
+  async function(assert) {
+    const called = assert.async(1);
+
+    this.on('lastReached', (item, index) => {
+      assert.equal(index, 49, 'the lastReached item is correct');
+      called();
+    });
+
+    await waitForRender();
+    await scrollTo('.scrollable', 0, 800);
+  }
+);
+
+testScenarios(
+  'Sends the firstReached action after prepend with renderAll set to true',
+  standardScenariosFor(getNumbers(0, 20), { firstReached: 'firstReached', bufferSize: 5, renderAll: true }),
+  standardTemplate,
+
+  false, // Run test function before render
+  function(assert) {
+    assert.expect(0);
+    const called = assert.async(2);
+
+    this.on('firstReached', ({ number }) => {
+      prepend(this, getNumbers(number - 3, 5));
+      called();
+    });
+  }
+);
+
+testScenarios(
+  'Sends the lastReached action after append with renderAll set to true',
+  standardScenariosFor(getNumbers(0, 10), { lastReached: 'lastReached', bufferSize: 5, renderAll: true }),
+  standardTemplate,
+
+  false, // Run test function before render
+  async function(assert) {
+    assert.expect(0);
+    const called = assert.async(2);
+
+    this.on('lastReached', ({ number }) => {
+      append(this, getNumbers(number + 1, 5));
+      called();
+    });
+
+    await waitForRender();
+  }
+);
+
+testScenarios(
+  'Does not send the firstReached action twice for the same item with renderAll set to true',
+  scenariosFor(getNumbers(0, 50), { firstReached: 'firstReached', renderAll: true }),
+  standardTemplate,
+
+  false, // Run test function before render
+  async function(assert) {
+    assert.expect(0);
+    const called = assert.async(1);
+
+    this.on('firstReached', () => {
+      called();
+    });
+
+    await waitForRender();
+    await scrollTo('.scrollable', 0, 800);
+    await scrollTo('.scrollable', 0, 0);
+  }
+);
+
+testScenarios(
+  'Does not send the lastReached action twice for the same item with renderAll set to true',
+  scenariosFor(getNumbers(0, 50), { lastReached: 'lastReached', renderAll: true }),
+  standardTemplate,
+
+  false, // Run test function before render
+  async function(assert) {
+    assert.expect(0);
+    const called = assert.async(1);
+
+    this.on('lastReached', () => {
+      called();
+    });
+
+    await waitForRender();
+    await scrollTo('.scrollable', 0, 800);
+    await scrollTo('.scrollable', 0, 0);
+    await scrollTo('.scrollable', 0, 800);
+  }
+);
+
+testScenarios(
   'Collection scrolls and measures correctly when parent is a table',
   {
     staticScenario: { items: getNumbers(0, 100), staticHeight: true },

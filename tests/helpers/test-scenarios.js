@@ -82,6 +82,7 @@ export const standardTemplate = hbs`
       estimateHeight=(either-or estimateHeight 20)
       staticHeight=staticHeight
       bufferSize=(either-or bufferSize 0)
+      renderAll=renderAll
 
       renderFromLast=renderFromLast
       idForFirstItem=idForFirstItem

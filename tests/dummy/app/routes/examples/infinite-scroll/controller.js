@@ -29,11 +29,6 @@ export default Controller.extend({
       model.pushObjects(numbers);
       // this.set('model.numbers', newModel);
       this.set('model.last', last + 20);
-    },
-
-    setEstimateHeight() {
-      this.set('someProperty', 90);
     }
   }
-
 });

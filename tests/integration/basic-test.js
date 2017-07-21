@@ -317,23 +317,27 @@ testScenarios(
   }
 );
 
-/*
-test("The Collection Reveals it's children when `renderAllInitially` is true.", function(assert) {
-  assert.expect(1);
+testScenarios(
+  'The collection renders all items when renderAll is set',
+  scenariosFor(getNumbers(0, 20), { renderAll: true }),
+  standardTemplate,
 
-  // Set any properties with this.set('myProperty', 'value');
-  // Handle any actions with this.on('myAction', function(val) { ... });
-  this.set('items', A([Ember.Object.create({ text: 'b' })]));
+  async function(assert) {
+    assert.equal(findAll('.vertical-item').length, 20, 'correct number of items rendered');
+  }
+);
 
-  // Template block usage:
-  this.render(hbs`
-  <div style="height: 500px; width: 500px;">
-    {{#vertical-collection ${'items'} renderAllInitially=true as |item|}}
-      {{item.text}}
-    {{/vertical-collection}}
-  </div>
-  `);
+testScenarios(
+  'The collection can switch on renderAll after being rendered',
+  scenariosFor(getNumbers(0, 20)),
+  standardTemplate,
 
-  assert.equal(this.$().find('vertical-item').first().get(0).innerHTML, 'b');
-});
-*/
+  async function(assert) {
+    assert.equal(findAll('.vertical-item').length, 10, 'correct number of items rendered before');
+
+    this.set('renderAll', true);
+    await waitForRender();
+
+    assert.equal(findAll('.vertical-item').length, 20, 'correct number of items rendered before');
+  }
+);
