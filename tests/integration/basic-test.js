@@ -300,7 +300,7 @@ testScenarios(
         {{#vertical-collection ${'items'}
           containerSelector=".scrollable"
           estimateHeight=20
-          staticHeight=true
+          staticHeight=staticHeight
           bufferSize=0
 
           as |item i|}}

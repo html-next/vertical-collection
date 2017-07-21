@@ -40,6 +40,8 @@ const VerticalCollection = Component.extend({
   // –––––––––––––– Optional Settings
   staticHeight: false,
 
+  shouldRecycle: true,
+
   /*
    * A selector string that will select the element from
    * which to calculate the viewable height and needed offsets.
@@ -213,14 +215,16 @@ const VerticalCollection = Component.extend({
     const RadarClass = this.staticHeight ? StaticRadar : DynamicRadar;
 
     const items = this.get('items') || [];
-    const initialRenderCount = this.get('initialRenderCount');
-    const renderFromLast = this.get('renderFromLast');
+
     const idForFirstItem = this.get('idForFirstItem');
+    const initialRenderCount = this.get('initialRenderCount');
     const key = this.get('key');
+    const renderFromLast = this.get('renderFromLast');
+    const shouldRecycle = this.get('shouldRecycle');
 
     const startingIndex = calculateStartingIndex(items, idForFirstItem, key, renderFromLast);
 
-    this._radar = new RadarClass(this.token, items, initialRenderCount, startingIndex);
+    this._radar = new RadarClass(this.token, items, initialRenderCount, startingIndex, shouldRecycle);
     this._radar.renderFromLast = renderFromLast;
 
     this.supportsInverse = SUPPORTS_INVERSE_BLOCK;

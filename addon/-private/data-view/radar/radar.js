@@ -22,13 +22,14 @@ const {
 export const NULL_INDEX = -2;
 
 export default class Radar {
-  constructor(parentToken, initialItems, initialRenderCount, startingIndex) {
+  constructor(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle) {
     this.token = new Token(parentToken);
 
     this.items = initialItems;
     this.estimateHeight = 0;
     this.bufferSize = 0;
     this.startingIndex = startingIndex;
+    this.shouldRecycle = shouldRecycle;
     this.renderFromLast = false;
     this.renderAll = false;
     this.itemContainer = null;
@@ -43,6 +44,7 @@ export default class Radar {
     this._nextUpdate = null;
     this._nextLayout = null;
     this._started = false;
+    this._wasReset = false;
 
     this._prevFirstItemIndex = NULL_INDEX;
     this._prevLastItemIndex = NULL_INDEX;
@@ -239,6 +241,9 @@ export default class Radar {
       virtualComponents,
       _componentPool,
 
+      shouldRecycle,
+      _wasReset,
+
       itemContainer,
       _occludedContentBefore,
       _occludedContentAfter,
@@ -264,11 +269,22 @@ export default class Radar {
       _componentPool.unshift(orderedComponents.pop());
     }
 
-    // If the underlying array has changed, the indexes could be the same but the content may have changed,
-    // so recycle the remaining components just in case. If content has not changed, this is a no-op.
-    for (let i = 0; i < orderedComponents.length; i++) {
-      const component = orderedComponents[i];
-      component.recycle(objectAt(items, component.index), component.index);
+    if (_wasReset) {
+      if (shouldRecycle === true) {
+        for (let i = 0; i < orderedComponents.length; i++) {
+          // If the underlying array has changed, the indexes could be the same but
+          // the content may have changed, so recycle the remaining components
+          const component = orderedComponents[i];
+          component.recycle(objectAt(items, component.index), component.index);
+        }
+      } else {
+        while (orderedComponents.length > 0) {
+          // If recycling is disabled we need to delete all components and clear the array
+          _componentPool.push(orderedComponents.shift());
+        }
+      }
+
+      this._wasReset = false;
     }
 
     let firstRenderedIndex = orderedComponents[0] ? orderedComponents[0].index : firstItemIndex;
@@ -276,7 +292,14 @@ export default class Radar {
 
     // Append as many items as needed to the rendered components
     while (orderedComponents.length < totalComponents && lastRenderedIndex < lastItemIndex) {
-      const component = _componentPool.pop() || new VirtualComponent();
+      let component;
+
+      if (shouldRecycle === true) {
+        component = _componentPool.pop() || new VirtualComponent();
+      } else {
+        component = new VirtualComponent();
+      }
+
       const itemIndex = ++lastRenderedIndex;
 
       component.recycle(objectAt(items, itemIndex), itemIndex);
@@ -287,7 +310,14 @@ export default class Radar {
 
     // Prepend as many items as needed to the rendered components
     while (orderedComponents.length < totalComponents && firstRenderedIndex > firstItemIndex) {
-      const component = _componentPool.pop() || new VirtualComponent();
+      let component;
+
+      if (shouldRecycle === true) {
+        component = _componentPool.pop() || new VirtualComponent();
+      } else {
+        component = new VirtualComponent();
+      }
+
       const itemIndex = --firstRenderedIndex;
 
       component.recycle(objectAt(items, itemIndex), itemIndex);
@@ -406,6 +436,8 @@ export default class Radar {
   }
 
   reset() {
+    this._wasReset = true;
+
     this._prevFirstItemIndex = NULL_INDEX;
     this._prevLastItemIndex = NULL_INDEX;
 
