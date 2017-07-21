@@ -17,10 +17,6 @@ const {
   set
 } = Ember;
 
-// Used to represent null numbers, while still setting those properties to
-// numbers in the constructor so the shape of an object is consistent
-export const NULL_INDEX = -2;
-
 export default class Radar {
   constructor(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle) {
     this.token = new Token(parentToken);
@@ -44,14 +40,12 @@ export default class Radar {
     this._nextUpdate = null;
     this._nextLayout = null;
     this._started = false;
-    this._wasReset = false;
+    this._didReset = true;
 
-    this._prevFirstItemIndex = NULL_INDEX;
-    this._prevLastItemIndex = NULL_INDEX;
-    this._prevFirstVisibleIndex = NULL_INDEX;
-    this._prevLastVisibleIndex = NULL_INDEX;
-    this._firstItemIndex = NULL_INDEX;
-    this._lastItemIndex = NULL_INDEX;
+    this._prevFirstItemIndex = 0;
+    this._prevLastItemIndex = 0;
+    this._prevFirstVisibleIndex = 0;
+    this._prevLastVisibleIndex = 0;
 
     this._firstReached = false;
     this._lastReached = false;
@@ -183,6 +177,9 @@ export default class Radar {
         this._prevLastItemIndex = this.lastItemIndex;
         this._prevFirstVisibleIndex = this.firstVisibleIndex;
         this._prevLastVisibleIndex = this.lastVisibleIndex;
+
+        // Clear the reset flag
+        this._didReset = false;
       });
     });
   }
@@ -242,7 +239,7 @@ export default class Radar {
       _componentPool,
 
       shouldRecycle,
-      _wasReset,
+      _didReset,
 
       itemContainer,
       _occludedContentBefore,
@@ -269,7 +266,7 @@ export default class Radar {
       _componentPool.unshift(orderedComponents.pop());
     }
 
-    if (_wasReset) {
+    if (_didReset) {
       if (shouldRecycle === true) {
         for (let i = 0; i < orderedComponents.length; i++) {
           // If the underlying array has changed, the indexes could be the same but
@@ -283,8 +280,6 @@ export default class Radar {
           _componentPool.push(orderedComponents.shift());
         }
       }
-
-      this._wasReset = false;
     }
 
     let firstRenderedIndex = orderedComponents[0] ? orderedComponents[0].index : firstItemIndex;
@@ -396,14 +391,15 @@ export default class Radar {
       totalItems,
 
       _firstReached,
-      _lastReached
+      _lastReached,
+      _didReset
     } = this;
 
-    if (firstVisibleIndex !== _prevFirstVisibleIndex) {
+    if (_didReset || firstVisibleIndex !== _prevFirstVisibleIndex) {
       this.sendAction('firstVisibleChanged', firstVisibleIndex);
     }
 
-    if (lastVisibleIndex !== _prevLastVisibleIndex) {
+    if (_didReset || lastVisibleIndex !== _prevLastVisibleIndex) {
       this.sendAction('lastVisibleChanged', lastVisibleIndex);
     }
 
@@ -436,13 +432,9 @@ export default class Radar {
   }
 
   reset() {
-    this._wasReset = true;
-
-    this._prevFirstItemIndex = NULL_INDEX;
-    this._prevLastItemIndex = NULL_INDEX;
-
     this._firstReached = false;
     this._lastReached = false;
+    this._didReset = true;
   }
 
   /*
@@ -459,15 +451,11 @@ export default class Radar {
    * in this exact order.
    */
   get visibleTop() {
-    return this._scrollTop - this._scrollTopOffset + this._prependOffset;
+    return Math.max(this._scrollTop - this._scrollTopOffset + this._prependOffset, 0);
   }
 
   get visibleBottom() {
-    return this.visibleTop + this._scrollContainerHeight;
-  }
-
-  get visibleMiddle() {
-    return Math.max(this.visibleTop, 0) + (this._scrollContainerHeight / 2);
+    return this.visibleTop + this._scrollContainerHeight - 1;
   }
 
   get totalItems() {

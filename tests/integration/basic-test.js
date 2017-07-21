@@ -136,8 +136,8 @@ testScenarios(
     let occludedBoundaries = findAll('occluded-content');
 
     assert.equal(occludedBoundaries[0].getAttribute('style'), 'height: 0px;', 'Occluded height above is correct');
-    assert.equal(occludedBoundaries[1].getAttribute('style'), 'height: 140px;', 'Occluded height below is correct');
-    assert.equal(findAll('vertical-item').length, 3, 'Rendered correct number of items');
+    assert.equal(occludedBoundaries[1].getAttribute('style'), 'height: 100px;', 'Occluded height below is correct');
+    assert.equal(findAll('vertical-item').length, 5, 'Rendered correct number of items');
   }
 );
 
@@ -168,8 +168,8 @@ testScenarios(
     let occludedBoundaries = findAll('occluded-content');
 
     assert.equal(occludedBoundaries[0].getAttribute('style'), 'height: 0px;', 'Occluded height above is correct');
-    assert.equal(occludedBoundaries[1].getAttribute('style'), 'height: 140px;', 'Occluded height below is correct');
-    assert.equal(findAll('vertical-item').length, 3, 'Rendered correct number of items');
+    assert.equal(occludedBoundaries[1].getAttribute('style'), 'height: 100px;', 'Occluded height below is correct');
+    assert.equal(findAll('vertical-item').length, 5, 'Rendered correct number of items');
   }
 );
 
@@ -184,12 +184,14 @@ testScenarios(
         containerSelector="body"
         as |item|
       }}
-        Content
-        {{#if item.shouldRender}}
-          <section>
-            Conditional Content
-          </section>
-        {{/if}}
+        <div>
+          Content
+          {{#if item.shouldRender}}
+            <section>
+              Conditional Content
+            </section>
+          {{/if}}
+        </div>
       {{/vertical-collection}}
     </div>
   `,
