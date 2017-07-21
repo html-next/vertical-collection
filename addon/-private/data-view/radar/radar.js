@@ -30,6 +30,7 @@ export default class Radar {
     this.bufferSize = 0;
     this.startingIndex = startingIndex;
     this.renderFromLast = false;
+    this.renderAll = false;
     this.itemContainer = null;
     this.scrollContainer = null;
 
@@ -241,14 +242,18 @@ export default class Radar {
       itemContainer,
       _occludedContentBefore,
       _occludedContentAfter,
-
-      firstItemIndex,
-      lastItemIndex,
-      totalBefore,
-      totalAfter,
-
-      totalComponents
+      totalItems,
+      renderAll
     } = this;
+
+    // If `renderAll` is true, render components for all items. We intercept this here because
+    // for all other behavior (action sending) we want to maintain the "correct" item indexes
+    const firstItemIndex = renderAll === true ? 0 : this.firstItemIndex;
+    const lastItemIndex = renderAll === true ? totalItems - 1 : this.lastItemIndex;
+    const totalBefore = renderAll === true ? 0 : this.totalBefore;
+    const totalAfter = renderAll === true ? 0 : this.totalAfter;
+
+    const totalComponents = Math.min(totalItems, (lastItemIndex - firstItemIndex) + 1);
 
     // Add components to be recycled to the pool
     while (orderedComponents.length > 0 && orderedComponents[0].index < firstItemIndex) {
@@ -435,9 +440,5 @@ export default class Radar {
 
   get totalItems() {
     return this.items ? get(this.items, 'length') : 0;
-  }
-
-  get totalComponents() {
-    return Math.min(this.totalItems, (this._lastItemIndex - this._firstItemIndex) + 1);
   }
 }

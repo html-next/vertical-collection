@@ -54,7 +54,7 @@ export default class DynamicRadar extends Radar {
     // completely new set of items and won't get an accurate measurement until after they render the
     // first time.
     if (_prevFirstItemIndex !== NULL_INDEX) {
-      this._measure(_prevFirstItemIndex);
+      this._measure();
     }
 
     const { total, values } = skipList;
@@ -105,7 +105,7 @@ export default class DynamicRadar extends Radar {
 
         const measureLimit = this._firstRender ? numBeforeStatic : Math.max(Math.min(Math.abs(itemDelta), numBeforeStatic), 1);
 
-        this._prependOffset += Math.round(this._measure(firstItemIndex, measureLimit));
+        this._prependOffset += Math.round(this._measure(measureLimit));
         this._firstRender = false;
       });
     }
@@ -116,7 +116,7 @@ export default class DynamicRadar extends Radar {
     this._totalAfter = Math.max(total - totalBeforeBottom, 0);
   }
 
-  _measure(firstItemIndex, measureLimit = null) {
+  _measure(measureLimit = null) {
     const {
       orderedComponents,
       itemContainer,
@@ -129,9 +129,9 @@ export default class DynamicRadar extends Radar {
     let totalDelta = 0;
 
     for (let i = 0; i < numToMeasure; i++) {
-      const itemIndex = firstItemIndex + i;
       const currentItem = orderedComponents[i];
       const previousItem = orderedComponents[i - 1];
+      const itemIndex = currentItem.index;
 
       const {
         top: currentItemTop,

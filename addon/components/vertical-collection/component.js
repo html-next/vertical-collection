@@ -79,10 +79,15 @@ const VerticalCollection = Component.extend({
    */
   renderFromLast: false,
 
+  /*
+   * If set, the collection will render all of the items passed in
+   */
+  renderAll: false,
+
   isEmpty: computed.empty('items'),
   shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
 
-  virtualComponents: computed('items.[]', 'estimateHeight', 'bufferSize', function() {
+  virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function() {
     const {
       _radar,
       _prevItemsLength,
@@ -91,6 +96,7 @@ const VerticalCollection = Component.extend({
     } = this;
 
     _radar.estimateHeight = this.get('estimateHeight');
+    _radar.renderAll = this.get('renderAll');
     _radar.bufferSize = this.get('bufferSize');
 
     const items = this.get('items');

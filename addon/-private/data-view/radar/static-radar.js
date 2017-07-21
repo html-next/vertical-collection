@@ -72,19 +72,4 @@ export default class StaticRadar extends Radar {
 
     return this.firstItemIndex === NULL_INDEX ? NULL_INDEX : lastVisibleIndex;
   }
-
-  get totalComponents() {
-    const {
-      _scrollContainerHeight,
-      _estimateHeight,
-      bufferSize,
-      totalItems
-    } = this;
-
-    // The total number of components is determined by the minimum number required to span the
-    // container plus its buffers. Combined with the above rendering strategy this is fairly
-    // performant, even if mean item size is above the minimum.
-    const calculatedComponents = Math.ceil(_scrollContainerHeight / _estimateHeight) + 1 + (bufferSize * 2);
-    return Math.min(totalItems, calculatedComponents);
-  }
 }
