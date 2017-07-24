@@ -318,28 +318,3 @@ testScenarios(
     assert.equal(findAll('vertical-item').length, 10);
   }
 );
-
-testScenarios(
-  'The collection renders all items when renderAll is set',
-  scenariosFor(getNumbers(0, 20), { renderAll: true }),
-  standardTemplate,
-
-  async function(assert) {
-    assert.equal(findAll('.vertical-item').length, 20, 'correct number of items rendered');
-  }
-);
-
-testScenarios(
-  'The collection can switch on renderAll after being rendered',
-  scenariosFor(getNumbers(0, 20)),
-  standardTemplate,
-
-  async function(assert) {
-    assert.equal(findAll('.vertical-item').length, 10, 'correct number of items rendered before');
-
-    this.set('renderAll', true);
-    await waitForRender();
-
-    assert.equal(findAll('.vertical-item').length, 20, 'correct number of items rendered before');
-  }
-);

@@ -10,7 +10,8 @@ const {
   ArrayProxy,
   RSVP: {
     Promise
-  }
+  },
+  merge
 } = Ember;
 
 const {
@@ -130,8 +131,8 @@ function generateScenario(name, defaultOptions, initializer) {
 
 function mergeScenarioGenerators(...scenarioGenerators) {
   return function(items, options) {
-    const scenariosToCombine = scenarioGenerators.map((generator) => generator(items, options));
-
-    return Ember.merge(...scenariosToCombine);
+    return scenarioGenerators.reduce((scenarios, generator) => {
+      return merge(scenarios, generator(items, options));
+    }, {});
   };
 }

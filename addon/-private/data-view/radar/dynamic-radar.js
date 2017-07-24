@@ -14,8 +14,6 @@ export default class DynamicRadar extends Radar {
     this._totalBefore = 0;
     this._totalAfter = 0;
 
-    this._firstRender = true;
-
     this.skipList = null;
 
     stripInProduction(() => {
@@ -36,6 +34,7 @@ export default class DynamicRadar extends Radar {
       visibleTop,
       visibleBottom,
       totalItems,
+      totalComponents,
 
       _prevFirstItemIndex,
       _didReset
@@ -59,10 +58,13 @@ export default class DynamicRadar extends Radar {
 
     const { values } = skipList;
 
-    let { totalBefore, index: firstItemIndex } = this.skipList.find(visibleTop);
-    let { totalAfter, index: lastItemIndex } = this.skipList.find(visibleBottom);
+    let { totalBefore, index: firstVisibleIndex } = this.skipList.find(visibleTop);
+    let { totalAfter, index: lastVisibleIndex } = this.skipList.find(visibleBottom);
 
     const maxIndex = totalItems - 1;
+
+    let firstItemIndex = firstVisibleIndex;
+    let lastItemIndex = lastVisibleIndex;
 
     // Add buffers
     for (let i = bufferSize; i > 0 && firstItemIndex > 0; i--) {
@@ -75,18 +77,16 @@ export default class DynamicRadar extends Radar {
       totalAfter -= values[lastItemIndex];
     }
 
-    const itemDelta = (_prevFirstItemIndex !== null) ? firstItemIndex - _prevFirstItemIndex : 0;
+    const itemDelta = (_prevFirstItemIndex !== null) ? firstItemIndex - _prevFirstItemIndex : lastItemIndex - firstItemIndex;
 
-    if (itemDelta < 0 || this._firstRender === true) {
-      // schedule a measurement for items that could affect scrollTop
+    if (itemDelta < 0 || itemDelta >= totalComponents) {
       this.schedule('measure', () => {
-        const staticVisibleIndex = this.renderFromLast ? this.lastVisibleIndex + 1 : this.firstVisibleIndex;
+        // schedule a measurement for items that could affect scrollTop
+        const staticVisibleIndex = this.renderFromLast ? lastVisibleIndex + 1 : firstVisibleIndex;
         const numBeforeStatic = staticVisibleIndex - firstItemIndex;
-
-        const measureLimit = this._firstRender ? numBeforeStatic : Math.max(Math.min(Math.abs(itemDelta), numBeforeStatic), 1);
+        const measureLimit = Math.min(Math.abs(itemDelta), numBeforeStatic);
 
         this._prependOffset += Math.round(this._measure(measureLimit));
-        this._firstRender = false;
       });
     }
 
@@ -193,5 +193,14 @@ export default class DynamicRadar extends Radar {
     super.reset();
 
     this.skipList = new SkipList(this.totalItems, this.estimateHeight);
+  }
+
+  /*
+   * Public API to query the skiplist for the offset of an item
+   */
+  getOffsetForIndex(index) {
+    this._measure();
+
+    return this.skipList.getOffset(index);
   }
 }

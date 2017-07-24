@@ -145,6 +145,38 @@ export default class SkipList {
     return { index, totalBefore, totalAfter };
   }
 
+  getOffset(targetIndex) {
+    const { layers, length, values } = this;
+    const numLayers = layers.length;
+
+    if (length === 0) {
+      return 0;
+    }
+
+    let index = 0;
+    let offset = 0;
+
+    for (let i = 0; i < numLayers - 1; i++) {
+      const layer = layers[i];
+
+      const leftIndex = index;
+      const rightIndex = index + 1;
+
+      if (targetIndex >= rightIndex * Math.pow(2, numLayers - i - 1)) {
+        offset = offset + layer[leftIndex];
+        index = rightIndex * 2;
+      } else {
+        index = leftIndex * 2;
+      }
+    }
+
+    if (index + 1 === targetIndex) {
+      offset += values[index];
+    }
+
+    return offset;
+  }
+
   set(index, value) {
     assert('value must be a number', typeof value === 'number');
     assert('index must be a number', typeof index === 'number');
