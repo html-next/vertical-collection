@@ -9,7 +9,7 @@ import roundTo from '../utils/round-to';
 
 import estimateElementHeight from '../../utils/element/estimate-element-height';
 
-import { assert } from 'vertical-collection/-debug/helpers';
+import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
 
 const {
   A,
@@ -86,6 +86,8 @@ export default class Radar {
     // In older versions of Ember/IE, binding anything on an object in the template
     // adds observers which creates __ember_meta__
     this.__ember_meta__ = null; // eslint-disable-line camelcase
+
+    stripInProduction(() => this._debugDidUpdate = null);
   }
 
   destroy() {
@@ -183,6 +185,11 @@ export default class Radar {
 
         // Clear the reset flag
         this._didReset = false;
+
+        stripInProduction(() => {
+          // Hook to update the visual debugger
+          this._debugDidUpdate(this);
+        });
       });
     });
   }

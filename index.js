@@ -139,7 +139,7 @@ module.exports = {
     this._setupBabelOptions(app.env);
 
     if (!/production/.test(app.env) && !/test/.test(app.env)) {
-      app.import('./vendor/debug.css');
+      app.import('vendor/debug.css');
     }
   },
 

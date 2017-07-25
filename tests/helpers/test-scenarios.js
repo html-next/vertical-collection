@@ -84,6 +84,8 @@ export const standardTemplate = hbs`
       staticHeight=staticHeight
       bufferSize=(either-or bufferSize 0)
       renderAll=renderAll
+      debugVis=(either-or debugVis false)
+      debugCSS=(either-or debugCSS false)
 
       renderFromLast=renderFromLast
       idForFirstItem=idForFirstItem
