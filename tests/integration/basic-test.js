@@ -318,3 +318,35 @@ testScenarios(
     assert.equal(findAll('vertical-item').length, 10);
   }
 );
+
+testScenarios(
+  'The collection renders in the correctly when starting offscreen',
+  scenariosFor(getNumbers(0, 100)),
+
+  hbs`
+    <div style="height: 100px;" class="scrollable">
+      <div style="padding-top: 400px;">
+        {{#vertical-collection ${'items'}
+          containerSelector=".scrollable"
+          estimateHeight=20
+          bufferSize=2
+
+          as |item i|}}
+          <vertical-item style="height: 20px">
+            {{item.number}} {{i}}
+          </vertical-item>
+        {{/vertical-collection}}
+      </div>
+    </div>
+  `,
+
+  async function(assert) {
+    assert.expect(2);
+
+    assert.equal(findAll('vertical-item').length, 7, 'Rendered correct number of items');
+
+    await scrollTo('.scrollable', 0, 500);
+
+    assert.equal(findAll('vertical-item').length, 9, 'Rendered correct number of items');
+  }
+);
