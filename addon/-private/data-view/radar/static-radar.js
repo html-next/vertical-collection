@@ -68,4 +68,11 @@ export default class StaticRadar extends Radar {
   get lastVisibleIndex() {
     return Math.min(Math.ceil(this.visibleBottom / this._estimateHeight), this.totalItems) - 1;
   }
+
+  /*
+   * Public API to query for the offset of an item
+   */
+  getOffsetForIndex(index) {
+    return index * this._estimateHeight + 1;
+  }
 }

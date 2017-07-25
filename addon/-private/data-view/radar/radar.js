@@ -58,6 +58,9 @@ export default class Radar {
     this._occludedContentBefore.element = document.createElement('occluded-content');
     this._occludedContentAfter.element = document.createElement('occluded-content');
 
+    this._occludedContentBefore.element.addEventListener('click', this.pageUp.bind(this));
+    this._occludedContentAfter.element.addEventListener('click', this.pageDown.bind(this));
+
     const virtualComponents = [this._occludedContentBefore];
     const orderedComponents = [];
 
@@ -245,24 +248,20 @@ export default class Radar {
       _occludedContentBefore,
       _occludedContentAfter,
       totalItems,
-      renderAll
+
+      renderedFirstItemIndex,
+      renderedLastItemIndex,
+      renderedTotalBefore,
+      renderedTotalAfter,
+      totalComponents
     } = this;
 
-    // If `renderAll` is true, render components for all items. We intercept this here because
-    // for all other behavior (action sending) we want to maintain the "correct" item indexes
-    const firstItemIndex = renderAll === true ? 0 : this.firstItemIndex;
-    const lastItemIndex = renderAll === true ? totalItems - 1 : this.lastItemIndex;
-    const totalBefore = renderAll === true ? 0 : this.totalBefore;
-    const totalAfter = renderAll === true ? 0 : this.totalAfter;
-
-    const totalComponents = Math.min(totalItems, (lastItemIndex - firstItemIndex) + 1);
-
     // Add components to be recycled to the pool
-    while (orderedComponents.length > 0 && orderedComponents[0].index < firstItemIndex) {
+    while (orderedComponents.length > 0 && orderedComponents[0].index < renderedFirstItemIndex) {
       _componentPool.push(orderedComponents.shift());
     }
 
-    while (orderedComponents.length > 0 && orderedComponents[orderedComponents.length - 1].index > lastItemIndex) {
+    while (orderedComponents.length > 0 && orderedComponents[orderedComponents.length - 1].index > renderedLastItemIndex) {
       _componentPool.unshift(orderedComponents.pop());
     }
 
@@ -282,11 +281,11 @@ export default class Radar {
       }
     }
 
-    let firstRenderedIndex = orderedComponents[0] ? orderedComponents[0].index : firstItemIndex;
-    let lastRenderedIndex = orderedComponents[orderedComponents.length - 1] ? orderedComponents[orderedComponents.length - 1].index : firstItemIndex - 1;
+    let firstIndexInList = orderedComponents[0] ? orderedComponents[0].index : renderedFirstItemIndex;
+    let lastIndexInList = orderedComponents[orderedComponents.length - 1] ? orderedComponents[orderedComponents.length - 1].index : renderedFirstItemIndex - 1;
 
     // Append as many items as needed to the rendered components
-    while (orderedComponents.length < totalComponents && lastRenderedIndex < lastItemIndex) {
+    while (orderedComponents.length < totalComponents && lastIndexInList < renderedLastItemIndex) {
       let component;
 
       if (shouldRecycle === true) {
@@ -295,7 +294,7 @@ export default class Radar {
         component = new VirtualComponent();
       }
 
-      const itemIndex = ++lastRenderedIndex;
+      const itemIndex = ++lastIndexInList;
 
       component.recycle(objectAt(items, itemIndex), itemIndex);
       this._appendComponent(component);
@@ -304,7 +303,7 @@ export default class Radar {
     }
 
     // Prepend as many items as needed to the rendered components
-    while (orderedComponents.length < totalComponents && firstRenderedIndex > firstItemIndex) {
+    while (orderedComponents.length < totalComponents && firstIndexInList > renderedFirstItemIndex) {
       let component;
 
       if (shouldRecycle === true) {
@@ -313,7 +312,7 @@ export default class Radar {
         component = new VirtualComponent();
       }
 
-      const itemIndex = --firstRenderedIndex;
+      const itemIndex = --firstIndexInList;
 
       component.recycle(objectAt(items, itemIndex), itemIndex);
       this._prependComponent(component);
@@ -327,9 +326,19 @@ export default class Radar {
       _componentPool.length = 0;
     }
 
+    const totalItemsBefore = renderedFirstItemIndex;
+    const totalItemsAfter = totalItems - renderedLastItemIndex - 1;
+
+    const beforeItemsText = totalItemsBefore === 1 ? 'item' : 'items';
+    const afterItemsText = totalItemsAfter === 1 ? 'item' : 'items';
+
     // Set padding element heights, unset itemContainer's minHeight
-    _occludedContentBefore.element.style.height = `${totalBefore}px`;
-    _occludedContentAfter.element.style.height = `${totalAfter}px`;
+    _occludedContentBefore.element.style.height = `${renderedTotalBefore}px`;
+    _occludedContentBefore.element.innerHTML = totalItemsBefore > 0 ? `And ${totalItemsBefore} ${beforeItemsText} before` : '';
+
+    _occludedContentAfter.element.style.height = `${renderedTotalAfter}px`;
+    _occludedContentAfter.element.innerHTML = totalItemsAfter > 0 ? `And ${totalItemsAfter} ${afterItemsText} after` : '';
+
     itemContainer.style.minHeight = '';
   }
 
@@ -435,6 +444,59 @@ export default class Radar {
     this._firstReached = false;
     this._lastReached = false;
     this._didReset = true;
+  }
+
+  pageUp() {
+    const {
+      bufferSize,
+      renderedFirstItemIndex,
+      totalComponents
+    } = this;
+
+    if (renderedFirstItemIndex !== 0) {
+      const newFirstItemIndex = Math.max(renderedFirstItemIndex - totalComponents + bufferSize, 0);
+      const offset = this.getOffsetForIndex(newFirstItemIndex);
+
+      this.scrollContainer.scrollTop = offset + this._scrollTopOffset;
+    }
+  }
+
+  pageDown() {
+    const {
+      bufferSize,
+      renderedLastItemIndex,
+      totalComponents,
+      totalItems
+    } = this;
+
+    if (renderedLastItemIndex !== totalItems - 1) {
+      const newFirstItemIndex = Math.min(renderedLastItemIndex + bufferSize + 1, totalItems - totalComponents);
+      const offset = this.getOffsetForIndex(newFirstItemIndex);
+
+      this.scrollContainer.scrollTop = offset + this._scrollTopOffset;
+    }
+  }
+
+  // If `renderAll` is true, render components for all items. We intercept this here because
+  // for all other behavior (action sending) we want to maintain the "correct" item indexes
+  get renderedFirstItemIndex() {
+    return this.renderAll === true ? 0 : this.firstItemIndex;
+  }
+
+  get renderedLastItemIndex() {
+    return this.renderAll === true ? this.totalItems - 1 : this.lastItemIndex;
+  }
+
+  get renderedTotalBefore() {
+    return this.renderAll === true ? 0 : this.totalBefore;
+  }
+
+  get renderedTotalAfter() {
+    return this.renderAll === true ? 0 : this.totalAfter;
+  }
+
+  get totalComponents() {
+    return Math.min(this.totalItems, (this.renderedLastItemIndex - this.renderedFirstItemIndex) + 1);
   }
 
   /*
