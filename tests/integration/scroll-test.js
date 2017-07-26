@@ -170,7 +170,7 @@ testScenarios(
     const called = assert.async(2);
 
     this.on('lastReached', ({ number }) => {
-      append(this, getNumbers(number + 1, 5));
+      append(this, getNumbers(number + 1, 6));
       called();
     });
 
@@ -334,7 +334,7 @@ testScenarios(
     const called = assert.async(2);
 
     this.on('lastReached', ({ number }) => {
-      append(this, getNumbers(number + 1, 5));
+      append(this, getNumbers(number + 1, 6));
       called();
     });
 
@@ -451,7 +451,7 @@ testScenarios(
     await scrollTo('.scroll-parent', 0, 200);
     await scrollTo('.scroll-child', 0, 400);
 
-    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '10 10', 'correct first item rendered');
+    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '5 5', 'correct first item rendered');
   }
 );
 

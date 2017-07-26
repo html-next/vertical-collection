@@ -64,19 +64,16 @@ testScenarios(
   async function(assert) {
     assert.expect(3);
 
-    // Should render 2 components to be able to cover the whole scroll space, and 1
-    // extra buffer component on the bottom
-    assert.equal(findAll('.vertical-item').length, 2);
+    // Should always render 3 components, one to span the space and two buffers
+    assert.equal(findAll('.vertical-item').length, 3);
 
     await scrollTo('.scrollable', 0, 200);
 
-    // Should render a buffer on both sides
     assert.equal(findAll('.vertical-item').length, 3);
 
     await scrollTo('.scrollable', 0, 2000);
 
-    // Back to 3 items because at the bottom
-    assert.equal(findAll('.vertical-item').length, 2);
+    assert.equal(findAll('.vertical-item').length, 3);
   }
 );
 
@@ -343,7 +340,7 @@ testScenarios(
   async function(assert) {
     assert.expect(2);
 
-    assert.equal(findAll('vertical-item').length, 7, 'Rendered correct number of items');
+    assert.equal(findAll('vertical-item').length, 9, 'Rendered correct number of items');
 
     await scrollTo('.scrollable', 0, 500);
 

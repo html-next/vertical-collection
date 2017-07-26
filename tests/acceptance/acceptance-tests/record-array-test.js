@@ -16,8 +16,8 @@ if (VERSION.match(/1\.11\.\d+/) === null) {
 
     await waitForRender();
 
-    assert.equal(findAll('number-slide').length, 15, 'correct number of items rendered');
+    assert.equal(findAll('number-slide').length, 20, 'correct number of items rendered');
     assert.equal(find('number-slide:first-of-type').textContent.replace(/\s/g, ''), '0(0)', 'correct first item rendered');
-    assert.equal(find('number-slide:last-of-type').textContent.replace(/\s/g, ''), '14(14)', 'correct last item rendered');
+    assert.equal(find('number-slide:last-of-type').textContent.replace(/\s/g, ''), '19(19)', 'correct last item rendered');
   });
 }
