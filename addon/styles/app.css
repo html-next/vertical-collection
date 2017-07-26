@@ -12,7 +12,10 @@ occluded-content {
   width: 100%;
 
   /* prevents margin overflow on item container */
-  min-height: 0.001px;
+  min-height: 0.01px;
+
+  /* hides text visually while still being readable by screen readers */
+  color: rgba(0,0,0,0);
 }
 
 table > occluded-content,
