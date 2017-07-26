@@ -214,7 +214,7 @@ testScenarios(
 
 testScenarios(
   'Dynamic collection maintains state if the same list is passed in twice',
-  dynamicSimpleScenarioFor(getNumbers(0, 10), { itemHeight: 40 }),
+  dynamicSimpleScenarioFor(getNumbers(0, 20), { itemHeight: 40 }),
   standardTemplate,
 
   async function(assert) {
@@ -222,7 +222,8 @@ testScenarios(
 
     const itemContainer = find('vertical-collection');
 
-    await scrollTo('.scrollable', 0, 40);
+    // Occlude a single item,
+    await scrollTo('.scrollable', 0, 140);
 
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '1 1', 'first item rendered correctly after initial scroll set');
     assert.equal(paddingBefore(itemContainer), 40, 'itemContainer padding correct before same items set');

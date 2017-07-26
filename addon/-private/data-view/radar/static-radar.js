@@ -15,10 +15,9 @@ export default class StaticRadar extends Radar {
 
   _updateIndexes() {
     const {
-      bufferSize,
       totalItems,
-      visibleTop,
-      visibleBottom,
+      totalComponents,
+      visibleMiddle,
       _estimateHeight
     } = this;
 
@@ -31,11 +30,20 @@ export default class StaticRadar extends Radar {
 
     const maxIndex = totalItems - 1;
 
-    let firstItemIndex = Math.floor(visibleTop / _estimateHeight);
-    firstItemIndex = Math.max(0, firstItemIndex - bufferSize);
+    const middleItemIndex = Math.floor(visibleMiddle / _estimateHeight);
 
-    let lastItemIndex = Math.ceil(visibleBottom / _estimateHeight) - 1;
-    lastItemIndex = Math.min(maxIndex, lastItemIndex + bufferSize);
+    let firstItemIndex = middleItemIndex - Math.floor(totalComponents / 2);
+    let lastItemIndex = middleItemIndex + Math.ceil(totalComponents / 2) - 1;
+
+    if (firstItemIndex < 0) {
+      firstItemIndex = 0;
+      lastItemIndex = Math.min(totalComponents - 1, maxIndex);
+    }
+
+    if (lastItemIndex > maxIndex) {
+      lastItemIndex = maxIndex;
+      firstItemIndex = Math.max(maxIndex - (totalComponents - 1), 0);
+    }
 
     this._firstItemIndex = firstItemIndex;
     this._lastItemIndex = lastItemIndex;

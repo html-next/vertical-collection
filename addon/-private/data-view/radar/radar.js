@@ -260,7 +260,7 @@ export default class Radar {
       renderedLastItemIndex,
       renderedTotalBefore,
       renderedTotalAfter,
-      totalComponents
+      totalRendered
     } = this;
 
     // Add components to be recycled to the pool
@@ -292,7 +292,7 @@ export default class Radar {
     let lastIndexInList = orderedComponents[orderedComponents.length - 1] ? orderedComponents[orderedComponents.length - 1].index : renderedFirstItemIndex - 1;
 
     // Append as many items as needed to the rendered components
-    while (orderedComponents.length < totalComponents && lastIndexInList < renderedLastItemIndex) {
+    while (orderedComponents.length < totalRendered && lastIndexInList < renderedLastItemIndex) {
       let component;
 
       if (shouldRecycle === true) {
@@ -310,7 +310,7 @@ export default class Radar {
     }
 
     // Prepend as many items as needed to the rendered components
-    while (orderedComponents.length < totalComponents && firstIndexInList > renderedFirstItemIndex) {
+    while (orderedComponents.length < totalRendered && firstIndexInList > renderedFirstItemIndex) {
       let component;
 
       if (shouldRecycle === true) {
@@ -457,11 +457,11 @@ export default class Radar {
     const {
       bufferSize,
       renderedFirstItemIndex,
-      totalComponents
+      totalRendered
     } = this;
 
     if (renderedFirstItemIndex !== 0) {
-      const newFirstItemIndex = Math.max(renderedFirstItemIndex - totalComponents + bufferSize, 0);
+      const newFirstItemIndex = Math.max(renderedFirstItemIndex - totalRendered + bufferSize, 0);
       const offset = this.getOffsetForIndex(newFirstItemIndex);
 
       this.scrollContainer.scrollTop = offset + this._scrollTopOffset;
@@ -472,12 +472,12 @@ export default class Radar {
     const {
       bufferSize,
       renderedLastItemIndex,
-      totalComponents,
+      totalRendered,
       totalItems
     } = this;
 
     if (renderedLastItemIndex !== totalItems - 1) {
-      const newFirstItemIndex = Math.min(renderedLastItemIndex + bufferSize + 1, totalItems - totalComponents);
+      const newFirstItemIndex = Math.min(renderedLastItemIndex + bufferSize + 1, totalItems - totalRendered);
       const offset = this.getOffsetForIndex(newFirstItemIndex);
 
       this.scrollContainer.scrollTop = offset + this._scrollTopOffset;
@@ -502,8 +502,12 @@ export default class Radar {
     return this.renderAll === true ? 0 : this.totalAfter;
   }
 
+  get totalRendered() {
+    return this.renderAll === true ? this.totalItems : Math.min(this.totalItems, this.totalComponents);
+  }
+
   get totalComponents() {
-    return Math.min(this.totalItems, (this.renderedLastItemIndex - this.renderedFirstItemIndex) + 1);
+    return Math.ceil(this._scrollContainerHeight / this._estimateHeight) + (2 * this.bufferSize);
   }
 
   /*
@@ -521,6 +525,10 @@ export default class Radar {
    */
   get visibleTop() {
     return Math.max(this._scrollTop - this._scrollTopOffset + this._prependOffset, 0);
+  }
+
+  get visibleMiddle() {
+    return this.visibleTop + (this._scrollContainerHeight / 2);
   }
 
   get visibleBottom() {

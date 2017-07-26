@@ -29,10 +29,8 @@ export default class DynamicRadar extends Radar {
 
   _updateIndexes() {
     const {
-      bufferSize,
       skipList,
-      visibleTop,
-      visibleBottom,
+      visibleMiddle,
       totalItems,
       totalComponents,
 
@@ -58,23 +56,30 @@ export default class DynamicRadar extends Radar {
 
     const { values } = skipList;
 
-    let { totalBefore, index: firstVisibleIndex } = this.skipList.find(visibleTop);
-    let { totalAfter, index: lastVisibleIndex } = this.skipList.find(visibleBottom);
+    let { totalBefore, totalAfter, index: middleItemIndex } = this.skipList.find(visibleMiddle);
 
     const maxIndex = totalItems - 1;
 
-    let firstItemIndex = firstVisibleIndex;
-    let lastItemIndex = lastVisibleIndex;
+    let firstItemIndex = middleItemIndex - Math.floor(totalComponents / 2);
+    let lastItemIndex = middleItemIndex + Math.ceil(totalComponents / 2) - 1;
 
-    // Add buffers
-    for (let i = bufferSize; i > 0 && firstItemIndex > 0; i--) {
-      firstItemIndex--;
-      totalBefore -= values[firstItemIndex];
+    if (firstItemIndex < 0) {
+      firstItemIndex = 0;
+      lastItemIndex = Math.min(totalComponents - 1, maxIndex);
     }
 
-    for (let i = bufferSize; i > 0 && lastItemIndex < maxIndex; i--) {
-      lastItemIndex++;
-      totalAfter -= values[lastItemIndex];
+    if (lastItemIndex > maxIndex) {
+      lastItemIndex = maxIndex;
+      firstItemIndex = Math.max(maxIndex - (totalComponents - 1), 0);
+    }
+
+    // Add buffers
+    for (let i = middleItemIndex - 1; i >= firstItemIndex; i--) {
+      totalBefore -= values[i];
+    }
+
+    for (let i = middleItemIndex + 1; i <= lastItemIndex; i++) {
+      totalAfter -= values[i];
     }
 
     const itemDelta = (_prevFirstItemIndex !== null) ? firstItemIndex - _prevFirstItemIndex : lastItemIndex - firstItemIndex;
@@ -82,8 +87,9 @@ export default class DynamicRadar extends Radar {
     if (itemDelta < 0 || itemDelta >= totalComponents) {
       this.schedule('measure', () => {
         // schedule a measurement for items that could affect scrollTop
-        const staticVisibleIndex = this.renderFromLast ? lastVisibleIndex + 1 : firstVisibleIndex;
+        const staticVisibleIndex = this.renderFromLast ? this.lastVisibleIndex + 1 : this.firstVisibleIndex;
         const numBeforeStatic = staticVisibleIndex - firstItemIndex;
+
         const measureLimit = Math.min(Math.abs(itemDelta), numBeforeStatic);
 
         this._prependOffset += Math.round(this._measure(measureLimit));

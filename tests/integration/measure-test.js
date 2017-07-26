@@ -106,10 +106,10 @@ testScenarios(
 
     await waitForRender();
 
-    assert.equal(find('.scrollable').scrollTop, 400, 'scrollTop set to correct value');
+    assert.equal(find('.scrollable').scrollTop, 420, 'scrollTop set to correct value');
 
     const itemContainer = find('vertical-collection');
-    assert.equal(paddingBefore(itemContainer), 400, 'Occluded content has the correct height before');
-    assert.equal(paddingAfter(itemContainer), 290, 'Occluded content has the correct height after');
+    assert.equal(paddingBefore(itemContainer), 360, 'Occluded content has the correct height before');
+    assert.equal(paddingAfter(itemContainer), 260, 'Occluded content has the correct height after');
   }
 );

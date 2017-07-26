@@ -146,7 +146,7 @@ module.exports = {
   treeForApp: function() {
     var tree = this._super.treeForApp.apply(this, arguments);
 
-    if (/production/.test(this._env) || /test/.test(this._env)) {
+    if (isProductionEnv()) {
       tree = new Funnel(tree, { exclude: [ /initializers/ ] });
     }
 
