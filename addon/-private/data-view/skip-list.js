@@ -37,6 +37,14 @@ function fill(array, value, start = 0, end = array.length) {
   }
 }
 
+function subarray(array, start, end) {
+  if (typeof array.subarray === 'function') {
+    return array.subarray(start, end);
+  } else {
+    return array.slice(start, end);
+  }
+}
+
 export default class SkipList {
   constructor(length, defaultValue) {
     const values = new Float32Array(new ArrayBuffer(length * 4));
@@ -64,8 +72,7 @@ export default class SkipList {
 
       layer = new Float32Array(new ArrayBuffer(length * 4));
 
-      // TODO add explicit test
-      if (defaultValue) {
+      if (defaultValue !== undefined) {
         // If given a default value we assume that we can fill each
         // layer of the skip list with the previous layer's value * 2.
         // This allows us to use the `fill` method on Typed arrays, which
@@ -239,5 +246,34 @@ export default class SkipList {
 
     this.length = newLength;
     this._initializeLayers(newValues);
+  }
+
+  reset(newLength) {
+    const {
+      values: oldValues,
+      length: oldLength,
+      defaultValue
+    } = this;
+
+    if (oldLength === newLength) {
+      return;
+    }
+
+    const newValues = new Float32Array(new ArrayBuffer(newLength * 4));
+
+    if (oldLength < newLength) {
+      newValues.set(oldValues);
+      fill(newValues, defaultValue, oldLength);
+    } else {
+      newValues.set(subarray(oldValues, 0, newLength));
+    }
+
+    this.length = newLength;
+
+    if (oldLength === 0) {
+      this._initializeLayers(newValues, defaultValue);
+    } else {
+      this._initializeLayers(newValues);
+    }
   }
 }
