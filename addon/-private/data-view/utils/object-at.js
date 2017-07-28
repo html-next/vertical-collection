@@ -1,10 +1,7 @@
-import Ember from 'ember';
 import { assert } from 'vertical-collection/-debug/helpers';
 
-const { Array: EmberArray } = Ember;
-
 export default function objectAt(arr, index) {
-  assert('arr must be an instance of an Ember Array or Javascript Array', EmberArray.detect(arr) || Array.isArray(arr));
+  assert('arr must be an instance of a Javascript Array or implement `objectAt`', Array.isArray(arr) || typeof arr.objectAt === 'function');
 
   return arr.objectAt ? arr.objectAt(index) : arr[index];
 }
