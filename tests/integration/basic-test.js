@@ -57,6 +57,106 @@ testScenarios(
 );
 
 testScenarios(
+  'The collection renders correctly when em height is used',
+  scenariosFor(getNumbers(0, 10)),
+
+  hbs`
+    <div style="height: 100px; font-size: 10px;" class="scrollable">
+      {{#vertical-collection ${'items'}
+        estimateHeight="2em"
+        staticHeight=staticHeight
+        bufferSize=0
+
+        as |item i|}}
+        <vertical-item style="height: 2em">
+          {{item.number}} {{i}}
+        </vertical-item>
+      {{/vertical-collection}}
+    </div>
+  `,
+
+  async function(assert) {
+    assert.expect(1);
+    assert.equal(findAll('vertical-item').length, 5);
+  }
+);
+
+testScenarios(
+  'The collection renders correctly when rem height is used',
+  scenariosFor(getNumbers(0, 10)),
+
+  hbs`
+    <div style="height: 100px; font-size: 10px;" class="scrollable">
+      {{#vertical-collection ${'items'}
+        estimateHeight="2rem"
+        staticHeight=staticHeight
+        bufferSize=0
+
+        as |item i|}}
+        <vertical-item style="height: 2rem">
+          {{item.number}} {{i}}
+        </vertical-item>
+      {{/vertical-collection}}
+    </div>
+  `,
+
+  async function(assert) {
+    assert.expect(1);
+    assert.equal(findAll('vertical-item').length, 4);
+  }
+);
+
+testScenarios(
+  'The collection renders correctly when percent height is used',
+  scenariosFor(getNumbers(0, 10)),
+
+  hbs`
+    <div style="height: 100px;" class="scrollable">
+      {{#vertical-collection ${'items'}
+        estimateHeight="66%"
+        staticHeight=staticHeight
+        bufferSize=0
+
+        as |item i|}}
+        <vertical-item style="height: 66%">
+          {{item.number}} {{i}}
+        </vertical-item>
+      {{/vertical-collection}}
+    </div>
+  `,
+
+  async function(assert) {
+    assert.expect(1);
+    assert.equal(findAll('vertical-item').length, 2);
+  }
+);
+
+testScenarios(
+  'The collection renders correctly when em height is used',
+  scenariosFor(getNumbers(0, 10)),
+
+  hbs`
+    <div style="height: 100px; font-size: 10px;" class="scrollable">
+      {{#vertical-collection ${'items'}
+        estimateHeight="2em"
+        staticHeight=staticHeight
+        bufferSize=0
+
+        as |item i|}}
+        <vertical-item style="height: 2em">
+          {{item.number}} {{i}}
+        </vertical-item>
+      {{/vertical-collection}}
+    </div>
+  `,
+
+  async function(assert) {
+    assert.expect(1);
+    assert.equal(findAll('vertical-item').length, 5);
+  }
+);
+
+testScenarios(
   'The collection renders correct number of components with bufferSize set',
   scenariosFor(getNumbers(0, 10), { estimateHeight: 200, bufferSize: 1 }),
   standardTemplate,

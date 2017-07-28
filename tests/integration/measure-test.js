@@ -8,7 +8,7 @@ import waitForRender from 'dummy/tests/helpers/wait-for-render';
 import getNumbers from 'dummy/lib/get-numbers';
 
 import { paddingBefore, paddingAfter } from 'dummy/tests/helpers/measurement';
-import { prepend } from 'dummy/tests/helpers/array';
+import { prepend, replaceArray } from 'dummy/tests/helpers/array';
 
 import {
   testScenarios,
@@ -111,5 +111,29 @@ testScenarios(
     const itemContainer = find('vertical-collection');
     assert.equal(paddingBefore(itemContainer), 360, 'Occluded content has the correct height before');
     assert.equal(paddingAfter(itemContainer), 260, 'Occluded content has the correct height after');
+  }
+);
+
+testScenarios(
+  'Measurements are correct after a reset',
+  dynamicSimpleScenarioFor(getNumbers(0, 20), { itemHeight: 30 }),
+  standardTemplate,
+
+  async function(assert) {
+    assert.expect(6);
+
+    await scrollTo('.scrollable', 0, 300);
+
+    assert.equal(find('.scrollable').scrollTop, 300, 'scrollTop set to correct value');
+    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '10 10', 'the first rendered item is correct');
+    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '19 19', 'the last rendered item is correct');
+
+    replaceArray(this, getNumbers(20, 20));
+
+    await waitForRender();
+
+    assert.equal(find('.scrollable').scrollTop, 300, 'scrollTop set to correct value');
+    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '30 10', 'the first rendered item is correct');
+    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '39 19', 'the last rendered item is correct');
   }
 );
