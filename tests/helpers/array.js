@@ -55,3 +55,29 @@ export function replaceArray(context, items) {
 
   return waitForRender();
 }
+
+export function move(context, sourceItemIdx, destItemIdx) {
+  const items = context.get('items');
+  let destItem, sourceItem;
+
+  if (items.objectAt && items.removeObject && items.insertAt) {
+    // Ember Array
+    destItem = items.objectAt(destItemIdx);
+    sourceItem = items.objectAt(sourceItemIdx);
+    items.removeObject(sourceItem);
+    destItemIdx = items.indexOf(destItem) + 1;
+    items.insertAt(destItemIdx, sourceItem);
+  } else {
+    // native array
+    destItem = items[destItemIdx];
+    sourceItem = items[sourceItemIdx];
+    items.splice(sourceItemIdx, 1);
+    destItemIdx = items.indexOf(destItem) + 1;
+    items.splice(destItemIdx, 0, sourceItem);
+    // if we are not using Ember Arrays we need to set `items` to a new array
+    // instance to trigger a recompute on `virtualComponents`
+    context.set('items', [].concat(items));
+  }
+
+  return waitForRender();
+}
