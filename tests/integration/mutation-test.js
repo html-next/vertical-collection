@@ -13,7 +13,7 @@ import {
   standardTemplate
 } from 'dummy/tests/helpers/test-scenarios';
 
-import { prepend, append, emptyArray, replaceArray } from 'dummy/tests/helpers/array';
+import { prepend, append, emptyArray, replaceArray, move } from 'dummy/tests/helpers/array';
 import { paddingBefore, containerHeight } from 'dummy/tests/helpers/measurement';
 
 moduleForComponent('vertical-collection', 'Integration | Mutation Tests', {
@@ -232,5 +232,28 @@ testScenarios(
 
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '1 1', 'first item rendered correctly after same items set');
     assert.equal(paddingBefore(itemContainer), 40, 'itemContainer padding correct after same items set');
+  }
+);
+
+testScenarios(
+  'Collection reorders correctly',
+  scenariosFor(getNumbers(0, 5)),
+  standardTemplate,
+
+  async function(assert) {
+    assert.expect(8);
+
+    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'first item rendered correctly before move');
+    assert.equal(find('.vertical-item:nth-of-type(2)').textContent.trim(), '1 1', 'second item starts in second');
+    assert.equal(find('.vertical-item:nth-of-type(4)').textContent.trim(), '3 3', 'foruth item starts in fourth');
+    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '4 4', 'last item rendered correctly before move');
+
+    // move second object to the second last position
+    await move(this, 1, 3);
+
+    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'first item rendered correctly after move');
+    assert.equal(find('.vertical-item:nth-of-type(2)').textContent.trim(), '2 1', 'third item drops to second');
+    assert.equal(find('.vertical-item:nth-of-type(4)').textContent.trim(), '1 3', 'second item is now in fourth position');
+    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '4 4', 'last item rendered correctly before move');
   }
 );
