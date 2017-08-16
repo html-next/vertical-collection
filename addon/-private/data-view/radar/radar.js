@@ -188,7 +188,9 @@ export default class Radar {
 
         stripInProduction(() => {
           // Hook to update the visual debugger
-          this._debugDidUpdate(this);
+          if (this._debugDidUpdate != null) {
+            this._debugDidUpdate(this);
+          }
         });
       });
     });
