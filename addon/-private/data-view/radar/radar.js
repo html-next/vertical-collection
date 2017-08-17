@@ -534,7 +534,10 @@ export default class Radar {
   }
 
   get visibleBottom() {
-    return this.visibleTop + this._scrollContainerHeight - 1;
+    // There is a case where the container of this vertical collection could have height 0 at
+    // initial render step but will be updated later. We want to return visibleBottom to be 0 rather
+    // than -1.
+    return Math.max(this.visibleTop + this._scrollContainerHeight - 1, 0);
   }
 
   get totalItems() {
