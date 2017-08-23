@@ -1,5 +1,6 @@
 import Radar from './radar';
-import SkipList from '../skip-list';
+// import SkipList from '../skip-list';
+import SkipList from '../rb-tree/rb-tree-wrapper';
 import roundTo from '../utils/round-to';
 
 import { stripInProduction } from 'vertical-collection/-debug/helpers';
@@ -65,8 +66,6 @@ export default class DynamicRadar extends Radar {
       this._measure();
     }
 
-    const { values } = skipList;
-
     let { totalBefore, totalAfter, index: middleItemIndex } = this.skipList.find(visibleMiddle);
 
     const maxIndex = totalItems - 1;
@@ -86,11 +85,11 @@ export default class DynamicRadar extends Radar {
 
     // Add buffers
     for (let i = middleItemIndex - 1; i >= firstItemIndex; i--) {
-      totalBefore -= values[i];
+      totalBefore -= skipList.getValues(i);
     }
 
     for (let i = middleItemIndex + 1; i <= lastItemIndex; i++) {
-      totalAfter -= values[i];
+      totalAfter -= skipList.getValues(i);
     }
 
     const itemDelta = (_prevFirstItemIndex !== null) ? firstItemIndex - _prevFirstItemIndex : lastItemIndex - firstItemIndex;

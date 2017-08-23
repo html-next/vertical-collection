@@ -107,6 +107,10 @@ export default class SkipList {
     this.values = values;
   }
 
+  getValues(index) {
+    return this.values[index];
+  }
+
   find(targetValue) {
     const { layers, total, length, values } = this;
     const numLayers = layers.length;
