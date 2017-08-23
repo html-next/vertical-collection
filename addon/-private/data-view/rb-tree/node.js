@@ -202,7 +202,7 @@ export class Node {
     if (this.left !== null) {
       sum += this.left.debugSum();
     }
-    if (this.data.leftSum !== sum) {
+    if (this.data.leftSum !== sum && Math.abs(this.data.leftSum - sum) > 0.0001) {
       this.printNode(0);
       throw new Error('Sum does not match: ' + this.data.start + ' ' + this.data.leftSum + ' ' + sum);
     }

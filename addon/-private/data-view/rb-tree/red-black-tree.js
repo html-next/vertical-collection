@@ -4,6 +4,7 @@ import { assert } from 'vertical-collection/-debug/helpers';
 export default class RedBlackTree {
   constructor() {
     this.root = null;
+    this.minIndex = 0;
   }
 
   printTree() {
@@ -314,14 +315,15 @@ export default class RedBlackTree {
     this.debugSum();
   }
 
-  update(index, value) {
+  update(outsideIndex, value) {
+    let index = this.minIndex + outsideIndex;
     const data = {
       start: index,
       end: index,
       value
     };
 
-    const node = this.nodeContainingIndex(index);
+    const node = this._nodeContainingIndex(index);
     if (node === null) {
       throw new Error('Node cannot be found for ' + index + ' ' + value);
     }
@@ -403,7 +405,7 @@ export default class RedBlackTree {
     this.debugSum();
   }
 
-  nodeContainingIndex(index) {
+  _nodeContainingIndex(index) {
     let n = this.root;
 
     while (n !== null) {
@@ -422,7 +424,8 @@ export default class RedBlackTree {
     return null;
   }
 
-  getSum(index) {
+  getSum(outsideIndex) {
+    let index = this.minIndex + outsideIndex;
     let sum = 0;
     let n = this.root;
 
@@ -452,6 +455,37 @@ export default class RedBlackTree {
     return sum;
   }
 
+  /**
+   * Public function to get an index. This index is the outside index.
+   */
+  getValueAtIndex(outsideIndex) {
+    return this._getValueAtIndex(this.minIndex + outsideIndex);
+  }
+
+  _getValueAtIndex(index) {
+    let n = this.root;
+
+    const data = {
+      start: index,
+      end: index
+    }
+
+    while (n !== null) {
+      const nodeData = n.getData();
+      const comparisonResult = this.compareNode(data, nodeData);
+      if (comparisonResult == 0) {
+        return nodeData.value;
+      } else if (comparisonResult < 0) {
+        if (index >= nodeData.start) {
+          return nodeData.value;
+        }
+        n = n.getLeft();
+      } else {
+        n = n.getRight();
+      }
+    }
+  }
+
   findMaxIndex(targetValue) {
     let n = this.root;
     if (n === null) {
@@ -465,7 +499,8 @@ export default class RedBlackTree {
     let remainingValue = targetValue;
     let totalBefore = 0;
     let valueAtIndex = 0;
-    let index = -1;
+    const MIN = -100000000;
+    let index = MIN;
 
     const DIRECTION_STAY = 0;
     const DIRECTION_GO_LEFT = 1;
@@ -528,8 +563,22 @@ export default class RedBlackTree {
       }
     }
 
+    if (index === MIN) {
+      index = this.minIndex;
+      valueAtIndex = this._getValueAtIndex(index);
+    }
+
     const totalAfter = this.root.getTotalSum() - totalBefore - valueAtIndex;
-    return { index: index, totalBefore: totalBefore, totalAfter: totalAfter };
+    return { index: index - this.minIndex, totalBefore: totalBefore, totalAfter: totalAfter };
+  }
+
+  prepend(itemCount, value) {
+    this.minIndex -= itemCount;
+    this.add({
+      start: this.minIndex,
+      end: this.minIndex + itemCount - 1,
+      value: value
+    });
   }
 
   debugSum() {

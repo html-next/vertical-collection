@@ -1,4 +1,5 @@
 import RedBlackTree from './red-black-tree';
+import roundTo from '../utils/round-to';
 
 export default class RbTreeWrapper {
   constructor(length, defaultValue) {
@@ -7,7 +8,7 @@ export default class RbTreeWrapper {
   }
 
   find(targetValue) {
-    return this.tree.findMaxIndex(targetValue);
+    return this.tree.findMaxIndex(targetValue);;
   }
 
   getOffset(targetIndex) {
@@ -16,7 +17,14 @@ export default class RbTreeWrapper {
   }
 
   set(index, value) {
+    const oldValue = this.tree.getValueAtIndex(index);
     this.tree.update(index, value);
+
+    return roundTo(value - oldValue);
+  }
+
+  getValues(index) {
+    return this.tree.getValueAtIndex(index);
   }
 
   prepend(numPrepended) {
@@ -24,13 +32,7 @@ export default class RbTreeWrapper {
       return;
     }
 
-    const oldSmallestIndex = this.smallesIndex;
-    tree.add({
-      start: oldSmallestIndex - numPrepended,
-      end: oldSmallestIndex - 1,
-      value: this.defaultValue
-    });
-    thils.smallesIndex = oldSmallestIndex - numPrepended;
+    this.tree.prepend(numPrepended, this.defaultValue);
   }
 
   append(numAppended) {
@@ -38,8 +40,11 @@ export default class RbTreeWrapper {
       return;
     }
 
+    throw new Error("Not supported yet")
+    // TODO(Billy): support append.
+
     const oldBiggestIndex = this.biggestIndex;
-    tree.add({
+    this.tree.add({
       start: oldBiggestIndex + numAppended,
       end: oldBiggestIndex + 1,
       value: this.defaultValue
@@ -53,11 +58,9 @@ export default class RbTreeWrapper {
 
   _createTree(length) {
     this.length = length;
-    this.smallesIndex = 0;
-    this.biggestIndex = length - 1;
 
     this.tree = new RedBlackTree();
-    tree.add({
+    this.tree.add({
       start: 0,
       end: length - 1,
       value: this.defaultValue
