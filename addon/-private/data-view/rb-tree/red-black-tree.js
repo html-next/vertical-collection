@@ -574,7 +574,7 @@ export default class RedBlackTree {
             index = nodeData.start;
           } else {
             index = Math.floor((remainingValue - nodeData.value) / nodeData.value) + nodeData.start;
-            assert('index should be bigger than start', index > nodeData.start);
+            assert('index should be bigger than start', index >= nodeData.start);
             totalBefore += (index - nodeData.start) * nodeData.value;
           }
         }

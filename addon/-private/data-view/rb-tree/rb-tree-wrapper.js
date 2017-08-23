@@ -9,7 +9,7 @@ export default class RbTreeWrapper {
 
   find(targetValue) {
     let ret = this.tree.findMaxIndex(targetValue);;
-    if (ret.index !== 0) {
+    if (ret.index !== 0 && ret.index < this.length - 1) {
       ret = this.tree.getTriple(ret.index + 1);
     }
     return ret;

@@ -1,7 +1,7 @@
 import Radar from './radar';
-import SkipList from '../skip-list';
-// import SkipList from '../rb-tree/rb-tree-wrapper';
-import RbTreeWrapper from '../rb-tree/rb-tree-wrapper';
+// import SkipList from '../skip-list';
+import SkipList from '../rb-tree/rb-tree-wrapper';
+// import RbTreeWrapper from '../rb-tree/rb-tree-wrapper';
 import roundTo from '../utils/round-to';
 
 import { stripInProduction } from 'vertical-collection/-debug/helpers';
@@ -36,10 +36,10 @@ export default class DynamicRadar extends Radar {
     // Create the SkipList only after the estimateHeight has been calculated the first time
     if (this.skipList === null) {
       this.skipList = new SkipList(this.totalItems, this._estimateHeight);
-      this.rbTreeWrapper = new RbTreeWrapper(this.totalItems, this._estimateHeight);
+      // this.rbTreeWrapper = new RbTreeWrapper(this.totalItems, this._estimateHeight);
     } else {
       this.skipList.defaultValue = this._estimateHeight;
-      this.rbTreeWrapper.defaultValue = this._estimateHeight;
+      // this.rbTreeWrapper.defaultValue = this._estimateHeight;
     }
   }
 
@@ -74,16 +74,16 @@ export default class DynamicRadar extends Radar {
     // const { values } = skipList;
 
     let { totalBefore, totalAfter, index: middleItemIndex } = this.skipList.find(visibleMiddle);
-    let { totalBefore: before2, totalAfter: after2, index: index2 } = this.rbTreeWrapper.find(visibleMiddle);
-    if (index2 === middleItemIndex) {
-      console.log('Equal ' + index2);
-    }
-    if (before2 !== totalBefore || after2 !== totalAfter || index2 !== middleItemIndex) {
-      console.log(middleItemIndex, index2, totalBefore, before2);
-      // debugger
-      // this.rbTreeWrapper.find(visibleMiddle);
-      // throw new Error('Not matching')
-    }
+    // let { totalBefore: before2, totalAfter: after2, index: index2 } = this.rbTreeWrapper.find(visibleMiddle);
+    // if (index2 === middleItemIndex) {
+    //   console.log('Equal ' + index2);
+    // }
+    // if (before2 !== totalBefore || after2 !== totalAfter || index2 !== middleItemIndex) {
+    //   console.log(middleItemIndex, index2, totalBefore, before2);
+    //   // debugger
+    //   // this.rbTreeWrapper.find(visibleMiddle);
+    //   // throw new Error('Not matching')
+    // }
 
     const maxIndex = totalItems - 1;
 
@@ -103,18 +103,18 @@ export default class DynamicRadar extends Radar {
     // Add buffers
     for (let i = middleItemIndex - 1; i >= firstItemIndex; i--) {
       const value = skipList.getValues(i);
-      if (Math.abs(value - rbTreeWrapper.getValues(i)) > 0.01) {
-        debugger;
-        rbTreeWrapper.getValues(i)
-      }
+      // if (Math.abs(value - rbTreeWrapper.getValues(i)) > 0.01) {
+      //   debugger;
+      //   rbTreeWrapper.getValues(i)
+      // }
       totalBefore -= value;
     }
 
     for (let i = middleItemIndex + 1; i <= lastItemIndex; i++) {
       const value = skipList.getValues(i);
-      if (Math.abs(value - rbTreeWrapper.getValues(i)) > 0.01) {
-        debugger;
-      }
+      // if (Math.abs(value - rbTreeWrapper.getValues(i)) > 0.01) {
+      //   debugger;
+      // }
       totalAfter -= value;
     }
 
@@ -170,7 +170,7 @@ export default class DynamicRadar extends Radar {
       }
 
       const itemDelta = skipList.set(itemIndex, roundTo(currentItemHeight + margin));
-      rbTreeWrapper.set(itemIndex, roundTo(currentItemHeight + margin));
+      // rbTreeWrapper.set(itemIndex, roundTo(currentItemHeight + margin));
 
       if (itemDelta !== 0) {
         totalDelta += itemDelta;
@@ -226,14 +226,14 @@ export default class DynamicRadar extends Radar {
     super.prepend(numPrepended);
 
     this.skipList.prepend(numPrepended);
-    this.rbTreeWrapper.prepend(numPrepended);
+    // this.rbTreeWrapper.prepend(numPrepended);
   }
 
   append(numAppended) {
     super.append(numAppended);
 
     this.skipList.append(numAppended);
-    this.rbTreeWrapper.append(numAppended);
+    // this.rbTreeWrapper.append(numAppended);
   }
 
   reset() {
@@ -241,7 +241,7 @@ export default class DynamicRadar extends Radar {
 
     if (this.skipList !== null) {
       this.skipList.reset(this.totalItems);
-      this.rbTreeWrapper.reset(this.totalItems);
+      // this.rbTreeWrapper.reset(this.totalItems);
     }
   }
 

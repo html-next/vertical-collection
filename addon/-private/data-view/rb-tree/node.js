@@ -2,11 +2,13 @@ export const COLOR_BLACK = 1;
 export const COLOR_RED = 2;
 
 export class Node {
+
   constructor(data) {
     this.data = data;
     this.data.leftSum = this.getTotalIntervalValue();
 
     this.color = COLOR_BLACK;
+    this.debugMode = true;
 
     this.left = null;
     this.right = null;
@@ -151,6 +153,16 @@ export class Node {
     return value;
   }
 
+  getRightMostData() {
+    let data = null;
+    let node = this;
+    while (node !== null) {
+      data = node.data;
+      node = node.right;
+    }
+    return data;
+  }
+
   getTotalSum() {
     let node = this;
     let sum = 0;
@@ -198,11 +210,15 @@ export class Node {
   }
 
   debugSum() {
+    if (!this.debugMode) {
+      return;
+    }
+
     let sum = this.getTotalIntervalValue();
     if (this.left !== null) {
       sum += this.left.debugSum();
     }
-    if (this.data.leftSum !== sum && Math.abs(this.data.leftSum - sum) > 0.0001) {
+    if (Math.abs(this.data.leftSum - sum) > 0.5) {
       this.printNode(0);
       throw new Error('Sum does not match: ' + this.data.start + ' ' + this.data.leftSum + ' ' + sum);
     }
