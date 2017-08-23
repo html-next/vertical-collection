@@ -427,6 +427,10 @@ export default class RedBlackTree {
 
   getSum(outsideIndex) {
     let index = this.minIndex + outsideIndex;
+    return this._getSum(index);
+  }
+
+  _getSum(index) {
     let sum = 0;
     let n = this.root;
 
@@ -464,6 +468,10 @@ export default class RedBlackTree {
   }
 
   _getValueAtIndex(index) {
+    return this._getDataAtIndex(index).value;
+  }
+
+  _getDataAtIndex(index) {
     let n = this.root;
 
     const data = {
@@ -475,10 +483,10 @@ export default class RedBlackTree {
       const nodeData = n.getData();
       const comparisonResult = this.compareNode(data, nodeData);
       if (comparisonResult == 0) {
-        return nodeData.value;
+        return nodeData;
       } else if (comparisonResult < 0) {
         if (index >= nodeData.start) {
-          return nodeData.value;
+          return nodeData;
         }
         n = n.getLeft();
       } else {
@@ -486,6 +494,16 @@ export default class RedBlackTree {
       }
     }
     return null;
+  }
+
+  getTriple(outsideIndex) {
+    const index = this.minIndex + outsideIndex;
+    const value = this._getValueAtIndex(index);
+    const totalBefore = this._getSum(index) - value;
+    const total = this.root.getTotalSum();
+    const totalAfter = this.root.getTotalSum() - totalBefore - value;
+
+    return { index: index - this.minIndex, totalBefore: totalBefore, totalAfter: totalAfter };
   }
 
   findMaxIndex(targetValue) {

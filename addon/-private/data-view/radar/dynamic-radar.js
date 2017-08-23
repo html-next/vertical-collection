@@ -79,7 +79,7 @@ export default class DynamicRadar extends Radar {
       console.log('Equal ' + index2);
     }
     if (before2 !== totalBefore || after2 !== totalAfter || index2 !== middleItemIndex) {
-      console.log(middleItemIndex, index2);
+      console.log(middleItemIndex, index2, totalBefore, before2);
       // debugger
       // this.rbTreeWrapper.find(visibleMiddle);
       // throw new Error('Not matching')

@@ -8,7 +8,11 @@ export default class RbTreeWrapper {
   }
 
   find(targetValue) {
-    return this.tree.findMaxIndex(targetValue);;
+    let ret = this.tree.findMaxIndex(targetValue);;
+    if (ret.index !== 0) {
+      ret = this.tree.getTriple(ret.index + 1);
+    }
+    return ret;
   }
 
   getOffset(targetIndex) {
