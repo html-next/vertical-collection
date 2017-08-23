@@ -193,8 +193,6 @@ export default class SkipList {
     assert('index must be a number', typeof index === 'number');
     assert('index must be within bounds', index >= 0 && index < this.values.length);
 
-    // debugger
-
     const { layers } = this;
     const oldValue = layers[layers.length - 1][index];
     const delta = roundTo(value - oldValue);
@@ -237,7 +235,6 @@ export default class SkipList {
   }
 
   append(numAppended) {
-    debugger
     const {
       values: oldValues,
       length: oldLength,
