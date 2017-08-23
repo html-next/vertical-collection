@@ -5,6 +5,7 @@ export default class RedBlackTree {
   constructor() {
     this.root = null;
     this.minIndex = 0;
+    this.maxIndex = 0;
   }
 
   printTree() {
@@ -484,6 +485,7 @@ export default class RedBlackTree {
         n = n.getRight();
       }
     }
+    return null;
   }
 
   findMaxIndex(targetValue) {
@@ -577,6 +579,19 @@ export default class RedBlackTree {
     this.add({
       start: this.minIndex,
       end: this.minIndex + itemCount - 1,
+      value: value
+    });
+  }
+
+  append(itemCount, value) {
+    if (this.root !== null) {
+      const data = this.root.getRightMostData();
+      this.maxIndex = data.end;
+    }
+
+    this.add({
+      start: this.maxIndex + 1,
+      end: this.maxIndex + itemCount,
       value: value
     });
   }

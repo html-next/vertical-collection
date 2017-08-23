@@ -40,16 +40,7 @@ export default class RbTreeWrapper {
       return;
     }
 
-    throw new Error("Not supported yet")
-    // TODO(Billy): support append.
-
-    const oldBiggestIndex = this.biggestIndex;
-    this.tree.add({
-      start: oldBiggestIndex + numAppended,
-      end: oldBiggestIndex + 1,
-      value: this.defaultValue
-    });
-    this.biggestIndex = oldBiggestIndex + numAppended;
+    this.tree.append(numAppended, this.defaultValue);
   }
 
   reset(newLength) {
