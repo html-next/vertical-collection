@@ -220,6 +220,9 @@ export default class Radar {
       const maxHeightString = window.getComputedStyle(scrollContainer).maxHeight;
       if (/\d+$/.test(maxHeightString)) {
         maxHeight = parseInt(maxHeightString);
+      } else if (/\d+%$/.test(maxHeightString)) {
+        const percent = maxHeightString.substr(0, maxHeightString.length - 1);
+        maxHeight = scrollContainer.parentElement.offsetHeight * (percent / 100.0);
       }
     }
 
