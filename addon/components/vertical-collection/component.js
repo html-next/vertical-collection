@@ -272,7 +272,7 @@ function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {
 
   let startingIndex = 0;
 
-  if (idForFirstItem !== null) {
+  if (idForFirstItem !== undefined && idForFirstItem !== null) {
     for (let i = 0; i < totalItems; i++) {
       if (keyForItem(objectAt(items, i), key, i) === idForFirstItem) {
         startingIndex = i;
