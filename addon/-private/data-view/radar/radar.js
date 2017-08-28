@@ -218,7 +218,7 @@ export default class Radar {
     let maxHeight = 0;
     if (scrollContainer instanceof Element) {
       const maxHeightString = window.getComputedStyle(scrollContainer).maxHeight;
-      if (/\d+$/.test(maxHeightString)) { // example: 50%
+      if (/\d+$/.test(maxHeightString)) {
         maxHeight = parseInt(maxHeightString);
       }
     }
