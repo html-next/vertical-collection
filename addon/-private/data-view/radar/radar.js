@@ -7,7 +7,7 @@ import insertRangeBefore from '../utils/insert-range-before';
 import objectAt from '../utils/object-at';
 import roundTo from '../utils/round-to';
 
-import estimateElementHeight from '../../utils/element/estimate-element-height';
+import { estimateElementHeight, estimateElementMaxHeight } from '../../utils/element/estimate-element-height';
 
 import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
 
@@ -217,13 +217,7 @@ export default class Radar {
 
     let maxHeight = 0;
     if (scrollContainer instanceof Element) {
-      const maxHeightString = window.getComputedStyle(scrollContainer).maxHeight;
-      if (/\d+px$/.test(maxHeightString)) { // e.g: 50px
-        maxHeight = parseInt(maxHeightString);
-      } else if (/\d+%$/.test(maxHeightString)) { // e.g: 50%
-        const percent = maxHeightString.substr(0, maxHeightString.length - 1);
-        maxHeight = scrollContainer.parentElement.offsetHeight * (percent / 100.0);
-      }
+      maxHeight = estimateElementMaxHeight(scrollContainer);
     }
 
     maxHeight = isNaN(maxHeight) ? 0 : maxHeight;
