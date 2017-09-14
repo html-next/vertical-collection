@@ -16,7 +16,7 @@ if (SUPPORTS_INVERSE_BLOCK) {
     this.set('items', []);
 
     this.render(hbs`
-      {{#vertical-collection ${'items'}
+      {{#vertical-collection items
         estimateHeight=20
         staticHeight=true
       }}

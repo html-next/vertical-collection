@@ -1,7 +1,5 @@
 /* eslint-env node */
 var EmberAddon = require('ember-cli/lib/broccoli/ember-addon');
-var VersionChecker = require('ember-cli-version-checker');
-var replace = require('broccoli-string-replace');
 
 module.exports = function(defaults) {
 
@@ -9,19 +7,10 @@ module.exports = function(defaults) {
   defaults.snippetPaths = ['tests/dummy/snippets'];
 
   var app = new EmberAddon(defaults);
-  var checker = new VersionChecker(app);
 
   app.isDevelopingAddon = () => {
     return true;
   };
-
-  app.trees.tests = replace('tests', {
-    files: ['**/*'],
-    pattern: {
-      match: /\$\{\'items\'\}/g,
-      replacement: checker.forEmber().isAbove('1.13.0') ? 'items' : 'items=items'
-    }
-  });
 
   var bootstrapPath = app.bowerDirectory + '/bootstrap/dist/';
   app.import(bootstrapPath + 'css/bootstrap.css');

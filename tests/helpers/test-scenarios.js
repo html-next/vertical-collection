@@ -79,7 +79,7 @@ export const scenariosFor = mergeScenarioGenerators(
 
 export const standardTemplate = hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection ${'items'}
+    {{#vertical-collection items
       estimateHeight=(either-or estimateHeight 20)
       staticHeight=staticHeight
       bufferSize=(either-or bufferSize 0)

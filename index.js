@@ -7,6 +7,7 @@ var RemoveImports = require('./lib/babel-plugin-remove-imports');
 var Funnel = require('broccoli-funnel');
 var Rollup = require('broccoli-rollup');
 var merge   = require('broccoli-merge-trees');
+var VersionChecker = require('ember-cli-version-checker');
 
 function isProductionEnv() {
   var isProd = /production/.test(process.env.EMBER_ENV);
@@ -125,6 +126,7 @@ module.exports = {
 
   included: function(app) {
     this._super.included.apply(this, arguments);
+    this.checker = new VersionChecker(app);
 
     while (typeof app.import !== 'function' && app.app) {
       app = app.app;
@@ -146,10 +148,16 @@ module.exports = {
   treeForApp: function() {
     var tree = this._super.treeForApp.apply(this, arguments);
 
+    const exclude = [];
+
     if (isProductionEnv()) {
-      tree = new Funnel(tree, { exclude: [ /initializers/ ] });
+      exclude.push('initializers/debug.js');
     }
 
-    return tree;
+    if (this.checker.forEmber().isAbove('1.13.0')) {
+      exclude.push('initializers/vertical-collection-legacy-compat.js');
+    }
+
+    return new Funnel(tree, { exclude });
   }
 };
