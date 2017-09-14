@@ -7,7 +7,7 @@ import insertRangeBefore from '../utils/insert-range-before';
 import objectAt from '../utils/object-at';
 import roundTo from '../utils/round-to';
 
-import estimateElementHeight from '../../utils/element/estimate-element-height';
+import { estimateElementHeight, estimateElementMaxHeight } from '../../utils/element/estimate-element-height';
 
 import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
 
@@ -215,7 +215,11 @@ export default class Radar {
       height: scrollContainerHeight
     } = scrollContainer.getBoundingClientRect();
 
-    let maxHeight = scrollContainer instanceof Element ? parseInt(window.getComputedStyle(scrollContainer).maxHeight) : 0;
+    let maxHeight = 0;
+    if (scrollContainer instanceof Element) {
+      maxHeight = estimateElementMaxHeight(scrollContainer);
+    }
+
     maxHeight = isNaN(maxHeight) ? 0 : maxHeight;
 
     this._estimateHeight = typeof estimateHeight === 'string' ? estimateElementHeight(itemContainer, estimateHeight) : estimateHeight;
