@@ -1,0 +1,14 @@
+import Ember from 'ember';
+import VerticalCollection from 'vertical-collection/components/vertical-collection/component';
+
+Ember.HTMLBars._registerHelper('vertical-collection', (params, hash, options, env) => {
+  hash.items = params.pop();
+
+  return env.helpers.view.helperFunction.call(this, [VerticalCollection], hash, options, env);
+});
+
+export default {
+  name: 'vertical-collection-legacy-compat',
+
+  initialize() {}
+};

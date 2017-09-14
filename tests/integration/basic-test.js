@@ -62,7 +62,7 @@ testScenarios(
 
   hbs`
     <div style="height: 100px; font-size: 10px;" class="scrollable">
-      {{#vertical-collection ${'items'}
+      {{#vertical-collection items
         estimateHeight="2em"
         staticHeight=staticHeight
         bufferSize=0
@@ -87,7 +87,7 @@ testScenarios(
 
   hbs`
     <div style="height: 100px; font-size: 10px;" class="scrollable">
-      {{#vertical-collection ${'items'}
+      {{#vertical-collection items
         estimateHeight="2rem"
         staticHeight=staticHeight
         bufferSize=0
@@ -112,7 +112,7 @@ testScenarios(
 
   hbs`
     <div style="height: 100px;" class="scrollable">
-      {{#vertical-collection ${'items'}
+      {{#vertical-collection items
         estimateHeight="66%"
         staticHeight=staticHeight
         bufferSize=0
@@ -137,7 +137,7 @@ testScenarios(
 
   hbs`
     <div style="height: 100px; font-size: 10px;" class="scrollable">
-      {{#vertical-collection ${'items'}
+      {{#vertical-collection items
         estimateHeight="2em"
         staticHeight=staticHeight
         bufferSize=0
@@ -184,7 +184,7 @@ testScenarios(
   hbs`
     <div style="height: 100px;" class="scrollable">
       <div>
-        {{#vertical-collection ${'items'}
+        {{#vertical-collection items
           containerSelector=".scrollable"
           estimateHeight=20
           staticHeight=true
@@ -212,7 +212,7 @@ testScenarios(
   hbs`
     <div style="height: 100px; padding-top: 50px;" class="scrollable">
       <div>
-        {{#vertical-collection ${'items'}
+        {{#vertical-collection items
           containerSelector=".scrollable"
           estimateHeight=20
           staticHeight=true
@@ -245,7 +245,7 @@ testScenarios(
   hbs`
     <div style="position: relative; background: red; box-sizing: content-box; height: 100px; overflow-y: scroll;" class="scrollable">
       <div style="padding: 200px;">
-        {{#vertical-collection ${'items'}
+        {{#vertical-collection items
           containerSelector=".scrollable"
           estimateHeight=20
           bufferSize=0
@@ -276,7 +276,7 @@ testScenarios(
 
   hbs`
     <div style="height: 500px; width: 500px;">
-      {{#vertical-collection ${'items'}
+      {{#vertical-collection items
         estimateHeight=10
         containerSelector="body"
         as |item|
@@ -304,7 +304,7 @@ test('The collection renders the initialRenderCount correctly', async function(a
 
   this.render(hbs`
     <div style="height: 500px; width: 500px;" class="scrollable">
-      {{#vertical-collection ${'items'}
+      {{#vertical-collection items
         estimateHeight=50
         initialRenderCount=1
         as |item i|
@@ -334,7 +334,7 @@ test('The collection renders the initialRenderCount correctly if idForFirstItem 
 
   this.render(hbs`
     <div style="height: 500px; width: 500px;" class="scrollable">
-      {{#vertical-collection ${'items'}
+      {{#vertical-collection items
         estimateHeight=50
         initialRenderCount=1
         idForFirstItem="20"
@@ -366,7 +366,7 @@ test('The collection renders the initialRenderCount correctly if the count is mo
 
   this.render(hbs`
     <div style="height: 500px; width: 500px;" class="scrollable">
-      {{#vertical-collection ${'items'}
+      {{#vertical-collection items
         estimateHeight=50
         initialRenderCount=5
         as |item i|
@@ -396,7 +396,7 @@ testScenarios(
   hbs`
     <div class="scrollable with-max-height">
       <div>
-        {{#vertical-collection ${'items'}
+        {{#vertical-collection items
           containerSelector=".scrollable"
           estimateHeight=20
           staticHeight=staticHeight
@@ -423,7 +423,7 @@ testScenarios(
   hbs`
     <div style="height: 100px;" class="scrollable">
       <div style="padding-top: 400px;">
-        {{#vertical-collection ${'items'}
+        {{#vertical-collection items
           containerSelector=".scrollable"
           estimateHeight=20
           bufferSize=2

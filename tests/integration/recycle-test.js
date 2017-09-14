@@ -25,7 +25,7 @@ testScenarios(
   hbs`
     <div style="height: 200px" class="scrollable with-max-height">
       <div>
-        {{#vertical-collection ${'items'}
+        {{#vertical-collection items
           containerSelector=".scrollable"
           estimateHeight=20
           staticHeight=staticHeight
@@ -59,7 +59,7 @@ testScenarios(
   hbs`
     <div style="height: 200px" class="scrollable">
       <div>
-        {{#vertical-collection ${'items'}
+        {{#vertical-collection items
           containerSelector=".scrollable"
           estimateHeight=20
           staticHeight=staticHeight
