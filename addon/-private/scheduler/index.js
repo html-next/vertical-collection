@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import { stripInProduction } from 'vertical-collection/-debug/helpers';
+import { DEBUG } from '@glimmer/env';
 
 const {
   run
@@ -10,9 +10,9 @@ export class Token {
     this._parent = parent;
     this._cancelled = false;
 
-    stripInProduction(() => {
+    if (DEBUG) {
       Object.seal(this);
-    });
+    }
   }
 
   get cancelled() {
@@ -42,9 +42,9 @@ export class Scheduler {
     this._nextFlush = null;
     this.ticks = 0;
 
-    stripInProduction(() => {
+    if (DEBUG) {
       Object.seal(this);
-    });
+    }
   }
 
   schedule(queueName, cb, parent) {

@@ -2,9 +2,10 @@
 import Ember from 'ember';
 import layout from './template';
 
+import { SUPPORTS_INVERSE_BLOCK } from 'ember-compatibility-helpers';
+
 import {
   keyForItem,
-  SUPPORTS_INVERSE_BLOCK,
   closestElement,
   DynamicRadar,
   StaticRadar,
@@ -87,7 +88,7 @@ const VerticalCollection = Component.extend({
   renderAll: false,
 
   isEmpty: computed.empty('items'),
-  shouldYieldToInverse: computed.and('isEmpty', 'supportsInverse'),
+  shouldYieldToInverse: computed.readOnly('isEmpty'),
 
   virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function() {
     const {
@@ -266,6 +267,12 @@ const VerticalCollection = Component.extend({
 VerticalCollection.reopenClass({
   positionalParams: ['items']
 });
+
+if (!SUPPORTS_INVERSE_BLOCK) {
+  VerticalCollection.reopen({
+    shouldYieldToInverse: false
+  });
+}
 
 function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {
   const totalItems = get(items, 'length');

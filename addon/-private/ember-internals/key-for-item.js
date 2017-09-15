@@ -1,4 +1,3 @@
-/* global String */
 import Ember from 'ember';
 import identity from './identity';
 

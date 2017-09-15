@@ -1,4 +1,4 @@
-import { assert } from 'vertical-collection/-debug/helpers';
+import { assert } from '@ember/debug';
 
 export function estimateElementHeight(element, fallbackHeight) {
   assert(`You called estimateElement height without a fallbackHeight`, fallbackHeight);

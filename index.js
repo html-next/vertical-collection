@@ -1,17 +1,29 @@
 /* eslint-env node */
 'use strict';
 
-var StripClassCallCheck = require('babel6-plugin-strip-class-callcheck');
-var FilterImports = require('babel-plugin-filter-imports');
-var RemoveImports = require('./lib/babel-plugin-remove-imports');
-var Funnel = require('broccoli-funnel');
-var Rollup = require('broccoli-rollup');
-var merge   = require('broccoli-merge-trees');
-var VersionChecker = require('ember-cli-version-checker');
+const StripClassCallCheckPlugin = require('babel6-plugin-strip-class-callcheck');
+const Funnel = require('broccoli-funnel');
+const Rollup = require('broccoli-rollup');
+const merge   = require('broccoli-merge-trees');
+const VersionChecker = require('ember-cli-version-checker');
+
+const path = require('path');
+
+const BlockScopingTransform = (function() {
+  let plugin = require('babel-plugin-transform-es2015-block-scoping');
+
+  // adding `baseDir` ensures that broccoli-babel-transpiler does not
+  // issue a warning and opt out of caching
+  let pluginPath = require.resolve('babel-plugin-transform-es2015-block-scoping/package');
+  let pluginBaseDir = path.dirname(pluginPath);
+  plugin.baseDir = () => pluginBaseDir;
+
+  return plugin;
+})();
 
 function isProductionEnv() {
-  var isProd = /production/.test(process.env.EMBER_ENV);
-  var isTest = process.env.EMBER_CLI_TEST_COMMAND;
+  const isProd = /production/.test(process.env.EMBER_ENV);
+  const isTest = process.env.EMBER_CLI_TEST_COMMAND;
 
   return isProd && !isTest;
 }
@@ -19,14 +31,14 @@ function isProductionEnv() {
 module.exports = {
   name: 'vertical-collection',
 
-  init: function() {
+  init() {
     this._super.init && this._super.init.apply(this, arguments);
 
     this.options = this.options || {};
   },
 
-  treeForAddon: function(tree) {
-    let babel = this.addons.find(addon => addon.name === 'ember-cli-babel');
+  treeForAddon(tree) {
+    let babel = this.addons.find((addon) => addon.name === 'ember-cli-babel');
     let withPrivate    = new Funnel(tree, { include: ['-private/**'] });
     let withoutPrivate = new Funnel(tree, {
       exclude: [
@@ -38,20 +50,20 @@ module.exports = {
       destDir: 'vertical-collection'
     });
 
-    var privateTree = babel.transpileTree(withPrivate, {
-      babel: this.buildBabelOptions(),
+    let privateTree = babel.transpileTree(withPrivate, {
+      babel: this.options.babel,
       'ember-cli-babel': {
         compileModules: false
       }
     });
 
-    var templateTree = new Funnel(tree, {
+    const templateTree = new Funnel(tree, {
       include: ['**/**.hbs']
     });
 
     // use the default options
-    var addonTemplateTree = this._super(templateTree);
-    var publicTree = babel.transpileTree(withoutPrivate);
+    const addonTemplateTree = this._super(templateTree);
+    let publicTree = babel.transpileTree(withoutPrivate);
 
     privateTree = new Rollup(privateTree, {
       rollup: {
@@ -59,11 +71,7 @@ module.exports = {
         targets: [
           { dest: 'vertical-collection/-private.js', format: 'amd', moduleId: 'vertical-collection/-private' }
         ],
-        external: [
-          'ember',
-          'vertical-collection/-debug/helpers'
-        ],
-        // cache: true|false Defaults to true
+        external: ['ember']
       }
     });
 
@@ -79,52 +87,36 @@ module.exports = {
   },
 
   _hasSetupBabelOptions: false,
-  buildBabelOptions() {
-    let opts = {
+  buildBabelOptions(originalOptions) {
+    const plugins = originalOptions.plugins || [];
+
+    const opts = {
       loose: true,
-      plugins: [],
-      postTransformPlugins: [StripClassCallCheck],
+      plugins,
+      postTransformPlugins: [StripClassCallCheckPlugin],
       exclude: [
         'transform-es2015-block-scoping',
         'transform-es2015-typeof-symbol'
       ]
     };
 
-    if (isProductionEnv()) {
-      var strippedImports = {
-        'vertical-collection/-debug/helpers': [
-          'assert',
-          'warn',
-          'debug',
-          'debugOnError',
-          'deprecate',
-          'stripInProduction'
-        ]
-      };
-
-      opts.plugins.push(
-        [FilterImports, strippedImports],
-        [RemoveImports, 'vertical-collection/-debug/helpers']
-      );
-    }
-
     opts.plugins.push(
-      ['transform-es2015-block-scoping', { 'throwIfClosureRequired': true }]
+      [BlockScopingTransform, { 'throwIfClosureRequired': true }]
     );
 
     return opts;
   },
-  _setupBabelOptions: function() {
+  _setupBabelOptions() {
     if (this._hasSetupBabelOptions) {
       return;
     }
 
-    this.options.babel = this.buildBabelOptions();
+    this.options.babel = this.buildBabelOptions(this.options.babel);
 
     this._hasSetupBabelOptions = true;
   },
 
-  included: function(app) {
+  included(app) {
     this._super.included.apply(this, arguments);
     this.checker = new VersionChecker(app);
 
@@ -145,8 +137,8 @@ module.exports = {
     }
   },
 
-  treeForApp: function() {
-    var tree = this._super.treeForApp.apply(this, arguments);
+  treeForApp() {
+    const tree = this._super.treeForApp.apply(this, arguments);
 
     const exclude = [];
 

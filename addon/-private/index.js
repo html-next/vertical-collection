@@ -1,5 +1,4 @@
-export { default as keyForItem } from './ember-internals/utils/key-for-item';
-export { SUPPORTS_INVERSE_BLOCK } from './ember-internals/compatibility';
+export { default as keyForItem } from './ember-internals/key-for-item';
 
 export { estimateElementHeight } from './utils/element/estimate-element-height';
 export { default as closestElement } from './utils/element/closest';

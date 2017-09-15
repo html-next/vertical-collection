@@ -1,5 +1,6 @@
+import { DEBUG } from '@glimmer/env';
+
 import Radar from './radar';
-import { stripInProduction } from 'vertical-collection/-debug/helpers';
 
 export default class StaticRadar extends Radar {
   constructor(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle) {
@@ -8,9 +9,9 @@ export default class StaticRadar extends Radar {
     this._firstItemIndex = 0;
     this._lastItemIndex = 0;
 
-    stripInProduction(() => {
+    if (DEBUG) {
       Object.preventExtensions(this);
-    });
+    }
   }
 
   _updateIndexes() {
