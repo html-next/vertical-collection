@@ -1,7 +1,8 @@
 import Ember from 'ember';
-import { IS_GLIMMER_2 } from '../ember-internals/compatibility';
+import { assert } from '@ember/debug';
+import { DEBUG } from '@glimmer/env';
 
-import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
+import { IS_GLIMMER_2 } from 'ember-compatibility-helpers';
 
 const { set } = Ember;
 
@@ -24,9 +25,9 @@ export default class VirtualComponent {
     // adds observers which creates __ember_meta__
     this.__ember_meta__ = null; // eslint-disable-line camelcase
 
-    stripInProduction(() => {
+    if (DEBUG) {
       Object.preventExtensions(this);
-    });
+    }
   }
 
   get realUpperBound() {
@@ -51,15 +52,15 @@ export default class VirtualComponent {
         bottom = Math.max(bottom, upperBound.getBoundingClientRect().bottom);
       }
 
-      stripInProduction(() => {
+      if (DEBUG) {
         if (upperBound instanceof Element) {
-          return;
+          continue;
         }
 
         const text = upperBound.textContent;
 
         assert(`All content inside of vertical-collection must be wrapped in an element. Detected a text node with content: ${text}`, text === '' || text.match(/^\s+$/));
-      });
+      }
     }
 
     assert('Items in a vertical collection require atleast one element in them', top !== Infinity && bottom !== -Infinity);

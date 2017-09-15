@@ -1,8 +1,8 @@
+import { DEBUG } from '@glimmer/env';
+
 import Radar from './radar';
 import SkipList from '../skip-list';
 import roundTo from '../utils/round-to';
-
-import { stripInProduction } from 'vertical-collection/-debug/helpers';
 
 export default class DynamicRadar extends Radar {
   constructor(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle) {
@@ -16,9 +16,9 @@ export default class DynamicRadar extends Radar {
 
     this.skipList = null;
 
-    stripInProduction(() => {
+    if (DEBUG) {
       Object.preventExtensions(this);
-    });
+    }
   }
 
   destroy() {

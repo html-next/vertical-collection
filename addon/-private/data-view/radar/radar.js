@@ -1,4 +1,6 @@
 import Ember from 'ember';
+import { assert } from '@ember/debug';
+import { DEBUG } from '@glimmer/env';
 
 import { Token, scheduler } from '../../scheduler/index';
 
@@ -8,8 +10,6 @@ import objectAt from '../utils/object-at';
 import roundTo from '../utils/round-to';
 
 import { estimateElementHeight, estimateElementMaxHeight } from '../../utils/element/estimate-element-height';
-
-import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
 
 const {
   A,
@@ -87,7 +87,9 @@ export default class Radar {
     // adds observers which creates __ember_meta__
     this.__ember_meta__ = null; // eslint-disable-line camelcase
 
-    stripInProduction(() => this._debugDidUpdate = null);
+    if (DEBUG) {
+      this._debugDidUpdate = null;
+    }
   }
 
   destroy() {
@@ -186,12 +188,10 @@ export default class Radar {
         // Clear the reset flag
         this._didReset = false;
 
-        stripInProduction(() => {
+        if (DEBUG && this._debugDidUpdate !== null) {
           // Hook to update the visual debugger
-          if (this._debugDidUpdate != null) {
-            this._debugDidUpdate(this);
-          }
-        });
+          this._debugDidUpdate(this);
+        }
       });
     });
   }

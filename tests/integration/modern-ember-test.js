@@ -2,7 +2,7 @@ import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import { find } from 'ember-native-dom-helpers';
 
-import { SUPPORTS_INVERSE_BLOCK } from 'vertical-collection/-private';
+import { SUPPORTS_INVERSE_BLOCK } from 'ember-compatibility-helpers';
 
 import waitForRender from 'dummy/tests/helpers/wait-for-render';
 

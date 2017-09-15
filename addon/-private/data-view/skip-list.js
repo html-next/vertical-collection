@@ -1,4 +1,6 @@
-import { assert, stripInProduction } from 'vertical-collection/-debug/helpers';
+import { assert } from '@ember/debug';
+import { DEBUG } from '@glimmer/env';
+
 import roundTo from './utils/round-to';
 
 /*
@@ -55,9 +57,9 @@ export default class SkipList {
 
     this._initializeLayers(values, defaultValue);
 
-    stripInProduction(() => {
+    if (DEBUG) {
       Object.preventExtensions(this);
-    });
+    }
   }
 
   _initializeLayers(values, defaultValue) {
