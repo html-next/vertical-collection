@@ -70,7 +70,7 @@ export default
 
   // Selector for the scrollContainer. Defaults to "body"
   // to select the immediate parent element of the collection
-  // use "*" or a mroe specific selector if available.
+  // use "*" or a more specific selector if available.
   containerSelector: "body"
 }
 /* !- END-SNIPPET vertical-collection-defaults-example */
