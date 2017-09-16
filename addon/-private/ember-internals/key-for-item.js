@@ -1,4 +1,6 @@
 import Ember from 'ember';
+import { assert } from '@ember/debug';
+
 import identity from './identity';
 
 const {
@@ -8,24 +10,18 @@ const {
 export default function keyForItem(item, keyPath, index) {
   let key;
 
+  assert(`keyPath must be a string, received: ${keyPath}`, typeof keyPath === 'string');
+
   switch (keyPath) {
     case '@index':
-      // allow 0 index
-      if (!index && index !== 0) {
-        throw new Error('No index was supplied to keyForItem');
-      }
+      assert(`A numerical index must be supplied for keyForItem when keyPath is @index, received: ${index}`, typeof index === 'number');
       key = index;
       break;
     case '@identity':
       key = identity(item);
       break;
     default:
-      // TODO add explicit test
-      if (keyPath) {
-        key = get(item, keyPath);
-      } else {
-        key = identity(item);
-      }
+      key = get(item, keyPath);
   }
 
   if (typeof key === 'number') {
