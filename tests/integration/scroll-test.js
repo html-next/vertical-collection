@@ -433,9 +433,9 @@ testScenarios(
     <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
       <div style="height: 400px; width: 100px;" class="scroll-child scrollable">
         {{#vertical-collection items
+          containerSelector="*"
           estimateHeight=20
           bufferSize=0
-
           as |item i|}}
           <div class="vertical-item" style="height:40px;">
             {{item.number}} {{i}}

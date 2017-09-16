@@ -1,9 +1,9 @@
 <div class="table-wrapper dark">
   {{#vertical-collection model
+    containerSelector=".table-wrapper"
     estimateHeight=50
     bufferSize=5
-
-    as |item index|}}
+  as |item index|}}
     {{number-slide item=item index=index}}
   {{/vertical-collection}}
 </div>

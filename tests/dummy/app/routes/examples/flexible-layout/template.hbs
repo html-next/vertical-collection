@@ -5,6 +5,7 @@
       {{!- BEGIN-SNIPPET flexible-layout-example }}
         <div class="table-wrapper dark">
           {{#vertical-collection model.numbers
+            containerSelector="*"
             estimateHeight=270
             firstReached="loadAbove"
             lastReached="loadBelow"
