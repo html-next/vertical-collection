@@ -95,7 +95,7 @@ export const standardTemplate = hbs`
       firstReached=firstReached
       lastReached=lastReached
 
-      key=key
+      key=(either-or key "@identity")
 
       as |item i|}}
       <div
