@@ -205,8 +205,12 @@ const VerticalCollection = Component.extend({
     this._radar.destroy();
     clearTimeout(this._nextSendActions);
 
-    removeScrollHandler(this._scrollContainer, this._scrollHandler);
-    Container.removeEventListener('resize', this._resizeHandler);
+    if (this._scrollHandler) {
+      removeScrollHandler(this._scrollContainer, this._scrollHandler);
+    }
+    if (this._resizeHandler) {
+      Container.removeEventListener('resize', this._resizeHandler);
+    }
   },
 
   init() {
