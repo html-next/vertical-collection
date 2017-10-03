@@ -27,6 +27,39 @@ It will try its best to allow you to keep the conventions, structures, and layou
 ember install @html-next/vertical-collection
 ```
 
+##Usage
+
+```htmlbars
+{{#vertical-collection
+    items
+    tagName='ul'
+    estimateHeight=50
+    staticHeight=false
+    bufferSize=1
+    renderAll=false
+    renderFromLast=false
+    idForFirstItem=idForFirstItem
+    firstReached=firstReached
+    lastReached=lastReached
+    lastVisibleChanged=lastVisibleChanged
+    lastVisibleChanged=lastVisibleChanged
+     as |item i|}}
+    <li>
+      {{item.number}} {{i}}
+    </li>
+{{/vertical-collection}}
+```
+
+###Actions
+
+`firstReached` - Triggered when scroll reaches the first element in the collection
+
+`lastReached`- Triggered when scroll reaches the last element in the collection
+
+`firstVisibleChanged` - Triggered when the first element in the viewport changes
+ 
+`lastVisibleChanged` - Triggered when the last element in the viewport changes
+
 ## Support, Questions, Collaboration
 
 Join the [smoke-and-mirrors](https://embercommunity.slack.com/messages/smoke-and-mirrors/) channel on Slack.
