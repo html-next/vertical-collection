@@ -29,18 +29,54 @@ const VerticalCollection = Component.extend({
 
   tagName: 'vertical-collection',
 
+  /**
+   * Property name used for storing references to each item in items. Accessing this attribute for each item
+   * should yield a unique result for every item in the list.
+   * 
+   * @property key
+   * @type String
+   * @default '@identity'
+   */
   key: '@identity',
 
   // –––––––––––––– Required Settings
 
+  /**
+   * Estimated height of an item to be rendered. Use best guess as this will be used to determine how many items
+   * are displayed virtually, before and after the vertical-collection viewport.
+   *
+   * @property estimateHeight
+   * @type Number
+   * @required
+   */
   estimateHeight: null,
 
-  // usable via {{#vertical-collection <items-array>}}
+  /**
+   * List of objects to svelte-render.
+   * Can be called like `{{#vertical-collection <items-array>}}`, since it's the first positional parameter of this component.
+   *
+   * @property items
+   * @type Array
+   * @required
+   */
   items: null,
 
   // –––––––––––––– Optional Settings
+  /**
+   * Indicates if this component's height will change after initial render.
+   * If true, item tracking will be done using the StaticRadar, otherwise the DynamicRadar.
+   * @property staticHeight
+   * @type Boolean
+   */
   staticHeight: false,
 
+  /**
+   * Indicates whether or not list items in the Radar should be reused on update of virtual components (e.g. scroll).
+   * This yields performance benefits because it is not necessary to repopulate the component pool of the radar.
+   * // WHEN WOULD WE WANT TO SET THIS TO FALSE?
+   * @property shouldRecycle
+   * @type Boolean
+   */
   shouldRecycle: true,
 
   /*
@@ -57,14 +93,18 @@ const VerticalCollection = Component.extend({
   containerSelector: null,
 
   // –––––––––––––– Performance Tuning
-  /*
-   * how much extra room to keep visible and invisible on
-   * either side of the viewport.
+  /**
+   * The amount of extra room in pixels to keep visible and invisible on
+   * either side of the viewport. This value needs to be greater than 0.
+   *
+   * @property bufferSize
+   * @type Number
+   * @default 1
    */
   bufferSize: 1,
 
   // –––––––––––––– Initial Scroll State
-  /*
+  /**
    * If set, upon initialization the scroll
    * position will be set such that the item
    * with the provided id is at the top left
@@ -72,18 +112,29 @@ const VerticalCollection = Component.extend({
    *
    * If the item cannot be found, scrollTop
    * is set to 0.
+   * @property idForFirstItem
    */
   idForFirstItem: null,
 
-  /*
+  /**
    * If set, if scrollPosition is empty
    * at initialization, the component will
    * render starting at the bottom.
+   * @property renderFromLast
+   * @type Boolean
+   * @default false
    */
   renderFromLast: false,
 
-  /*
-   * If set, the collection will render all of the items passed in
+  /**
+   * If set to true, the collection will render all of the items passed into the component.
+   * This counteracts the performance benefits of using vertical collection, but allows for improved accessibility,
+   * since the high performance of vertical-collection is attributed to rendering only the visible elements of a list,
+   * which is not a viable solution in a screen-reader environment, for example.
+   *
+   * @property renderAll
+   * @type Boolean
+   * @default false
    */
   renderAll: false,
 
