@@ -32,7 +32,7 @@ const VerticalCollection = Component.extend({
   /**
    * Property name used for storing references to each item in items. Accessing this attribute for each item
    * should yield a unique result for every item in the list.
-   * 
+   *
    * @property key
    * @type String
    * @default '@identity'
@@ -63,8 +63,10 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– Optional Settings
   /**
-   * Indicates if this component's height will change after initial render.
-   * If true, item tracking will be done using the StaticRadar, otherwise the DynamicRadar.
+   * Indicates if the occluded items' heights will change or not.
+   * If true, the vertical-collection will assume that items' heights are always equal to estimateHeight;
+   * this is more performant, but less flexible.
+   *
    * @property staticHeight
    * @type Boolean
    */
@@ -73,7 +75,13 @@ const VerticalCollection = Component.extend({
   /**
    * Indicates whether or not list items in the Radar should be reused on update of virtual components (e.g. scroll).
    * This yields performance benefits because it is not necessary to repopulate the component pool of the radar.
-   * // WHEN WOULD WE WANT TO SET THIS TO FALSE?
+   * Set to false when recycling a component instance has undesirable ramifications including:
+   *  - When using `unbound` in a component or sub-component
+   *  - When using init for instance state that differs between instances of a component or sub-component
+   *      (can move to didInitAttrs to fix this)
+   *  - When templates for individual items vary widely or are based on conditionals that are likely to change
+   *      (i.e. would defeat any benefits of DOM recycling anyway)
+   *
    * @property shouldRecycle
    * @type Boolean
    */
@@ -94,8 +102,9 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– Performance Tuning
   /**
-   * The amount of extra room in pixels to keep visible and invisible on
-   * either side of the viewport. This value needs to be greater than 0.
+   * The amount of extra items to keep visible on either side of the viewport -- must be greater than 0.
+   * Increasing this value is useful when doing infinite scrolling and loading data from a remote service,
+   * with the desire to allow records to show as the user scrolls and the backend API takes time to respond.
    *
    * @property bufferSize
    * @type Number
@@ -128,9 +137,13 @@ const VerticalCollection = Component.extend({
 
   /**
    * If set to true, the collection will render all of the items passed into the component.
-   * This counteracts the performance benefits of using vertical collection, but allows for improved accessibility,
-   * since the high performance of vertical-collection is attributed to rendering only the visible elements of a list,
-   * which is not a viable solution in a screen-reader environment, for example.
+   * This counteracts the performance benefits of using vertical collection, but has several potential applications,
+   * including but not limited to:
+   *
+   * - It allows for improved accessibility since all elements are rendered and can be picked up by a screen reader.
+   * - Can be applied in SEO solutions (i.e. fastboot) where rendering every item is desirable.
+   * - Can be used to respond to the keyboard input for Find (i.e. ctrl+F/cmd+F) to show all elements, which then
+   *    allows the list items to be searchable
    *
    * @property renderAll
    * @type Boolean
