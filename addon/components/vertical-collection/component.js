@@ -29,18 +29,62 @@ const VerticalCollection = Component.extend({
 
   tagName: 'vertical-collection',
 
+  /**
+   * Property name used for storing references to each item in items. Accessing this attribute for each item
+   * should yield a unique result for every item in the list.
+   *
+   * @property key
+   * @type String
+   * @default '@identity'
+   */
   key: '@identity',
 
   // –––––––––––––– Required Settings
 
+  /**
+   * Estimated height of an item to be rendered. Use best guess as this will be used to determine how many items
+   * are displayed virtually, before and after the vertical-collection viewport.
+   *
+   * @property estimateHeight
+   * @type Number
+   * @required
+   */
   estimateHeight: null,
 
-  // usable via {{#vertical-collection <items-array>}}
+  /**
+   * List of objects to svelte-render.
+   * Can be called like `{{#vertical-collection <items-array>}}`, since it's the first positional parameter of this component.
+   *
+   * @property items
+   * @type Array
+   * @required
+   */
   items: null,
 
   // –––––––––––––– Optional Settings
+  /**
+   * Indicates if the occluded items' heights will change or not.
+   * If true, the vertical-collection will assume that items' heights are always equal to estimateHeight;
+   * this is more performant, but less flexible.
+   *
+   * @property staticHeight
+   * @type Boolean
+   */
   staticHeight: false,
 
+  /**
+   * Indicates whether or not list items in the Radar should be reused on update of virtual components (e.g. scroll).
+   * This yields performance benefits because it is not necessary to repopulate the component pool of the radar.
+   * Set to false when recycling a component instance has undesirable ramifications including:
+   *  - When using `unbound` in a component or sub-component
+   *  - When using init for instance state that differs between instances of a component or sub-component
+   *      (can move to didInitAttrs to fix this)
+   *  - When templates for individual items vary widely or are based on conditionals that are likely to change
+   *      (i.e. would defeat any benefits of DOM recycling anyway)
+   *
+   * @property shouldRecycle
+   * @type Boolean
+   */
   shouldRecycle: true,
 
   /*
@@ -57,14 +101,19 @@ const VerticalCollection = Component.extend({
   containerSelector: null,
 
   // –––––––––––––– Performance Tuning
-  /*
-   * how much extra room to keep visible and invisible on
-   * either side of the viewport.
+  /**
+   * The amount of extra items to keep visible on either side of the viewport -- must be greater than 0.
+   * Increasing this value is useful when doing infinite scrolling and loading data from a remote service,
+   * with the desire to allow records to show as the user scrolls and the backend API takes time to respond.
+   *
+   * @property bufferSize
+   * @type Number
+   * @default 1
    */
   bufferSize: 1,
 
   // –––––––––––––– Initial Scroll State
-  /*
+  /**
    * If set, upon initialization the scroll
    * position will be set such that the item
    * with the provided id is at the top left
@@ -72,18 +121,33 @@ const VerticalCollection = Component.extend({
    *
    * If the item cannot be found, scrollTop
    * is set to 0.
+   * @property idForFirstItem
    */
   idForFirstItem: null,
 
-  /*
+  /**
    * If set, if scrollPosition is empty
    * at initialization, the component will
    * render starting at the bottom.
+   * @property renderFromLast
+   * @type Boolean
+   * @default false
    */
   renderFromLast: false,
 
-  /*
-   * If set, the collection will render all of the items passed in
+  /**
+   * If set to true, the collection will render all of the items passed into the component.
+   * This counteracts the performance benefits of using vertical collection, but has several potential applications,
+   * including but not limited to:
+   *
+   * - It allows for improved accessibility since all elements are rendered and can be picked up by a screen reader.
+   * - Can be applied in SEO solutions (i.e. fastboot) where rendering every item is desirable.
+   * - Can be used to respond to the keyboard input for Find (i.e. ctrl+F/cmd+F) to show all elements, which then
+   *    allows the list items to be searchable
+   *
+   * @property renderAll
+   * @type Boolean
+   * @default false
    */
   renderAll: false,
 
