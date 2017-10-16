@@ -1,4 +1,6 @@
 import { moduleForComponent } from 'ember-qunit';
+import hbs from 'htmlbars-inline-precompile';
+
 import {
   find,
   scrollTo
@@ -130,5 +132,32 @@ testScenarios(
     assert.equal(find('.scrollable').scrollTop, 300, 'scrollTop set to correct value');
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '30 10', 'the first rendered item is correct');
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '39 19', 'the last rendered item is correct');
+  }
+);
+
+testScenarios(
+  'The collection renders correctly when scaled',
+  dynamicSimpleScenarioFor(getNumbers(0, 100)),
+
+  hbs`
+    <div style="transform: scale(0.333333)">
+      <div style="height: 100px" class="scrollable">
+        {{#vertical-collection items
+          estimateHeight=20
+          bufferSize=0
+
+          as |item i|}}
+          <vertical-item style="height: 30px">
+            {{item.number}} {{i}}
+          </vertical-item>
+        {{/vertical-collection}}
+      </div>
+    </div>
+  `,
+
+  async function(assert) {
+    await scrollTo('.scrollable', 0, 150);
+
+    assert.equal(paddingBefore(find('.scrollable')), 150, 'Rendered correct number of items');
   }
 );

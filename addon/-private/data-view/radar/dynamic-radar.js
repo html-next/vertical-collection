@@ -3,6 +3,7 @@ import { DEBUG } from '@glimmer/env';
 import Radar from './radar';
 import SkipList from '../skip-list';
 import roundTo from '../utils/round-to';
+import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
 
 export default class DynamicRadar extends Radar {
   constructor(parentToken, options) {
@@ -116,8 +117,10 @@ export default class DynamicRadar extends Radar {
   _measure(measureLimit = null) {
     const {
       orderedComponents,
+      skipList,
+
       _occludedContentBefore,
-      skipList
+      _transformScale
     } = this;
 
     const numToMeasure = measureLimit !== null ? measureLimit : orderedComponents.length;
@@ -132,14 +135,14 @@ export default class DynamicRadar extends Radar {
       const {
         top: currentItemTop,
         height: currentItemHeight
-      } = currentItem.getBoundingClientRect();
+      } = getScaledClientRect(currentItem, _transformScale);
 
       let margin;
 
       if (previousItem !== undefined) {
-        margin = currentItemTop - previousItem.getBoundingClientRect().bottom;
+        margin = currentItemTop - getScaledClientRect(previousItem, _transformScale).bottom;
       } else {
-        margin = currentItemTop - _occludedContentBefore.getBoundingClientRect().bottom;
+        margin = currentItemTop - getScaledClientRect(_occludedContentBefore, _transformScale).bottom;
       }
 
       const itemDelta = skipList.set(itemIndex, roundTo(currentItemHeight + margin));

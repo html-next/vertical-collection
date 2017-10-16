@@ -14,6 +14,7 @@ import {
 } from 'dummy/tests/helpers/test-scenarios';
 
 import { prepend, append } from 'dummy/tests/helpers/array';
+import { paddingBefore } from 'dummy/tests/helpers/measurement';
 
 moduleForComponent('vertical-collection', 'Integration | Scroll Tests', {
   integration: true
@@ -417,13 +418,10 @@ testScenarios(
     // Occlude one item
     await scrollTo('.scrollable', 0, 38);
 
-    const tableTop = find('table').getBoundingClientRect().top;
-
     const row = find('tr:first-of-type');
-    const rowTop = row.getBoundingClientRect().top;
 
     assert.equal(row.textContent.replace(/\s/g, ''), '11', 'correct first row is rendered');
-    assert.equal(rowTop - tableTop, 37, 'first row offset is correct');
+    assert.equal(paddingBefore(find('tbody')), 37, 'first row offset is correct');
   }
 );
 

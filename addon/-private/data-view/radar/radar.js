@@ -18,6 +18,7 @@ import Container from '../container';
 
 import closestElement from '../../utils/element/closest';
 import estimateElementHeight from '../../utils/element/estimate-element-height';
+import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
 
 const {
   A,
@@ -64,6 +65,7 @@ export default class Radar {
     this._calculatedEstimateHeight = 0;
     this._scrollTopOffset = 0;
     this._calculatedScrollContainerHeight = 0;
+    this._transformScale = 1;
 
     // Event handlers
     this._scrollHandler = ({ top }) => {
@@ -258,10 +260,21 @@ export default class Radar {
     assert('itemContainer must be set on Radar before scheduling an update', _itemContainer !== null);
     assert('scrollContainer must be set on Radar before scheduling an update', _scrollContainer !== null);
 
+    // The scroll container's offsetHeight will reflect the actual height of the element, while
+    // it's measured height via bounding client rect will reflect the height with any transformations
+    // applied. We use this to find out the scale of the items so we can store measurements at the
+    // correct heights.
     const scrollContainerOffsetHeight = _scrollContainer.offsetHeight;
+    const { height: scrollContainerRenderedHeight } = _scrollContainer.getBoundingClientRect();
 
-    const { top: scrollContentTop } = _occludedContentBefore.element.getBoundingClientRect();
-    const { top: scrollContainerTop } = _scrollContainer.getBoundingClientRect();
+    // Represents the opposite of the scale, if any, applied to the collection. Check for equality
+    // to guard against floating point errors and divide by zero (both should be zero if one is)
+    const transformScale = scrollContainerOffsetHeight !== scrollContainerRenderedHeight
+      ? scrollContainerOffsetHeight / scrollContainerRenderedHeight
+      : 1;
+
+    const { top: scrollContentTop } = getScaledClientRect(_occludedContentBefore, transformScale);
+    const { top: scrollContainerTop } = getScaledClientRect(_scrollContainer, transformScale);
 
     let scrollContainerMaxHeight = 0;
 
@@ -279,9 +292,9 @@ export default class Radar {
 
     assert(`calculatedEstimateHeight must be greater than 0, instead was "${calculatedEstimateHeight}" based on estimateHeight: ${estimateHeight}`, calculatedEstimateHeight > 0);
 
+    this._transformScale = transformScale;
     this._calculatedEstimateHeight = calculatedEstimateHeight;
     this._calculatedScrollContainerHeight = roundTo(Math.max(scrollContainerOffsetHeight, scrollContainerMaxHeight));
-
     this._scrollTopOffset = roundTo(this._scrollTop + scrollContentTop - scrollContainerTop);
   }
 
