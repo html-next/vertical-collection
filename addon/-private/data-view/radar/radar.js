@@ -471,6 +471,7 @@ export default class Radar {
       const offset = this.getOffsetForIndex(newFirstItemIndex);
 
       this.scrollContainer.scrollTop = offset + this._scrollTopOffset;
+      this.scheduleUpdate();
     }
   }
 
@@ -487,6 +488,7 @@ export default class Radar {
       const offset = this.getOffsetForIndex(newFirstItemIndex);
 
       this.scrollContainer.scrollTop = offset + this._scrollTopOffset;
+      this.scheduleUpdate();
     }
   }
 
