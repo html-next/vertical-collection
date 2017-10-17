@@ -5,10 +5,10 @@ import {
   findAll,
   scrollTo
 } from 'ember-native-dom-helpers';
+import wait from 'ember-test-helpers/wait';
 
 import getNumbers from 'dummy/lib/get-numbers';
 
-import waitForRender from 'dummy/tests/helpers/wait-for-render';
 import {
   testScenarios,
 
@@ -321,7 +321,7 @@ test('The collection renders the initialRenderCount correctly', async function(a
     assert.equal(find('vertical-item').textContent.trim(), '0 0', 'correct item rendered');
   });
 
-  await waitForRender();
+  await wait();
 
   assert.equal(findAll('vertical-item').length, 10, 'correctly updates the number of items rendered on second pass');
   assert.equal(find('vertical-item:first-of-type').textContent.trim(), '0 0', 'correct first item rendered');
@@ -353,7 +353,7 @@ test('The collection renders the initialRenderCount correctly if idForFirstItem 
     assert.equal(find('vertical-item').textContent.trim(), '20 20', 'correct item rendered');
   });
 
-  await waitForRender();
+  await wait();
 
   assert.equal(findAll('vertical-item').length, 12, 'correctly updates the number of items rendered on second pass');
   assert.equal(find('vertical-item:first-of-type').textContent.trim(), '19 19', 'correct first item rendered');
@@ -383,7 +383,7 @@ test('The collection renders the initialRenderCount correctly if the count is mo
     assert.equal(find('vertical-item').textContent.trim(), '0 0', 'correct item rendered');
   });
 
-  await waitForRender();
+  await wait();
 
   assert.equal(findAll('vertical-item').length, 1, 'correctly updates the number of items rendered on second pass');
   assert.equal(find('vertical-item').textContent.trim(), '0 0', 'correct first item rendered');
