@@ -110,9 +110,10 @@ export default class Radar {
   start() {
     let { startingIndex } = this;
 
-    if (startingIndex !== 0) {
-      this._updateConstants();
+    // Run initial measurements and setup initial state, e.g. skipList in dynamic radar
+    this._updateConstants();
 
+    if (startingIndex !== 0) {
       const {
         totalItems,
         renderFromLast,
@@ -437,6 +438,10 @@ export default class Radar {
   }
 
   prepend(numPrepended) {
+    if (this._started === false) {
+      return;
+    }
+
     this._prevFirstItemIndex += numPrepended;
     this._prevLastItemIndex += numPrepended;
 
@@ -450,10 +455,18 @@ export default class Radar {
   }
 
   append() {
+    if (this._started === false) {
+      return;
+    }
+
     this._lastReached = false;
   }
 
   reset() {
+    if (this._started === false) {
+      return;
+    }
+
     this._firstReached = false;
     this._lastReached = false;
     this._didReset = true;

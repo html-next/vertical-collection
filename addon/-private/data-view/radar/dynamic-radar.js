@@ -195,23 +195,33 @@ export default class DynamicRadar extends Radar {
   }
 
   prepend(numPrepended) {
+    if (this._started === false) {
+      return;
+    }
+
     super.prepend(numPrepended);
 
     this.skipList.prepend(numPrepended);
   }
 
   append(numAppended) {
+    if (this._started === false) {
+      return;
+    }
+
     super.append(numAppended);
 
     this.skipList.append(numAppended);
   }
 
   reset() {
+    if (this._started === false) {
+      return;
+    }
+
     super.reset();
 
-    if (this.skipList !== null) {
-      this.skipList.reset(this.totalItems);
-    }
+    this.skipList.reset(this.totalItems);
   }
 
   /*
