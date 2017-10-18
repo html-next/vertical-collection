@@ -468,3 +468,22 @@ testScenarios(
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '49 49', 'the last item in the list should be rendered');
   }
 );
+
+testScenarios(
+  'The collection does not allow interaction before being setup',
+  scenariosFor(getNumbers(20, 100)),
+  standardTemplate,
+
+  false, // Run test function before render
+  async function(assert) {
+    assert.expect(2);
+
+    prepend(this, getNumbers(10, 10));
+    prepend(this, getNumbers(0, 10));
+
+    await waitForRender();
+
+    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'Rendered correct number of items');
+    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 9', 'Rendered correct number of items');
+  }
+);

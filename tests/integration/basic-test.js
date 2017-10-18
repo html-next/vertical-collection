@@ -417,7 +417,7 @@ testScenarios(
 );
 
 testScenarios(
-  'The collection renders in the correctly when starting offscreen',
+  'The collection renders correctly when starting offscreen',
   scenariosFor(getNumbers(0, 100)),
 
   hbs`
