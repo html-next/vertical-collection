@@ -5,10 +5,10 @@ import {
   findAll,
   scrollTo
 } from 'ember-native-dom-helpers';
+import wait from 'ember-test-helpers/wait';
 
 import getNumbers from 'dummy/lib/get-numbers';
 
-import waitForRender from 'dummy/tests/helpers/wait-for-render';
 import {
   testScenarios,
   scenariosFor,
@@ -38,7 +38,7 @@ testScenarios(
     assert.equal(findAll('.vertical-item').length, 10, 'correct number of items rendered before');
 
     this.set('renderAll', true);
-    await waitForRender();
+    await wait(); // Wait for changes
 
     assert.equal(findAll('.vertical-item').length, 20, 'correct number of items rendered before');
   }
@@ -86,13 +86,11 @@ testScenarios(
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 9', 'correct last item rendered');
 
     await click(occludedAfter);
-    await waitForRender();
 
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '10 10', 'correct first item rendered');
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '19 19', 'correct last item rendered');
 
     await click(occludedBefore);
-    await waitForRender();
 
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'correct first item rendered');
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 9', 'correct last item rendered');

@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import waitForRender from './wait-for-render';
+import wait from 'ember-test-helpers/wait';
 
 const {
   A,
@@ -15,7 +15,7 @@ export function prepend(context, itemsToPrepend) {
     context.set('items', itemsToPrepend.concat(items));
   }
 
-  return waitForRender();
+  return wait();
 }
 
 export function append(context, itemsToAppend) {
@@ -27,7 +27,7 @@ export function append(context, itemsToAppend) {
     context.set('items', items.concat(itemsToAppend));
   }
 
-  return waitForRender();
+  return wait();
 }
 
 export function emptyArray(context) {
@@ -41,7 +41,7 @@ export function emptyArray(context) {
     }
   });
 
-  return waitForRender();
+  return wait();
 }
 
 export function replaceArray(context, items) {
@@ -53,7 +53,7 @@ export function replaceArray(context, items) {
     context.set('items', items);
   }
 
-  return waitForRender();
+  return wait();
 }
 
 export function move(context, sourceItemIdx, destItemIdx) {
@@ -79,5 +79,5 @@ export function move(context, sourceItemIdx, destItemIdx) {
     context.set('items', [].concat(items));
   }
 
-  return waitForRender();
+  return wait();
 }

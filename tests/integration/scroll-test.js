@@ -1,10 +1,10 @@
 import { moduleForComponent } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
+import wait from 'ember-test-helpers/wait';
 
 import { find, scrollTo } from 'ember-native-dom-helpers';
 
 import getNumbers from 'dummy/lib/get-numbers';
-import waitForRender from 'dummy/tests/helpers/wait-for-render';
 import {
   testScenarios,
   dynamicSimpleScenarioFor,
@@ -75,7 +75,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
     await scrollTo('.scrollable', 0, 200);
   }
 );
@@ -100,7 +100,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
     await scrollTo('.scrollable', 0, 200);
   }
 );
@@ -119,7 +119,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
   }
 );
 
@@ -137,7 +137,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
     await scrollTo('.scrollable', 0, 800);
   }
 );
@@ -174,7 +174,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
   }
 );
 
@@ -192,7 +192,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
     await scrollTo('.scrollable', 0, 800);
     await scrollTo('.scrollable', 0, 0);
   }
@@ -212,7 +212,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
     await scrollTo('.scrollable', 0, 800);
     await scrollTo('.scrollable', 0, 0);
     await scrollTo('.scrollable', 0, 800);
@@ -239,7 +239,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
     await scrollTo('.scrollable', 0, 200);
   }
 );
@@ -264,7 +264,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
     await scrollTo('.scrollable', 0, 200);
   }
 );
@@ -283,7 +283,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
   }
 );
 
@@ -301,7 +301,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
     await scrollTo('.scrollable', 0, 800);
   }
 );
@@ -338,7 +338,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
   }
 );
 
@@ -356,7 +356,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
     await scrollTo('.scrollable', 0, 800);
     await scrollTo('.scrollable', 0, 0);
   }
@@ -376,7 +376,7 @@ testScenarios(
       called();
     });
 
-    await waitForRender();
+    await wait();
     await scrollTo('.scrollable', 0, 800);
     await scrollTo('.scrollable', 0, 0);
     await scrollTo('.scrollable', 0, 800);

@@ -2,8 +2,7 @@ import { test } from 'ember-qunit';
 import Ember from 'ember';
 import DS from 'ember-data';
 import hbs from 'htmlbars-inline-precompile';
-
-import waitForRender from 'dummy/tests/helpers/wait-for-render';
+import wait from 'ember-test-helpers/wait';
 
 const {
   A,
@@ -33,7 +32,7 @@ export function testScenarios(description, scenarios, template, testFn, preRende
       if (preRenderTestFn) {
         await preRenderTestFn.call(this, assert);
       } else {
-        await waitForRender();
+        await wait();
         await testFn.call(this, assert);
       }
     });

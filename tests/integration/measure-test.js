@@ -4,7 +4,6 @@ import {
   scrollTo
 } from 'ember-native-dom-helpers';
 
-import waitForRender from 'dummy/tests/helpers/wait-for-render';
 import getNumbers from 'dummy/lib/get-numbers';
 
 import { paddingBefore, paddingAfter } from 'dummy/tests/helpers/measurement';
@@ -102,9 +101,7 @@ testScenarios(
   async function(assert) {
     assert.expect(3);
 
-    prepend(this, getNumbers(-20, 20));
-
-    await waitForRender();
+    await prepend(this, getNumbers(-20, 20));
 
     assert.equal(find('.scrollable').scrollTop, 420, 'scrollTop set to correct value');
 
@@ -128,9 +125,7 @@ testScenarios(
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '10 10', 'the first rendered item is correct');
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '19 19', 'the last rendered item is correct');
 
-    replaceArray(this, getNumbers(20, 20));
-
-    await waitForRender();
+    await replaceArray(this, getNumbers(20, 20));
 
     assert.equal(find('.scrollable').scrollTop, 300, 'scrollTop set to correct value');
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '30 10', 'the first rendered item is correct');

@@ -1,10 +1,9 @@
 import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import { find } from 'ember-native-dom-helpers';
+import wait from 'ember-test-helpers/wait';
 
 import { SUPPORTS_INVERSE_BLOCK } from 'ember-compatibility-helpers';
-
-import waitForRender from 'dummy/tests/helpers/wait-for-render';
 
 if (SUPPORTS_INVERSE_BLOCK) {
   moduleForComponent('vertical-collection', 'Integration | Modern Ember Features Tests', {
@@ -25,7 +24,7 @@ if (SUPPORTS_INVERSE_BLOCK) {
       {{/vertical-collection}}
     `);
 
-    await waitForRender();
+    await wait();
 
     assert.equal(find('vertical-collection').textContent.indexOf('Foobar') !== -1, true);
   });
