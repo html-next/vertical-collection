@@ -88,17 +88,15 @@ const VerticalCollection = Component.extend({
   shouldRecycle: true,
 
   /*
-   * A selector string that will select the element from
-   * which to calculate the viewable height and needed offsets.
+   * A selector string that will select the closest parent element
+   * to which to attach the `scroll` event handler and from which
+   * to calculate the viewable height and needed offsets.
    *
-   * This element will also have the `scroll` event handler added to it.
+   * To set this to the component's immediate parent element, use '*'
    *
-   * Usually this element will be the component's immediate parent element,
-   * if so, you can leave this null.
-   *
-   * Set this to "body" to scroll the entire web page.
+   * @default 'body'
    */
-  containerSelector: null,
+  containerSelector: 'body',
 
   // –––––––––––––– Performance Tuning
   /**

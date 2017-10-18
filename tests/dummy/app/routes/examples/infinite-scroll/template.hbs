@@ -5,15 +5,13 @@
       {{!- BEGIN-SNIPPET infinite-scroll-example }}
         <div class="table-wrapper dark">
           {{#vertical-collection model.numbers
+            containerSelector="*"
             estimateHeight=90
             staticHeight=true
             bufferSize=5
-
             firstReached="loadAbove"
             lastReached="loadBelow"
-
-            as |item index|
-          }}
+          as |item index| }}
             {{number-slide item=item index=index}}
           {{/vertical-collection}}
         </div>

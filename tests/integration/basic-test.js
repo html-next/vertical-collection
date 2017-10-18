@@ -63,6 +63,7 @@ testScenarios(
   hbs`
     <div style="height: 100px; font-size: 10px;" class="scrollable">
       {{#vertical-collection items
+        containerSelector="*"
         estimateHeight="2em"
         staticHeight=staticHeight
         bufferSize=0
@@ -88,6 +89,7 @@ testScenarios(
   hbs`
     <div style="height: 100px; font-size: 10px;" class="scrollable">
       {{#vertical-collection items
+        containerSelector="*"
         estimateHeight="2rem"
         staticHeight=staticHeight
         bufferSize=0
@@ -113,6 +115,7 @@ testScenarios(
   hbs`
     <div style="height: 100px;" class="scrollable">
       {{#vertical-collection items
+        containerSelector="*"
         estimateHeight="66%"
         staticHeight=staticHeight
         bufferSize=0
@@ -138,6 +141,7 @@ testScenarios(
   hbs`
     <div style="height: 100px; font-size: 10px;" class="scrollable">
       {{#vertical-collection items
+        containerSelector="*"
         estimateHeight="2em"
         staticHeight=staticHeight
         bufferSize=0
@@ -305,6 +309,7 @@ test('The collection renders the initialRenderCount correctly', async function(a
   this.render(hbs`
     <div style="height: 500px; width: 500px;" class="scrollable">
       {{#vertical-collection items
+        containerSelector="*"
         estimateHeight=50
         initialRenderCount=1
         as |item i|
@@ -335,6 +340,7 @@ test('The collection renders the initialRenderCount correctly if idForFirstItem 
   this.render(hbs`
     <div style="height: 500px; width: 500px;" class="scrollable">
       {{#vertical-collection items
+        containerSelector="*"
         estimateHeight=50
         initialRenderCount=1
         idForFirstItem="20"
@@ -367,6 +373,7 @@ test('The collection renders the initialRenderCount correctly if the count is mo
   this.render(hbs`
     <div style="height: 500px; width: 500px;" class="scrollable">
       {{#vertical-collection items
+        containerSelector="*"
         estimateHeight=50
         initialRenderCount=5
         as |item i|
