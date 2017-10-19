@@ -40,14 +40,10 @@ export default class Visualization {
   }
 
   styleViewport() {
-    const {
-      itemContainer,
-      scrollContainer
-    } = this.radar;
-    this.container.style.height = `${scrollContainer.getBoundingClientRect().height}px`;
+    const { _scrollContainer } = this.radar;
+    this.container.style.height = `${_scrollContainer.getBoundingClientRect().height}px`;
 
-    applyVerticalStyles(this.scrollContainer, scrollContainer.getBoundingClientRect());
-    applyVerticalStyles(this.itemContainer, itemContainer.getBoundingClientRect());
+    applyVerticalStyles(this.scrollContainer, _scrollContainer.getBoundingClientRect());
     applyVerticalStyles(this.screen, Container.getBoundingClientRect());
   }
 

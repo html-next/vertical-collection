@@ -14,7 +14,7 @@ import {
 } from 'dummy/tests/helpers/test-scenarios';
 
 import { prepend, append, emptyArray, replaceArray, move } from 'dummy/tests/helpers/array';
-import { paddingBefore, containerHeight } from 'dummy/tests/helpers/measurement';
+import { paddingBefore, paddingAfter } from 'dummy/tests/helpers/measurement';
 
 moduleForComponent('vertical-collection', 'Integration | Mutation Tests', {
   integration: true
@@ -26,22 +26,23 @@ testScenarios(
   standardTemplate,
 
   async function(assert) {
-    assert.expect(8);
+    assert.expect(10);
 
     const scrollContainer = find('.scrollable');
-    const itemContainer = find('vertical-collection');
 
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'first item rendered correctly before prepend');
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 9', 'last item rendered correctly before prepnd');
     assert.equal(scrollContainer.scrollTop, 0, 'scrollTop is correct before prepend');
-    assert.equal(containerHeight(itemContainer), 2000, 'itemContainer height is correct before prepend');
+    assert.equal(paddingBefore(scrollContainer), 0, 'padding before is correct before prepend');
+    assert.equal(paddingAfter(scrollContainer), 1800, 'padding after is correct before prepend');
 
     await prepend(this, getNumbers(-20, 20));
 
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 20', 'first item rendered correctly after prepend');
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 29', 'last item rendered correctly after prepend');
     assert.equal(scrollContainer.scrollTop, 400, 'scrollTop is correct after prepend');
-    assert.equal(containerHeight(itemContainer), 2400, 'itemContainer height is correct after prepend');
+    assert.equal(paddingBefore(scrollContainer), 400, 'padding before is correct after prepend');
+    assert.equal(paddingAfter(scrollContainer), 1800, 'padding after is correct after prepend');
   }
 );
 
@@ -51,22 +52,23 @@ testScenarios(
   standardTemplate,
 
   async function(assert) {
-    assert.expect(8);
+    assert.expect(10);
 
     const scrollContainer = find('.scrollable');
-    const itemContainer = find('vertical-collection');
 
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'first item rendered correctly before append');
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 9', 'last item rendered correctly before append');
     assert.equal(scrollContainer.scrollTop, 0, 'scrollTop is correct before append');
-    assert.equal(containerHeight(itemContainer), 2000, 'itemContainer height is correct after append');
+    assert.equal(paddingBefore(scrollContainer), 0, 'padding after is correct after append');
+    assert.equal(paddingAfter(scrollContainer), 1800, 'padding after is correct before prepend');
 
     await append(this, getNumbers(100, 20));
 
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'first item rendered correctly after append');
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 9', 'last item rendered correctly after append');
     assert.equal(scrollContainer.scrollTop, 0, 'scrollTop is correct after append');
-    assert.equal(containerHeight(itemContainer), 2400, 'itemContainer height is correct after append');
+    assert.equal(paddingBefore(scrollContainer), 0, 'b height is correct after append');
+    assert.equal(paddingAfter(scrollContainer), 2200, 'padding after is correct before prepend');
   }
 );
 
@@ -220,7 +222,7 @@ testScenarios(
   async function(assert) {
     assert.expect(4);
 
-    const itemContainer = find('vertical-collection');
+    const itemContainer = find('.scrollable');
 
     // Occlude a single item,
     await scrollTo('.scrollable', 0, 140);

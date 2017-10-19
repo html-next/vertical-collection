@@ -2,7 +2,7 @@ export default
 /* !- BEGIN-SNIPPET vertical-collection-defaults-example */
 {
 // basics
-  tagName: 'vertical-collection',
+  tagName: '',
 
 // required
 
@@ -68,9 +68,11 @@ export default
 
 // scroll setup
 
-  // Selector for the scrollContainer. Defaults to
-  // the immediate parent of the collection if null.
-  containerSelector: null
+  // Selector for the scrollContainer. The collection
+  // will traverse its ancestry to find the first element
+  // that matches the selector. Defaults to '*', which
+  // will match the immediate parent of the collection.
+  containerSelector: '*'
 }
 /* !- END-SNIPPET vertical-collection-defaults-example */
 ;

@@ -9,6 +9,14 @@ import insertRangeBefore from '../utils/insert-range-before';
 import objectAt from '../utils/object-at';
 import roundTo from '../utils/round-to';
 
+import {
+  addScrollHandler,
+  removeScrollHandler
+} from '../utils/scroll-handler';
+
+import Container from '../container';
+
+import closestElement from '../../utils/element/closest';
 import { estimateElementHeight, estimateElementMaxHeight } from '../../utils/element/estimate-element-height';
 
 const {
@@ -18,40 +26,73 @@ const {
 } = Ember;
 
 export default class Radar {
-  constructor(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle) {
+  constructor(
+    parentToken,
+    {
+      bufferSize,
+      containerSelector,
+      estimateHeight,
+      items,
+      renderAll,
+      renderFromLast,
+      initialRenderCount,
+      shouldRecycle,
+      startingIndex
+    }
+  ) {
     this.token = new Token(parentToken);
 
-    this.items = initialItems;
-    this.estimateHeight = 0;
-    this.bufferSize = 0;
-    this.startingIndex = startingIndex;
+    // Public API
+    this.bufferSize = bufferSize;
+    this.containerSelector = containerSelector;
+    this.estimateHeight = estimateHeight;
+    this.initialRenderCount = initialRenderCount;
+    this.items = items;
+    this.renderAll = renderAll;
+    this.renderFromLast = renderFromLast;
     this.shouldRecycle = shouldRecycle;
-    this.renderFromLast = false;
-    this.renderAll = false;
-    this.itemContainer = null;
-    this.scrollContainer = null;
+    this.startingIndex = startingIndex;
 
-    this._scrollTop = 0;
+    // defaults to a no-op intentionally, actions will only be sent if they
+    // are passed into the component
+    this.sendAction = () => {};
+
+    // Calculated constants
+    this._itemContainer = null;
+    this._scrollContainer = null;
     this._prependOffset = 0;
     this._estimateHeight = 0;
     this._scrollTopOffset = 0;
     this._scrollContainerHeight = 0;
 
+    // Event handlers
+    this._scrollHandler = ({ top }) => {
+      // debounce scheduling updates by checking to make sure we've moved a minimum amount
+      if (Math.abs(this._scrollTop - top) > this._estimateHeight / 2) {
+        this.scheduleUpdate();
+      }
+    };
+
+    this._resizeHandler = this.scheduleUpdate.bind(this);
+
+    // Run state
     this._nextUpdate = null;
     this._nextLayout = null;
     this._started = false;
     this._didReset = true;
 
+    // Cache state
+    this._scrollTop = 0;
     this._prevFirstItemIndex = 0;
     this._prevLastItemIndex = 0;
     this._prevFirstVisibleIndex = 0;
     this._prevLastVisibleIndex = 0;
-
     this._firstReached = false;
     this._lastReached = false;
+    this._componentPool = [];
+    this._prependComponentPool = [];
 
-    this.sendAction = () => {};
-
+    // Boundaries
     this._occludedContentBefore = new VirtualComponent();
     this._occludedContentAfter = new VirtualComponent();
 
@@ -61,27 +102,11 @@ export default class Radar {
     this._occludedContentBefore.element.addEventListener('click', this.pageUp.bind(this));
     this._occludedContentAfter.element.addEventListener('click', this.pageDown.bind(this));
 
-    const virtualComponents = [this._occludedContentBefore];
-    const orderedComponents = [];
+    // Initialize virtual components
+    this.virtualComponents = A([this._occludedContentBefore, this._occludedContentAfter]);
+    this.orderedComponents = [];
 
-    const lastIndex = Math.min(startingIndex + initialRenderCount, get(initialItems, 'length'));
-    const firstIndex = Math.max(0, lastIndex - initialRenderCount);
-
-    for (let i = firstIndex; i < lastIndex; i++) {
-      const component = new VirtualComponent;
-      component.recycle(objectAt(initialItems, i), i);
-      component.rendered = true;
-
-      virtualComponents.push(component);
-      orderedComponents.push(component);
-    }
-
-    virtualComponents.push(this._occludedContentAfter);
-
-    this.virtualComponents = A(virtualComponents);
-    this.orderedComponents = orderedComponents;
-    this._componentPool = [];
-    this._prependComponentPool = [];
+    this._updateVirtualComponents();
 
     // In older versions of Ember/IE, binding anything on an object in the template
     // adds observers which creates __ember_meta__
@@ -101,18 +126,37 @@ export default class Radar {
 
     this.orderedComponents = null;
     set(this, 'virtualComponents', null);
+
+    if (this._started) {
+      removeScrollHandler(this._scrollContainer, this._scrollHandler);
+      Container.removeEventListener('resize', this._resizeHandler);
+    }
   }
 
   schedule(queueName, job) {
     return scheduler.schedule(queueName, job, this.token);
   }
 
+  /**
+   * Start the Radar. Does initial measurements, adds event handlers,
+   * sets up initial scroll state, and
+   */
   start() {
-    let { startingIndex } = this;
+    const {
+      startingIndex,
+      containerSelector,
+      _occludedContentBefore
+    } = this;
 
+    // Use the occluded content element, which has been inserted into the DOM,
+    // to find the item container and the scroll container
+    this._itemContainer = _occludedContentBefore.element.parentNode;
+    this._scrollContainer = containerSelector === 'body' ? Container : closestElement(this._itemContainer, containerSelector);
+
+    this._updateConstants();
+
+    // Setup initial scroll state
     if (startingIndex !== 0) {
-      this._updateConstants();
-
       const {
         totalItems,
         renderFromLast,
@@ -128,15 +172,18 @@ export default class Radar {
       }
 
       // The container element needs to have some height in order for us to set the scroll position
-      // on initialization, so we set this min-height property to radar's total
-      this.itemContainer.style.minHeight = `${_estimateHeight * totalItems}px`;
-      this.scrollContainer.scrollTop = startingScrollTop + _scrollTopOffset;
-
-      this._occludedContentBefore.element.style.height = `${startingIndex * _estimateHeight}px`;
+      // on initialization, so we set this height property of an occluded content elementto radar's total.
+      // This will be fixed immediately upon `_updateVirtualComponents` being called.
+      _occludedContentBefore.element.style.height = `${_estimateHeight * totalItems}px`;
+      this._scrollTop = this._scrollContainer.scrollTop = startingScrollTop + _scrollTopOffset;
     }
 
     this._started = true;
-    this.scheduleUpdate();
+    this.update();
+
+    // Setup event handlers
+    addScrollHandler(this._scrollContainer, this._scrollHandler);
+    Container.addEventListener('resize', this._resizeHandler);
   }
 
   /*
@@ -158,71 +205,75 @@ export default class Radar {
 
     this._nextUpdate = this.schedule('sync', () => {
       this._nextUpdate = null;
+      this.update();
+    });
+  }
 
-      this._scrollTop = this.scrollContainer.scrollTop;
+  update() {
+    this._scrollTop = this._scrollContainer.scrollTop;
 
-      this._updateConstants();
-      this._updateIndexes();
-      this._updateVirtualComponents();
+    this._updateConstants();
+    this._updateIndexes();
+    this._updateVirtualComponents();
 
-      this.schedule('measure', () => {
-        // If there is a prependOffset of some kind _and_ the scrollTop has changed. Chrome will
-        // automatically change the scrollTop for us in certain situations, which is why we need
-        // to check the cache.
-        if (this._prependOffset !== 0 && this._scrollTop === this.scrollContainer.scrollTop) {
-          this.scrollContainer.scrollTop += this._prependOffset;
-        }
+    this.schedule('measure', () => {
+      // If there is a prependOffset of some kind _and_ the scrollTop has changed. Chrome will
+      // automatically change the scrollTop for us in certain situations, which is why we need
+      // to check the cache.
+      if (this._prependOffset !== 0 && this._scrollTop === this._scrollContainer.scrollTop) {
+        this._scrollContainer.scrollTop += this._prependOffset;
+      }
 
-        this._prependOffset = 0;
+      this._prependOffset = 0;
 
-        if (this.totalItems !== 0) {
-          this._sendActions();
-        }
+      if (this.totalItems !== 0) {
+        this._sendActions();
+      }
 
-        // cache previous values
-        this._prevFirstItemIndex = this.firstItemIndex;
-        this._prevLastItemIndex = this.lastItemIndex;
-        this._prevFirstVisibleIndex = this.firstVisibleIndex;
-        this._prevLastVisibleIndex = this.lastVisibleIndex;
+      // cache previous values
+      this._prevFirstItemIndex = this.firstItemIndex;
+      this._prevLastItemIndex = this.lastItemIndex;
+      this._prevFirstVisibleIndex = this.firstVisibleIndex;
+      this._prevLastVisibleIndex = this.lastVisibleIndex;
 
-        // Clear the reset flag
-        this._didReset = false;
+      // Clear the reset flag
+      this._didReset = false;
 
-        if (DEBUG && this._debugDidUpdate !== null) {
-          // Hook to update the visual debugger
-          this._debugDidUpdate(this);
-        }
-      });
+      if (DEBUG && this._debugDidUpdate !== null) {
+        // Hook to update the visual debugger
+        this._debugDidUpdate(this);
+      }
     });
   }
 
   _updateConstants() {
     const {
       estimateHeight,
-      itemContainer,
-      scrollContainer
+      _occludedContentBefore,
+      _itemContainer,
+      _scrollContainer
     } = this;
 
     assert('Must provide a `estimateHeight` value to vertical-collection', estimateHeight !== null);
-    assert('itemContainer must be set on Radar before scheduling an update', itemContainer !== null);
-    assert('scrollContainer must be set on Radar before scheduling an update', scrollContainer !== null);
+    assert('itemContainer must be set on Radar before scheduling an update', _itemContainer !== null);
+    assert('scrollContainer must be set on Radar before scheduling an update', _scrollContainer !== null);
 
     const {
       top: itemContainerTop
-    } = itemContainer.getBoundingClientRect();
+    } = _occludedContentBefore.element.getBoundingClientRect();
     const {
       top: scrollContainerTop,
       height: scrollContainerHeight
-    } = scrollContainer.getBoundingClientRect();
+    } = _scrollContainer.getBoundingClientRect();
 
     let maxHeight = 0;
-    if (scrollContainer instanceof Element) {
-      maxHeight = estimateElementMaxHeight(scrollContainer);
+    if (_scrollContainer instanceof Element) {
+      maxHeight = estimateElementMaxHeight(_scrollContainer);
     }
 
     maxHeight = isNaN(maxHeight) ? 0 : maxHeight;
 
-    this._estimateHeight = typeof estimateHeight === 'string' ? estimateElementHeight(itemContainer, estimateHeight) : estimateHeight;
+    this._estimateHeight = typeof estimateHeight === 'string' ? estimateElementHeight(_itemContainer, estimateHeight) : estimateHeight;
     this._scrollTopOffset = roundTo(this._scrollTop + itemContainerTop - scrollContainerTop);
     this._scrollContainerHeight = Math.max(roundTo(scrollContainerHeight), maxHeight);
   }
@@ -255,19 +306,42 @@ export default class Radar {
       _componentPool,
 
       shouldRecycle,
-      _didReset,
+      renderAll,
 
-      itemContainer,
+      _didReset,
+      _started,
+
       _occludedContentBefore,
       _occludedContentAfter,
-      totalItems,
-
-      renderedFirstItemIndex,
-      renderedLastItemIndex,
-      renderedTotalBefore,
-      renderedTotalAfter,
-      totalRendered
+      totalItems
     } = this;
+
+    let renderedFirstItemIndex, renderedLastItemIndex, renderedTotalBefore, renderedTotalAfter;
+
+    if (renderAll === true) {
+      // All items should be rendered, set indexes based on total item count
+      renderedFirstItemIndex = 0;
+      renderedLastItemIndex = totalItems - 1;
+      renderedTotalBefore = 0;
+      renderedTotalAfter = 0;
+
+    } else if (_started === false) {
+      // The Radar hasn't been started yet, render the initialRenderCount if it exists
+      renderedFirstItemIndex = this.startingIndex;
+      renderedLastItemIndex = this.startingIndex + this.initialRenderCount - 1;
+      renderedTotalBefore = 0;
+      renderedTotalAfter = 0;
+
+    } else {
+      renderedFirstItemIndex = this.firstItemIndex;
+      renderedLastItemIndex = this.lastItemIndex;
+      renderedTotalBefore = this.totalBefore;
+      renderedTotalAfter = this.totalAfter;
+
+    }
+
+    // If there are less items available than rendered, we drop the last rendered item index
+    renderedLastItemIndex = Math.min(renderedLastItemIndex, totalItems - 1);
 
     // Add components to be recycled to the pool
     while (orderedComponents.length > 0 && orderedComponents[0].index < renderedFirstItemIndex) {
@@ -294,11 +368,11 @@ export default class Radar {
       }
     }
 
-    let firstIndexInList = orderedComponents[0] ? orderedComponents[0].index : renderedFirstItemIndex;
-    let lastIndexInList = orderedComponents[orderedComponents.length - 1] ? orderedComponents[orderedComponents.length - 1].index : renderedFirstItemIndex - 1;
+    let firstIndexInList = orderedComponents.length > 0 ? orderedComponents[0].index : renderedFirstItemIndex;
+    let lastIndexInList = orderedComponents.length > 0 ? orderedComponents[orderedComponents.length - 1].index : renderedFirstItemIndex - 1;
 
     // Append as many items as needed to the rendered components
-    while (orderedComponents.length < totalRendered && lastIndexInList < renderedLastItemIndex) {
+    while (lastIndexInList < renderedLastItemIndex) {
       let component;
 
       if (shouldRecycle === true) {
@@ -316,7 +390,7 @@ export default class Radar {
     }
 
     // Prepend as many items as needed to the rendered components
-    while (orderedComponents.length < totalRendered && firstIndexInList > renderedFirstItemIndex) {
+    while (firstIndexInList > renderedFirstItemIndex) {
       let component;
 
       if (shouldRecycle === true) {
@@ -351,8 +425,6 @@ export default class Radar {
 
     _occludedContentAfter.element.style.height = `${Math.max(renderedTotalAfter, 0)}px`;
     _occludedContentAfter.element.innerHTML = totalItemsAfter > 0 ? `And ${totalItemsAfter} ${afterItemsText} after` : '';
-
-    itemContainer.style.minHeight = '';
   }
 
   _appendComponent(component) {
@@ -460,58 +532,44 @@ export default class Radar {
   }
 
   pageUp() {
+    if (this.renderAll) {
+      return; // All items rendered, no need to page up
+    }
+
     const {
       bufferSize,
-      renderedFirstItemIndex,
-      totalRendered
+      firstItemIndex,
+      totalComponents
     } = this;
 
-    if (renderedFirstItemIndex !== 0) {
-      const newFirstItemIndex = Math.max(renderedFirstItemIndex - totalRendered + bufferSize, 0);
+    if (firstItemIndex !== 0) {
+      const newFirstItemIndex = Math.max(firstItemIndex - totalComponents + bufferSize, 0);
       const offset = this.getOffsetForIndex(newFirstItemIndex);
 
-      this.scrollContainer.scrollTop = offset + this._scrollTopOffset;
+      this._scrollContainer.scrollTop = offset + this._scrollTopOffset;
       this.scheduleUpdate();
     }
   }
 
   pageDown() {
+    if (this.renderAll) {
+      return; // All items rendered, no need to page down
+    }
+
     const {
       bufferSize,
-      renderedLastItemIndex,
-      totalRendered,
+      lastItemIndex,
+      totalComponents,
       totalItems
     } = this;
 
-    if (renderedLastItemIndex !== totalItems - 1) {
-      const newFirstItemIndex = Math.min(renderedLastItemIndex + bufferSize + 1, totalItems - totalRendered);
+    if (lastItemIndex !== totalItems - 1) {
+      const newFirstItemIndex = Math.min(lastItemIndex + bufferSize + 1, totalItems - totalComponents);
       const offset = this.getOffsetForIndex(newFirstItemIndex);
 
-      this.scrollContainer.scrollTop = offset + this._scrollTopOffset;
+      this._scrollContainer.scrollTop = offset + this._scrollTopOffset;
       this.scheduleUpdate();
     }
-  }
-
-  // If `renderAll` is true, render components for all items. We intercept this here because
-  // for all other behavior (action sending) we want to maintain the "correct" item indexes
-  get renderedFirstItemIndex() {
-    return this.renderAll === true ? 0 : this.firstItemIndex;
-  }
-
-  get renderedLastItemIndex() {
-    return this.renderAll === true ? this.totalItems - 1 : this.lastItemIndex;
-  }
-
-  get renderedTotalBefore() {
-    return this.renderAll === true ? 0 : this.totalBefore;
-  }
-
-  get renderedTotalAfter() {
-    return this.renderAll === true ? 0 : this.totalAfter;
-  }
-
-  get totalRendered() {
-    return this.renderAll === true ? this.totalItems : Math.min(this.totalItems, this.totalComponents);
   }
 
   get totalComponents() {

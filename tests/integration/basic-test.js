@@ -316,10 +316,8 @@ test('The collection renders the initialRenderCount correctly', async function(a
     </div>
   `);
 
-  requestAnimationFrame(() => {
-    assert.equal(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
-    assert.equal(find('vertical-item').textContent.trim(), '0 0', 'correct item rendered');
-  });
+  assert.equal(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
+  assert.equal(find('vertical-item').textContent.trim(), '0 0', 'correct item rendered');
 
   await wait();
 
@@ -348,10 +346,8 @@ test('The collection renders the initialRenderCount correctly if idForFirstItem 
     </div>
   `);
 
-  requestAnimationFrame(() => {
-    assert.equal(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
-    assert.equal(find('vertical-item').textContent.trim(), '20 20', 'correct item rendered');
-  });
+  assert.equal(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
+  assert.equal(find('vertical-item').textContent.trim(), '20 20', 'correct item rendered');
 
   await wait();
 

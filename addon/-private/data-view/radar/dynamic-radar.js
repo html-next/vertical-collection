@@ -5,8 +5,8 @@ import SkipList from '../skip-list';
 import roundTo from '../utils/round-to';
 
 export default class DynamicRadar extends Radar {
-  constructor(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle) {
-    super(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle);
+  constructor(parentToken, options) {
+    super(parentToken, options);
 
     this._firstItemIndex = 0;
     this._lastItemIndex = 0;
@@ -116,7 +116,7 @@ export default class DynamicRadar extends Radar {
   _measure(measureLimit = null) {
     const {
       orderedComponents,
-      itemContainer,
+      _occludedContentBefore,
       totalBefore,
       skipList
     } = this;
@@ -140,7 +140,7 @@ export default class DynamicRadar extends Radar {
       if (previousItem !== undefined) {
         margin = currentItemTop - previousItem.getBoundingClientRect().bottom;
       } else {
-        margin = currentItemTop - itemContainer.getBoundingClientRect().top - totalBefore;
+        margin = currentItemTop - _occludedContentBefore.getBoundingClientRect().top - totalBefore;
       }
 
       const itemDelta = skipList.set(itemIndex, roundTo(currentItemHeight + margin));

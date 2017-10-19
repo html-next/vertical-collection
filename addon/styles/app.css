@@ -1,11 +1,3 @@
-/* includes legacy support for older tagNames */
-vertical-collection {
-  display: block;
-  width: 100%;
-  min-height: 100%;
-  position: relative;
-}
-
 occluded-content {
   display: block;
   position: relative;

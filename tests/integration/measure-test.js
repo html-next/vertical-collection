@@ -27,7 +27,7 @@ testScenarios(
   async function(assert) {
     assert.expect(2);
 
-    const itemContainer = find('vertical-collection');
+    const itemContainer = find('.scrollable');
     assert.equal(paddingBefore(itemContainer), 0, 'itemContainer padding is correct on initial render');
 
     find('.vertical-item:first-of-type').style.height = '50px';
@@ -46,7 +46,7 @@ testScenarios(
   async function(assert) {
     assert.expect(3);
 
-    const itemContainer = find('vertical-collection');
+    const itemContainer = find('.scrollable');
 
     assert.equal(paddingAfter(itemContainer), 200, 'itemContainer padding is correct on initial render');
 
@@ -71,7 +71,7 @@ testScenarios(
 
     await scrollTo('.scrollable', 0, 400);
 
-    const itemContainer = find('vertical-collection');
+    const itemContainer = find('.scrollable');
 
     // Floats aren't perfect, neither is browser rendering/measuring, but any subpixel errors
     // should be amplified to the point where they are very noticeable at this point, so rounding
@@ -105,7 +105,7 @@ testScenarios(
 
     assert.equal(find('.scrollable').scrollTop, 420, 'scrollTop set to correct value');
 
-    const itemContainer = find('vertical-collection');
+    const itemContainer = find('.scrollable');
     assert.equal(paddingBefore(itemContainer), 360, 'Occluded content has the correct height before');
     assert.equal(paddingAfter(itemContainer), 260, 'Occluded content has the correct height after');
   }

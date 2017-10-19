@@ -3,8 +3,8 @@ import { DEBUG } from '@glimmer/env';
 import Radar from './radar';
 
 export default class StaticRadar extends Radar {
-  constructor(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle) {
-    super(parentToken, initialItems, initialRenderCount, startingIndex, shouldRecycle);
+  constructor(parentToken, options) {
+    super(parentToken, options);
 
     this._firstItemIndex = 0;
     this._lastItemIndex = 0;
