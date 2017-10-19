@@ -393,19 +393,20 @@ testScenarios(
   hbs`
   <div style="height: 370px; width: 200px;" class="scrollable">
     <table class="table table-striped latest-data">
-      {{#vertical-collection items
-        containerSelector=".scrollable"
-        tagName="tbody"
-        estimateHeight=37
-        staticHeight=staticHeight
-        bufferSize=0
+      <tbody>
+        {{#vertical-collection items
+          containerSelector=".scrollable"
+          estimateHeight=37
+          staticHeight=staticHeight
+          bufferSize=0
 
-        as |item i|}}
-        <tr>
-          <td>{{item.number}}</td>
-          <td>{{i}}</td>
-        </tr>
-      {{/vertical-collection}}
+          as |item i|}}
+          <tr>
+            <td>{{item.number}}</td>
+            <td>{{i}}</td>
+          </tr>
+        {{/vertical-collection}}
+      </tbody>
     </table>
   </div>
   `,
