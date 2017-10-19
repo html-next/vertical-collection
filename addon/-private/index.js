@@ -1,6 +1,5 @@
 export { default as keyForItem } from './ember-internals/key-for-item';
 
-export { estimateElementHeight } from './utils/element/estimate-element-height';
 export { default as closestElement } from './utils/element/closest';
 
 export { default as DynamicRadar } from './data-view/radar/dynamic-radar';

@@ -47,9 +47,24 @@ nav a {
   background: #fff;
 }
 
-.scrollable.with-max-height {
+.scrollable.with-pixel-max-height {
   height: initial;
   max-height: 200px;
+}
+
+.scrollable.with-percent-max-height {
+  height: initial;
+  max-height: 50%;
+}
+
+.scrollable.with-em-max-height {
+  height: initial;
+  max-height: 10em;
+}
+
+.scrollable.with-rem-max-height {
+  height: initial;
+  max-height: 20rem;
 }
 
 .table-wrapper.dark, .bg-dark {
