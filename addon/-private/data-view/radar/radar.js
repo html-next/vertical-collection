@@ -17,7 +17,7 @@ import {
 import Container from '../container';
 
 import closestElement from '../../utils/element/closest';
-import { estimateElementHeight, estimateElementMaxHeight } from '../../utils/element/estimate-element-height';
+import estimateElementHeight from '../../utils/element/estimate-element-height';
 
 const {
   A,
@@ -61,14 +61,14 @@ export default class Radar {
     this._itemContainer = null;
     this._scrollContainer = null;
     this._prependOffset = 0;
-    this._estimateHeight = 0;
+    this._calculatedEstimateHeight = 0;
     this._scrollTopOffset = 0;
-    this._scrollContainerHeight = 0;
+    this._calculatedScrollContainerHeight = 0;
 
     // Event handlers
     this._scrollHandler = ({ top }) => {
       // debounce scheduling updates by checking to make sure we've moved a minimum amount
-      if (Math.abs(this._scrollTop - top) > this._estimateHeight / 2) {
+      if (Math.abs(this._scrollTop - top) > this._calculatedEstimateHeight / 2) {
         this.scheduleUpdate();
       }
     };
@@ -160,21 +160,21 @@ export default class Radar {
       const {
         totalItems,
         renderFromLast,
-        _estimateHeight,
+        _calculatedEstimateHeight,
         _scrollTopOffset,
-        _scrollContainerHeight
+        _calculatedScrollContainerHeight
       } = this;
 
-      let startingScrollTop = startingIndex * _estimateHeight;
+      let startingScrollTop = startingIndex * _calculatedEstimateHeight;
 
       if (renderFromLast) {
-        startingScrollTop -= (_scrollContainerHeight - _estimateHeight);
+        startingScrollTop -= (_calculatedScrollContainerHeight - _calculatedEstimateHeight);
       }
 
       // The container element needs to have some height in order for us to set the scroll position
       // on initialization, so we set this height property of an occluded content elementto radar's total.
       // This will be fixed immediately upon `_updateVirtualComponents` being called.
-      _occludedContentBefore.element.style.height = `${_estimateHeight * totalItems}px`;
+      _occludedContentBefore.element.style.height = `${_calculatedEstimateHeight * totalItems}px`;
       this._scrollTop = this._scrollContainer.scrollTop = startingScrollTop + _scrollTopOffset;
     }
 
@@ -258,24 +258,31 @@ export default class Radar {
     assert('itemContainer must be set on Radar before scheduling an update', _itemContainer !== null);
     assert('scrollContainer must be set on Radar before scheduling an update', _scrollContainer !== null);
 
-    const {
-      top: itemContainerTop
-    } = _occludedContentBefore.element.getBoundingClientRect();
-    const {
-      top: scrollContainerTop,
-      height: scrollContainerHeight
-    } = _scrollContainer.getBoundingClientRect();
+    const scrollContainerOffsetHeight = _scrollContainer.offsetHeight;
 
-    let maxHeight = 0;
+    const { top: scrollContentTop } = _occludedContentBefore.element.getBoundingClientRect();
+    const { top: scrollContainerTop } = _scrollContainer.getBoundingClientRect();
+
+    let scrollContainerMaxHeight = 0;
+
     if (_scrollContainer instanceof Element) {
-      maxHeight = estimateElementMaxHeight(_scrollContainer);
+      const maxHeightStyle = window.getComputedStyle(_scrollContainer).maxHeight;
+
+      if (maxHeightStyle !== 'none') {
+        scrollContainerMaxHeight = estimateElementHeight(_scrollContainer.parentElement, maxHeightStyle);
+      }
     }
 
-    maxHeight = isNaN(maxHeight) ? 0 : maxHeight;
+    const calculatedEstimateHeight = typeof estimateHeight === 'string'
+      ? estimateElementHeight(_itemContainer, estimateHeight)
+      : estimateHeight;
 
-    this._estimateHeight = typeof estimateHeight === 'string' ? estimateElementHeight(_itemContainer, estimateHeight) : estimateHeight;
-    this._scrollTopOffset = roundTo(this._scrollTop + itemContainerTop - scrollContainerTop);
-    this._scrollContainerHeight = Math.max(roundTo(scrollContainerHeight), maxHeight);
+    assert(`calculatedEstimateHeight must be greater than 0, instead was "${calculatedEstimateHeight}" based on estimateHeight: ${estimateHeight}`, calculatedEstimateHeight > 0);
+
+    this._calculatedEstimateHeight = calculatedEstimateHeight;
+    this._calculatedScrollContainerHeight = roundTo(Math.max(scrollContainerOffsetHeight, scrollContainerMaxHeight));
+
+    this._scrollTopOffset = roundTo(this._scrollTop + scrollContentTop - scrollContainerTop);
   }
 
   /*
@@ -518,7 +525,7 @@ export default class Radar {
 
     this._firstReached = false;
 
-    this._prependOffset = numPrepended * this._estimateHeight;
+    this._prependOffset = numPrepended * this._calculatedEstimateHeight;
   }
 
   append() {
@@ -573,7 +580,7 @@ export default class Radar {
   }
 
   get totalComponents() {
-    return Math.ceil(this._scrollContainerHeight / this._estimateHeight) + (2 * this.bufferSize);
+    return Math.ceil(this._calculatedScrollContainerHeight / this._calculatedEstimateHeight) + (2 * this.bufferSize);
   }
 
   /*
@@ -594,14 +601,14 @@ export default class Radar {
   }
 
   get visibleMiddle() {
-    return this.visibleTop + (this._scrollContainerHeight / 2);
+    return this.visibleTop + (this._calculatedScrollContainerHeight / 2);
   }
 
   get visibleBottom() {
     // There is a case where the container of this vertical collection could have height 0 at
     // initial render step but will be updated later. We want to return visibleBottom to be 0 rather
     // than -1.
-    return Math.max(this.visibleTop + this._scrollContainerHeight - 1, 0);
+    return Math.max(this.visibleTop + this._calculatedScrollContainerHeight - 1, 0);
   }
 
   get totalItems() {

@@ -72,7 +72,7 @@ export default class Visualization {
       totalBefore,
       totalAfter,
       skipList,
-      _estimateHeight
+      _calculatedEstimateHeight
     } = this.radar;
 
     const isDynamic = !!skipList;
@@ -98,7 +98,7 @@ export default class Visualization {
     for (let itemIndex = firstVisualizedIndex, i = 0; itemIndex <= lastVisualizedIndex; itemIndex++, i++) {
       const element = sats[i];
 
-      const itemHeight = isDynamic ? itemHeights[itemIndex] : _estimateHeight;
+      const itemHeight = isDynamic ? itemHeights[itemIndex] : _calculatedEstimateHeight;
 
       element.style.height = `${itemHeight}px`;
       element.setAttribute('index', String(itemIndex));

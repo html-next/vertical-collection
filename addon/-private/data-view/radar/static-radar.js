@@ -19,7 +19,7 @@ export default class StaticRadar extends Radar {
       totalItems,
       totalComponents,
       visibleMiddle,
-      _estimateHeight
+      _calculatedEstimateHeight
     } = this;
 
     if (totalItems === 0) {
@@ -31,7 +31,7 @@ export default class StaticRadar extends Radar {
 
     const maxIndex = totalItems - 1;
 
-    const middleItemIndex = Math.floor(visibleMiddle / _estimateHeight);
+    const middleItemIndex = Math.floor(visibleMiddle / _calculatedEstimateHeight);
 
     let firstItemIndex = middleItemIndex - Math.floor(totalComponents / 2);
     let lastItemIndex = middleItemIndex + Math.ceil(totalComponents / 2) - 1;
@@ -51,15 +51,15 @@ export default class StaticRadar extends Radar {
   }
 
   get total() {
-    return this.totalItems * this._estimateHeight;
+    return this.totalItems * this._calculatedEstimateHeight;
   }
 
   get totalBefore() {
-    return this.firstItemIndex * this._estimateHeight;
+    return this.firstItemIndex * this._calculatedEstimateHeight;
   }
 
   get totalAfter() {
-    return this.total - ((this.lastItemIndex + 1) * this._estimateHeight);
+    return this.total - ((this.lastItemIndex + 1) * this._calculatedEstimateHeight);
   }
 
   get firstItemIndex() {
@@ -71,17 +71,17 @@ export default class StaticRadar extends Radar {
   }
 
   get firstVisibleIndex() {
-    return Math.ceil(this.visibleTop / this._estimateHeight);
+    return Math.ceil(this.visibleTop / this._calculatedEstimateHeight);
   }
 
   get lastVisibleIndex() {
-    return Math.min(Math.ceil(this.visibleBottom / this._estimateHeight), this.totalItems) - 1;
+    return Math.min(Math.ceil(this.visibleBottom / this._calculatedEstimateHeight), this.totalItems) - 1;
   }
 
   /*
    * Public API to query for the offset of an item
    */
   getOffsetForIndex(index) {
-    return index * this._estimateHeight + 1;
+    return index * this._calculatedEstimateHeight + 1;
   }
 }
