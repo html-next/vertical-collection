@@ -117,7 +117,6 @@ export default class DynamicRadar extends Radar {
     const {
       orderedComponents,
       _occludedContentBefore,
-      totalBefore,
       skipList
     } = this;
 
@@ -140,7 +139,7 @@ export default class DynamicRadar extends Radar {
       if (previousItem !== undefined) {
         margin = currentItemTop - previousItem.getBoundingClientRect().bottom;
       } else {
-        margin = currentItemTop - _occludedContentBefore.getBoundingClientRect().top - totalBefore;
+        margin = currentItemTop - _occludedContentBefore.getBoundingClientRect().bottom;
       }
 
       const itemDelta = skipList.set(itemIndex, roundTo(currentItemHeight + margin));
