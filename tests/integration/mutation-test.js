@@ -225,7 +225,7 @@ testScenarios(
     const itemContainer = find('.scrollable');
 
     // Occlude a single item,
-    await scrollTo('.scrollable', 0, 140);
+    await scrollTo('.scrollable', 0, 41);
 
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '1 1', 'first item rendered correctly after initial scroll set');
     assert.equal(paddingBefore(itemContainer), 40, 'itemContainer padding correct before same items set');

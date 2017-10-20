@@ -71,7 +71,7 @@ module.exports = {
         targets: [
           { dest: 'vertical-collection/-private.js', format: 'amd', moduleId: 'vertical-collection/-private' }
         ],
-        external: ['ember']
+        external: ['ember', 'ember-raf-scheduler']
       }
     });
 

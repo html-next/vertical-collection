@@ -2,7 +2,7 @@ import Ember from 'ember';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
-import { IS_GLIMMER_2 } from 'ember-compatibility-helpers';
+import { IS_GLIMMER_2, GTE_EMBER_1_13 } from 'ember-compatibility-helpers';
 
 const { set } = Ember;
 
@@ -25,7 +25,7 @@ export default class VirtualComponent {
     // adds observers which creates __ember_meta__
     this.__ember_meta__ = null; // eslint-disable-line camelcase
 
-    if (DEBUG) {
+    if (DEBUG && GTE_EMBER_1_13) {
       Object.preventExtensions(this);
     }
   }

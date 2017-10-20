@@ -15,6 +15,10 @@ export default class DynamicRadar extends Radar {
     this._totalBefore = 0;
     this._totalAfter = 0;
 
+    this._minHeight = Infinity;
+
+    this._nextIncrementalRender = null;
+
     this.skipList = null;
 
     if (DEBUG) {
@@ -28,8 +32,34 @@ export default class DynamicRadar extends Radar {
     this.skipList = null;
   }
 
+  scheduleUpdate() {
+    // Cancel incremental render check, since we'll be remeasuring anyways
+    if (this._nextIncrementalRender !== null) {
+      this._nextIncrementalRender.cancel();
+    }
+
+    super.scheduleUpdate();
+  }
+
+  afterUpdate() {
+    // Schedule a check to see if we should rerender
+    this._nextIncrementalRender = this.schedule('measure', () => {
+      this._nextIncrementalRender = null;
+
+      if (this._shouldScheduleRerender()) {
+        this.update();
+      }
+    });
+
+    super.afterUpdate();
+  }
+
   _updateConstants() {
     super._updateConstants();
+
+    if (this._calculatedEstimateHeight < this._minHeight) {
+      this._minHeight = this._calculatedEstimateHeight;
+    }
 
     // Create the SkipList only after the estimateHeight has been calculated the first time
     if (this.skipList === null) {
@@ -41,12 +71,12 @@ export default class DynamicRadar extends Radar {
 
   _updateIndexes() {
     const {
+      bufferSize,
       skipList,
-      visibleMiddle,
+      visibleTop,
+      visibleBottom,
       totalItems,
-      totalComponents,
 
-      _prevFirstItemIndex,
       _didReset
     } = this;
 
@@ -68,50 +98,68 @@ export default class DynamicRadar extends Radar {
 
     const { values } = skipList;
 
-    let { totalBefore, totalAfter, index: middleItemIndex } = this.skipList.find(visibleMiddle);
+    let { totalBefore, index: firstVisibleIndex } = this.skipList.find(visibleTop);
+    let { totalAfter, index: lastVisibleIndex } = this.skipList.find(visibleBottom);
 
     const maxIndex = totalItems - 1;
 
-    let firstItemIndex = middleItemIndex - Math.floor(totalComponents / 2);
-    let lastItemIndex = middleItemIndex + Math.ceil(totalComponents / 2) - 1;
-
-    if (firstItemIndex < 0) {
-      firstItemIndex = 0;
-      lastItemIndex = Math.min(totalComponents - 1, maxIndex);
-    }
-
-    if (lastItemIndex > maxIndex) {
-      lastItemIndex = maxIndex;
-      firstItemIndex = Math.max(maxIndex - (totalComponents - 1), 0);
-    }
+    let firstItemIndex = firstVisibleIndex;
+    let lastItemIndex = lastVisibleIndex;
 
     // Add buffers
-    for (let i = middleItemIndex - 1; i >= firstItemIndex; i--) {
-      totalBefore -= values[i];
+    for (let i = bufferSize; i > 0 && firstItemIndex > 0; i--) {
+      firstItemIndex--;
+      totalBefore -= values[firstItemIndex];
     }
 
-    for (let i = middleItemIndex + 1; i <= lastItemIndex; i++) {
-      totalAfter -= values[i];
-    }
-
-    const itemDelta = (_prevFirstItemIndex !== null) ? firstItemIndex - _prevFirstItemIndex : lastItemIndex - firstItemIndex;
-
-    if (itemDelta < 0 || itemDelta >= totalComponents) {
-      this.schedule('measure', () => {
-        // schedule a measurement for items that could affect scrollTop
-        const staticVisibleIndex = this.renderFromLast ? this.lastVisibleIndex + 1 : this.firstVisibleIndex;
-        const numBeforeStatic = staticVisibleIndex - firstItemIndex;
-
-        const measureLimit = Math.min(Math.abs(itemDelta), numBeforeStatic);
-
-        this._prependOffset += Math.round(this._measure(measureLimit));
-      });
+    for (let i = bufferSize; i > 0 && lastItemIndex < maxIndex; i--) {
+      lastItemIndex++;
+      totalAfter -= values[lastItemIndex];
     }
 
     this._firstItemIndex = firstItemIndex;
     this._lastItemIndex = lastItemIndex;
     this._totalBefore = totalBefore;
     this._totalAfter = totalAfter;
+  }
+
+  _calculateScrollDiff() {
+    const {
+      firstItemIndex,
+      _prevFirstVisibleIndex,
+      _prevFirstItemIndex
+    } = this;
+
+    let beforeVisibleDiff = 0;
+
+    if (firstItemIndex < _prevFirstItemIndex) {
+      // Measurement only items that could affect scrollTop. This will necesarilly be the
+      // minimum of the either the total number of items that are rendered up to the first
+      // visible item, OR the number of items that changed before the first visible item
+      // (the delta). We want to measure the delta of exactly this number of items, because
+      // items that are after the first visible item should not affect the scroll position,
+      // and neither should items already rendered before the first visible item.
+      const measureLimit = Math.min(Math.abs(firstItemIndex - _prevFirstItemIndex), _prevFirstVisibleIndex - firstItemIndex);
+
+      beforeVisibleDiff = Math.round(this._measure(measureLimit));
+    }
+
+    return beforeVisibleDiff + super._calculateScrollDiff();
+  }
+
+  _shouldScheduleRerender() {
+    const {
+      firstItemIndex,
+      lastItemIndex
+    } = this;
+
+    this._measure();
+
+    // These indexes could change after the measurement, and in the incremental render
+    // case we want to check them _after_ the change.
+    const { firstVisibleIndex, lastVisibleIndex } = this;
+
+    return firstVisibleIndex < firstItemIndex || lastVisibleIndex > lastItemIndex;
   }
 
   _measure(measureLimit = null) {
@@ -123,7 +171,9 @@ export default class DynamicRadar extends Radar {
       _transformScale
     } = this;
 
-    const numToMeasure = measureLimit !== null ? measureLimit : orderedComponents.length;
+    const numToMeasure = measureLimit !== null
+      ? Math.min(measureLimit, orderedComponents.length)
+      : orderedComponents.length;
 
     let totalDelta = 0;
 
@@ -145,7 +195,12 @@ export default class DynamicRadar extends Radar {
         margin = currentItemTop - getScaledClientRect(_occludedContentBefore, _transformScale).bottom;
       }
 
-      const itemDelta = skipList.set(itemIndex, roundTo(currentItemHeight + margin));
+      const newHeight = roundTo(currentItemHeight + margin);
+      const itemDelta = skipList.set(itemIndex, newHeight);
+
+      if (newHeight < this._minHeight) {
+        this._minHeight = newHeight;
+      }
 
       if (itemDelta !== 0) {
         totalDelta += itemDelta;
@@ -153,6 +208,10 @@ export default class DynamicRadar extends Radar {
     }
 
     return totalDelta;
+  }
+
+  _didEarthquake(scrollDiff) {
+    return scrollDiff > (this._minHeight / 2);
   }
 
   get total() {

@@ -24,7 +24,7 @@ moduleForComponent('vertical-collection', 'Integration | Basic Tests', {
 });
 
 testScenarios(
-  'The collection Renders',
+  'The collection renders',
   scenariosFor(getNumbers(0, 1)),
   standardTemplate,
 
@@ -35,7 +35,7 @@ testScenarios(
 );
 
 testScenarios(
-  'The collection Renders when content is empty',
+  'The collection renders when content is empty',
   scenariosFor([]),
   standardTemplate,
 
@@ -64,16 +64,18 @@ testScenarios(
   async function(assert) {
     assert.expect(3);
 
-    // Should always render 3 components, one to span the space and two buffers
-    assert.equal(findAll('.vertical-item').length, 3);
+    // Should render buffer on the bottom
+    assert.equal(findAll('.vertical-item').length, 2);
 
     await scrollTo('.scrollable', 0, 200);
 
+    // Should render buffers on both sides
     assert.equal(findAll('.vertical-item').length, 3);
 
     await scrollTo('.scrollable', 0, 2000);
 
-    assert.equal(findAll('.vertical-item').length, 3);
+    // Should render buffer on the top
+    assert.equal(findAll('.vertical-item').length, 2);
   }
 );
 
@@ -309,7 +311,7 @@ testScenarios(
   async function(assert) {
     assert.expect(2);
 
-    assert.equal(findAll('vertical-item').length, 9, 'Rendered correct number of items');
+    assert.equal(findAll('vertical-item').length, 7, 'Rendered correct number of items');
 
     await scrollTo('.scrollable', 0, 500);
 

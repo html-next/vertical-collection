@@ -2580,9 +2580,9 @@ ember-code-snippet@^1.1.0:
     glob "^4.0.4"
     highlight.js "^9.5.0"
 
-ember-compatibility-helpers@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/ember-compatibility-helpers/-/ember-compatibility-helpers-0.1.0.tgz#52dbe15fd67cd357fdf3d2bdb1221467c87947c3"
+ember-compatibility-helpers@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/ember-compatibility-helpers/-/ember-compatibility-helpers-0.1.2.tgz#8eb1769ad761db273fd40242b1170d9f3841d0f0"
   dependencies:
     babel-plugin-debug-macros "^0.1.11"
     ember-cli-version-checker "^2.0.0"
