@@ -15,17 +15,19 @@ if (SUPPORTS_INVERSE_BLOCK) {
     this.set('items', []);
 
     this.render(hbs`
-      {{#vertical-collection items
-        estimateHeight=20
-        staticHeight=true
-      }}
-        {{else}}
-          Foobar
-      {{/vertical-collection}}
+      <div class="scrollable">
+        {{#vertical-collection items
+          estimateHeight=20
+          staticHeight=true
+        }}
+          {{else}}
+            Foobar
+        {{/vertical-collection}}
+      </div>
     `);
 
     await wait();
 
-    assert.equal(find('vertical-collection').textContent.indexOf('Foobar') !== -1, true);
+    assert.equal(find('.scrollable').textContent.indexOf('Foobar') !== -1, true);
   });
 }

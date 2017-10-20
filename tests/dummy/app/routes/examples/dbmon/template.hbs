@@ -6,19 +6,20 @@
         {{!- BEGIN-SNIPPET dbmon-example }}
           <div class="table-wrapper">
             <table class="table table-striped latest-data">
-              {{#vertical-collection model.databases
-                containerSelector=".table-wrapper"
-                tagName="tbody"
-                key="id"
+              <tbody>
+                {{#vertical-collection model.databases
+                  containerSelector=".table-wrapper"
+                  key="id"
 
-                estimateHeight=37
-                staticHeight=true
-                bufferSize=5
+                  estimateHeight=37
+                  staticHeight=true
+                  bufferSize=5
 
-                as |db|
-              }}
-                {{examples/dbmon/components/dbmon-row tagName="tr" db=db}}
-              {{/vertical-collection}}
+                  as |db|
+                }}
+                  {{examples/dbmon/components/dbmon-row tagName="tr" db=db}}
+                {{/vertical-collection}}
+              </tbody>
             </table>
           </div>
         {{!- END-SNIPPET }}

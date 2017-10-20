@@ -61,7 +61,7 @@ export default Mixin.create({
     // check item defaults
     assert(`You must supply at least one item to the collection to debug it's CSS.`, this.get('items.length'));
 
-    let element = radar.itemContainer.firstElementChild;
+    let element = radar._itemContainer.firstElementChild;
 
     styles = window.getComputedStyle(element);
 

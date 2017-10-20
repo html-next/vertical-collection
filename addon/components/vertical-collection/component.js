@@ -6,13 +6,9 @@ import { SUPPORTS_INVERSE_BLOCK } from 'ember-compatibility-helpers';
 
 import {
   keyForItem,
-  closestElement,
   DynamicRadar,
   StaticRadar,
-  Container,
   objectAt,
-  addScrollHandler,
-  removeScrollHandler,
   Token,
   scheduler
 } from '../../-private';
@@ -27,7 +23,7 @@ const {
 const VerticalCollection = Component.extend({
   layout,
 
-  tagName: 'vertical-collection',
+  tagName: '',
 
   /**
    * Property name used for storing references to each item in items. Accessing this attribute for each item
@@ -98,7 +94,7 @@ const VerticalCollection = Component.extend({
    *
    * Set this to "body" to scroll the entire web page.
    */
-  containerSelector: null,
+  containerSelector: '*',
 
   // –––––––––––––– Performance Tuning
   /**
@@ -230,51 +226,15 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
-    const containerSelector = this.get('containerSelector');
-
-    if (containerSelector === 'body') {
-      this._scrollContainer = Container;
-    } else {
-      this._scrollContainer = containerSelector ? closestElement(this.element.parentNode, containerSelector) : this.element.parentNode;
-    }
-
-    // Initialize the Radar and set the scroll state
-    this._radar.itemContainer = this.element;
-    this._radar.scrollContainer = this._scrollContainer;
-
     this.schedule('sync', () => {
-      this._initializeEventHandlers();
       this._radar.start();
     });
-  },
-
-  _initializeEventHandlers() {
-    this._scrollHandler = ({ top }) => {
-      if (Math.abs(this._lastEarthquake - top) > this._radar._estimateHeight / 2) {
-        this._radar.scheduleUpdate();
-        this._lastEarthquake = top;
-      }
-    };
-
-    this._resizeHandler = () => {
-      this._radar.scheduleUpdate();
-    };
-
-    addScrollHandler(this._scrollContainer, this._scrollHandler);
-    Container.addEventListener('resize', this._resizeHandler);
   },
 
   willDestroy() {
     this.token.cancel();
     this._radar.destroy();
     clearTimeout(this._nextSendActions);
-
-    if (this._scrollHandler) {
-      removeScrollHandler(this._scrollContainer, this._scrollHandler);
-    }
-    if (this._resizeHandler) {
-      Container.removeEventListener('resize', this._resizeHandler);
-    }
   },
 
   init() {
@@ -285,25 +245,37 @@ const VerticalCollection = Component.extend({
 
     const items = this.get('items') || [];
 
-    const idForFirstItem = this.get('idForFirstItem');
+    const bufferSize = this.get('bufferSize');
+    const containerSelector = this.get('containerSelector');
+    const estimateHeight = this.get('estimateHeight');
     const initialRenderCount = this.get('initialRenderCount');
-    const key = this.get('key');
+    const renderAll = this.get('renderAll');
     const renderFromLast = this.get('renderFromLast');
     const shouldRecycle = this.get('shouldRecycle');
 
+    const idForFirstItem = this.get('idForFirstItem');
+    const key = this.get('key');
+
     const startingIndex = calculateStartingIndex(items, idForFirstItem, key, renderFromLast);
 
-    this._radar = new RadarClass(this.token, items, initialRenderCount, startingIndex, shouldRecycle);
-    this._radar.renderFromLast = renderFromLast;
+    this._radar = new RadarClass(
+      this.token,
+      {
+        bufferSize,
+        containerSelector,
+        estimateHeight,
+        initialRenderCount,
+        items,
+        renderAll,
+        renderFromLast,
+        shouldRecycle,
+        startingIndex
+      }
+    );
 
-    this.supportsInverse = SUPPORTS_INVERSE_BLOCK;
     this._prevItemsLength = 0;
     this._prevFirstKey = null;
     this._prevLastKey = null;
-    this._lastEarthquake = 0;
-    this._scrollContainer = null;
-    this._scrollHandler = null;
-    this._resizeHandler = null;
 
     this._hasAction = null;
     this._scheduledActions = [];
