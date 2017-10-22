@@ -267,11 +267,15 @@ export default class Radar {
     const scrollContainerOffsetHeight = _scrollContainer.offsetHeight;
     const { height: scrollContainerRenderedHeight } = _scrollContainer.getBoundingClientRect();
 
-    // Represents the opposite of the scale, if any, applied to the collection. Check for equality
-    // to guard against floating point errors and divide by zero (both should be zero if one is)
-    const transformScale = scrollContainerOffsetHeight !== scrollContainerRenderedHeight
-      ? scrollContainerOffsetHeight / scrollContainerRenderedHeight
-      : 1;
+    let transformScale;
+
+    // transformScale represents the opposite of the scale, if any, applied to the collection. Check for equality
+    // to guard against floating point errors, and check to make sure we're not dividing by zero (default to scale 1 if so)
+    if (scrollContainerOffsetHeight === scrollContainerRenderedHeight || scrollContainerRenderedHeight === 0) {
+      transformScale = 1;
+    } else {
+      transformScale = scrollContainerOffsetHeight / scrollContainerRenderedHeight;
+    }
 
     const { top: scrollContentTop } = getScaledClientRect(_occludedContentBefore, transformScale);
     const { top: scrollContainerTop } = getScaledClientRect(_scrollContainer, transformScale);
