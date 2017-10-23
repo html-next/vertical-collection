@@ -61,7 +61,7 @@ testScenarios(
   `,
 
   async function(assert) {
-    assert.equal(findAll('vertical-item').length, 4);
+    assert.equal(findAll('vertical-item').length, 5);
   }
 );
 
@@ -115,7 +115,7 @@ testScenarios(
 
 testScenarios(
   'The collection renders correctly with a scroll parent with a pixel based max height',
-  simpleScenariosFor(getNumbers(0, 10)),
+  simpleScenariosFor(getNumbers(0, 20)),
 
   hbs`
     <div class="scrollable with-pixel-max-height">
@@ -142,7 +142,7 @@ testScenarios(
 
 testScenarios(
   'The collection renders correctly with a scroll parent with a percentage based max height',
-  simpleScenariosFor(getNumbers(0, 10)),
+  simpleScenariosFor(getNumbers(0, 20)),
 
   hbs`
     <div style="height: 400px;">
@@ -171,7 +171,7 @@ testScenarios(
 
 testScenarios(
   'The collection renders correctly with a scroll parent with an em based max height',
-  simpleScenariosFor(getNumbers(0, 10)),
+  simpleScenariosFor(getNumbers(0, 20)),
 
   hbs`
     <div style="font-size: 20px;">
@@ -200,7 +200,7 @@ testScenarios(
 
 testScenarios(
   'The collection renders correctly with a scroll parent with a rem based max height',
-  simpleScenariosFor(getNumbers(0, 10)),
+  simpleScenariosFor(getNumbers(0, 20)),
 
   hbs`
     <div class="scrollable with-rem-max-height">
