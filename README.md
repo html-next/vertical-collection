@@ -27,7 +27,7 @@ It will try its best to allow you to keep the conventions, structures, and layou
 ember install @html-next/vertical-collection
 ```
 
-##Usage
+## Usage
 
 ```htmlbars
 {{#vertical-collection
@@ -50,7 +50,7 @@ ember install @html-next/vertical-collection
 {{/vertical-collection}}
 ```
 
-###Actions
+### Actions
 
 `firstReached` - Triggered when scroll reaches the first element in the collection
 
