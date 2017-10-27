@@ -1,4 +1,4 @@
-import { scheduler } from '../../scheduler/index';
+import { scheduler } from 'ember-raf-scheduler';
 import SUPPORTS_PASSIVE from './supports-passive';
 import Ember from 'ember';
 
