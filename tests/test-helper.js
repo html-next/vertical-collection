@@ -1,6 +1,6 @@
 import resolver from './helpers/resolver';
 import 'vertical-collection/-debug';
-import registerWaiter from 'vertical-collection/test-support/register-waiter';
+import registerWaiter from 'ember-raf-scheduler/test-support/register-waiter';
 
 import {
   setResolver

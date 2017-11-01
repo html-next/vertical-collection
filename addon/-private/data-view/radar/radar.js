@@ -2,7 +2,7 @@ import Ember from 'ember';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
-import { Token, scheduler } from '../../scheduler/index';
+import { Token, scheduler } from 'ember-raf-scheduler';
 
 import VirtualComponent from '../virtual-component';
 import insertRangeBefore from '../utils/insert-range-before';

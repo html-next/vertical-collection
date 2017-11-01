@@ -2,15 +2,15 @@
 import Ember from 'ember';
 import layout from './template';
 
+import { scheduler, Token } from 'ember-raf-scheduler';
+
 import { SUPPORTS_INVERSE_BLOCK } from 'ember-compatibility-helpers';
 
 import {
   keyForItem,
   DynamicRadar,
   StaticRadar,
-  objectAt,
-  Token,
-  scheduler
+  objectAt
 } from '../../-private';
 
 const {
