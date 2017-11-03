@@ -25,7 +25,7 @@ function getPercentageHeight(element, fallbackHeight) {
 }
 
 function getEmHeight(element, fallbackHeight) {
-  const fontSizeElement = fallbackHeight.indexOf('rem') !== -1 ? document.body : element;
+  const fontSizeElement = fallbackHeight.indexOf('rem') !== -1 ? document.documentElement : element;
   const fontSize = window.getComputedStyle(fontSizeElement).getPropertyValue('font-size');
 
   return (parseFloat(fallbackHeight) * parseFloat(fontSize));
