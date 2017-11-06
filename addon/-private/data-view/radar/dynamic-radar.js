@@ -43,13 +43,15 @@ export default class DynamicRadar extends Radar {
 
   afterUpdate() {
     // Schedule a check to see if we should rerender
-    this._nextIncrementalRender = this.schedule('sync', () => {
-      this._nextIncrementalRender = null;
+    if (this._nextIncrementalRender === null && this._nextUpdate === null) {
+      this._nextIncrementalRender = this.schedule('sync', () => {
+        this._nextIncrementalRender = null;
 
-      if (this._shouldScheduleRerender()) {
-        this.update();
-      }
-    });
+        if (this._shouldScheduleRerender()) {
+          this.update();
+        }
+      });
+    }
 
     super.afterUpdate();
   }
