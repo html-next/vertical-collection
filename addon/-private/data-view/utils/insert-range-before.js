@@ -1,10 +1,9 @@
-export default function insertRangeBefore(element, firstNode, lastNode) {
-  const { parentNode } = element;
+export default function insertRangeBefore(parent, element, firstNode, lastNode) {
   let nextNode;
 
   while (firstNode) {
     nextNode = firstNode.nextSibling;
-    parentNode.insertBefore(firstNode, element);
+    parent.insertBefore(firstNode, element);
 
     if (firstNode === lastNode) {
       break;

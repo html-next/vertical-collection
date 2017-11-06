@@ -124,7 +124,8 @@ function generateScenario(name, defaultOptions, initializer) {
     const items = initializer ? initializer(baseItems.slice()) : baseItems.slice();
     const scenario = { items };
 
-    Ember.merge(scenario, options, defaultOptions);
+    Ember.merge(scenario, options);
+    Ember.merge(scenario, defaultOptions);
 
     return { [name]: scenario };
   };

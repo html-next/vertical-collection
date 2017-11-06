@@ -63,14 +63,14 @@ export default class Radar {
     this._scrollContainer = null;
     this._prependOffset = 0;
     this._calculatedEstimateHeight = 0;
-    this._scrollTopOffset = 0;
+    this._collectionOffset = 0;
     this._calculatedScrollContainerHeight = 0;
     this._transformScale = 1;
 
-    // Event handlers
+    // Event handler
     this._scrollHandler = ({ top }) => {
       // debounce scheduling updates by checking to make sure we've moved a minimum amount
-      if (Math.abs(this._scrollTop - top) > this._calculatedEstimateHeight / 2) {
+      if (this._didEarthquake(Math.abs(this._scrollTop - top))) {
         this.scheduleUpdate();
       }
     };
@@ -85,8 +85,10 @@ export default class Radar {
 
     // Cache state
     this._scrollTop = 0;
-    this._prevFirstItemIndex = 0;
-    this._prevLastItemIndex = 0;
+    // Setting these values to infinity starts us in a guaranteed good state for the radar,
+    // so it knows that it needs to run certain measurements, etc.
+    this._prevFirstItemIndex = Infinity;
+    this._prevLastItemIndex = -Infinity;
     this._prevFirstVisibleIndex = 0;
     this._prevLastVisibleIndex = 0;
     this._firstReached = false;
@@ -103,6 +105,9 @@ export default class Radar {
 
     this._occludedContentBefore.element.addEventListener('click', this.pageUp.bind(this));
     this._occludedContentAfter.element.addEventListener('click', this.pageDown.bind(this));
+
+    // Element to hold pooled component DOM when not in use
+    this._domPool = document.createDocumentFragment();
 
     // Initialize virtual components
     this.virtualComponents = A([this._occludedContentBefore, this._occludedContentAfter]);
@@ -160,10 +165,9 @@ export default class Radar {
     // Setup initial scroll state
     if (startingIndex !== 0) {
       const {
-        totalItems,
         renderFromLast,
         _calculatedEstimateHeight,
-        _scrollTopOffset,
+        _collectionOffset,
         _calculatedScrollContainerHeight
       } = this;
 
@@ -173,11 +177,9 @@ export default class Radar {
         startingScrollTop -= (_calculatedScrollContainerHeight - _calculatedEstimateHeight);
       }
 
-      // The container element needs to have some height in order for us to set the scroll position
-      // on initialization, so we set this height property of an occluded content elementto radar's total.
-      // This will be fixed immediately upon `_updateVirtualComponents` being called.
-      _occludedContentBefore.element.style.height = `${_calculatedEstimateHeight * totalItems}px`;
-      this._scrollTop = this._scrollContainer.scrollTop = startingScrollTop + _scrollTopOffset;
+      // initialize the scrollTop value, which will be applied to the
+      // scrollContainer after the collection has been initialized
+      this._scrollTop = startingScrollTop + _collectionOffset;
     }
 
     this._started = true;
@@ -207,45 +209,69 @@ export default class Radar {
 
     this._nextUpdate = this.schedule('sync', () => {
       this._nextUpdate = null;
+      this._scrollTop = this._scrollContainer.scrollTop;
+
       this.update();
     });
   }
 
   update() {
-    this._scrollTop = this._scrollContainer.scrollTop;
-
     this._updateConstants();
     this._updateIndexes();
     this._updateVirtualComponents();
 
-    this.schedule('measure', () => {
-      // If there is a prependOffset of some kind _and_ the scrollTop has changed. Chrome will
-      // automatically change the scrollTop for us in certain situations, which is why we need
-      // to check the cache.
-      if (this._prependOffset !== 0 && this._scrollTop === this._scrollContainer.scrollTop) {
-        this._scrollContainer.scrollTop += this._prependOffset;
-      }
+    this.schedule('measure', this.afterUpdate.bind(this));
+  }
 
-      this._prependOffset = 0;
+  afterUpdate() {
+    const { totalItems } = this;
 
-      if (this.totalItems !== 0) {
-        this._sendActions();
-      }
+    const scrollDiff = this._calculateScrollDiff();
 
-      // cache previous values
-      this._prevFirstItemIndex = this.firstItemIndex;
-      this._prevLastItemIndex = this.lastItemIndex;
-      this._prevFirstVisibleIndex = this.firstVisibleIndex;
-      this._prevLastVisibleIndex = this.lastVisibleIndex;
+    if (scrollDiff !== 0) {
+      this._scrollContainer.scrollTop += scrollDiff;
+    }
 
-      // Clear the reset flag
-      this._didReset = false;
+    // Re-sync scrollTop, since Chrome may have intervened
+    this._scrollTop = this._scrollContainer.scrollTop;
 
-      if (DEBUG && this._debugDidUpdate !== null) {
-        // Hook to update the visual debugger
-        this._debugDidUpdate(this);
-      }
-    });
+    // Unset prepend offset, we're done with any prepend changes at this point
+    this._prependOffset = 0;
+
+    // Send actions if there are any items
+    if (totalItems !== 0) {
+      this._sendActions();
+    }
+
+    // Cache previous values
+    this._prevFirstItemIndex = this.firstItemIndex;
+    this._prevLastItemIndex = this.lastItemIndex;
+    this._prevFirstVisibleIndex = this.firstVisibleIndex;
+    this._prevLastVisibleIndex = this.lastVisibleIndex;
+
+    // Clear the reset flag
+    this._didReset = false;
+
+    if (DEBUG && this._debugDidUpdate !== null) {
+      // Hook to update the visual debugger
+      this._debugDidUpdate(this);
+    }
+  }
+
+  /*
+   * The scroll diff is the difference between where we want the container's scrollTop to be,
+   * and where it actually is right now. By default it accounts for the `_prependOffset`, which
+   * is set when items are added to the front of the collection, as well as any discrepancies
+   * that may have arisen between the cached `_scrollTop` value and the actually container's
+   * scrollTop. The container's scrollTop may be modified by the browser when we manipulate DOM
+   * (Chrome specifically does this a lot), so `_scrollTop` should be considered the canonical
+   * scroll top.
+   *
+   * Subclasses should override this method to provide any difference between expected item size
+   * pre-render and actual item size post-render.
+   */
+  _calculateScrollDiff() {
+    return (this._prependOffset + this._scrollTop) - this._scrollContainer.scrollTop;
   }
 
   _updateConstants() {
@@ -299,7 +325,11 @@ export default class Radar {
     this._transformScale = transformScale;
     this._calculatedEstimateHeight = calculatedEstimateHeight;
     this._calculatedScrollContainerHeight = roundTo(Math.max(scrollContainerOffsetHeight, scrollContainerMaxHeight));
-    this._scrollTopOffset = roundTo(this._scrollTop + scrollContentTop - scrollContainerTop);
+
+    // The offset between the top of the collection and the top of the scroll container. Determined by finding
+    // the distance from the collection is from the top of the scroll container's content (scrollTop + actual position)
+    // and subtracting the scroll containers actual top.
+    this._collectionOffset = roundTo((_scrollContainer.scrollTop + scrollContentTop) - scrollContainerTop);
   }
 
   /*
@@ -433,8 +463,18 @@ export default class Radar {
 
     // If there are any items remaining in the pool, remove them
     if (_componentPool.length > 0) {
-      virtualComponents.removeObjects(_componentPool);
-      _componentPool.length = 0;
+      if (shouldRecycle === true) {
+        // Grab the DOM of the remaining components and move it to temporary node disconnected from
+        // the body. If we end up using these components again, we'll grab their DOM and put it back
+        for (let i = 0; i < _componentPool.length; i++) {
+          const component = _componentPool[i];
+
+          insertRangeBefore(this._domPool, null, component.realUpperBound, component.realLowerBound);
+        }
+      } else {
+        virtualComponents.removeObjects(_componentPool);
+        _componentPool.length = 0;
+      }
     }
 
     const totalItemsBefore = renderedFirstItemIndex;
@@ -454,11 +494,14 @@ export default class Radar {
   _appendComponent(component) {
     const {
       virtualComponents,
-      _occludedContentAfter
+      _occludedContentAfter,
+      _itemContainer
     } = this;
 
+    const relativeNode = _occludedContentAfter.realUpperBound;
+
     if (component.rendered === true) {
-      insertRangeBefore(_occludedContentAfter.realUpperBound, component.realUpperBound, component.realLowerBound);
+      insertRangeBefore(_itemContainer, relativeNode, component.realUpperBound, component.realLowerBound);
     } else {
       virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
       component.rendered = true;
@@ -469,11 +512,14 @@ export default class Radar {
     const {
       virtualComponents,
       _occludedContentBefore,
-      _prependComponentPool
+      _prependComponentPool,
+      _itemContainer
     } = this;
 
+    const relativeNode = _occludedContentBefore.realLowerBound.nextSibling;
+
     if (component.rendered === true) {
-      insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, component.realUpperBound, component.realLowerBound);
+      insertRangeBefore(_itemContainer, relativeNode, component.realUpperBound, component.realLowerBound);
     } else {
       virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
       component.rendered = true;
@@ -489,7 +535,10 @@ export default class Radar {
           while (_prependComponentPool.length > 0) {
             const component = _prependComponentPool.pop();
 
-            insertRangeBefore(_occludedContentBefore.realLowerBound.nextSibling, component.realUpperBound, component.realLowerBound);
+            // Changes with each inserted component
+            const relativeNode = _occludedContentBefore.realLowerBound.nextSibling;
+
+            insertRangeBefore(_itemContainer, relativeNode, component.realUpperBound, component.realLowerBound);
           }
         });
       }
@@ -536,9 +585,7 @@ export default class Radar {
     this._prevFirstItemIndex += numPrepended;
     this._prevLastItemIndex += numPrepended;
 
-    this.schedule('sync', () => {
-      this.orderedComponents.forEach((c) => set(c, 'index', get(c, 'index') + numPrepended));
-    });
+    this.orderedComponents.forEach((c) => set(c, 'index', get(c, 'index') + numPrepended));
 
     this._firstReached = false;
 
@@ -570,7 +617,7 @@ export default class Radar {
       const newFirstItemIndex = Math.max(firstItemIndex - totalComponents + bufferSize, 0);
       const offset = this.getOffsetForIndex(newFirstItemIndex);
 
-      this._scrollContainer.scrollTop = offset + this._scrollTopOffset;
+      this._scrollContainer.scrollTop = offset + this._collectionOffset;
       this.scheduleUpdate();
     }
   }
@@ -591,13 +638,13 @@ export default class Radar {
       const newFirstItemIndex = Math.min(lastItemIndex + bufferSize + 1, totalItems - totalComponents);
       const offset = this.getOffsetForIndex(newFirstItemIndex);
 
-      this._scrollContainer.scrollTop = offset + this._scrollTopOffset;
+      this._scrollContainer.scrollTop = offset + this._collectionOffset;
       this.scheduleUpdate();
     }
   }
 
   get totalComponents() {
-    return Math.ceil(this._calculatedScrollContainerHeight / this._calculatedEstimateHeight) + (2 * this.bufferSize);
+    return Math.min(this.totalItems, (this.lastItemIndex - this.firstItemIndex) + 1);
   }
 
   /*
@@ -614,7 +661,7 @@ export default class Radar {
    * in this exact order.
    */
   get visibleTop() {
-    return Math.max(this._scrollTop - this._scrollTopOffset + this._prependOffset, 0);
+    return Math.max(this._scrollTop - this._collectionOffset + this._prependOffset, 0);
   }
 
   get visibleMiddle() {

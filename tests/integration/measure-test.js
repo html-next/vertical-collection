@@ -3,6 +3,7 @@ import hbs from 'htmlbars-inline-precompile';
 
 import {
   find,
+  findAll,
   scrollTo
 } from 'ember-native-dom-helpers';
 
@@ -97,7 +98,7 @@ testScenarios(
 
 testScenarios(
   'Measurements are correct after a prepend',
-  dynamicSimpleScenarioFor(getNumbers(0, 20), { itemHeight: 30 }),
+  dynamicSimpleScenarioFor(getNumbers(0, 20), { itemHeight: 40 }),
   standardTemplate,
 
   async function(assert) {
@@ -105,33 +106,37 @@ testScenarios(
 
     await prepend(this, getNumbers(-20, 20));
 
-    assert.equal(find('.scrollable').scrollTop, 420, 'scrollTop set to correct value');
+    assert.equal(find('.scrollable').scrollTop, 400, 'scrollTop set to correct value');
 
     const itemContainer = find('.scrollable');
-    assert.equal(paddingBefore(itemContainer), 360, 'Occluded content has the correct height before');
-    assert.equal(paddingAfter(itemContainer), 260, 'Occluded content has the correct height after');
+    assert.equal(paddingBefore(itemContainer), 400, 'Occluded content has the correct height before');
+    assert.equal(paddingAfter(itemContainer), 400, 'Occluded content has the correct height after');
   }
 );
 
 testScenarios(
   'Measurements are correct after a reset',
-  dynamicSimpleScenarioFor(getNumbers(0, 20), { itemHeight: 30 }),
+  dynamicSimpleScenarioFor(getNumbers(0, 20), { itemHeight: 40 }),
   standardTemplate,
 
   async function(assert) {
     assert.expect(6);
 
-    await scrollTo('.scrollable', 0, 300);
+    await scrollTo('.scrollable', 0, 400);
 
-    assert.equal(find('.scrollable').scrollTop, 300, 'scrollTop set to correct value');
+    assert.equal(find('.scrollable').scrollTop, 400, 'scrollTop set to correct value');
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '10 10', 'the first rendered item is correct');
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '19 19', 'the last rendered item is correct');
 
+    // Trigger measurements
+    await scrollTo('.scrollable', 0, 420);
+    await scrollTo('.scrollable', 0, 400);
+
     await replaceArray(this, getNumbers(20, 20));
 
-    assert.equal(find('.scrollable').scrollTop, 300, 'scrollTop set to correct value');
+    assert.equal(find('.scrollable').scrollTop, 400, 'scrollTop set to correct value');
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '30 10', 'the first rendered item is correct');
-    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '39 19', 'the last rendered item is correct');
+    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '34 14', 'the last rendered item is correct');
   }
 );
 
@@ -159,5 +164,31 @@ testScenarios(
     await scrollTo('.scrollable', 0, 150);
 
     assert.equal(paddingBefore(find('.scrollable')), 150, 'Rendered correct number of items');
+  }
+);
+
+testScenarios(
+  'The collection shrinks the pool if items are much larger than expected',
+  dynamicSimpleScenarioFor(getNumbers(0, 20), { estimateHeight: 20, itemHeight: 200 }),
+  standardTemplate,
+
+  async function(assert) {
+    await scrollTo('.scrollable', 0, 20);
+    await scrollTo('.scrollable', 0, 0);
+
+    assert.equal(findAll('.vertical-item').length, 1, 'scrollTop set to correct value');
+    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'the last rendered item is correct');
+  }
+);
+
+testScenarios(
+  'The collection renders incrementally until the entire scroll container is covered',
+  dynamicSimpleScenarioFor(getNumbers(0, 20), { estimateHeight: 200, itemHeight: 20 }),
+  standardTemplate,
+
+  async function(assert) {
+    assert.equal(findAll('.vertical-item').length, 10, 'scrollTop set to correct value');
+    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'the first rendered item is correct');
+    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 9', 'the last rendered item is correct');
   }
 );

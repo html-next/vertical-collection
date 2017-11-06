@@ -188,6 +188,7 @@ export default class SkipList {
 
   set(index, value) {
     assert('value must be a number', typeof value === 'number');
+    assert('value must non-negative', value >= 0);
     assert('index must be a number', typeof index === 'number');
     assert('index must be within bounds', index >= 0 && index < this.values.length);
 

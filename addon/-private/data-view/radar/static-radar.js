@@ -16,10 +16,11 @@ export default class StaticRadar extends Radar {
 
   _updateIndexes() {
     const {
+      bufferSize,
       totalItems,
-      totalComponents,
       visibleMiddle,
-      _calculatedEstimateHeight
+      _calculatedEstimateHeight,
+      _calculatedScrollContainerHeight
     } = this;
 
     if (totalItems === 0) {
@@ -33,21 +34,30 @@ export default class StaticRadar extends Radar {
 
     const middleItemIndex = Math.floor(visibleMiddle / _calculatedEstimateHeight);
 
-    let firstItemIndex = middleItemIndex - Math.floor(totalComponents / 2);
-    let lastItemIndex = middleItemIndex + Math.ceil(totalComponents / 2) - 1;
+    const shouldRenderCount = Math.min(Math.ceil(_calculatedScrollContainerHeight / _calculatedEstimateHeight), totalItems);
+
+    let firstItemIndex = middleItemIndex - Math.floor(shouldRenderCount / 2);
+    let lastItemIndex = middleItemIndex + Math.ceil(shouldRenderCount / 2) - 1;
 
     if (firstItemIndex < 0) {
       firstItemIndex = 0;
-      lastItemIndex = Math.min(totalComponents - 1, maxIndex);
+      lastItemIndex = shouldRenderCount - 1;
     }
 
     if (lastItemIndex > maxIndex) {
       lastItemIndex = maxIndex;
-      firstItemIndex = Math.max(maxIndex - (totalComponents - 1), 0);
+      firstItemIndex = maxIndex - (shouldRenderCount - 1);
     }
+
+    firstItemIndex = Math.max(firstItemIndex - bufferSize, 0);
+    lastItemIndex = Math.min(lastItemIndex + bufferSize, maxIndex);
 
     this._firstItemIndex = firstItemIndex;
     this._lastItemIndex = lastItemIndex;
+  }
+
+  _didEarthquake(scrollDiff) {
+    return scrollDiff > (this._calculatedEstimateHeight / 2);
   }
 
   get total() {

@@ -2,7 +2,7 @@ import { moduleForComponent } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';
 
-import { find, scrollTo } from 'ember-native-dom-helpers';
+import { find, findAll, scrollTo } from 'ember-native-dom-helpers';
 
 import getNumbers from 'dummy/lib/get-numbers';
 import {
@@ -26,8 +26,6 @@ testScenarios(
   standardTemplate,
 
   function(assert) {
-    assert.expect(1);
-
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '49 49', 'the last item in the list should be rendered');
   }
 );
@@ -38,8 +36,6 @@ testScenarios(
   standardTemplate,
 
   function(assert) {
-    assert.expect(1);
-
     assert.equal(find('.scrollable').scrollTop, 500, 'the scroll container offset is correct');
   }
 );
@@ -50,8 +46,6 @@ testScenarios(
   standardTemplate,
 
   function(assert) {
-    assert.expect(1);
-
     assert.equal(find('.scrollable').scrollTop, 320, 'the scroll container offset is correct');
   }
 );
@@ -162,7 +156,7 @@ testScenarios(
 
 testScenarios(
   'Sends the lastReached action after append',
-  standardScenariosFor(getNumbers(0, 10), { lastReached: 'lastReached', bufferSize: 5 }),
+  standardScenariosFor(getNumbers(0, 5), { lastReached: 'lastReached', bufferSize: 5 }),
   standardTemplate,
 
   false, // Run test function before render
@@ -326,7 +320,7 @@ testScenarios(
 
 testScenarios(
   'Sends the lastReached action after append with renderAll set to true',
-  standardScenariosFor(getNumbers(0, 10), { lastReached: 'lastReached', bufferSize: 5, renderAll: true }),
+  standardScenariosFor(getNumbers(0, 5), { lastReached: 'lastReached', bufferSize: 5, renderAll: true }),
   standardTemplate,
 
   false, // Run test function before render
@@ -426,7 +420,7 @@ testScenarios(
 );
 
 testScenarios(
-  'Collection measures correctly when it\'s scroll parent has scrolled',
+  'Collection measures correctly when its scroll parent has scrolled',
   dynamicSimpleScenarioFor(getNumbers(0, 100)),
   hbs`
     <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
@@ -445,12 +439,13 @@ testScenarios(
   `,
 
   async function(assert) {
-    assert.expect(1);
+    assert.expect(2);
 
     await scrollTo('.scroll-parent', 0, 200);
     await scrollTo('.scroll-child', 0, 400);
 
-    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '5 5', 'correct first item rendered');
+    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '10 10', 'correct first item rendered');
+    assert.equal(findAll('.vertical-item').length, 10, 'correct number of items rendered');
   }
 );
 

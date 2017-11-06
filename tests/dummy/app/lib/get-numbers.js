@@ -5,7 +5,7 @@ export default function(start, total, prefix = '') {
   let height;
 
   for (let i = start; i < start + total; i++) {
-    height = getDynamicHeight();
+    height = Math.max(getDynamicHeight() * Math.random(), 40);
     ret.push({
       number: i,
       height,
