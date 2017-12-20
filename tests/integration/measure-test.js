@@ -92,7 +92,7 @@ testScenarios(
   async function(assert) {
     assert.expect(1);
 
-    assert.equal(find('.scrollable'.scrollTop, 210, 'scrollTop set to correct value'));
+    assert.equal(find('.scrollable').scrollTop, 210, 'scrollTop set to correct value');
   }
 );
 
