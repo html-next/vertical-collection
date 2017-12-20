@@ -228,7 +228,8 @@ export default class Radar {
 
     const scrollDiff = this._calculateScrollDiff();
 
-    if (scrollDiff !== 0) {
+    // Reset the container scrolling position when the collection has no offset
+    if (scrollDiff !== 0 && this._collectionOffset === 0) {
       this._scrollContainer.scrollTop += scrollDiff;
     }
 
