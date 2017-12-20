@@ -2,7 +2,7 @@ import { moduleForComponent } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';
 
-import { find, findAll, scrollTo } from 'ember-native-dom-helpers';
+import { find, findAll, scrollTo, click } from 'ember-native-dom-helpers';
 
 import getNumbers from 'dummy/lib/get-numbers';
 import {
@@ -460,5 +460,53 @@ testScenarios(
     await scrollTo('.scrollable', 0, 10000);
 
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '49 49', 'the last item in the list should be rendered');
+  }
+);
+
+testScenarios(
+  'Collection container should keep existing scroll position on render',
+  dynamicSimpleScenarioFor(getNumbers(0, 1000), { isExpanded: false }),
+  hbs`
+    <style>
+      .scrollable {
+        overflow-y: auto;
+        height: 400px;
+        width: 200px;
+      }
+      .fake-content {
+        height: 600px;
+      }
+      .vertical-item {
+        height: 40px;
+      }
+    </style>
+    <button class="toggle-btn" {{action 'expandAction'}}>Expand</button>
+    <div class="scrollable">
+      <div class="fake-content">Fake Content</div>
+      {{#if isExpanded}}
+        {{#vertical-collection items
+            estimateHeight=40
+            bufferSize=1
+            as |item i|}}
+            <div class="vertical-item">
+              {{item.number}} {{i}}
+            </div>
+          {{/vertical-collection}}
+      {{/if}}
+      <div class="fake-content">Fake Content</div>
+    </div>
+  `,
+
+  async function(assert) {
+    assert.expect(2);
+
+    this.on('expandAction', () => this.set('isExpanded', true));
+
+    await scrollTo('.scrollable', 0, 400);
+    await click('.toggle-btn');
+    await wait();
+
+    assert.equal(this.get('isExpanded'), true, 'isExpanded should be truthy');
+    assert.equal(find('.scrollable').scrollTop, 400, 'container scrollTop should stay the same on render');
   }
 );
