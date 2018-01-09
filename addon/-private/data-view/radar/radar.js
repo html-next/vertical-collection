@@ -483,7 +483,7 @@ export default class Radar {
     const beforeItemsText = totalItemsBefore === 1 ? 'item' : 'items';
     const afterItemsText = totalItemsAfter === 1 ? 'item' : 'items';
 
-    // Set padding element heights, unset itemContainer's minHeight
+    // Set padding element heights.
     _occludedContentBefore.element.style.height = `${Math.max(renderedTotalBefore, 0)}px`;
     _occludedContentBefore.element.innerHTML = totalItemsBefore > 0 ? `And ${totalItemsBefore} ${beforeItemsText} before` : '';
 
