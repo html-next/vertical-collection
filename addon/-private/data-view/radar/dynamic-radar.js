@@ -156,6 +156,7 @@ export default class DynamicRadar extends Radar {
       lastItemIndex
     } = this;
 
+    this._updateConstants();
     this._measure();
 
     // These indexes could change after the measurement, and in the incremental render
