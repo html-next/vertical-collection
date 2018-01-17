@@ -8,6 +8,7 @@ import VirtualComponent from '../virtual-component';
 import insertRangeBefore from '../utils/insert-range-before';
 import objectAt from '../utils/object-at';
 import roundTo from '../utils/round-to';
+import { isPrepend, isAppend } from '../utils/mutation-checkers';
 
 import {
   addScrollHandler,
@@ -19,6 +20,7 @@ import Container from '../container';
 import closestElement from '../../utils/element/closest';
 import estimateElementHeight from '../../utils/element/estimate-element-height';
 import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
+import keyForItem from '../../ember-internals/key-for-item';
 
 const {
   A,
@@ -33,10 +35,11 @@ export default class Radar {
       bufferSize,
       containerSelector,
       estimateHeight,
+      initialRenderCount,
       items,
+      key,
       renderAll,
       renderFromLast,
-      initialRenderCount,
       shouldRecycle,
       startingIndex
     }
@@ -49,6 +52,7 @@ export default class Radar {
     this.estimateHeight = estimateHeight;
     this.initialRenderCount = initialRenderCount;
     this.items = items;
+    this.key = key;
     this.renderAll = renderAll;
     this.renderFromLast = renderFromLast;
     this.shouldRecycle = shouldRecycle;
@@ -82,17 +86,24 @@ export default class Radar {
     this._nextLayout = null;
     this._started = false;
     this._didReset = true;
+    this._didUpdateItems = false;
 
     // Cache state
     this._scrollTop = 0;
+
     // Setting these values to infinity starts us in a guaranteed good state for the radar,
     // so it knows that it needs to run certain measurements, etc.
     this._prevFirstItemIndex = Infinity;
     this._prevLastItemIndex = -Infinity;
     this._prevFirstVisibleIndex = 0;
     this._prevLastVisibleIndex = 0;
+
     this._firstReached = false;
     this._lastReached = false;
+    this._prevTotalItems = 0;
+    this._prevFirstKey = 0;
+    this._prevLastKey = 0;
+
     this._componentPool = [];
     this._prependComponentPool = [];
 
@@ -204,7 +215,13 @@ export default class Radar {
    *
    * @private
    */
-  scheduleUpdate() {
+  scheduleUpdate(didUpdateItems) {
+    if (didUpdateItems === true) {
+      // Set the update items flag first, in case scheduleUpdate has already been called
+      // but the RAF hasn't yet run
+      this._didUpdateItems = true;
+    }
+
     if (this._nextUpdate !== null || this._started === false) {
       return;
     }
@@ -218,6 +235,11 @@ export default class Radar {
   }
 
   update() {
+    if (this._didUpdateItems === true) {
+      this._determineUpdateType();
+      this._didUpdateItems = false;
+    }
+
     this._updateConstants();
     this._updateIndexes();
     this._updateVirtualComponents();
@@ -226,7 +248,7 @@ export default class Radar {
   }
 
   afterUpdate() {
-    const { totalItems } = this;
+    const { _prevTotalItems: totalItems } = this;
 
     const scrollDiff = this._calculateScrollDiff();
 
@@ -240,7 +262,6 @@ export default class Radar {
     // Unset prepend offset, we're done with any prepend changes at this point
     this._prependOffset = 0;
 
-    // Send actions if there are any items
     if (totalItems !== 0) {
       this._sendActions();
     }
@@ -274,6 +295,35 @@ export default class Radar {
    */
   _calculateScrollDiff() {
     return (this._prependOffset + this._scrollTop) - this._scrollContainer.scrollTop;
+  }
+
+  _determineUpdateType() {
+    const {
+      items,
+      key,
+      totalItems,
+
+      _prevTotalItems,
+      _prevFirstKey,
+      _prevLastKey
+    } = this;
+
+    const lenDiff = totalItems - _prevTotalItems;
+
+    if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey) === true) {
+      this.prepend(lenDiff);
+    } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey) === true) {
+      this.append(lenDiff);
+    } else {
+      this.reset();
+    }
+
+    const firstItem = objectAt(this.items, 0);
+    const lastItem = objectAt(this.items, this.totalItems - 1);
+
+    this._prevTotalItems = totalItems;
+    this._prevFirstKey = totalItems > 0 ? keyForItem(firstItem, key, 0) : 0;
+    this._prevLastKey = totalItems > 0 ? keyForItem(lastItem, key, totalItems - 1) : 0;
   }
 
   _updateConstants() {
@@ -363,9 +413,8 @@ export default class Radar {
 
       shouldRecycle,
       renderAll,
-
-      _didReset,
       _started,
+      _didReset,
 
       _occludedContentBefore,
       _occludedContentAfter,

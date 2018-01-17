@@ -151,48 +151,16 @@ const VerticalCollection = Component.extend({
   shouldYieldToInverse: computed.readOnly('isEmpty'),
 
   virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function() {
-    const {
-      _radar,
-      _prevItemsLength,
-      _prevFirstKey,
-      _prevLastKey
-    } = this;
+    const { _radar } = this;
 
+    const items = this.get('items');
+
+    _radar.items = items === null || items === undefined ? [] : items;
     _radar.estimateHeight = this.get('estimateHeight');
     _radar.renderAll = this.get('renderAll');
     _radar.bufferSize = this.get('bufferSize');
 
-    const items = this.get('items');
-    const itemsLength = get(items, 'length');
-
-    if (items === null || items === undefined || itemsLength === 0) {
-      _radar.items = [];
-      _radar.reset();
-      _radar.scheduleUpdate();
-
-      this._prevItemsLength = this._prevFirstKey = this._prevLastKey = 0;
-
-      return _radar.virtualComponents;
-    }
-
-    _radar.items = items;
-
-    const key = this.get('key');
-    const lenDiff = itemsLength - _prevItemsLength;
-
-    this._prevItemsLength = itemsLength;
-    this._prevFirstKey = keyForItem(objectAt(items, 0), key, 0);
-    this._prevLastKey = keyForItem(objectAt(items, itemsLength - 1), key, itemsLength - 1);
-
-    if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey) === true) {
-      _radar.prepend(lenDiff);
-    } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey) === true) {
-      _radar.append(lenDiff);
-    } else {
-      _radar.reset();
-    }
-
-    _radar.scheduleUpdate();
+    _radar.scheduleUpdate(true);
 
     return _radar.virtualComponents;
   }),
@@ -266,6 +234,7 @@ const VerticalCollection = Component.extend({
         estimateHeight,
         initialRenderCount,
         items,
+        key,
         renderAll,
         renderFromLast,
         shouldRecycle,
@@ -332,32 +301,6 @@ function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {
   }
 
   return startingIndex;
-}
-
-function isPrepend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
-  const newItemsLength = get(newItems, 'length');
-
-  if (lenDiff <= 0 || lenDiff >= newItemsLength || newItemsLength === 0) {
-    return false;
-  }
-
-  const newFirstKey = keyForItem(objectAt(newItems, lenDiff), key, lenDiff);
-  const newLastKey = keyForItem(objectAt(newItems, newItemsLength - 1), key, newItemsLength - 1);
-
-  return oldFirstKey === newFirstKey && oldLastKey === newLastKey;
-}
-
-function isAppend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
-  const newItemsLength = get(newItems, 'length');
-
-  if (lenDiff <= 0 || lenDiff >= newItemsLength || newItemsLength === 0) {
-    return false;
-  }
-
-  const newFirstKey = keyForItem(objectAt(newItems, 0), key, 0);
-  const newLastKey = keyForItem(objectAt(newItems, newItemsLength - lenDiff - 1), key, newItemsLength - lenDiff - 1);
-
-  return oldFirstKey === newFirstKey && oldLastKey === newLastKey;
 }
 
 export default VerticalCollection;
