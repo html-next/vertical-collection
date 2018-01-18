@@ -3,7 +3,7 @@
 const StripClassCallCheckPlugin = require('babel6-plugin-strip-class-callcheck');
 const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
-const merge   = require('broccoli-merge-trees');
+const merge = require('broccoli-merge-trees');
 const VersionChecker = require('ember-cli-version-checker');
 
 const path = require('path');
@@ -38,7 +38,7 @@ module.exports = {
 
   treeForAddon(tree) {
     let babel = this.addons.find((addon) => addon.name === 'ember-cli-babel');
-    let withPrivate    = new Funnel(tree, { include: ['-private/**'] });
+    let withPrivate = new Funnel(tree, { include: ['-private/**'] });
     let withoutPrivate = new Funnel(tree, {
       exclude: [
         '**/**.hbs',
@@ -75,7 +75,7 @@ module.exports = {
     });
 
     // the output of treeForAddon is required to be modules/<your files>
-    publicTree  = new Funnel(publicTree,  { destDir: 'modules' });
+    publicTree = new Funnel(publicTree, { destDir: 'modules' });
     privateTree = new Funnel(privateTree, { destDir: 'modules' });
 
     return merge([
@@ -124,8 +124,8 @@ module.exports = {
     }
 
     if (typeof app.import !== 'function') {
-      throw new Error('vertical-collection is being used within another addon or engine ' +
-        'and is having trouble registering itself to the parent application.');
+      throw new Error('vertical-collection is being used within another addon or engine '
+        + 'and is having trouble registering itself to the parent application.');
     }
 
     this._env = app.env;
