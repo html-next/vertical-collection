@@ -1,4 +1,3 @@
-/* eslint-env node */
 'use strict';
 
 const StripClassCallCheckPlugin = require('babel6-plugin-strip-class-callcheck');

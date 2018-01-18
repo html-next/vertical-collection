@@ -53,6 +53,7 @@ module.exports = function(environment) {
     // Testem prefers this...
     ENV.locationType = 'none';
     ENV.APP.rootElement = '#ember-testing';
+    ENV.APP.autoboot = false;
   }
 
   if (environment === 'production') {
