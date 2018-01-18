@@ -1,14 +1,8 @@
-import Ember from 'ember';
+import { alias } from '@ember/object/computed';
+import Component from '@ember/component';
+import { computed } from '@ember/object';
+import { htmlSafe } from '@ember/string';
 import layout from './template';
-
-const {
-  htmlSafe
-} = Ember.String;
-
-const {
-  Component,
-  computed
-} = Ember;
 
 function numberToOpacity(number) {
   let r = number % 255;
@@ -49,5 +43,5 @@ export default Component.extend({
   layout,
   index: 0,
   item: null,
-  number: computed.alias('item.number')
+  number: alias('item.number')
 });

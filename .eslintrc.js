@@ -9,12 +9,24 @@ module.exports = {
   ],
   extends: [
     'eslint:recommended',
-    'plugin:ember/recommended'
+    'plugin:ember/recommended',
+    'plugin:ember-suave/recommended'
   ],
   env: {
     browser: true
   },
+  globals: {
+    ArrayBuffer: true,
+    Float32Array: true
+  },
   rules: {
+    'quotes': ['error', 'single', { 'allowTemplateLiterals': true, 'avoidEscape': true }],
+
+    'ember/closure-actions': 'off',
+
+    'ember-suave/no-const-outside-module-scope': 'off',
+    'ember-suave/no-direct-property-access': 'error',
+    'ember-suave/require-access-in-comments': 'off'
   },
   overrides: [
     // node files

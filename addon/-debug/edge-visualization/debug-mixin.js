@@ -1,11 +1,7 @@
-import Ember from 'ember';
+import { assert } from '@ember/debug';
+import Mixin from '@ember/object/mixin';
 import Visualization from './visualization';
 import Container from '../../-private';
-
-const {
-  assert,
-  Mixin
-} = Ember;
 
 import {
   styleIsOneOf,

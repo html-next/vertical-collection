@@ -1,10 +1,6 @@
-import Ember from 'ember';
+import EmberArray, { A } from '@ember/array';
+import { run } from '@ember/runloop';
 import wait from 'ember-test-helpers/wait';
-
-const {
-  A,
-  run
-} = Ember;
 
 export function prepend(context, itemsToPrepend) {
   const items = context.get('items');
@@ -47,7 +43,7 @@ export function emptyArray(context) {
 export function replaceArray(context, items) {
   const oldItems = context.get('items');
 
-  if (Ember.Array.detect(oldItems)) {
+  if (EmberArray.detect(oldItems)) {
     context.set('items', A(items));
   } else {
     context.set('items', items);

@@ -3,9 +3,9 @@ language: node_js
 node_js:
   # we recommend testing addons with the same minimum supported node version as Ember CLI
   # so that your addon works for all apps
-  - "4"
+  - "6"
 
-sudo: false
+sudo: required
 dist: trusty
 
 addons:
@@ -39,6 +39,8 @@ before_install:
 
 install:
   - yarn install --no-lockfile --non-interactive
+  - yarn global add bower
+  - bower install
 
 script:
   - yarn lint:js

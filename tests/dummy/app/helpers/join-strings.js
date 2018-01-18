@@ -1,15 +1,16 @@
+import Helper, { helper } from '@ember/component/helper';
 import Ember from 'ember';
 
-let helper;
+let joinStringsHelper;
 
-if (Ember.Helper) {
-  helper = Ember.Helper.helper(function(params) {
+if (Helper) {
+  joinStringsHelper = helper(function(params) {
     return params.join('');
   });
 } else {
-  helper = Ember.Handlebars.makeBoundHelper(function(...params) {
+  joinStringsHelper = Ember.Handlebars.makeBoundHelper(function(...params) {
     return params.join('');
   });
 }
 
-export default helper;
+export default joinStringsHelper;

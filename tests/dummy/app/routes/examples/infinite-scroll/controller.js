@@ -1,9 +1,5 @@
-import Ember from 'ember';
+import Controller from '@ember/controller';
 import getNumbers from 'dummy/lib/get-numbers';
-
-const {
-  Controller
-} = Ember;
 
 export default Controller.extend({
 
