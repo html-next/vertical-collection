@@ -180,6 +180,8 @@ export default class Radar {
       // initialize the scrollTop value, which will be applied to the
       // scrollContainer after the collection has been initialized
       this._scrollTop = startingScrollTop + _collectionOffset;
+
+      this._prevFirstVisibleIndex = startingIndex;
     }
 
     this._started = true;

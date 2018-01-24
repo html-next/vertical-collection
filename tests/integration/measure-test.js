@@ -86,13 +86,13 @@ testScenarios(
 
 testScenarios(
   'Can measure and affect correctly in list of items with non-integer heights',
-  dynamicSimpleScenarioFor(getNumbers(0, 20), { itemHeight: 30.1, key: '@index', idForFirstItem: '10' }),
+  dynamicSimpleScenarioFor(getNumbers(0, 20), { itemHeight: 30.1, key: '@index', idForFirstItem: '10', bufferSize: 1 }),
   standardTemplate,
 
   async function(assert) {
     assert.expect(1);
 
-    assert.equal(find('.scrollable'.scrollTop, 210, 'scrollTop set to correct value'));
+    assert.equal(find('.scrollable').scrollTop, 210, 'scrollTop set to correct value');
   }
 );
 
