@@ -32,14 +32,14 @@ export default class DynamicRadar extends Radar {
     this.skipList = null;
   }
 
-  scheduleUpdate() {
+  scheduleUpdate(didUpdateItems) {
     // Cancel incremental render check, since we'll be remeasuring anyways
     if (this._nextIncrementalRender !== null) {
       this._nextIncrementalRender.cancel();
       this._nextIncrementalRender = null;
     }
 
-    super.scheduleUpdate();
+    super.scheduleUpdate(didUpdateItems);
   }
 
   afterUpdate() {
@@ -274,9 +274,7 @@ export default class DynamicRadar extends Radar {
   reset() {
     super.reset();
 
-    if (this.skipList !== null) {
-      this.skipList.reset(this.totalItems);
-    }
+    this.skipList.reset(this.totalItems);
   }
 
   /*
