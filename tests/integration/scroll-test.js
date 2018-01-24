@@ -1,4 +1,3 @@
-import { run } from '@ember/runloop';
 import { moduleForComponent } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';
@@ -473,10 +472,8 @@ testScenarios(
   async function(assert) {
     assert.expect(2);
 
-    run(() => {
-      prepend(this, getNumbers(10, 10));
-      prepend(this, getNumbers(0, 10));
-    });
+    prepend(this, getNumbers(10, 10));
+    prepend(this, getNumbers(0, 10));
 
     await wait();
 

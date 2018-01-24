@@ -1,8 +1,6 @@
-import Ember from 'ember';
+import { get } from '@ember/object';
 import objectAt from './object-at';
 import keyForItem from '../../ember-internals/key-for-item';
-
-const { get } = Ember;
 
 export function isPrepend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
   const newItemsLength = get(newItems, 'length');
