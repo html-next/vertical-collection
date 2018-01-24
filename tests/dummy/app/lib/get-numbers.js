@@ -1,4 +1,8 @@
-import { getDynamicHeight, booleanToss, getDynamicWidth } from './get-images';
+import {
+  getDynamicHeight,
+  booleanToss,
+  getDynamicWidth
+} from './get-images';
 
 export default function(start, total, prefix = '') {
   let ret = [];

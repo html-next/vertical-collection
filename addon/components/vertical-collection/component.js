@@ -1,5 +1,9 @@
 /* global Array, Math */
-import Ember from 'ember';
+import { empty, readOnly } from '@ember/object/computed';
+
+import Component from '@ember/component';
+import { get, computed } from '@ember/object';
+import { run } from '@ember/runloop';
 import layout from './template';
 
 import { scheduler, Token } from 'ember-raf-scheduler';
@@ -12,13 +16,6 @@ import {
   StaticRadar,
   objectAt
 } from '../../-private';
-
-const {
-  computed,
-  Component,
-  get,
-  run
-} = Ember;
 
 const VerticalCollection = Component.extend({
   layout,
@@ -147,8 +144,8 @@ const VerticalCollection = Component.extend({
    */
   renderAll: false,
 
-  isEmpty: computed.empty('items'),
-  shouldYieldToInverse: computed.readOnly('isEmpty'),
+  isEmpty: empty('items'),
+  shouldYieldToInverse: readOnly('isEmpty'),
 
   virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function() {
     const { _radar } = this;

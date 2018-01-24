@@ -1,10 +1,8 @@
-import Ember from 'ember';
+import { set } from '@ember/object';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
 import { IS_GLIMMER_2, GTE_EMBER_1_13 } from 'ember-compatibility-helpers';
-
-const { set } = Ember;
 
 let VC_IDENTITY = 0;
 

@@ -13,7 +13,13 @@ import {
   standardTemplate
 } from 'dummy/tests/helpers/test-scenarios';
 
-import { prepend, append, emptyArray, replaceArray, move } from 'dummy/tests/helpers/array';
+import {
+  prepend,
+  append,
+  emptyArray,
+  replaceArray,
+  move
+} from 'dummy/tests/helpers/array';
 import { paddingBefore, paddingAfter } from 'dummy/tests/helpers/measurement';
 
 moduleForComponent('vertical-collection', 'Integration | Mutation Tests', {

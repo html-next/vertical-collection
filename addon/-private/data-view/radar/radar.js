@@ -1,4 +1,5 @@
-import Ember from 'ember';
+import { A } from '@ember/array';
+import { set, get } from '@ember/object';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
@@ -21,12 +22,6 @@ import closestElement from '../../utils/element/closest';
 import estimateElementHeight from '../../utils/element/estimate-element-height';
 import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
 import keyForItem from '../../ember-internals/key-for-item';
-
-const {
-  A,
-  get,
-  set
-} = Ember;
 
 export default class Radar {
   constructor(

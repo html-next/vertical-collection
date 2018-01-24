@@ -1,15 +1,16 @@
+import Helper, { helper } from '@ember/component/helper';
 import Ember from 'ember';
 
-let helper;
+let eitherOrHelper;
 
-if (Ember.Helper) {
-  helper = Ember.Helper.helper(function(params) {
+if (Helper) {
+  eitherOrHelper = helper(function(params) {
     return params[0] || params[1];
   });
 } else {
-  helper = Ember.Handlebars.makeBoundHelper(function(...params) {
+  eitherOrHelper = Ember.Handlebars.makeBoundHelper(function(...params) {
     return params[0] || params[1];
   });
 }
 
-export default helper;
+export default eitherOrHelper;

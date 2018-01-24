@@ -1,11 +1,7 @@
-import Ember from 'ember';
+import { get } from '@ember/object';
 import { assert } from '@ember/debug';
 
 import identity from './identity';
-
-const {
-  get
-} = Ember;
 
 export default function keyForItem(item, keyPath, index) {
   let key;

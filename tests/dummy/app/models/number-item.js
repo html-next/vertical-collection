@@ -1,9 +1,5 @@
-import Ember from 'ember';
+import { computed } from '@ember/object';
 import DS from 'ember-data';
-
-const {
-  computed
-} = Ember;
 
 const {
   attr,
