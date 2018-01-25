@@ -66,12 +66,14 @@ module.exports = {
 
     privateTree = new Rollup(privateTree, {
       rollup: {
-        entry: '-private/index.js',
-        targets: [
+        input: '-private/index.js',
+        output: [
           {
-            dest: '@html-next/vertical-collection/-private.js',
+            file: '@html-next/vertical-collection/-private.js',
             format: 'amd',
-            moduleId: '@html-next/vertical-collection/-private'
+            amd: {
+              id: '@html-next/vertical-collection/-private'
+            }
           }
         ],
         external: ['ember', 'ember-raf-scheduler']

@@ -1,6 +1,8 @@
 vertical-collection
 =================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/html-next/vertical-collection.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/html-next/vertical-collection.svg)](https://travis-ci.org/html-next/vertical-collection)
 
 Infinite Scroll and Occlusion at > 60FPS
