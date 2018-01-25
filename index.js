@@ -28,7 +28,7 @@ function isProductionEnv() {
 }
 
 module.exports = {
-  name: 'vertical-collection',
+  name: '@html-next/vertical-collection',
 
   init() {
     this._super.init && this._super.init.apply(this, arguments);
@@ -46,7 +46,7 @@ module.exports = {
         isProductionEnv() ? '-debug' : false
       ].filter(Boolean),
 
-      destDir: 'vertical-collection'
+      destDir: '@html-next/vertical-collection'
     });
 
     let privateTree = babel.transpileTree(withPrivate, {
@@ -68,7 +68,11 @@ module.exports = {
       rollup: {
         entry: '-private/index.js',
         targets: [
-          { dest: 'vertical-collection/-private.js', format: 'amd', moduleId: 'vertical-collection/-private' }
+          {
+            dest: '@html-next/vertical-collection/-private.js',
+            format: 'amd',
+            moduleId: '@html-next/vertical-collection/-private'
+          }
         ],
         external: ['ember', 'ember-raf-scheduler']
       }

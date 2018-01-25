@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import VerticalCollection from 'vertical-collection/components/vertical-collection/component';
+import VerticalCollection from '@html-next/vertical-collection/components/vertical-collection/component';
 
 const { HTMLBars } = Ember;
 
