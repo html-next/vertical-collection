@@ -12,7 +12,7 @@
  * to access and set the scrollTop and scrollLeft properties.
  *
  */
-export function Container() {
+export function ViewportContainer() {
 
   // A bug occurs in Chrome when we reload the browser at a lower
   // scrollTop, window.scrollY becomes stuck on a single value.
@@ -48,15 +48,15 @@ export function Container() {
   });
 }
 
-Container.prototype.addEventListener = function addEventListener(event, handler, options) {
+ViewportContainer.prototype.addEventListener = function addEventListener(event, handler, options) {
   return window.addEventListener(event, handler, options);
 };
 
-Container.prototype.removeEventListener = function addEventListener(event, handler, options) {
+ViewportContainer.prototype.removeEventListener = function addEventListener(event, handler, options) {
   return window.removeEventListener(event, handler, options);
 };
 
-Container.prototype.getBoundingClientRect = function getBoundingClientRect() {
+ViewportContainer.prototype.getBoundingClientRect = function getBoundingClientRect() {
   return {
     height: window.innerHeight,
     width: window.innerWidth,
@@ -67,4 +67,4 @@ Container.prototype.getBoundingClientRect = function getBoundingClientRect() {
   };
 };
 
-export default new Container();
+export default new ViewportContainer();

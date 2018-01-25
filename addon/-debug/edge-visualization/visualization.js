@@ -1,5 +1,5 @@
 /* global document */
-import { Container } from '../../-private';
+import { ViewportContainer } from '../../-private';
 
 function applyVerticalStyles(element, geography) {
   element.style.height = `${geography.height}px`;
@@ -44,7 +44,7 @@ export default class Visualization {
     this.container.style.height = `${_scrollContainer.getBoundingClientRect().height}px`;
 
     applyVerticalStyles(this.scrollContainer, _scrollContainer.getBoundingClientRect());
-    applyVerticalStyles(this.screen, Container.getBoundingClientRect());
+    applyVerticalStyles(this.screen, ViewportContainer.getBoundingClientRect());
   }
 
   makeSatellite() {
