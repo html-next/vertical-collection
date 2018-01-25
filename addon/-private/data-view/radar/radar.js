@@ -16,7 +16,7 @@ import {
   removeScrollHandler
 } from '../utils/scroll-handler';
 
-import Container from '../container';
+import ViewportContainer from '../viewport-container';
 
 import closestElement from '../../utils/element/closest';
 import estimateElementHeight from '../../utils/element/estimate-element-height';
@@ -142,7 +142,7 @@ export default class Radar {
 
     if (this._started) {
       removeScrollHandler(this._scrollContainer, this._scrollHandler);
-      Container.removeEventListener('resize', this._resizeHandler);
+      ViewportContainer.removeEventListener('resize', this._resizeHandler);
     }
   }
 
@@ -164,7 +164,7 @@ export default class Radar {
     // Use the occluded content element, which has been inserted into the DOM,
     // to find the item container and the scroll container
     this._itemContainer = _occludedContentBefore.element.parentNode;
-    this._scrollContainer = containerSelector === 'body' ? Container : closestElement(this._itemContainer, containerSelector);
+    this._scrollContainer = containerSelector === 'body' ? ViewportContainer : closestElement(this._itemContainer, containerSelector);
 
     this._updateConstants();
 
@@ -195,7 +195,7 @@ export default class Radar {
 
     // Setup event handlers
     addScrollHandler(this._scrollContainer, this._scrollHandler);
-    Container.addEventListener('resize', this._resizeHandler);
+    ViewportContainer.addEventListener('resize', this._resizeHandler);
   }
 
   /*
