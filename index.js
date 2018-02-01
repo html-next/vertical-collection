@@ -61,7 +61,7 @@ module.exports = {
     });
 
     // use the default options
-    const addonTemplateTree = this._super(templateTree);
+    const addonTemplateTree = this._super.treeForAddon.call(this, templateTree);
     let publicTree = babel.transpileTree(withoutPrivate);
 
     privateTree = new Rollup(privateTree, {
