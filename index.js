@@ -125,15 +125,6 @@ module.exports = {
     this._super.included.apply(this, arguments);
     this.checker = new VersionChecker(app);
 
-    while (typeof app.import !== 'function' && app.app) {
-      app = app.app;
-    }
-
-    if (typeof app.import !== 'function') {
-      throw new Error('vertical-collection is being used within another addon or engine '
-        + 'and is having trouble registering itself to the parent application.');
-    }
-
     this._env = app.env;
     this._setupBabelOptions(app.env);
 
