@@ -1,0 +1,15 @@
+<div class="table-wrapper">
+  <table class="table table-striped">
+    {{#vertical-collection
+      items
+      bufferSize=5
+      containerSelector=".table-wrapper"
+      estimateHeight=20
+      tagName="tbody" as |row index|}}
+      <tr>
+        <td>{{index}}</td>
+        <td>{{row.name}}</td>
+      </tr>
+    {{/vertical-collection}}
+  </table>
+</div>
