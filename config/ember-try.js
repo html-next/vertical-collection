@@ -30,8 +30,7 @@ module.exports = function() {
               'ember-cli-shims': null,
               'ember-cli-fastboot': null,
               'ember-data': '~1.13.0',
-              'ember-source': null,
-              'fastboot': null
+              'ember-source': null
             }
           }
         },
@@ -52,6 +51,7 @@ module.exports = function() {
           npm: {
             devDependencies: {
               'ember-cli-shims': null,
+              'ember-cli-fastboot': null,
               'ember-data': '~1.13.15',
               'ember-source': null
             }
@@ -72,6 +72,7 @@ module.exports = function() {
           npm: {
             devDependencies: {
               'ember-cli-shims': null,
+              'ember-cli-fastboot': null,
               'ember-data': '~2.4.0',
               'ember-source': null
             }

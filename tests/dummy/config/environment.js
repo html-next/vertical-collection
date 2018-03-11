@@ -10,7 +10,7 @@ module.exports = function(environment) {
     podModulePrefix: 'dummy/routes',
     environment,
     rootURL: '/',
-    locationType: 'hash',
+    locationType: 'auto',
     EmberENV: {
       FEATURES: {},
       EXTEND_PROTOTYPES: false

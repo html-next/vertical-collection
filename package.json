@@ -50,7 +50,7 @@
     "babel-plugin-transform-es2015-block-scoping": "^6.24.1",
     "babel6-plugin-strip-class-callcheck": "^6.0.0",
     "broccoli-funnel": "^2.0.1",
-    "broccoli-merge-trees": "^3.0.0",
+    "broccoli-merge-trees": "^2.0.0",
     "broccoli-rollup": "^2.0.0",
     "ember-cli-babel": "^6.6.0",
     "ember-cli-htmlbars": "^2.0.3",
@@ -66,6 +66,7 @@
     "ember-cli-changelog": "0.3.4",
     "ember-cli-dependency-checker": "^2.1.0",
     "ember-cli-eslint": "^4.2.3",
+    "ember-cli-fastboot": "^1.1.4-beta.1",
     "ember-cli-github-pages": "^0.2.0",
     "ember-cli-htmlbars-inline-precompile": "^1.0.2",
     "ember-cli-inject-live-reload": "^1.4.1",
@@ -81,7 +82,7 @@
     "ember-export-application-global": "^2.0.0",
     "ember-load-initializers": "^1.1.0",
     "ember-maybe-import-regenerator": "^0.1.6",
-    "ember-native-dom-helpers": "^0.6.2",
+    "ember-native-dom-helpers": "^0.5.2",
     "ember-perf-timeline": "^1.2.1",
     "ember-resolver": "^4.5.0",
     "ember-source": "~3.1.0",
@@ -90,7 +91,6 @@
     "eslint-plugin-ember": "^5.2.0",
     "eslint-plugin-ember-suave": "^1.0.0",
     "eslint-plugin-node": "^6.0.1",
-    "fastboot": "^1.1.4-beta.1",
     "loader.js": "^4.2.3"
   },
   "engines": {

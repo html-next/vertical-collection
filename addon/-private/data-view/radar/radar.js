@@ -22,7 +22,6 @@ import closestElement from '../../utils/element/closest';
 import estimateElementHeight from '../../utils/element/estimate-element-height';
 import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
 import keyForItem from '../../ember-internals/key-for-item';
-import { IS_EMBER_2 } from 'ember-compatibility-helpers';
 
 export default class Radar {
   constructor(
@@ -127,9 +126,7 @@ export default class Radar {
 
     // In older versions of Ember/IE, binding anything on an object in the template
     // adds observers which creates __ember_meta__
-    if (!IS_EMBER_2) {
-      this.__ember_meta__ = undefined; // eslint-disable-line camelcase
-    }
+    this.__ember_meta__ = null; // eslint-disable-line camelcase
 
     if (DEBUG) {
       this._debugDidUpdate = null;
