@@ -132,7 +132,7 @@ testScenarios(
   async function(assert) {
     assert.expect(3);
 
-    let occludedBoundaries = findAll('occluded-content');
+    let occludedBoundaries = findAll('.occluded-content');
 
     assert.equal(occludedBoundaries[0].getAttribute('style'), 'height: 0px;', 'Occluded height above is correct');
     assert.equal(occludedBoundaries[1].getAttribute('style'), 'height: 100px;', 'Occluded height below is correct');
@@ -164,7 +164,7 @@ testScenarios(
   async function(assert) {
     assert.expect(3);
 
-    let occludedBoundaries = findAll('occluded-content');
+    let occludedBoundaries = findAll('.occluded-content');
 
     assert.equal(occludedBoundaries[0].getAttribute('style'), 'height: 0px;', 'Occluded height above is correct');
     assert.equal(occludedBoundaries[1].getAttribute('style'), 'height: 100px;', 'Occluded height below is correct');

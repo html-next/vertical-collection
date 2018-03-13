@@ -37,7 +37,8 @@ export default class Radar {
       renderAll,
       renderFromLast,
       shouldRecycle,
-      startingIndex
+      startingIndex,
+      occlusionTagName
     }
   ) {
     this.token = new Token(parentToken);
@@ -107,8 +108,10 @@ export default class Radar {
     this._occludedContentBefore = new VirtualComponent();
     this._occludedContentAfter = new VirtualComponent();
 
-    this._occludedContentBefore.element = document.createElement('occluded-content');
-    this._occludedContentAfter.element = document.createElement('occluded-content');
+    this._occludedContentBefore.element = document.createElement(occlusionTagName);
+    this._occludedContentBefore.element.className += 'occluded-content';
+    this._occludedContentAfter.element = document.createElement(occlusionTagName);
+    this._occludedContentAfter.element.className += 'occluded-content';
 
     this._occludedContentBefore.element.addEventListener('click', this.pageUp.bind(this));
     this._occludedContentAfter.element.addEventListener('click', this.pageDown.bind(this));

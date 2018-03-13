@@ -50,8 +50,8 @@ testScenarios(
   standardTemplate,
 
   async function(assert) {
-    const occludedBefore = find('occluded-content:first-of-type');
-    const occludedAfter = find('occluded-content:last-of-type');
+    const occludedBefore = find('.occluded-content:first-of-type');
+    const occludedAfter = find('.occluded-content:last-of-type');
 
     assert.equal(occludedBefore.textContent.trim(), '', 'occluded before text correct when no items before');
     assert.equal(occludedAfter.textContent.trim(), 'And 10 items after', 'occluded after text correct when some items after');
@@ -79,8 +79,8 @@ testScenarios(
   standardTemplate,
 
   async function(assert) {
-    const occludedBefore = find('occluded-content:first-of-type');
-    const occludedAfter = find('occluded-content:last-of-type');
+    const occludedBefore = find('.occluded-content:first-of-type');
+    const occludedAfter = find('.occluded-content:last-of-type');
 
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'correct first item rendered');
     assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 9', 'correct last item rendered');
