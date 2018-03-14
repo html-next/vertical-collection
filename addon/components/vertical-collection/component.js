@@ -144,6 +144,14 @@ const VerticalCollection = Component.extend({
    */
   renderAll: false,
 
+  /**
+   * The tag name used in DOM elements before and after the rendered list. By default, it is set to
+   * 'occluded-content' to avoid any confusion with user's CSS settings. However, it could be
+   * overriden to provide custom behavior (for example, in table user wants to set it to 'tr' to
+   * comply with table semantics).
+   */
+  occlusionTagName: 'occluded-content',
+
   isEmpty: empty('items'),
   shouldYieldToInverse: readOnly('isEmpty'),
 
@@ -217,6 +225,7 @@ const VerticalCollection = Component.extend({
     const renderAll = this.get('renderAll');
     const renderFromLast = this.get('renderFromLast');
     const shouldRecycle = this.get('shouldRecycle');
+    const occlusionTagName = this.get('occlusionTagName');
 
     const idForFirstItem = this.get('idForFirstItem');
     const key = this.get('key');
@@ -235,7 +244,8 @@ const VerticalCollection = Component.extend({
         renderAll,
         renderFromLast,
         shouldRecycle,
-        startingIndex
+        startingIndex,
+        occlusionTagName
       }
     );
 
