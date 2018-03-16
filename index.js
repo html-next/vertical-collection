@@ -36,6 +36,16 @@ module.exports = {
     this.options = this.options || {};
   },
 
+  getOutputDirForVersion() {
+    let VersionChecker = require('ember-cli-version-checker');
+    let checker = new VersionChecker(this);
+    let emberCli = checker.for('ember-cli', 'npm');
+
+    let requiresModulesDir = emberCli.satisfies('< 3.0.0');
+
+    return requiresModulesDir ? 'modules' : '';
+  },
+
   treeForAddon(tree) {
     let babel = this.addons.find((addon) => addon.name === 'ember-cli-babel');
     let withPrivate = new Funnel(tree, { include: ['-private/**'] });
@@ -80,9 +90,9 @@ module.exports = {
       }
     });
 
-    // the output of treeForAddon is required to be modules/<your files>
-    publicTree = new Funnel(publicTree, { destDir: 'modules' });
-    privateTree = new Funnel(privateTree, { destDir: 'modules' });
+    let destDir = this.getOutputDirForVersion();
+    publicTree = new Funnel(publicTree, { destDir });
+    privateTree = new Funnel(privateTree, { destDir });
 
     return merge([
       addonTemplateTree,
