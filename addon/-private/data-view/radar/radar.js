@@ -19,7 +19,7 @@ import {
 import ViewportContainer from '../viewport-container';
 
 import closestElement from '../../utils/element/closest';
-import estimateElementHeight from '../../utils/element/estimate-element-height';
+import estimateElementSize from '../../utils/element/estimate-element-size';
 import keyForItem from '../../ember-internals/key-for-item';
 import { IS_EMBER_2 } from 'ember-compatibility-helpers';
 
@@ -73,6 +73,13 @@ export default class Radar {
       this._getScaledStartPosition = (element, scale) => element.getBoundingClientRect().top * scale;
       this._setDimension = (element, styleForHeight) => element.style.height = styleForHeight;
       this._setScrollDistance = (scrollDistance) => this._scrollContainer.scrollTop = scrollDistance;
+
+      this._scrollHandler = ({ top }) => {
+        // debounce scheduling updates by checking to make sure we've moved a minimum amount
+        if (this._didEarthquake(Math.abs(this._scrollDistance - top))) {
+          this.scheduleUpdate();
+        }
+      };
     } else {
       this._getScrollContainerMaxSize = () => window.getComputedStyle(this._scrollContainer).maxWidth;
       this._getScrollContainerOffset = () => this._scrollContainer.offsetWidth;
@@ -81,6 +88,13 @@ export default class Radar {
       this._getScaledStartPosition = (element, scale) => element.getBoundingClientRect().left * scale;
       this._setDimension = (element, styleForWidth) => element.style.width = styleForWidth;
       this._setScrollDistance = (scrollDistance) => this._scrollContainer.scrollLeft = scrollDistance;
+
+      this._scrollHandler = ({ left }) => {
+        // debounce scheduling updates by checking to make sure we've moved a minimum amount
+        if (this._didEarthquake(Math.abs(this._scrollDistance - left))) {
+          this.scheduleUpdate();
+        }
+      };
     }
 
     // defaults to a no-op intentionally, actions will only be sent if they
@@ -96,15 +110,7 @@ export default class Radar {
     this._calculatedScrollContainerSize = 0;
     this._transformScale = 1;
 
-    // TODO(kjb) fix "top" to be dimension-agnostic
     // Event handler
-    this._scrollHandler = ({ top }) => {
-      // debounce scheduling updates by checking to make sure we've moved a minimum amount
-      if (this._didEarthquake(Math.abs(this._scrollDistance - top))) {
-        this.scheduleUpdate();
-      }
-    };
-
     this._resizeHandler = this.scheduleUpdate.bind(this);
 
     // Run state
@@ -396,13 +402,12 @@ export default class Radar {
       const maxSizeStyle = this._getScrollContainerMaxSize();
 
       if (maxSizeStyle !== 'none') {
-        // TODO(kjb) generify
-        scrollContainerMaxSize = estimateElementHeight(_scrollContainer.parentElement, maxSizeStyle);
+        scrollContainerMaxSize = estimateElementSize(_scrollContainer.parentElement, maxSizeStyle);
       }
     }
 
     const calculatedEstimateSize = typeof estimateSize === 'string'
-      ? estimateElementHeight(_itemContainer, estimateSize)
+      ? estimateElementSize(_itemContainer, estimateSize)
       : estimateSize;
 
     assert(
@@ -750,19 +755,19 @@ export default class Radar {
    * on it's own when prepending item elements. We seem to avoid this behavior by doing these
    * things in a RAF in this exact order.
    */
-  get visibleTop() {
+  get visibleStart() {
     return Math.max(this._scrollDistance - this._collectionOffset + this._prependOffset, 0);
   }
 
   get visibleMiddle() {
-    return this.visibleTop + (this._calculatedScrollContainerSize / 2);
+    return this.visibleStart + (this._calculatedScrollContainerSize / 2);
   }
 
-  get visibleBottom() {
+  get visibleEnd() {
     // There is a case where the container of this vertical collection could have height 0 at
-    // initial render step but will be updated later. We want to return visibleBottom to be 0 rather
+    // initial render step but will be updated later. We want to return visibleEnd to be 0 rather
     // than -1.
-    return Math.max(this.visibleTop + this._calculatedScrollContainerSize - 1, 0);
+    return Math.max(this.visibleStart + this._calculatedScrollContainerSize - 1, 0);
   }
 
   get totalItems() {

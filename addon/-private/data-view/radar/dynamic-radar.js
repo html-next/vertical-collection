@@ -14,7 +14,7 @@ export default class DynamicRadar extends Radar {
     this._totalBefore = 0;
     this._totalAfter = 0;
 
-    this._minHeight = Infinity;
+    this._minSize = Infinity;
 
     this._nextIncrementalRender = null;
 
@@ -59,8 +59,8 @@ export default class DynamicRadar extends Radar {
   _updateConstants() {
     super._updateConstants();
 
-    if (this._calculatedEstimateSize < this._minHeight) {
-      this._minHeight = this._calculatedEstimateSize;
+    if (this._calculatedEstimateSize < this._minSize) {
+      this._minSize = this._calculatedEstimateSize;
     }
 
     // Create the SkipList only after the estimateSize has been calculated the first time
@@ -75,8 +75,8 @@ export default class DynamicRadar extends Radar {
     const {
       bufferSize,
       skipList,
-      visibleTop,
-      visibleBottom,
+      visibleStart,
+      visibleEnd,
       totalItems,
 
       _didReset
@@ -100,8 +100,8 @@ export default class DynamicRadar extends Radar {
 
     const { values } = skipList;
 
-    let { totalBefore, index: firstVisibleIndex } = this.skipList.find(visibleTop);
-    let { totalAfter, index: lastVisibleIndex } = this.skipList.find(visibleBottom);
+    let { totalBefore, index: firstVisibleIndex } = this.skipList.find(visibleStart);
+    let { totalAfter, index: lastVisibleIndex } = this.skipList.find(visibleEnd);
 
     const maxIndex = totalItems - 1;
 
@@ -135,7 +135,7 @@ export default class DynamicRadar extends Radar {
     let beforeVisibleDiff = 0;
 
     if (firstItemIndex < _prevFirstItemIndex) {
-      // Measurement only items that could affect scrollTop. This will necesarilly be the
+      // Measure only items that could affect scrollTop/scrollLeft. This will necessarily be the
       // minimum of the either the total number of items that are rendered up to the first
       // visible item, OR the number of items that changed before the first visible item
       // (the delta). We want to measure the delta of exactly this number of items, because
@@ -190,7 +190,7 @@ export default class DynamicRadar extends Radar {
 
       const {
         startPosition: currentItemStartPosition,
-        size: currentItemHeight
+        size: currentItemSize
       } = currentItem.getScaledPositionInformation(_transformScale);
 
       let margin;
@@ -203,11 +203,11 @@ export default class DynamicRadar extends Radar {
           - _occludedContentBefore.getScaledPositionInformation(_transformScale).endPosition;
       }
 
-      const newHeight = roundTo(currentItemHeight + margin);
-      const itemDelta = skipList.set(itemIndex, newHeight);
+      const newSize = roundTo(currentItemSize + margin);
+      const itemDelta = skipList.set(itemIndex, newSize);
 
-      if (newHeight < this._minHeight) {
-        this._minHeight = newHeight;
+      if (newSize < this._minSize) {
+        this._minSize = newSize;
       }
 
       if (itemDelta !== 0) {
@@ -219,7 +219,7 @@ export default class DynamicRadar extends Radar {
   }
 
   _didEarthquake(scrollDiff) {
-    return scrollDiff > (this._minHeight / 2);
+    return scrollDiff > (this._minSize / 2);
   }
 
   get total() {
@@ -244,21 +244,21 @@ export default class DynamicRadar extends Radar {
 
   get firstVisibleIndex() {
     const {
-      visibleTop
+      visibleStart
     } = this;
 
-    const { index } = this.skipList.find(visibleTop);
+    const { index } = this.skipList.find(visibleStart);
 
     return index;
   }
 
   get lastVisibleIndex() {
     const {
-      visibleBottom,
+      visibleEnd,
       totalItems
     } = this;
 
-    const { index } = this.skipList.find(visibleBottom);
+    const { index } = this.skipList.find(visibleEnd);
 
     return Math.min(index, totalItems - 1);
   }

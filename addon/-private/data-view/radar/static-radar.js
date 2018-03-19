@@ -81,11 +81,11 @@ export default class StaticRadar extends Radar {
   }
 
   get firstVisibleIndex() {
-    return Math.ceil(this.visibleTop / this._calculatedEstimateSize);
+    return Math.ceil(this.visibleStart / this._calculatedEstimateSize);
   }
 
   get lastVisibleIndex() {
-    return Math.min(Math.ceil(this.visibleBottom / this._calculatedEstimateSize), this.totalItems) - 1;
+    return Math.min(Math.ceil(this.visibleEnd / this._calculatedEstimateSize), this.totalItems) - 1;
   }
 
   /*
