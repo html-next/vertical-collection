@@ -3,7 +3,6 @@ import { DEBUG } from '@glimmer/env';
 import Radar from './radar';
 import SkipList from '../skip-list';
 import roundTo from '../utils/round-to';
-import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
 
 export default class DynamicRadar extends Radar {
   constructor(parentToken, options) {
@@ -142,7 +141,10 @@ export default class DynamicRadar extends Radar {
       // (the delta). We want to measure the delta of exactly this number of items, because
       // items that are after the first visible item should not affect the scroll position,
       // and neither should items already rendered before the first visible item.
-      const measureLimit = Math.min(Math.abs(firstItemIndex - _prevFirstItemIndex), _prevFirstVisibleIndex - firstItemIndex);
+      const measureLimit = Math.min(
+        Math.abs(firstItemIndex - _prevFirstItemIndex),
+        _prevFirstVisibleIndex - firstItemIndex
+      );
 
       beforeVisibleDiff = Math.round(this._measure(measureLimit));
     }
@@ -187,16 +189,18 @@ export default class DynamicRadar extends Radar {
       const itemIndex = currentItem.index;
 
       const {
-        top: currentItemTop,
-        height: currentItemHeight
-      } = getScaledClientRect(currentItem, _transformScale);
+        startPosition: currentItemStartPosition,
+        size: currentItemHeight
+      } = currentItem.getScaledPositionInformation(_transformScale);
 
       let margin;
 
       if (previousItem !== undefined) {
-        margin = currentItemTop - getScaledClientRect(previousItem, _transformScale).bottom;
+        margin = currentItemStartPosition
+          - previousItem.getScaledPositionInformation(_transformScale).endPosition;
       } else {
-        margin = currentItemTop - getScaledClientRect(_occludedContentBefore, _transformScale).bottom;
+        margin = currentItemStartPosition
+          - _occludedContentBefore.getScaledPositionInformation(_transformScale).endPosition;
       }
 
       const newHeight = roundTo(currentItemHeight + margin);

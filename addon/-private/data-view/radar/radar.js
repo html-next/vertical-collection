@@ -20,7 +20,6 @@ import ViewportContainer from '../viewport-container';
 
 import closestElement from '../../utils/element/closest';
 import estimateElementHeight from '../../utils/element/estimate-element-height';
-import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
 import keyForItem from '../../ember-internals/key-for-item';
 import { IS_EMBER_2 } from 'ember-compatibility-helpers';
 
@@ -71,6 +70,7 @@ export default class Radar {
       this._getScrollContainerOffset = () => this._scrollContainer.offsetHeight;
       this._getScrollContainerSize = () => this._scrollContainer.getBoundingClientRect().height;
       this._getScrollDistance = () => this._scrollContainer.scrollTop;
+      this._getScaledStartPosition = (element, scale) => element.getBoundingClientRect().top * scale;
       this._setDimension = (element, styleForHeight) => element.style.height = styleForHeight;
       this._setScrollDistance = (scrollDistance) => this._scrollContainer.scrollTop = scrollDistance;
     } else {
@@ -78,6 +78,7 @@ export default class Radar {
       this._getScrollContainerOffset = () => this._scrollContainer.offsetWidth;
       this._getScrollContainerSize = () => this._scrollContainer.getBoundingClientRect().width;
       this._getScrollDistance = () => this._scrollContainer.scrollLeft;
+      this._getScaledStartPosition = (element, scale) => element.getBoundingClientRect().left * scale;
       this._setDimension = (element, styleForWidth) => element.style.width = styleForWidth;
       this._setScrollDistance = (scrollDistance) => this._scrollContainer.scrollLeft = scrollDistance;
     }
@@ -133,8 +134,8 @@ export default class Radar {
     this._prependComponentPool = [];
 
     // Boundaries
-    this._occludedContentBefore = new VirtualComponent(null, null, this._dimension);
-    this._occludedContentAfter = new VirtualComponent(null, null, this._dimension);
+    this._occludedContentBefore = new VirtualComponent(this._dimension);
+    this._occludedContentAfter = new VirtualComponent(this._dimension);
 
     this._occludedContentBefore.element = document.createElement(occlusionTagName);
     this._occludedContentBefore.element.className += 'occluded-content';
@@ -385,9 +386,9 @@ export default class Radar {
       transformScale = scrollContainerOffsetSize / scrollContainerRenderedSize;
     }
 
-    // TODO(kjb) generify
-    const { top: scrollContentTop } = getScaledClientRect(_occludedContentBefore, transformScale);
-    const { top: scrollContainerTop } = getScaledClientRect(_scrollContainer, transformScale);
+    const { startPosition: scrollContentStartPosition }
+      = _occludedContentBefore.getScaledPositionInformation(transformScale);
+    const scrollContainerStartPosition = this._getScaledStartPosition(_scrollContainer, transformScale);
 
     let scrollContainerMaxSize = 0;
 
@@ -418,7 +419,8 @@ export default class Radar {
     // Determined by finding the distance the collection is from the beginning of the scroll
     // container's content (scrollDistance + actual position) and subtracting the scroll container's
     //  actual beginning.
-    this._collectionOffset = roundTo((this._getScrollDistance() + scrollContentTop) - scrollContainerTop);
+    this._collectionOffset
+      = roundTo((this._getScrollDistance() + scrollContentStartPosition) - scrollContainerStartPosition);
   }
 
   /*
@@ -518,9 +520,9 @@ export default class Radar {
       let component;
 
       if (shouldRecycle === true) {
-        component = _componentPool.pop() || new VirtualComponent(null, null, this._dimension);
+        component = _componentPool.pop() || new VirtualComponent(this._dimension);
       } else {
-        component = new VirtualComponent(null, null, this._dimension);
+        component = new VirtualComponent(this._dimension);
       }
 
       const itemIndex = ++lastIndexInList;
@@ -536,9 +538,9 @@ export default class Radar {
       let component;
 
       if (shouldRecycle === true) {
-        component = _componentPool.pop() || new VirtualComponent(null, null, this._dimension);
+        component = _componentPool.pop() || new VirtualComponent(this._dimension);
       } else {
-        component = new VirtualComponent(null, null, this._dimension);
+        component = new VirtualComponent(this._dimension);
       }
 
       const itemIndex = --firstIndexInList;
