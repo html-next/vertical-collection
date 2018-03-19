@@ -19,8 +19,8 @@ export default class StaticRadar extends Radar {
       bufferSize,
       totalItems,
       visibleMiddle,
-      _calculatedEstimateHeight,
-      _calculatedScrollContainerHeight
+      _calculatedEstimateSize,
+      _calculatedScrollContainerSize
     } = this;
 
     if (totalItems === 0) {
@@ -32,9 +32,9 @@ export default class StaticRadar extends Radar {
 
     const maxIndex = totalItems - 1;
 
-    const middleItemIndex = Math.floor(visibleMiddle / _calculatedEstimateHeight);
+    const middleItemIndex = Math.floor(visibleMiddle / _calculatedEstimateSize);
 
-    const shouldRenderCount = Math.min(Math.ceil(_calculatedScrollContainerHeight / _calculatedEstimateHeight), totalItems);
+    const shouldRenderCount = Math.min(Math.ceil(_calculatedScrollContainerSize / _calculatedEstimateSize), totalItems);
 
     let firstItemIndex = middleItemIndex - Math.floor(shouldRenderCount / 2);
     let lastItemIndex = middleItemIndex + Math.ceil(shouldRenderCount / 2) - 1;
@@ -57,19 +57,19 @@ export default class StaticRadar extends Radar {
   }
 
   _didEarthquake(scrollDiff) {
-    return scrollDiff > (this._calculatedEstimateHeight / 2);
+    return scrollDiff > (this._calculatedEstimateSize / 2);
   }
 
   get total() {
-    return this.totalItems * this._calculatedEstimateHeight;
+    return this.totalItems * this._calculatedEstimateSize;
   }
 
   get totalBefore() {
-    return this.firstItemIndex * this._calculatedEstimateHeight;
+    return this.firstItemIndex * this._calculatedEstimateSize;
   }
 
   get totalAfter() {
-    return this.total - ((this.lastItemIndex + 1) * this._calculatedEstimateHeight);
+    return this.total - ((this.lastItemIndex + 1) * this._calculatedEstimateSize);
   }
 
   get firstItemIndex() {
@@ -81,17 +81,17 @@ export default class StaticRadar extends Radar {
   }
 
   get firstVisibleIndex() {
-    return Math.ceil(this.visibleTop / this._calculatedEstimateHeight);
+    return Math.ceil(this.visibleTop / this._calculatedEstimateSize);
   }
 
   get lastVisibleIndex() {
-    return Math.min(Math.ceil(this.visibleBottom / this._calculatedEstimateHeight), this.totalItems) - 1;
+    return Math.min(Math.ceil(this.visibleBottom / this._calculatedEstimateSize), this.totalItems) - 1;
   }
 
   /*
    * Public API to query for the offset of an item
    */
   getOffsetForIndex(index) {
-    return index * this._calculatedEstimateHeight + 1;
+    return index * this._calculatedEstimateSize + 1;
   }
 }

@@ -60,15 +60,15 @@ export default class DynamicRadar extends Radar {
   _updateConstants() {
     super._updateConstants();
 
-    if (this._calculatedEstimateHeight < this._minHeight) {
-      this._minHeight = this._calculatedEstimateHeight;
+    if (this._calculatedEstimateSize < this._minHeight) {
+      this._minHeight = this._calculatedEstimateSize;
     }
 
-    // Create the SkipList only after the estimateHeight has been calculated the first time
+    // Create the SkipList only after the estimateSize has been calculated the first time
     if (this.skipList === null) {
-      this.skipList = new SkipList(this.totalItems, this._calculatedEstimateHeight);
+      this.skipList = new SkipList(this.totalItems, this._calculatedEstimateSize);
     } else {
-      this.skipList.defaultValue = this._calculatedEstimateHeight;
+      this.skipList.defaultValue = this._calculatedEstimateSize;
     }
   }
 
