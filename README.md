@@ -103,10 +103,10 @@ For updated documentation and demos see [http://html-next.github.io/vertical-col
 ## Contributing
 
  - Open an Issue for discussion first if you're unsure a feature/fix is wanted.
- - Branch off of `develop` (default branch)
+ - Branch off of `master` (default branch)
  - Use descriptive branch names (e.g. `<type>/<short-description>`)
  - Use [Angular Style Commits](https://github.com/angular/angular.js/blob/v1.4.8/CONTRIBUTING.md#commit)
- - PR against `develop` (default branch).
+ - PR against `master` (default branch).
 
 ### Commits
 
@@ -130,11 +130,3 @@ Angular Style commit messages have the full form:
 
  - chore(deps): bump deps in package.json and bower.json
  - docs(component): document the `fast-action` component
-
-
-
-## Funding
-
-OSS is often a labor of love. Smoke And Mirrors is largely built with that love.
-
-<a href='https://pledgie.com/campaigns/30822'><img alt='Click here to lend your support to: Smoke-and-mirrors: Ambitious infinite-scroll and svelte rendering for Ember applications and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/30822.png?skin_name=chrome' border='0' ></a>
