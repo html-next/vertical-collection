@@ -139,7 +139,7 @@ module.exports = {
     this._setupBabelOptions(app.env);
 
     if (!/production/.test(app.env) && !/test/.test(app.env)) {
-      app.import('vendor/debug.css');
+      findImporter(this).import('vendor/debug.css');
     }
   },
 
@@ -159,3 +159,18 @@ module.exports = {
     return new Funnel(tree, { exclude });
   }
 };
+
+function findImporter(addon) {
+  if (typeof addon.import === 'function') {
+    // If addon.import() is present (CLI 2.7+) use that
+    return addon;
+  } else {
+    // Otherwise, reuse the _findHost implementation that would power addon.import()
+    let current = addon;
+    let app;
+    do {
+      app = current.app || app;
+    } while (current.parent.parent && (current = current.parent));
+    return app;
+  }
+}
