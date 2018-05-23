@@ -13,7 +13,7 @@ module.exports = function(defaults) {
     return true;
   };
 
-  let bootstrapPath = `${app.bowerDirectory  }/bootstrap/dist/`;
+  let bootstrapPath = 'node_modules/bootstrap/dist/';
   app.import(`${bootstrapPath}css/bootstrap.css`);
   app.import(`${bootstrapPath}fonts/glyphicons-halflings-regular.eot`, { destDir: '/fonts' });
   app.import(`${bootstrapPath}fonts/glyphicons-halflings-regular.svg`, { destDir: '/fonts' });
