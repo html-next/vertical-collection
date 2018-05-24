@@ -51,8 +51,6 @@ after_script:
 
 install:
   - yarn install --no-lockfile --non-interactive
-  - yarn global add bower
-  - bower install
 
 script:
   - yarn lint:js
