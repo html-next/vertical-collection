@@ -1,10 +1,10 @@
 import { moduleForComponent } from 'ember-qunit';
 import {
-  click,
   find,
   findAll,
   scrollTo
 } from 'ember-native-dom-helpers';
+import { click } from '@ember/test-helpers';
 import wait from 'ember-test-helpers/wait';
 
 import getNumbers from 'dummy/lib/get-numbers';
