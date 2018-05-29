@@ -161,7 +161,7 @@ const VerticalCollection = Component.extend({
     const items = this.get('items');
 
     _radar.items = items === null || items === undefined ? [] : items;
-    _radar.estimateHeight = this.get('estimateHeight');
+    _radar.estimateSize = this.get('estimateHeight');
     _radar.renderAll = this.get('renderAll');
     _radar.bufferSize = this.get('bufferSize');
 
@@ -220,7 +220,7 @@ const VerticalCollection = Component.extend({
 
     const bufferSize = this.get('bufferSize');
     const containerSelector = this.get('containerSelector');
-    const estimateHeight = this.get('estimateHeight');
+    const estimateSize = this.get('estimateHeight');
     const initialRenderCount = this.get('initialRenderCount');
     const renderAll = this.get('renderAll');
     const renderFromLast = this.get('renderFromLast');
@@ -237,7 +237,7 @@ const VerticalCollection = Component.extend({
       {
         bufferSize,
         containerSelector,
-        estimateHeight,
+        estimateSize,
         initialRenderCount,
         items,
         key,

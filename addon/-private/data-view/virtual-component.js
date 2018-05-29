@@ -7,17 +7,25 @@ import { IS_GLIMMER_2, GTE_EMBER_1_13 } from 'ember-compatibility-helpers';
 let VC_IDENTITY = 0;
 
 export default class VirtualComponent {
-  constructor(content = null, index = null) {
+  constructor(dimension = 'height') {
     this.id = VC_IDENTITY++;
 
-    this.content = content;
-    this.index = index;
+    this.content = null;
+    this.index = null;
 
     this.upperBound = document.createTextNode('');
     this.lowerBound = document.createTextNode('');
     this.element = null;
 
     this.rendered = false;
+
+    if (dimension === 'height') {
+      this._getStartPosition = (boundingClientRect) => boundingClientRect.top;
+      this._getEndPosition = (boundingClientRect) => boundingClientRect.bottom;
+    } else {
+      this._getStartPosition = (boundingClientRect) => boundingClientRect.left;
+      this._getEndPosition = (boundingClientRect) => boundingClientRect.right;
+    }
 
     // In older versions of Ember/IE, binding anything on an object in the template
     // adds observers which creates __ember_meta__
@@ -36,18 +44,20 @@ export default class VirtualComponent {
     return IS_GLIMMER_2 ? this.lowerBound : this.lowerBound.nextSibling;
   }
 
-  getBoundingClientRect() {
+  getScaledPositionInformation(scale) {
     let { upperBound, lowerBound } = this;
 
-    let top = Infinity;
-    let bottom = -Infinity;
+    let startPosition = Infinity;
+    let endPosition = -Infinity;
 
     while (upperBound !== lowerBound) {
       upperBound = upperBound.nextSibling;
 
       if (upperBound instanceof Element) {
-        top = Math.min(top, upperBound.getBoundingClientRect().top);
-        bottom = Math.max(bottom, upperBound.getBoundingClientRect().bottom);
+        const boundingClientRect = upperBound.getBoundingClientRect();
+
+        startPosition = Math.min(startPosition, this._getStartPosition(boundingClientRect));
+        endPosition = Math.max(endPosition, this._getEndPosition(boundingClientRect));
       }
 
       if (DEBUG) {
@@ -61,11 +71,17 @@ export default class VirtualComponent {
       }
     }
 
-    assert('Items in a vertical collection require atleast one element in them', top !== Infinity && bottom !== -Infinity);
+    assert(
+      'Items in a collection require at least one element in them',
+      startPosition !== Infinity && endPosition !== -Infinity
+    );
 
-    const height = bottom - top;
+    const size = (endPosition - startPosition) * scale;
 
-    return { top, bottom, height };
+    startPosition *= scale;
+    endPosition *= scale;
+
+    return { startPosition, endPosition, size };
   }
 
   recycle(newContent, newIndex) {
