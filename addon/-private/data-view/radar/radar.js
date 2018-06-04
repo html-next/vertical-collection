@@ -194,6 +194,8 @@ export default class Radar {
       this._scrollTop = startingScrollTop + _collectionOffset;
 
       this._prevFirstVisibleIndex = startingIndex;
+    } else {
+      this._scrollTop = this._scrollContainer.scrollTop;
     }
 
     this._started = true;
