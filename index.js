@@ -71,7 +71,7 @@ module.exports = {
     });
 
     // use the default options
-    const addonTemplateTree = this._super.treeForAddon.call(this, templateTree);
+    const addonTemplateTree = this._super(templateTree);
     let publicTree = babel.transpileTree(withoutPrivate);
 
     privateTree = new Rollup(privateTree, {
@@ -134,6 +134,15 @@ module.exports = {
   included(app) {
     this._super.included.apply(this, arguments);
     this.checker = new VersionChecker(app);
+
+    while (typeof app.import !== 'function' && app.app) {
+      app = app.app;
+    }
+
+    if (typeof app.import !== 'function') {
+      throw new Error('vertical-collection is being used within another addon or engine '
+        + 'and is having trouble registering itself to the parent application.');
+    }
 
     this._env = app.env;
     this._setupBabelOptions(app.env);
