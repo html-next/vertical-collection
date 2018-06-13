@@ -5,7 +5,8 @@ import { DEBUG } from '@glimmer/env';
 
 import { Token, scheduler } from 'ember-raf-scheduler';
 
-import VirtualComponent from '../virtual-component';
+import VirtualComponent from '../elements/virtual-component';
+import OccludedContent from '../elements/occluded-content';
 import insertRangeBefore from '../utils/insert-range-before';
 import objectAt from '../utils/object-at';
 import roundTo from '../utils/round-to';
@@ -22,6 +23,8 @@ import closestElement from '../../utils/element/closest';
 import estimateElementHeight from '../../utils/element/estimate-element-height';
 import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
 import keyForItem from '../../ember-internals/key-for-item';
+
+import document from '../../utils/document-shim';
 
 export default class Radar {
   constructor(
@@ -104,19 +107,16 @@ export default class Radar {
     this._prependComponentPool = [];
 
     // Boundaries
-    this._occludedContentBefore = new VirtualComponent();
-    this._occludedContentAfter = new VirtualComponent();
+    this._occludedContentBefore = new OccludedContent(occlusionTagName);
+    this._occludedContentAfter = new OccludedContent(occlusionTagName);
 
-    this._occludedContentBefore.element = document.createElement(occlusionTagName);
-    this._occludedContentBefore.element.className += 'occluded-content';
-    this._occludedContentAfter.element = document.createElement(occlusionTagName);
-    this._occludedContentAfter.element.className += 'occluded-content';
-
-    this._occludedContentBefore.element.addEventListener('click', this.pageUp.bind(this));
-    this._occludedContentAfter.element.addEventListener('click', this.pageDown.bind(this));
+    this._occludedContentBefore.addEventListener('click', this.pageUp.bind(this));
+    this._occludedContentAfter.addEventListener('click', this.pageDown.bind(this));
 
     // Element to hold pooled component DOM when not in use
-    this._domPool = document.createDocumentFragment();
+    if (document) {
+      this._domPool = document.createDocumentFragment();
+    }
 
     // Initialize virtual components
     this.virtualComponents = A([this._occludedContentBefore, this._occludedContentAfter]);
@@ -535,11 +535,11 @@ export default class Radar {
     const afterItemsText = totalItemsAfter === 1 ? 'item' : 'items';
 
     // Set padding element heights.
-    _occludedContentBefore.element.style.height = `${Math.max(renderedTotalBefore, 0)}px`;
-    _occludedContentBefore.element.innerHTML = totalItemsBefore > 0 ? `And ${totalItemsBefore} ${beforeItemsText} before` : '';
+    _occludedContentBefore.style.height = `${Math.max(renderedTotalBefore, 0)}px`;
+    _occludedContentBefore.innerHTML = totalItemsBefore > 0 ? `And ${totalItemsBefore} ${beforeItemsText} before` : '';
 
-    _occludedContentAfter.element.style.height = `${Math.max(renderedTotalAfter, 0)}px`;
-    _occludedContentAfter.element.innerHTML = totalItemsAfter > 0 ? `And ${totalItemsAfter} ${afterItemsText} after` : '';
+    _occludedContentAfter.style.height = `${Math.max(renderedTotalAfter, 0)}px`;
+    _occludedContentAfter.innerHTML = totalItemsAfter > 0 ? `And ${totalItemsAfter} ${afterItemsText} after` : '';
   }
 
   _appendComponent(component) {
