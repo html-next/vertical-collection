@@ -2,7 +2,7 @@ import { set } from '@ember/object';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
-import { IS_GLIMMER_2, GTE_EMBER_1_13 } from 'ember-compatibility-helpers';
+import { IS_GLIMMER_2, gte as emberVersionGTE } from 'ember-compatibility-helpers';
 import document from '../../utils/document-shim';
 
 let VC_IDENTITY = 0;
@@ -26,7 +26,7 @@ export default class VirtualComponent {
     // adds observers which creates __ember_meta__
     this.__ember_meta__ = null; // eslint-disable-line camelcase
 
-    if (DEBUG && GTE_EMBER_1_13) {
+    if (DEBUG && emberVersionGTE('1.13.0')) {
       Object.preventExtensions(this);
     }
   }
