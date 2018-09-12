@@ -64,10 +64,7 @@ ember install @html-next/vertical-collection
 
 ## Support, Questions, Collaboration
 
-Join the [smoke-and-mirrors](https://embercommunity.slack.com/messages/smoke-and-mirrors/) channel on Slack.
-
-[![Slack Status](https://ember-community-slackin.herokuapp.com/badge.svg)](https://ember-community-slackin.herokuapp.com/)
-
+Join the [Ember community on Discord](https://discord.gg/zT3asNS)
 
 ## Features
 
