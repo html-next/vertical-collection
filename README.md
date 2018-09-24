@@ -127,3 +127,10 @@ Angular Style commit messages have the full form:
 
  - chore(deps): bump deps in package.json and bower.json
  - docs(component): document the `fast-action` component
+
+
+### Testing
+
+Make sure you register the test waiter from [ember-raf-scheduler](https://github.com/html-next/ember-raf-scheduler). So `ember-test-helpers`'s `wait` is aware of the scheduled updates.
+
+An example can be found [here](https://github.com/html-next/vertical-collection/blob/master/tests/test-helper.js#L2)
