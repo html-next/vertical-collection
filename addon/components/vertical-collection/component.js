@@ -155,7 +155,7 @@ const VerticalCollection = Component.extend({
   isEmpty: empty('items'),
   shouldYieldToInverse: readOnly('isEmpty'),
 
-  virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function() {
+  virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function () {
     const { _radar } = this;
 
     const items = this.get('items');
@@ -189,7 +189,11 @@ const VerticalCollection = Component.extend({
             const item = objectAt(items, index);
             const key = keyForItem(item, keyPath, index);
 
-            this.sendAction(action, item, index, key);
+            // this.sendAction will be deprecated in ember 4.0
+            const _action = get(this, action);
+            if (typeof _action == "function") {
+              _action(item, index, key);
+            }
           });
           this._scheduledActions.length = 0;
         });
