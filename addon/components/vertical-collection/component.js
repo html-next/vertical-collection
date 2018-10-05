@@ -8,7 +8,7 @@ import layout from './template';
 
 import { scheduler, Token } from 'ember-raf-scheduler';
 
-import { SUPPORTS_INVERSE_BLOCK } from 'ember-compatibility-helpers';
+import { SUPPORTS_INVERSE_BLOCK, SUPPORTS_CLOSURE_ACTIONS } from 'ember-compatibility-helpers';
 
 import {
   keyForItem,
@@ -190,9 +190,13 @@ const VerticalCollection = Component.extend({
             const key = keyForItem(item, keyPath, index);
 
             // this.sendAction will be deprecated in ember 4.0
-            const _action = get(this, action);
-            if (typeof _action == 'function') {
-              _action(item, index, key);
+            if (SUPPORTS_CLOSURE_ACTIONS) {
+              const _action = get(this, action);
+              if (typeof _action == 'function') {
+                _action(item, index, key);
+              }
+            } else {
+              this.sendAction(action, item, index, key);
             }
           });
           this._scheduledActions.length = 0;
