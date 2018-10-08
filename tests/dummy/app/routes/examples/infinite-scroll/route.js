@@ -1,14 +1,11 @@
-import Ember from 'ember';
+import { A } from '@ember/array';
+import Route from '@ember/routing/route';
 import getNumbers from 'dummy/lib/get-numbers';
-
-const {
-  Route
-  } = Ember;
 
 export default Route.extend({
   model() {
     return {
-      numbers: Ember.A(getNumbers(0, 100)),
+      numbers: A(getNumbers(0, 100)),
       first: 0,
       last: 100
     };

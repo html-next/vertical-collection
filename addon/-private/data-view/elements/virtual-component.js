@@ -1,23 +1,24 @@
-import Ember from 'ember';
+import { set } from '@ember/object';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
-import { IS_GLIMMER_2, GTE_EMBER_1_13 } from 'ember-compatibility-helpers';
-
-const { set } = Ember;
+import { IS_GLIMMER_2, gte as emberVersionGTE } from 'ember-compatibility-helpers';
+import document from '../../utils/document-shim';
 
 let VC_IDENTITY = 0;
 
 export default class VirtualComponent {
   constructor(content = null, index = null) {
-    this.id = VC_IDENTITY++;
+    this.id = `VC-${VC_IDENTITY++}`;
 
     this.content = content;
     this.index = index;
 
-    this.upperBound = document.createTextNode('');
-    this.lowerBound = document.createTextNode('');
-    this.element = null;
+    // We check to see if the document exists in Fastboot. Since RAF won't run in
+    // Fastboot, we'll never have to use these text nodes for measurements, so they
+    // can be empty
+    this.upperBound = document !== undefined ? document.createTextNode('') : null;
+    this.lowerBound = document !== undefined ? document.createTextNode('') : null;
 
     this.rendered = false;
 
@@ -25,7 +26,7 @@ export default class VirtualComponent {
     // adds observers which creates __ember_meta__
     this.__ember_meta__ = null; // eslint-disable-line camelcase
 
-    if (DEBUG && GTE_EMBER_1_13) {
+    if (DEBUG && emberVersionGTE('1.13.0')) {
       Object.preventExtensions(this);
     }
   }
@@ -83,7 +84,6 @@ export default class VirtualComponent {
   }
 
   destroy() {
-    set(this, 'element', null);
     set(this, 'upperBound', null);
     set(this, 'lowerBound', null);
     set(this, 'content', null);

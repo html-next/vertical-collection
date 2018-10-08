@@ -10,7 +10,7 @@ module.exports = function(environment) {
     podModulePrefix: 'dummy/routes',
     environment,
     rootURL: '/',
-    locationType: 'hash',
+    locationType: 'auto',
     EmberENV: {
       FEATURES: {},
       EXTEND_PROTOTYPES: false
@@ -53,6 +53,7 @@ module.exports = function(environment) {
     // Testem prefers this...
     ENV.locationType = 'none';
     ENV.APP.rootElement = '#ember-testing';
+    ENV.APP.autoboot = false;
   }
 
   if (environment === 'production') {

@@ -508,5 +508,23 @@ testScenarios(
 
     assert.equal(this.get('isExpanded'), true, 'isExpanded should be truthy');
     assert.equal(find('.scrollable').scrollTop, 400, 'container scrollTop should stay the same on render');
+);
+
+testScenarios(
+  'The collection does not allow interaction before being setup',
+  standardScenariosFor(getNumbers(100, 100)),
+  standardTemplate,
+
+  false, // Run test function before render
+  async function(assert) {
+    assert.expect(2);
+
+    prepend(this, getNumbers(10, 10));
+    prepend(this, getNumbers(0, 10));
+
+    await wait();
+
+    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'Rendered correct number of items');
+    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 9', 'Rendered correct number of items');
   }
 );

@@ -1,6 +1,8 @@
-/* eslint-env node */
+/* eslint-disable node/no-unpublished-require */
+'use strict';
+
 // var RSVP = require('rsvp');
-var generateChangelog = require('ember-cli-changelog/lib/tasks/release-with-changelog');
+const generateChangelog = require('ember-cli-changelog/lib/tasks/release-with-changelog');
 
 // For details on each option run `ember help release`
 module.exports = {

@@ -1,8 +1,6 @@
+import { run } from '@ember/runloop';
 import { scheduler } from 'ember-raf-scheduler';
 import SUPPORTS_PASSIVE from './supports-passive';
-import Ember from 'ember';
-
-const { run } = Ember;
 const DEFAULT_ARRAY_SIZE = 10;
 const UNDEFINED_VALUE = Object.create(null);
 

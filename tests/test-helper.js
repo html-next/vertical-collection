@@ -1,10 +1,12 @@
-import resolver from './helpers/resolver';
-import 'vertical-collection/-debug';
+import '@html-next/vertical-collection/-debug';
 import registerWaiter from 'ember-raf-scheduler/test-support/register-waiter';
+import Application from '../app';
+import config from '../config/environment';
+import { setApplication } from '@ember/test-helpers';
+import { start } from 'ember-qunit';
 
-import {
-  setResolver
-} from 'ember-qunit';
+setApplication(Application.create(config.APP));
 
-setResolver(resolver);
 registerWaiter();
+
+start();

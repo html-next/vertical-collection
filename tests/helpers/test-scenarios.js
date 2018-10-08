@@ -1,17 +1,11 @@
+import { A } from '@ember/array';
+import ArrayProxy from '@ember/array/proxy';
+import { Promise } from 'rsvp';
+import { merge } from '@ember/polyfills';
 import { test } from 'ember-qunit';
-import Ember from 'ember';
 import DS from 'ember-data';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';
-
-const {
-  A,
-  ArrayProxy,
-  RSVP: {
-    Promise
-  },
-  merge
-} = Ember;
 
 const {
   PromiseArray
@@ -124,8 +118,8 @@ function generateScenario(name, defaultOptions, initializer) {
     const items = initializer ? initializer(baseItems.slice()) : baseItems.slice();
     const scenario = { items };
 
-    Ember.merge(scenario, options);
-    Ember.merge(scenario, defaultOptions);
+    merge(scenario, options);
+    merge(scenario, defaultOptions);
 
     return { [name]: scenario };
   };

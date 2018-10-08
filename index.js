@@ -1,10 +1,9 @@
-/* eslint-env node */
 'use strict';
 
 const StripClassCallCheckPlugin = require('babel6-plugin-strip-class-callcheck');
 const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
-const merge   = require('broccoli-merge-trees');
+const merge = require('broccoli-merge-trees');
 const VersionChecker = require('ember-cli-version-checker');
 
 const path = require('path');
@@ -29,7 +28,7 @@ function isProductionEnv() {
 }
 
 module.exports = {
-  name: 'vertical-collection',
+  name: '@html-next/vertical-collection',
 
   init() {
     this._super.init && this._super.init.apply(this, arguments);
@@ -37,9 +36,19 @@ module.exports = {
     this.options = this.options || {};
   },
 
+  getOutputDirForVersion() {
+    let VersionChecker = require('ember-cli-version-checker');
+    let checker = new VersionChecker(this);
+    let emberCli = checker.for('ember-cli', 'npm');
+
+    let requiresModulesDir = emberCli.satisfies('< 3.0.0');
+
+    return requiresModulesDir ? 'modules' : '';
+  },
+
   treeForAddon(tree) {
     let babel = this.addons.find((addon) => addon.name === 'ember-cli-babel');
-    let withPrivate    = new Funnel(tree, { include: ['-private/**'] });
+    let withPrivate = new Funnel(tree, { include: ['-private/**'] });
     let withoutPrivate = new Funnel(tree, {
       exclude: [
         '**/**.hbs',
@@ -47,7 +56,7 @@ module.exports = {
         isProductionEnv() ? '-debug' : false
       ].filter(Boolean),
 
-      destDir: 'vertical-collection'
+      destDir: '@html-next/vertical-collection'
     });
 
     let privateTree = babel.transpileTree(withPrivate, {
@@ -67,17 +76,23 @@ module.exports = {
 
     privateTree = new Rollup(privateTree, {
       rollup: {
-        entry: '-private/index.js',
-        targets: [
-          { dest: 'vertical-collection/-private.js', format: 'amd', moduleId: 'vertical-collection/-private' }
+        input: '-private/index.js',
+        output: [
+          {
+            file: '@html-next/vertical-collection/-private.js',
+            format: 'amd',
+            amd: {
+              id: '@html-next/vertical-collection/-private'
+            }
+          }
         ],
         external: ['ember', 'ember-raf-scheduler']
       }
     });
 
-    // the output of treeForAddon is required to be modules/<your files>
-    publicTree  = new Funnel(publicTree,  { destDir: 'modules' });
-    privateTree = new Funnel(privateTree, { destDir: 'modules' });
+    let destDir = this.getOutputDirForVersion();
+    publicTree = new Funnel(publicTree, { destDir });
+    privateTree = new Funnel(privateTree, { destDir });
 
     return merge([
       addonTemplateTree,
@@ -125,15 +140,15 @@ module.exports = {
     }
 
     if (typeof app.import !== 'function') {
-      throw new Error('vertical-collection is being used within another addon or engine ' +
-        'and is having trouble registering itself to the parent application.');
+      throw new Error('vertical-collection is being used within another addon or engine '
+        + 'and is having trouble registering itself to the parent application.');
     }
 
     this._env = app.env;
     this._setupBabelOptions(app.env);
 
     if (!/production/.test(app.env) && !/test/.test(app.env)) {
-      app.import('vendor/debug.css');
+      findImporter(this).import('vendor/debug.css');
     }
   },
 
@@ -153,3 +168,18 @@ module.exports = {
     return new Funnel(tree, { exclude });
   }
 };
+
+function findImporter(addon) {
+  if (typeof addon.import === 'function') {
+    // If addon.import() is present (CLI 2.7+) use that
+    return addon;
+  } else {
+    // Otherwise, reuse the _findHost implementation that would power addon.import()
+    let current = addon;
+    let app;
+    do {
+      app = current.app || app;
+    } while (current.parent.parent && (current = current.parent));
+    return app;
+  }
+}

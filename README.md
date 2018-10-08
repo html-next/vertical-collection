@@ -1,6 +1,8 @@
 vertical-collection
 =================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/html-next/vertical-collection.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/html-next/vertical-collection.svg)](https://travis-ci.org/html-next/vertical-collection)
 
 Infinite Scroll and Occlusion at > 60FPS
@@ -41,7 +43,7 @@ ember install @html-next/vertical-collection
     idForFirstItem=idForFirstItem
     firstReached=firstReached
     lastReached=lastReached
-    lastVisibleChanged=lastVisibleChanged
+    firstVisibleChanged=firstVisibleChanged
     lastVisibleChanged=lastVisibleChanged
      as |item i|}}
     <li>
@@ -62,10 +64,7 @@ ember install @html-next/vertical-collection
 
 ## Support, Questions, Collaboration
 
-Join the [smoke-and-mirrors](https://embercommunity.slack.com/messages/smoke-and-mirrors/) channel on Slack.
-
-[![Slack Status](https://ember-community-slackin.herokuapp.com/badge.svg)](https://ember-community-slackin.herokuapp.com/)
-
+Join the [Ember community on Discord](https://discord.gg/zT3asNS)
 
 ## Features
 
@@ -101,10 +100,10 @@ For updated documentation and demos see [http://html-next.github.io/vertical-col
 ## Contributing
 
  - Open an Issue for discussion first if you're unsure a feature/fix is wanted.
- - Branch off of `develop` (default branch)
+ - Branch off of `master` (default branch)
  - Use descriptive branch names (e.g. `<type>/<short-description>`)
  - Use [Angular Style Commits](https://github.com/angular/angular.js/blob/v1.4.8/CONTRIBUTING.md#commit)
- - PR against `develop` (default branch).
+ - PR against `master` (default branch).
 
 ### Commits
 
@@ -130,9 +129,8 @@ Angular Style commit messages have the full form:
  - docs(component): document the `fast-action` component
 
 
+### Testing
 
-## Funding
+Make sure you register the test waiter from [ember-raf-scheduler](https://github.com/html-next/ember-raf-scheduler). So `ember-test-helpers`'s `wait` is aware of the scheduled updates.
 
-OSS is often a labor of love. Smoke And Mirrors is largely built with that love.
-
-<a href='https://pledgie.com/campaigns/30822'><img alt='Click here to lend your support to: Smoke-and-mirrors: Ambitious infinite-scroll and svelte rendering for Ember applications and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/30822.png?skin_name=chrome' border='0' ></a>
+An example can be found [here](https://github.com/html-next/vertical-collection/blob/master/tests/test-helper.js#L2)

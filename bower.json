@@ -1,7 +1,0 @@
-{
-  "name": "vertical-collection",
-  "dependencies": {},
-  "devDependencies": {
-    "bootstrap": "~3.3.5"
-  }
-}

@@ -1,10 +1,6 @@
-import Ember from 'ember';
+import Route from '@ember/routing/route';
+import { run } from '@ember/runloop';
 import getData from 'dummy/lib/get-data';
-
-const {
-  Route,
-  run
-  } = Ember;
 
 export default Route.extend({
   numRows: 100,

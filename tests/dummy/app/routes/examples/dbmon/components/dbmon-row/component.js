@@ -1,14 +1,12 @@
-import Ember from 'ember';
+import { alias } from '@ember/object/computed';
+import Component from '@ember/component';
+import { computed } from '@ember/object';
 
-const {
-  computed
-  } = Ember;
-
-export default Ember.Component.extend({
+export default Component.extend({
 
   tagName: 'tr',
 
-  queries: computed.alias('db.queries'),
+  queries: alias('db.queries'),
 
   topFiveQueries: computed('queries', function() {
     let queries = this.get('queries') || [];

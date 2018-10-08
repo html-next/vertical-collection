@@ -1,30 +1,30 @@
-import Ember from 'ember';
+import { A } from '@ember/array';
+import { set, get } from '@ember/object';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
 import { Token, scheduler } from 'ember-raf-scheduler';
 
-import VirtualComponent from '../virtual-component';
+import VirtualComponent from '../elements/virtual-component';
+import OccludedContent from '../elements/occluded-content';
 import insertRangeBefore from '../utils/insert-range-before';
 import objectAt from '../utils/object-at';
 import roundTo from '../utils/round-to';
+import { isPrepend, isAppend } from '../utils/mutation-checkers';
 
 import {
   addScrollHandler,
   removeScrollHandler
 } from '../utils/scroll-handler';
 
-import Container from '../container';
+import ViewportContainer from '../viewport-container';
 
 import closestElement from '../../utils/element/closest';
 import estimateElementHeight from '../../utils/element/estimate-element-height';
 import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
+import keyForItem from '../../ember-internals/key-for-item';
 
-const {
-  A,
-  get,
-  set
-} = Ember;
+import document from '../../utils/document-shim';
 
 export default class Radar {
   constructor(
@@ -33,12 +33,14 @@ export default class Radar {
       bufferSize,
       containerSelector,
       estimateHeight,
+      initialRenderCount,
       items,
+      key,
       renderAll,
       renderFromLast,
-      initialRenderCount,
       shouldRecycle,
-      startingIndex
+      startingIndex,
+      occlusionTagName
     }
   ) {
     this.token = new Token(parentToken);
@@ -49,6 +51,7 @@ export default class Radar {
     this.estimateHeight = estimateHeight;
     this.initialRenderCount = initialRenderCount;
     this.items = items;
+    this.key = key;
     this.renderAll = renderAll;
     this.renderFromLast = renderFromLast;
     this.shouldRecycle = shouldRecycle;
@@ -82,32 +85,38 @@ export default class Radar {
     this._nextLayout = null;
     this._started = false;
     this._didReset = true;
+    this._didUpdateItems = false;
 
     // Cache state
     this._scrollTop = 0;
+
     // Setting these values to infinity starts us in a guaranteed good state for the radar,
     // so it knows that it needs to run certain measurements, etc.
     this._prevFirstItemIndex = Infinity;
     this._prevLastItemIndex = -Infinity;
     this._prevFirstVisibleIndex = 0;
     this._prevLastVisibleIndex = 0;
+
     this._firstReached = false;
     this._lastReached = false;
+    this._prevTotalItems = 0;
+    this._prevFirstKey = 0;
+    this._prevLastKey = 0;
+
     this._componentPool = [];
     this._prependComponentPool = [];
 
     // Boundaries
-    this._occludedContentBefore = new VirtualComponent();
-    this._occludedContentAfter = new VirtualComponent();
+    this._occludedContentBefore = new OccludedContent(occlusionTagName);
+    this._occludedContentAfter = new OccludedContent(occlusionTagName);
 
-    this._occludedContentBefore.element = document.createElement('occluded-content');
-    this._occludedContentAfter.element = document.createElement('occluded-content');
-
-    this._occludedContentBefore.element.addEventListener('click', this.pageUp.bind(this));
-    this._occludedContentAfter.element.addEventListener('click', this.pageDown.bind(this));
+    this._occludedContentBefore.addEventListener('click', this.pageUp.bind(this));
+    this._occludedContentAfter.addEventListener('click', this.pageDown.bind(this));
 
     // Element to hold pooled component DOM when not in use
-    this._domPool = document.createDocumentFragment();
+    if (document) {
+      this._domPool = document.createDocumentFragment();
+    }
 
     // Initialize virtual components
     this.virtualComponents = A([this._occludedContentBefore, this._occludedContentAfter]);
@@ -136,7 +145,7 @@ export default class Radar {
 
     if (this._started) {
       removeScrollHandler(this._scrollContainer, this._scrollHandler);
-      Container.removeEventListener('resize', this._resizeHandler);
+      ViewportContainer.removeEventListener('resize', this._resizeHandler);
     }
   }
 
@@ -158,7 +167,7 @@ export default class Radar {
     // Use the occluded content element, which has been inserted into the DOM,
     // to find the item container and the scroll container
     this._itemContainer = _occludedContentBefore.element.parentNode;
-    this._scrollContainer = containerSelector === 'body' ? Container : closestElement(this._itemContainer, containerSelector);
+    this._scrollContainer = containerSelector === 'body' ? ViewportContainer : closestElement(this._itemContainer, containerSelector);
 
     this._updateConstants();
 
@@ -180,6 +189,10 @@ export default class Radar {
       // initialize the scrollTop value, which will be applied to the
       // scrollContainer after the collection has been initialized
       this._scrollTop = startingScrollTop + _collectionOffset;
+
+      this._prevFirstVisibleIndex = startingIndex;
+    } else {
+      this._scrollTop = this._scrollContainer.scrollTop;
     }
 
     this._started = true;
@@ -187,7 +200,7 @@ export default class Radar {
 
     // Setup event handlers
     addScrollHandler(this._scrollContainer, this._scrollHandler);
-    Container.addEventListener('resize', this._resizeHandler);
+    ViewportContainer.addEventListener('resize', this._resizeHandler);
   }
 
   /*
@@ -202,7 +215,13 @@ export default class Radar {
    *
    * @private
    */
-  scheduleUpdate() {
+  scheduleUpdate(didUpdateItems) {
+    if (didUpdateItems === true) {
+      // Set the update items flag first, in case scheduleUpdate has already been called
+      // but the RAF hasn't yet run
+      this._didUpdateItems = true;
+    }
+
     if (this._nextUpdate !== null || this._started === false) {
       return;
     }
@@ -216,6 +235,11 @@ export default class Radar {
   }
 
   update() {
+    if (this._didUpdateItems === true) {
+      this._determineUpdateType();
+      this._didUpdateItems = false;
+    }
+
     this._updateConstants();
     this._updateIndexes();
     this._updateVirtualComponents();
@@ -224,7 +248,7 @@ export default class Radar {
   }
 
   afterUpdate() {
-    const { totalItems } = this;
+    const { _prevTotalItems: totalItems } = this;
 
     const scrollDiff = this._calculateScrollDiff();
 
@@ -239,7 +263,6 @@ export default class Radar {
     // Unset prepend offset, we're done with any prepend changes at this point
     this._prependOffset = 0;
 
-    // Send actions if there are any items
     if (totalItems !== 0) {
       this._sendActions();
     }
@@ -273,6 +296,35 @@ export default class Radar {
    */
   _calculateScrollDiff() {
     return (this._prependOffset + this._scrollTop) - this._scrollContainer.scrollTop;
+  }
+
+  _determineUpdateType() {
+    const {
+      items,
+      key,
+      totalItems,
+
+      _prevTotalItems,
+      _prevFirstKey,
+      _prevLastKey
+    } = this;
+
+    const lenDiff = totalItems - _prevTotalItems;
+
+    if (isPrepend(lenDiff, items, key, _prevFirstKey, _prevLastKey) === true) {
+      this.prepend(lenDiff);
+    } else if (isAppend(lenDiff, items, key, _prevFirstKey, _prevLastKey) === true) {
+      this.append(lenDiff);
+    } else {
+      this.reset();
+    }
+
+    const firstItem = objectAt(this.items, 0);
+    const lastItem = objectAt(this.items, this.totalItems - 1);
+
+    this._prevTotalItems = totalItems;
+    this._prevFirstKey = totalItems > 0 ? keyForItem(firstItem, key, 0) : 0;
+    this._prevLastKey = totalItems > 0 ? keyForItem(lastItem, key, totalItems - 1) : 0;
   }
 
   _updateConstants() {
@@ -362,9 +414,8 @@ export default class Radar {
 
       shouldRecycle,
       renderAll,
-
-      _didReset,
       _started,
+      _didReset,
 
       _occludedContentBefore,
       _occludedContentAfter,
@@ -484,12 +535,12 @@ export default class Radar {
     const beforeItemsText = totalItemsBefore === 1 ? 'item' : 'items';
     const afterItemsText = totalItemsAfter === 1 ? 'item' : 'items';
 
-    // Set padding element heights, unset itemContainer's minHeight
-    _occludedContentBefore.element.style.height = `${Math.max(renderedTotalBefore, 0)}px`;
-    _occludedContentBefore.element.innerHTML = totalItemsBefore > 0 ? `And ${totalItemsBefore} ${beforeItemsText} before` : '';
+    // Set padding element heights.
+    _occludedContentBefore.style.height = `${Math.max(renderedTotalBefore, 0)}px`;
+    _occludedContentBefore.innerHTML = totalItemsBefore > 0 ? `And ${totalItemsBefore} ${beforeItemsText} before` : '';
 
-    _occludedContentAfter.element.style.height = `${Math.max(renderedTotalAfter, 0)}px`;
-    _occludedContentAfter.element.innerHTML = totalItemsAfter > 0 ? `And ${totalItemsAfter} ${afterItemsText} after` : '';
+    _occludedContentAfter.style.height = `${Math.max(renderedTotalAfter, 0)}px`;
+    _occludedContentAfter.innerHTML = totalItemsAfter > 0 ? `And ${totalItemsAfter} ${afterItemsText} after` : '';
   }
 
   _appendComponent(component) {

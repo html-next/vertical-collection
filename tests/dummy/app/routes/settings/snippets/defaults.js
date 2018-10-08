@@ -4,7 +4,7 @@ export default
 // basics
   tagName: '',
 
-// required
+  // required
 
   // Positional parameter, e.g.
   //
@@ -21,7 +21,7 @@ export default
   // like flex.
   estimateHeight: null,
 
-// performance
+  // performance
 
   // This key is the property used by the collection
   // to determine whether an array mutation is an
@@ -48,7 +48,7 @@ export default
   // numComponents === Math.ceil(containerHeight / estimateHeight) + (bufferSize * 2) + 1
   bufferSize: 0,
 
-// actions
+  // actions
 
   // Each action has the signature (item, index) => {}
   firstReached: null,
@@ -56,7 +56,7 @@ export default
   firstVisibleChanged: null,
   lastVisibleChanged: null,
 
-// initial state
+  // initial state
 
   // Id for the first item to be rendered. Will be the
   // top item by default, and the bottom item if
@@ -66,7 +66,7 @@ export default
   // Tells the collection to render from the last item.
   renderFromLast: false,
 
-// scroll setup
+  // scroll setup
 
   // Selector for the scrollContainer. The collection
   // will traverse its ancestry to find the first element

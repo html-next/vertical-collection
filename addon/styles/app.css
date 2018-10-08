@@ -1,4 +1,4 @@
-occluded-content {
+.occluded-content {
   display: block;
   position: relative;
   width: 100%;
@@ -10,16 +10,17 @@ occluded-content {
   color: rgba(0,0,0,0);
 }
 
-table > occluded-content,
-tbody > occluded-content,
-thead > occluded-content {
+table .occluded-content,
+tbody .occluded-content,
+thead .occluded-content,
+tfoot .occluded-content, {
   display: table-row;
   position: relative;
   width: 100%;
 }
 
-ul > occluded-content,
-ol > occluded-content {
+ul .occluded-content,
+ol .occluded-content {
   display: list-item;
   position: relative;
   width: 100%;
