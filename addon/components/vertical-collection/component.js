@@ -189,7 +189,7 @@ const VerticalCollection = Component.extend({
             const item = objectAt(items, index);
             const key = keyForItem(item, keyPath, index);
 
-            this.sendAction(action, item, index, key);
+            this[action](item, index, key);
           });
           this._scheduledActions.length = 0;
         });
