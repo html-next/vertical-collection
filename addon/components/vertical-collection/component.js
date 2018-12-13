@@ -194,6 +194,8 @@ const VerticalCollection = Component.extend({
               const _action = get(this, action);
               if (typeof _action == 'function') {
                 _action(item, index, key);
+              } else if (typeof _action === 'string') {
+                this.sendAction(action, item, index, key);
               }
             } else {
               this.sendAction(action, item, index, key);
