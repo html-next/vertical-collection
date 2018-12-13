@@ -155,7 +155,7 @@ const VerticalCollection = Component.extend({
   isEmpty: empty('items'),
   shouldYieldToInverse: readOnly('isEmpty'),
 
-  virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function () {
+  virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function() {
     const { _radar } = this;
 
     const items = this.get('items');
