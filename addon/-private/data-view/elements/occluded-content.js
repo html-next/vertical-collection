@@ -48,6 +48,12 @@ export default class OccludedContent {
     }
   }
 
+  removeEventListener(event, listener) {
+    if (this.element !== null) {
+      this.element.removeEventListener(event, listener);
+    }
+  }
+
   get realUpperBound() {
     return IS_GLIMMER_2 ? this.upperBound : this.upperBound.previousSibling;
   }
