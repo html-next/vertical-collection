@@ -110,8 +110,10 @@ export default class Radar {
     this._occludedContentBefore = new OccludedContent(occlusionTagName);
     this._occludedContentAfter = new OccludedContent(occlusionTagName);
 
-    this._occludedContentBefore.addEventListener('click', this.pageUp.bind(this));
-    this._occludedContentAfter.addEventListener('click', this.pageDown.bind(this));
+    this._pageUpHandler = this.pageUp.bind(this);
+    this._occludedContentBefore.addEventListener('click', this._pageUpHandler);
+    this._pageDownHandler = this.pageDown.bind(this);
+    this._occludedContentAfter.addEventListener('click', this._pageDownHandler);
 
     // Element to hold pooled component DOM when not in use
     if (document) {
@@ -139,6 +141,12 @@ export default class Radar {
     for (let i = 0; i < this.orderedComponents.length; i++) {
       this.orderedComponents[i].destroy();
     }
+
+    // Boundaries
+    this._occludedContentBefore.removeEventListener('click', this._pageUpHandler);
+    this._occludedContentAfter.removeEventListener('click', this._pageDownHandler);
+    this._occludedContentBefore.destroy();
+    this._occludedContentAfter.destroy();
 
     this.orderedComponents = null;
     set(this, 'virtualComponents', null);
