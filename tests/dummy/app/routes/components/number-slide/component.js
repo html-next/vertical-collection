@@ -41,7 +41,7 @@ export default Component.extend({
     return htmlSafe(styleStr);
   }),
   layout,
-  index: 0,
+  itemIndex: 0,
   item: null,
   number: alias('item.number')
 });
