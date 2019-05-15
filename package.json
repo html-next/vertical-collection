@@ -51,7 +51,7 @@
     "babel6-plugin-strip-class-callcheck": "^6.0.0",
     "broccoli-funnel": "^2.0.1",
     "broccoli-merge-trees": "^3.0.1",
-    "broccoli-rollup": "^2.0.0",
+    "broccoli-rollup": "^3.0.0",
     "ember-cli-babel": "^6.6.0",
     "ember-cli-htmlbars": "^3.0.0",
     "ember-cli-version-checker": "^2.1.0",
