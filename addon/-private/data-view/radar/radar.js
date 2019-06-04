@@ -21,6 +21,7 @@ import ViewportContainer from '../viewport-container';
 
 import closestElement from '../../utils/element/closest';
 import estimateElementHeight from '../../utils/element/estimate-element-height';
+import estimateElementWidth from '../../utils/element/estimate-element-width';
 import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
 import keyForItem from '../../ember-internals/key-for-item';
 
@@ -32,7 +33,8 @@ export default class Radar {
     {
       bufferSize,
       containerSelector,
-      estimateHeight,
+      estimateSize,
+      orientation,
       initialRenderCount,
       items,
       key,
@@ -48,9 +50,10 @@ export default class Radar {
     // Public API
     this.bufferSize = bufferSize;
     this.containerSelector = containerSelector;
-    this.estimateHeight = estimateHeight;
+    this.estimateSize = estimateSize;
     this.initialRenderCount = initialRenderCount;
     this.items = items;
+    this.orientation = orientation;
     this.key = key;
     this.renderAll = renderAll;
     this.renderFromLast = renderFromLast;
@@ -65,18 +68,30 @@ export default class Radar {
     this._itemContainer = null;
     this._scrollContainer = null;
     this._prependOffset = 0;
-    this._calculatedEstimateHeight = 0;
+    this._calculatedEstimateSize = 0;
     this._collectionOffset = 0;
-    this._calculatedScrollContainerHeight = 0;
+    this._calculatedScrollContainerSize = 0;
     this._transformScale = 1;
 
     // Event handler
-    this._scrollHandler = ({ top }) => {
-      // debounce scheduling updates by checking to make sure we've moved a minimum amount
-      if (this._didEarthquake(Math.abs(this._scrollTop - top))) {
-        this.scheduleUpdate();
-      }
-    };
+    if( this.orientation === 'horizontal' )
+    {
+      this._scrollHandler = ({ left }) => {
+        // debounce scheduling updates by checking to make sure we've moved a minimum amount
+        if (this._didEarthquake(Math.abs(this._scrollPos - left))) {
+          this.scheduleUpdate();
+        }
+      };
+    }
+    else
+    {
+      this._scrollHandler = ({ top }) => {
+        // debounce scheduling updates by checking to make sure we've moved a minimum amount
+        if (this._didEarthquake(Math.abs(this._scrollPos - top))) {
+          this.scheduleUpdate();
+        }
+      };
+    }
 
     this._resizeHandler = this.scheduleUpdate.bind(this);
 
@@ -88,7 +103,7 @@ export default class Radar {
     this._didUpdateItems = false;
 
     // Cache state
-    this._scrollTop = 0;
+    this._scrollPos = 0;
 
     // Setting these values to infinity starts us in a guaranteed good state for the radar,
     // so it knows that it needs to run certain measurements, etc.
@@ -107,8 +122,8 @@ export default class Radar {
     this._prependComponentPool = [];
 
     // Boundaries
-    this._occludedContentBefore = new OccludedContent(occlusionTagName);
-    this._occludedContentAfter = new OccludedContent(occlusionTagName);
+    this._occludedContentBefore = new OccludedContent(occlusionTagName, this.orientation);
+    this._occludedContentAfter = new OccludedContent(occlusionTagName, this.orientation);
 
     this._pageUpHandler = this.pageUp.bind(this);
     this._occludedContentBefore.addEventListener('click', this._pageUpHandler);
@@ -183,24 +198,24 @@ export default class Radar {
     if (startingIndex !== 0) {
       const {
         renderFromLast,
-        _calculatedEstimateHeight,
+        _calculatedEstimateSize,
         _collectionOffset,
-        _calculatedScrollContainerHeight
+        _calculatedScrollContainerSize
       } = this;
 
-      let startingScrollTop = startingIndex * _calculatedEstimateHeight;
+      let startingScrollPos = startingIndex * _calculatedEstimateSize;
 
       if (renderFromLast) {
-        startingScrollTop -= (_calculatedScrollContainerHeight - _calculatedEstimateHeight);
+        startingScrollPos -= (_calculatedScrollContainerSize - _calculatedEstimateSize);
       }
 
       // initialize the scrollTop value, which will be applied to the
       // scrollContainer after the collection has been initialized
-      this._scrollTop = startingScrollTop + _collectionOffset;
+      this._scrollPos = startingScrollPos + _collectionOffset;
 
       this._prevFirstVisibleIndex = startingIndex;
     } else {
-      this._scrollTop = this._scrollContainer.scrollTop;
+      this._scrollPos = this.orientation === 'horizontal' ? this._scrollContainer.scrollLeft : this._scrollContainer.scrollTop;
     }
 
     this._started = true;
@@ -236,7 +251,7 @@ export default class Radar {
 
     this._nextUpdate = this.schedule('sync', () => {
       this._nextUpdate = null;
-      this._scrollTop = this._scrollContainer.scrollTop;
+      this._scrollPos = this.orientation === 'horizontal' ? this._scrollContainer.scrollLeft : this._scrollContainer.scrollTop;
 
       this.update();
     });
@@ -261,11 +276,13 @@ export default class Radar {
     const scrollDiff = this._calculateScrollDiff();
 
     if (scrollDiff !== 0) {
-      this._scrollContainer.scrollTop += scrollDiff;
+      this._scrollPos = this.orientation === 'horizontal' ? this._scrollContainer.scrollLeft : this._scrollContainer.scrollTop;
+
+      this._scrollContainer[`scroll${this.orientation === 'horizontal' ? 'Left' : 'Top'}`] += scrollDiff;
     }
 
     // Re-sync scrollTop, since Chrome may have intervened
-    this._scrollTop = this._scrollContainer.scrollTop;
+    this._scrollPos = this.orientation === 'horizontal' ? this._scrollContainer.scrollLeft : this._scrollContainer.scrollTop;
 
     // Unset prepend offset, we're done with any prepend changes at this point
     this._prependOffset = 0;
@@ -302,7 +319,7 @@ export default class Radar {
    * pre-render and actual item size post-render.
    */
   _calculateScrollDiff() {
-    return (this._prependOffset + this._scrollTop) - this._scrollContainer.scrollTop;
+    return (this._prependOffset + this._scrollPos) - this._scrollContainer[`scroll${this.orientation === 'horizontal' ? 'Left' : 'Top'}`];
   }
 
   _determineUpdateType() {
@@ -336,13 +353,13 @@ export default class Radar {
 
   _updateConstants() {
     const {
-      estimateHeight,
+      estimateSize,
       _occludedContentBefore,
       _itemContainer,
       _scrollContainer
     } = this;
 
-    assert('Must provide a `estimateHeight` value to vertical-collection', estimateHeight !== null);
+    assert(`Must provide a \`estimate${ this.orientation === 'horizontal' ? 'Width' : 'Height'}\` value to ${ this.orientation }-collection`, estimateSize !== null);
     assert('itemContainer must be set on Radar before scheduling an update', _itemContainer !== null);
     assert('scrollContainer must be set on Radar before scheduling an update', _scrollContainer !== null);
 
@@ -350,46 +367,46 @@ export default class Radar {
     // it's measured height via bounding client rect will reflect the height with any transformations
     // applied. We use this to find out the scale of the items so we can store measurements at the
     // correct heights.
-    const scrollContainerOffsetHeight = _scrollContainer.offsetHeight;
-    const { height: scrollContainerRenderedHeight } = _scrollContainer.getBoundingClientRect();
+    const scrollContainerOffsetSize = _scrollContainer[`offset${this.orientation === 'horizontal' ? 'Width' : 'Height'}`];
+    const scrollContainerRenderedSize = _scrollContainer.getBoundingClientRect()[this.orientation === 'horizontal' ? 'width' : 'height'];
 
     let transformScale;
 
     // transformScale represents the opposite of the scale, if any, applied to the collection. Check for equality
     // to guard against floating point errors, and check to make sure we're not dividing by zero (default to scale 1 if so)
-    if (scrollContainerOffsetHeight === scrollContainerRenderedHeight || scrollContainerRenderedHeight === 0) {
+    if (scrollContainerOffsetSize === scrollContainerRenderedSize || scrollContainerRenderedSize === 0) {
       transformScale = 1;
     } else {
-      transformScale = scrollContainerOffsetHeight / scrollContainerRenderedHeight;
+      transformScale = scrollContainerOffsetSize / scrollContainerRenderedSize;
     }
 
-    const { top: scrollContentTop } = getScaledClientRect(_occludedContentBefore, transformScale);
-    const { top: scrollContainerTop } = getScaledClientRect(_scrollContainer, transformScale);
+    const scrollContentPos = getScaledClientRect(_occludedContentBefore, transformScale)[this.orientation === 'horizontal' ? 'left' : 'top'];
+    const scrollContainerPos = getScaledClientRect(_scrollContainer, transformScale)[this.orientation === 'horizontal' ? 'left' : 'top'];
 
-    let scrollContainerMaxHeight = 0;
+    let scrollContainerMaxSize = 0;
 
     if (_scrollContainer instanceof Element) {
-      const maxHeightStyle = window.getComputedStyle(_scrollContainer).maxHeight;
+      const maxSizeStyle = window.getComputedStyle(_scrollContainer)[`max${this.orientation === 'horizontal' ? 'Width' : 'Height'}`];
 
-      if (maxHeightStyle !== 'none') {
-        scrollContainerMaxHeight = estimateElementHeight(_scrollContainer.parentElement, maxHeightStyle);
+      if (maxSizeStyle !== 'none') {
+        scrollContainerMaxSize = this.orientation === 'horizontal' ? estimateElementWidth(_scrollContainer.parentElement, maxSizeStyle) : estimateElementHeight(_scrollContainer.parentElement, maxSizeStyle);
       }
     }
 
-    const calculatedEstimateHeight = typeof estimateHeight === 'string'
-      ? estimateElementHeight(_itemContainer, estimateHeight)
-      : estimateHeight;
+    const calculatedEstimateSize = typeof estimateSize === 'string'
+      ? (this.orientation === 'horizontal' ? estimateElementWidth(_itemContainer, estimateSize) : estimateElementHeight(_itemContainer, estimateSize) )
+      : estimateSize;
 
-    assert(`calculatedEstimateHeight must be greater than 0, instead was "${calculatedEstimateHeight}" based on estimateHeight: ${estimateHeight}`, calculatedEstimateHeight > 0);
+    assert(`calculatedEstimate${ this.orientation === 'horizontal' ? 'Width' : 'Height'} must be greater than 0, instead was "${calculatedEstimateSize}" based on estimate${ this.orientation === 'horizontal' ? 'Width' : 'Height'}: ${estimateSize}`, calculatedEstimateSize > 0);
 
     this._transformScale = transformScale;
-    this._calculatedEstimateHeight = calculatedEstimateHeight;
-    this._calculatedScrollContainerHeight = roundTo(Math.max(scrollContainerOffsetHeight, scrollContainerMaxHeight));
+    this._calculatedEstimateSize = calculatedEstimateSize;
+    this._calculatedScrollContainerSize = roundTo(Math.max(scrollContainerOffsetSize, scrollContainerMaxSize));
 
     // The offset between the top of the collection and the top of the scroll container. Determined by finding
     // the distance from the collection is from the top of the scroll container's content (scrollTop + actual position)
     // and subtracting the scroll containers actual top.
-    this._collectionOffset = roundTo((_scrollContainer.scrollTop + scrollContentTop) - scrollContainerTop);
+    this._collectionOffset = roundTo(((this.orientation === 'horizontal' ? _scrollContainer.scrollLeft : _scrollContainer.scrollTop) + scrollContentPos) - scrollContainerPos);
   }
 
   /*
@@ -489,9 +506,9 @@ export default class Radar {
       let component;
 
       if (shouldRecycle === true) {
-        component = _componentPool.pop() || new VirtualComponent();
+        component = _componentPool.pop() || new VirtualComponent(null, null, this.orientation);
       } else {
-        component = new VirtualComponent();
+        component = new VirtualComponent(null, null, this.orientation);
       }
 
       const itemIndex = ++lastIndexInList;
@@ -507,9 +524,9 @@ export default class Radar {
       let component;
 
       if (shouldRecycle === true) {
-        component = _componentPool.pop() || new VirtualComponent();
+        component = _componentPool.pop() || new VirtualComponent(null, null, this.orientation);
       } else {
-        component = new VirtualComponent();
+        component = new VirtualComponent(null, null, this.orientation);
       }
 
       const itemIndex = --firstIndexInList;
@@ -543,10 +560,10 @@ export default class Radar {
     const afterItemsText = totalItemsAfter === 1 ? 'item' : 'items';
 
     // Set padding element heights.
-    _occludedContentBefore.style.height = `${Math.max(renderedTotalBefore, 0)}px`;
+    _occludedContentBefore.style[this.orientation === 'horizontal' ? 'width' : 'height'] = `${Math.max(renderedTotalBefore, 0)}px`;
     _occludedContentBefore.innerHTML = totalItemsBefore > 0 ? `And ${totalItemsBefore} ${beforeItemsText} before` : '';
 
-    _occludedContentAfter.style.height = `${Math.max(renderedTotalAfter, 0)}px`;
+    _occludedContentAfter.style[this.orientation === 'horizontal' ? 'width' : 'height'] = `${Math.max(renderedTotalAfter, 0)}px`;
     _occludedContentAfter.innerHTML = totalItemsAfter > 0 ? `And ${totalItemsAfter} ${afterItemsText} after` : '';
   }
 
@@ -648,7 +665,7 @@ export default class Radar {
 
     this._firstReached = false;
 
-    this._prependOffset = numPrepended * this._calculatedEstimateHeight;
+    this._prependOffset = numPrepended * this._calculatedEstimateSize;
   }
 
   append() {
@@ -676,7 +693,7 @@ export default class Radar {
       const newFirstItemIndex = Math.max(firstItemIndex - totalComponents + bufferSize, 0);
       const offset = this.getOffsetForIndex(newFirstItemIndex);
 
-      this._scrollContainer.scrollTop = offset + this._collectionOffset;
+      this._scrollContainer[`scroll${this.orientation === 'horizontal' ? 'Top' : 'Left'}`] = offset + this._collectionOffset;
       this.scheduleUpdate();
     }
   }
@@ -697,7 +714,7 @@ export default class Radar {
       const newFirstItemIndex = Math.min(lastItemIndex + bufferSize + 1, totalItems - totalComponents);
       const offset = this.getOffsetForIndex(newFirstItemIndex);
 
-      this._scrollContainer.scrollTop = offset + this._collectionOffset;
+      this._scrollContainer[`scroll${this.orientation === 'horizontal' ? 'Top' : 'Left'}`] = offset + this._collectionOffset;
       this.scheduleUpdate();
     }
   }
@@ -719,19 +736,19 @@ export default class Radar {
    * when prepending item elements. We seem to avoid this behavior by doing these things in a RAF
    * in this exact order.
    */
-  get visibleTop() {
-    return Math.max(this._scrollTop - this._collectionOffset + this._prependOffset, 0);
+  get visibleStart() {
+    return Math.max(this._scrollPos - this._collectionOffset + this._prependOffset, 0);
   }
 
   get visibleMiddle() {
-    return this.visibleTop + (this._calculatedScrollContainerHeight / 2);
+    return this.visibleStart + (this._calculatedScrollContainerSize / 2);
   }
 
-  get visibleBottom() {
+  get visibleEnd() {
     // There is a case where the container of this vertical collection could have height 0 at
     // initial render step but will be updated later. We want to return visibleBottom to be 0 rather
     // than -1.
-    return Math.max(this.visibleTop + this._calculatedScrollContainerHeight - 1, 0);
+    return Math.max(this.visibleStart + this._calculatedScrollContainerSize - 1, 0);
   }
 
   get totalItems() {

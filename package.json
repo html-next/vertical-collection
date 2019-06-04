@@ -1,6 +1,6 @@
 {
-  "name": "@html-next/vertical-collection",
-  "version": "1.0.0-beta.13",
+  "name": "@html-next/virtual-collection",
+  "version": "2.0.0-alpha.1",
   "description": "infinite-scroll, done right. done.",
   "keywords": [
     "occlusion",
@@ -36,9 +36,9 @@
     "doc": "doc",
     "test": "tests"
   },
-  "repository": "https://github.com/html-next/vertical-collection.git",
-  "homepage": "https://github.com/html-next/vertical-collection",
-  "bugs": "https://github.com/html-next/vertical-collection/issues",
+  "repository": "https://github.com/html-next/virtual-collection.git",
+  "homepage": "https://github.com/html-next/virtual-collection",
+  "bugs": "https://github.com/html-next/virtual-collection/issues",
   "scripts": {
     "build": "ember build",
     "lint:js": "eslint ./*.js addon addon-test-support app blueprints config lib server test-support tests",
