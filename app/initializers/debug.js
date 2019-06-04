@@ -1,6 +1,6 @@
-import '@html-next/vertical-collection/-debug';
+import '@html-next/virtual-collection/-debug';
 
 export default {
-  name: 'vertical-collection-debug',
+  name: 'virtual-collection-debug',
   initialize() {}
 };

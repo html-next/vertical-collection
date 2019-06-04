@@ -1,4 +1,6 @@
 import DebugMixin from './edge-visualization/debug-mixin';
-import Collection from '../components/vertical-collection/component';
+import VerticalCollection from '../components/vertical-collection/component';
+import HorizontalCollection from '../components/horizontal-collection/component';
 
-Collection.reopen(DebugMixin);
+VerticalCollection.reopen(DebugMixin);
+HorizontalCollection.reopen(DebugMixin);

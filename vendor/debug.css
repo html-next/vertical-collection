@@ -1,7 +1,7 @@
 /**!
-  Visualization Classes for debugging the vertical-collection
+  Visualization Classes for debugging the virtual-collection
   */
-.vertical-collection-visual-debugger {
+.virtual-collection-visual-debugger {
   height: 100%;
   position: fixed;
   z-index: 1000;
@@ -13,50 +13,84 @@
   background: rgba(50, 50, 50, 1);
   width: 125px;
 }
-
-.vertical-collection-visual-debugger .vc_visualization-container {
-  transform: scale(0.25);
-  left: 0;
-  position: relative;
+.virtual-collection-visual-debugger.horizontal {
+  width: 100%;
+  height: 125px;
 }
 
+.virtual-collection-visual-debugger:not(.horizontal) .vc_visualization-container {
+  transform: scale(0.25);
+  position: relative;
+}
+.virtual-collection-visual-debugger:not(.horizontal) .vc_visualization-container {
+  left: 0;
+}
+.virtual-collection-visual-debugger.horizontal .vc_visualization-container {
+  top: 0;
+}
 
-.vertical-collection-visual-debugger .vc_visualization-screen {
+.virtual-collection-visual-debugger .vc_visualization-screen {
   position: absolute;
   background: transparent;
   box-sizing: content-box;
+}
+.virtual-collection-visual-debugger:not(.horizontal) .vc_visualization-screen {
   border-top: 2px dashed yellow;
   border-bottom: 2px dashed yellow;
   width: 500px;
 }
-
-.vertical-collection-visual-debugger .vc_visualization-scroll-container {
+.virtual-collection-visual-debugger .vc_visualization-screen {
+  border-left: 2px dashed yellow;
+  border-right: 2px dashed yellow;
+  height: 500px;
+}
+.virtual-collection-visual-debugger .vc_visualization-scroll-container {
   position: absolute;
-  width: 500px;
   background: rgba(100, 230, 100, 0.65);
 }
-
-.vertical-collection-visual-debugger .vc_visualization-item-container {
-  position: absolute;
+.virtual-collection-visual-debugger:not(.horizontal) .vc_visualization-scroll-container {
   width: 500px;
+}
+.virtual-collection-visual-debugger.horizontal .vc_visualization-scroll-container {
+  height: 500px;
+}
+
+.virtual-collection-visual-debugger .vc_visualization-item-container {
+  position: absolute;
   background: rgba(255, 255, 255, .15);
 }
 
-.vertical-collection-visual-debugger .vc_visualization-virtual-component {
+.virtual-collection-visual-debugger:not(.horizontal) .vc_visualization-item-container {
+  width: 500px;
+}
+.virtual-collection-visual-debugger.horizontal .vc_visualization-item-container {
+  height: 500px;
+}
+
+.virtual-collection-visual-debugger .vc_visualization-virtual-component {
   box-sizing: border-box;
   background: rgba(230, 100, 230, 0.6);
   border: 1px dotted #bbb;
-  border-top: 0px;
   color: #fff;
   text-align: center;
   font-size: 2.5em;
+}
+.virtual-collection-visual-debugger:not(.horizontal) .vc_visualization-virtual-component {
+  border-top: 0px;
   width: 250px;
 }
-
-.vertical-collection-visual-debugger .vc_visualization-virtual-component:first-of-type {
-  border-top: 1px dotted #bbb;
+.virtual-collection-visual-debugger.horizontal .vc_visualization-virtual-component {
+  border-left: 0px;
+  height: 250px;
 }
 
-.vertical-collection-visual-debugger .vc_visualization-virtual-component.culled {
+.virtual-collection-visual-debugger:not(.horizontal) .vc_visualization-virtual-component:first-of-type {
+  border-top: 1px dotted #bbb;
+}
+.virtual-collection-visual-debugger.horizontal .vc_visualization-virtual-component:first-of-type {
+  border-left: 1px dotted #bbb;
+}
+
+.virtual-collection-visual-debugger .vc_visualization-virtual-component.culled {
   background: transparent;
 }

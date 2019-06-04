@@ -1,9 +1,17 @@
 /* global document */
 import { ViewportContainer } from '../../-private';
 
-function applyVerticalStyles(element, geography) {
-  element.style.height = `${geography.height}px`;
-  element.style.top = `${geography.top}px`;
+function applyVerticalStyles(element, geography, orientation) {
+  if( orientation === 'horizontal' )
+    {
+      element.style.width = `${geography.width}px`;
+      element.style.left = `${geography.left}px`;
+    }
+    else
+    {
+      element.style.height = `${geography.height}px`;
+      element.style.top = `${geography.top}px`;
+    }
 }
 
 export default class Visualization {
@@ -13,7 +21,7 @@ export default class Visualization {
     this.cache = [];
 
     this.wrapper = document.createElement('div');
-    this.wrapper.className = 'vertical-collection-visual-debugger';
+    this.wrapper.className = `virtual-collection-visual-debugger${this.get('orientation') === 'horizontal' ? ' horizontal' : ''}`;
 
     this.container = document.createElement('div');
     this.container.className = 'vc_visualization-container';
@@ -41,7 +49,7 @@ export default class Visualization {
 
   styleViewport() {
     const { _scrollContainer } = this.radar;
-    this.container.style.height = `${_scrollContainer.getBoundingClientRect().height}px`;
+    this.container.style[this.get( 'orientation' ) === 'horizontal' ? 'width' : 'height'] = `${_scrollContainer.getBoundingClientRect()[this.get( 'orientation' ) === 'horizontal' ? 'width' : 'height']}px`;
 
     applyVerticalStyles(this.scrollContainer, _scrollContainer.getBoundingClientRect());
     applyVerticalStyles(this.screen, ViewportContainer.getBoundingClientRect());
@@ -72,11 +80,11 @@ export default class Visualization {
       totalBefore,
       totalAfter,
       skipList,
-      _calculatedEstimateHeight
+      _calculatedEstimateSize
     } = this.radar;
 
     const isDynamic = !!skipList;
-    const itemHeights = isDynamic && skipList.values;
+    const itemSizes = isDynamic && skipList.values;
 
     const firstVisualizedIndex = Math.max(firstItemIndex - 10, 0);
     const lastVisualizedIndex = Math.min(lastItemIndex + 10, totalItems - 1);
@@ -98,9 +106,9 @@ export default class Visualization {
     for (let itemIndex = firstVisualizedIndex, i = 0; itemIndex <= lastVisualizedIndex; itemIndex++, i++) {
       const element = sats[i];
 
-      const itemHeight = isDynamic ? itemHeights[itemIndex] : _calculatedEstimateHeight;
+      const itemSize = isDynamic ? itemSizes[itemIndex] : _calculatedEstimateSize;
 
-      element.style.height = `${itemHeight}px`;
+      element.style[this.get( 'orientation' ) === 'horizontal' ? 'width' : 'height'] = `${itemSize}px`;
       element.setAttribute('index', String(itemIndex));
       element.innerText = String(itemIndex);
 
@@ -115,8 +123,8 @@ export default class Visualization {
       }
     }
 
-    this.itemContainer.style.paddingTop = `${totalBefore}px`;
-    this.itemContainer.style.paddingBottom = `${totalAfter}px`;
+    this.itemContainer.style[this.get( 'orientation' ) === 'horizontal' ? 'paddingLeft' : 'paddingTop'] = `${totalBefore}px`;
+    this.itemContainer.style[this.get( 'orientation' ) === 'horizontal' ? 'paddingRight' : 'paddingBottom'] = `${totalAfter}px`;
   }
 
   destroy() {

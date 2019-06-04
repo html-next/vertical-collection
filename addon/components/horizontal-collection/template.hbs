@@ -1,0 +1,13 @@
+{{#each virtualComponents key="id" as |virtualComponent index| ~}}
+  {{~unbound virtualComponent.upperBound~}}
+  {{~#if virtualComponent.isOccludedContent ~}}
+    {{{unbound virtualComponent.element}}}
+  {{~else~}}
+    {{~yield virtualComponent.content virtualComponent.index ~}}
+  {{~/if~}}
+  {{~unbound virtualComponent.lowerBound~}}
+{{~/each}}
+
+{{#if shouldYieldToInverse}}
+  {{yield to="inverse"}}
+{{/if}}
