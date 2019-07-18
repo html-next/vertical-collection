@@ -218,7 +218,7 @@ const VerticalCollection = Component.extend({
     for (let indx = 0; indx < totalItems.length; indx++) {
       offsetHeight = offsetHeight + totalItems[indx];
       if (index === indx) {
-        return offsetHeight;
+        return offsetHeight - _radar.visibleMiddle;
       }
     }
   },
@@ -236,14 +236,6 @@ const VerticalCollection = Component.extend({
     }
   },
 
-  /* List of methods to be exposed to public should be added here */
-  publicAPI() {
-    return {
-      offsetForIndex: this.offsetForIndex.bind(this),
-      checkIfIndexIsInViewport: this.checkIfIndexIsInViewport.bind(this)
-    }
-  },
-
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
     this.schedule('sync', () => {
@@ -254,6 +246,10 @@ const VerticalCollection = Component.extend({
   willDestroy() {
     this.token.cancel();
     this._radar.destroy();
+    let registerAPI = this.get('registerAPI');
+    if (registerAPI) {
+      registerAPI(null);
+    }
     clearTimeout(this._nextSendActions);
   },
 
@@ -349,7 +345,12 @@ const VerticalCollection = Component.extend({
 
     let registerAPI = get(this, 'registerAPI');
     if (registerAPI) {
-      registerAPI(this.publicAPI());
+      /* List of methods to be exposed to public should be added here */
+      let publicAPI = {
+        offsetForIndex: this.offsetForIndex.bind(this),
+        checkIfIndexIsInViewport: this.checkIfIndexIsInViewport.bind(this)
+      };
+      registerAPI(publicAPI);
     }
   }
 });
