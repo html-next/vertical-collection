@@ -213,14 +213,14 @@ const VerticalCollection = Component.extend({
   */
   offsetForIndex(index) {
     const { _radar } = this;
-    let offsetHeight = 0;
-    let totalItems = _radar.skipList.values;
-    for (let indx = 0; indx < totalItems.length; indx++) {
-      offsetHeight = offsetHeight + totalItems[indx];
-      if (index === indx) {
-        return offsetHeight - _radar.visibleMiddle;
-      }
-    }
+    let scrollTop = _radar.getOffsetForIndex(index);
+    _radar._scrollTop = scrollTop;
+    _radar.update();
+    return new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        resolve(_radar.getOffsetForIndex(index));
+      });
+    });
   },
 
   /* Public API Methods 
