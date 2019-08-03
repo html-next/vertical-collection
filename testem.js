@@ -15,7 +15,8 @@ module.exports = {
         '--headless',
         '--disable-gpu',
         '--disable-dev-shm-usage',
-        '--disable-software-rasterizer',
+        // This has to stay commented out or the tests will not run locally
+        // '--disable-software-rasterizer',
         '--mute-audio',
         '--remote-debugging-port=0',
         '--window-size=1440,900'
