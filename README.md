@@ -41,10 +41,10 @@ ember install @html-next/vertical-collection
     renderAll=false
     renderFromLast=false
     idForFirstItem=idForFirstItem
-    firstReached=firstReached
-    lastReached=lastReached
-    firstVisibleChanged=firstVisibleChanged
-    lastVisibleChanged=lastVisibleChanged
+    firstReached=(action firstReached)
+    lastReached=(action lastReached)
+    firstVisibleChanged=(action firstVisibleChanged)
+    lastVisibleChanged=(action lastVisibleChanged)
      as |item i|}}
     <li>
       {{item.number}} {{i}}

@@ -7,8 +7,8 @@
         {{#vertical-collection
           model.numbers
           estimateHeight=270
-          firstReached="loadAbove"
-          lastReached="loadBelow"
+          firstReached=(action "loadAbove")
+          lastReached=(action "loadBelow")
           bufferSize=0 as |item index|
         }}
           {{number-slide isDynamic=true item=item index=index}}

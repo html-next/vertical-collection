@@ -9,8 +9,8 @@
           estimateHeight=90
           staticHeight=true
           bufferSize=5
-          firstReached="loadAbove"
-          lastReached="loadBelow" as |item index|
+          firstReached=(action "loadAbove")
+          lastReached=(action "loadBelow") as |item index|
         }}
           {{number-slide item=item index=index}}
         {{/vertical-collection}}
