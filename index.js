@@ -28,7 +28,7 @@ function isProductionEnv() {
 }
 
 module.exports = {
-  name: '@html-next/vertical-collection',
+  name: require('./package').name,
 
   init() {
     this._super.init && this._super.init.apply(this, arguments);
