@@ -21,7 +21,7 @@ export function testScenarios(description, scenarios, template, testFn, preRende
         this.set(key, value);
       }
 
-      this.render(template);
+      await this.render(template);
 
       if (preRenderTestFn) {
         await preRenderTestFn.call(this, assert);
