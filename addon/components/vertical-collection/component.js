@@ -1,4 +1,3 @@
-/* global Array, Math */
 import { empty, readOnly } from '@ember/object/computed';
 
 import Component from '@ember/component';
