@@ -17,13 +17,13 @@ module.exports = function() {
             dependencies: {
               ember: '~1.12.0',
               'ember-cli-shims': 'ember-cli/ember-cli-shims#0.0.3',
-              'ember-data': '~1.13.0',
+              'ember-data': '~1.13.0'
             },
             resolutions: {
               ember: '~1.12.0',
               'ember-cli-shims': '0.0.3',
-              'ember-data': '~1.13.0',
-            },
+              'ember-data': '~1.13.0'
+            }
           },
           npm: {
             devDependencies: {
@@ -31,8 +31,8 @@ module.exports = function() {
               'ember-cli-fastboot': null,
               'ember-data': '~1.13.0',
               'ember-source': null
-            },
-          },
+            }
+          }
         },
         {
           name: 'ember-1.13',
@@ -90,6 +90,7 @@ module.exports = function() {
           },
           npm: {
             devDependencies: {
+              'ember-cli-shims': '^1.2.0',
               'ember-data': '~2.8.0',
               'ember-source': null
             }
@@ -110,7 +111,7 @@ module.exports = function() {
         {
           name: 'ember-lts-2.16',
           env: {
-            EMBER_OPTIONAL_FEATURES: JSON.stringify({ 'jquery-integration': true }),
+            EMBER_OPTIONAL_FEATURES: JSON.stringify({ 'jquery-integration': true })
           },
           npm: {
             devDependencies: {
