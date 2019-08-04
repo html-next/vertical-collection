@@ -26,8 +26,6 @@ import keyForItem from '../../ember-internals/key-for-item';
 
 import document from '../../utils/document-shim';
 
-import { SUPPORTS_CLOSURE_ACTIONS } from 'ember-compatibility-helpers';
-
 export default class Radar {
   constructor(
     parentToken,
@@ -61,19 +59,7 @@ export default class Radar {
 
     // defaults to a no-op intentionally, actions will only be sent if they
     // are passed into the component
-    this.sendAction = (name, index) => {
-      // this.sendAction will be deprecated in ember 4.0
-      if (SUPPORTS_CLOSURE_ACTIONS) {
-        const _action = get(this, name);
-        if (typeof _action == 'function') {
-          _action(index);
-        } else if (typeof _action === 'string') {
-          this.sendAction(name, index);
-        }
-      } else {
-        this.sendAction(name, index);
-      }
-    };
+    this.sendAction = () => {};
 
     // Calculated constants
     this._itemContainer = null;
