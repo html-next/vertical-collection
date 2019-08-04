@@ -1,24 +1,7 @@
 'use strict';
 
-const StripClassCallCheckPlugin = require('babel6-plugin-strip-class-callcheck');
 const Funnel = require('broccoli-funnel');
-const Rollup = require('broccoli-rollup');
-const merge = require('broccoli-merge-trees');
 const VersionChecker = require('ember-cli-version-checker');
-
-const path = require('path');
-
-const BlockScopingTransform = (function() {
-  let plugin = require('babel-plugin-transform-es2015-block-scoping');
-
-  // adding `baseDir` ensures that broccoli-babel-transpiler does not
-  // issue a warning and opt out of caching
-  let pluginPath = require.resolve('babel-plugin-transform-es2015-block-scoping/package');
-  let pluginBaseDir = path.dirname(pluginPath);
-  plugin.baseDir = () => pluginBaseDir;
-
-  return plugin;
-})();
 
 function isProductionEnv() {
   const isProd = /production/.test(process.env.EMBER_ENV);
@@ -36,101 +19,6 @@ module.exports = {
     this.options = this.options || {};
   },
 
-  getOutputDirForVersion() {
-    let VersionChecker = require('ember-cli-version-checker');
-    let checker = new VersionChecker(this);
-    let emberCli = checker.for('ember-cli', 'npm');
-
-    let requiresModulesDir = emberCli.satisfies('< 3.0.0');
-
-    return requiresModulesDir ? 'modules' : '';
-  },
-
-  treeForAddon(tree) {
-    let babel = this.addons.find((addon) => addon.name === 'ember-cli-babel');
-    let withPrivate = new Funnel(tree, { include: ['-private/**'] });
-    let withoutPrivate = new Funnel(tree, {
-      exclude: [
-        '**/**.hbs',
-        '-private',
-        isProductionEnv() ? '-debug' : false
-      ].filter(Boolean),
-
-      destDir: '@html-next/vertical-collection'
-    });
-
-    let privateTree = babel.transpileTree(withPrivate, {
-      babel: this.options.babel,
-      'ember-cli-babel': {
-        compileModules: false
-      }
-    });
-
-    const templateTree = new Funnel(tree, {
-      include: ['**/**.hbs']
-    });
-
-    // use the default options
-    const addonTemplateTree = this._super(templateTree);
-    let publicTree = babel.transpileTree(withoutPrivate);
-
-    privateTree = new Rollup(privateTree, {
-      rollup: {
-        input: '-private/index.js',
-        output: [
-          {
-            file: '@html-next/vertical-collection/-private.js',
-            format: 'amd',
-            amd: {
-              id: '@html-next/vertical-collection/-private'
-            }
-          }
-        ],
-        external: ['ember', 'ember-raf-scheduler']
-      }
-    });
-
-    let destDir = this.getOutputDirForVersion();
-    publicTree = new Funnel(publicTree, { destDir });
-    privateTree = new Funnel(privateTree, { destDir });
-
-    return merge([
-      addonTemplateTree,
-      publicTree,
-      privateTree
-    ]);
-  },
-
-  _hasSetupBabelOptions: false,
-  buildBabelOptions(originalOptions) {
-    const plugins = originalOptions.plugins || [];
-
-    const opts = {
-      loose: true,
-      plugins,
-      postTransformPlugins: [StripClassCallCheckPlugin],
-      exclude: [
-        'transform-es2015-block-scoping',
-        'transform-es2015-typeof-symbol'
-      ]
-    };
-
-    opts.plugins.push(
-      [BlockScopingTransform, { 'throwIfClosureRequired': true }]
-    );
-
-    return opts;
-  },
-  _setupBabelOptions() {
-    if (this._hasSetupBabelOptions) {
-      return;
-    }
-
-    this.options.babel = this.buildBabelOptions(this.options.babel);
-
-    this._hasSetupBabelOptions = true;
-  },
-
   included(app) {
     this._super.included.apply(this, arguments);
     this.checker = new VersionChecker(app);
@@ -145,7 +33,6 @@ module.exports = {
     }
 
     this._env = app.env;
-    this._setupBabelOptions(app.env);
 
     if (!/production/.test(app.env) && !/test/.test(app.env)) {
       findImporter(this).import('vendor/debug.css');
