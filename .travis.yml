@@ -72,6 +72,9 @@ install:
 
 before_script:
   - greenkeeper-lockfile-update
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
 
 script:
   - node_modules/.bin/ember try:one $EMBER_TRY_SCENARIO
