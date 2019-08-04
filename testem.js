@@ -14,7 +14,7 @@ module.exports = {
         process.env.CI ? '--no-sandbox' : null,
         '--headless',
         // '--disable-gpu',
-        // '--disable-dev-shm-usage',
+        '--disable-dev-shm-usage',
         // This has to stay commented out or the tests will not run locally
         // '--disable-software-rasterizer',
         '--mute-audio',
