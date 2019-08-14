@@ -6,20 +6,6 @@ const Rollup = require('broccoli-rollup');
 const merge = require('broccoli-merge-trees');
 const VersionChecker = require('ember-cli-version-checker');
 
-const path = require('path');
-
-const BlockScopingTransform = (function() {
-  let plugin = require('babel-plugin-transform-es2015-block-scoping');
-
-  // adding `baseDir` ensures that broccoli-babel-transpiler does not
-  // issue a warning and opt out of caching
-  let pluginPath = require.resolve('babel-plugin-transform-es2015-block-scoping/package');
-  let pluginBaseDir = path.dirname(pluginPath);
-  plugin.baseDir = () => pluginBaseDir;
-
-  return plugin;
-})();
-
 function isProductionEnv() {
   const isProd = /production/.test(process.env.EMBER_ENV);
   const isTest = process.env.EMBER_CLI_TEST_COMMAND;
@@ -108,16 +94,8 @@ module.exports = {
     const opts = {
       loose: true,
       plugins,
-      postTransformPlugins: [StripClassCallCheckPlugin],
-      exclude: [
-        'transform-es2015-block-scoping',
-        'transform-es2015-typeof-symbol'
-      ]
+      postTransformPlugins: [StripClassCallCheckPlugin]
     };
-
-    opts.plugins.push(
-      [BlockScopingTransform, { 'throwIfClosureRequired': true }]
-    );
 
     return opts;
   },
