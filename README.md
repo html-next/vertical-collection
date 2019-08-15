@@ -106,31 +106,7 @@ For updated documentation and demos see [http://html-next.github.io/vertical-col
 - Open an Issue for discussion first if you're unsure a feature/fix is wanted.
 - Branch off of `master` (default branch)
 - Use descriptive branch names (e.g. `<type>/<short-description>`)
-- Use [Angular Style Commits](https://github.com/angular/angular.js/blob/v1.4.8/CONTRIBUTING.md#commit)
 - PR against `master` (default branch).
-
-### Commits
-
-Angular Style commit messages have the full form:
-
-```
-<type>(<scope>): <title>
-
-<body>
-
-<footer>
-```
-
-But the abbreviated form (below) is acceptable and often preferred.
-
-```
-<type>(<scope>): <title>
-```
-
-Examples:
-
-- chore(deps): bump deps in package.json and bower.json
-- docs(component): document the `fast-action` component
 
 ### Testing
 
