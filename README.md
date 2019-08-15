@@ -1,5 +1,4 @@
-vertical-collection
-=================
+# vertical-collection
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/html-next/vertical-collection.svg)](https://greenkeeper.io/)
 
@@ -15,13 +14,12 @@ component for performant lists and `svelte renders` to match a core belief:
 #### TL;DR svelte render: the fewer things you need to render, the faster your renders will be.
 
 Your web page is a universe, your viewport is the scene. Much like you wouldn't expect a video game to render
-out-of-scene content, your application should smartly cull the content it doesn't need to care about.  Trimming
+out-of-scene content, your application should smartly cull the content it doesn't need to care about. Trimming
 excess content lets the browser perform both initial renders and re-renders at far higher frame-rates, as the only
 content it needs to focus on for layout is the content the user can see.
 
 `vertical-collection` augments your existing app, it doesn't ask you to rewrite layouts or logic in order to use it.
 It will try its best to allow you to keep the conventions, structures, and layouts you want.
-
 
 ## Install
 
@@ -59,8 +57,15 @@ ember install @html-next/vertical-collection
 `lastReached`- Triggered when scroll reaches the last element in the collection
 
 `firstVisibleChanged` - Triggered when the first element in the viewport changes
- 
+
 `lastVisibleChanged` - Triggered when the last element in the viewport changes
+
+## Support Matrix
+
+| `vertical-collection` version | Supported Ember versions |
+| ----------------------------- | ------------------------ |
+| `^v1.0.0`                     | `v1.12.0 - v3.8.0`       |
+| `^v2.0.0`                     | `v3.8.0+`                |
 
 ## Support, Questions, Collaboration
 
@@ -74,10 +79,10 @@ Infinite scroll that remains performant even for very long lists is easily achie
 with the [`vertical-collection`](http://html-next.github.io/vertical-collection/#/settings).
 It works via a scrollable div or scrollable body.
 
- - [bi-directional scrollable div](http://html-next.github.io/vertical-collection/#/examples/infinite-scroll)
- - [scrollable body](http://html-next.github.io/vertical-collection/#/examples/scrollable-body)
- - [dynamic content sizes](http://html-next.github.io/vertical-collection/#/examples/flexible-layout)
- - [as a table](http://html-next.github.io/vertical-collection/#/examples/dbmon)
+- [bi-directional scrollable div](http://html-next.github.io/vertical-collection/#/examples/infinite-scroll)
+- [scrollable body](http://html-next.github.io/vertical-collection/#/examples/scrollable-body)
+- [dynamic content sizes](http://html-next.github.io/vertical-collection/#/examples/flexible-layout)
+- [as a table](http://html-next.github.io/vertical-collection/#/examples/dbmon)
 
 ### Svelte Everything
 
@@ -92,42 +97,16 @@ If it can be trimmer, smoke-and-mirrors likes to trim it.
 [![devDependency Status](https://david-dm.org/html-next/vertical-collection/dev-status.svg)](https://david-dm.org/html-next/vertical-collection#info=devDependencies)
 [![Coverage Status](https://coveralls.io/repos/html-next/vertical-collection/badge.svg?branch=master&service=github)](https://coveralls.io/github/html-next/vertical-collection?branch=master)
 
-
 ## Documentation
 
 For updated documentation and demos see [http://html-next.github.io/vertical-collection/](http://html-next.github.io/vertical-collection/)
 
 ## Contributing
 
- - Open an Issue for discussion first if you're unsure a feature/fix is wanted.
- - Branch off of `master` (default branch)
- - Use descriptive branch names (e.g. `<type>/<short-description>`)
- - Use [Angular Style Commits](https://github.com/angular/angular.js/blob/v1.4.8/CONTRIBUTING.md#commit)
- - PR against `master` (default branch).
-
-### Commits
-
-Angular Style commit messages have the full form:
-
- ```
- <type>(<scope>): <title>
-
- <body>
-
- <footer>
- ```
-
- But the abbreviated form (below) is acceptable and often preferred.
-
- ```
- <type>(<scope>): <title>
- ```
-
- Examples:
-
- - chore(deps): bump deps in package.json and bower.json
- - docs(component): document the `fast-action` component
-
+- Open an Issue for discussion first if you're unsure a feature/fix is wanted.
+- Branch off of `master` (default branch)
+- Use descriptive branch names (e.g. `<type>/<short-description>`)
+- PR against `master` (default branch).
 
 ### Testing
 
