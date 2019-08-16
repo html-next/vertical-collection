@@ -113,3 +113,8 @@ For updated documentation and demos see [http://html-next.github.io/vertical-col
 Make sure you register the test waiter from [ember-raf-scheduler](https://github.com/html-next/ember-raf-scheduler). So `ember-test-helpers`'s `wait` is aware of the scheduled updates.
 
 An example can be found [here](https://github.com/html-next/vertical-collection/blob/master/tests/test-helper.js#L2)
+
+License
+------------------------------------------------------------------------------
+
+This project is licensed under the [MIT License](LICENSE.md).
