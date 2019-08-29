@@ -3,18 +3,21 @@
   "version": "1.0.0",
   "description": "infinite-scroll, done right. done.",
   "keywords": [
-    "occlusion",
+    "cloaking",
+    "collection",
+    "ember-addon",
+    "grid",
     "infinite",
     "infinite-scroll",
-    "collection",
-    "grid",
     "list-view",
-    "recycling",
-    "cloaking",
-    "performance",
     "lists",
-    "ember-addon"
+    "occlusion",
+    "performance",
+    "recycling"
   ],
+  "homepage": "https://github.com/html-next/vertical-collection",
+  "bugs": "https://github.com/html-next/vertical-collection/issues",
+  "repository": "https://github.com/html-next/vertical-collection.git",
   "license": "MIT",
   "author": {
     "name": "Chris Thoburn (@runspired)",
@@ -36,9 +39,6 @@
     "doc": "doc",
     "test": "tests"
   },
-  "repository": "https://github.com/html-next/vertical-collection.git",
-  "homepage": "https://github.com/html-next/vertical-collection",
-  "bugs": "https://github.com/html-next/vertical-collection/issues",
   "scripts": {
     "build": "ember build",
     "lint:hbs": "ember-template-lint .",
@@ -88,12 +88,30 @@
     "eslint-plugin-ember": "^6.7.1",
     "eslint-plugin-node": "^9.1.0",
     "loader.js": "^4.7.0",
-    "qunit-dom": "^0.9.0"
+    "qunit-dom": "^0.9.0",
+    "release-it": "^12.2.1",
+    "release-it-lerna-changelog": "^1.0.3"
   },
   "engines": {
     "node": "8.* || >= 10.*"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "ember-addon": {
     "configPath": "tests/dummy/config"
+  },
+  "release-it": {
+    "plugins": {
+      "release-it-lerna-changelog": {
+        "infile": "CHANGELOG.md"
+      }
+    },
+    "git": {
+      "tagName": "v${version}"
+    },
+    "github": {
+      "release": true
+    }
   }
 }
