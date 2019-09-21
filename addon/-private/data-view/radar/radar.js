@@ -234,6 +234,10 @@ export default class Radar {
       return;
     }
 
+    // If should recycle is false, it should reset the component.
+    // https://github.com/html-next/vertical-collection/issues/296
+    this._didReset = !this.shouldRecycle;
+
     this._nextUpdate = this.schedule('sync', () => {
       this._nextUpdate = null;
       this._scrollTop = this._scrollContainer.scrollTop;
