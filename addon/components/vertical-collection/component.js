@@ -305,14 +305,24 @@ const VerticalCollection = Component.extend({
 
     /* Public methods to Expose to parent 
       
-       Usage:
-       {{vertical-collection registerAPI=(action "registerAPI")}}
+      Usage:
+
+      Template:
+
+      {{vertical-collection registerAPI=(action "registerAPI")}}
+
+      Component:
+      
        export default Component.extend({
         actions: {
           registerAPI(api) {
               this.set('collectionAPI', api);
           }
-        } 
+        },
+        scrollToItem() {
+          let collectionAPI = this.get('collectionAPI');
+          collectionAPI.scrollToItem(index);
+        }
       });
         
       Need to pass this property in the vertical-collection template
