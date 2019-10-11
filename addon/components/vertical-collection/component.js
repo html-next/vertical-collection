@@ -200,6 +200,24 @@ const VerticalCollection = Component.extend({
     }
   },
 
+  /* Public API Methods 
+     @index => number
+     This will return offset height of the indexed item.
+  */
+  scrollToItem(index) {
+    const { _radar } = this;
+    // Getting the offset height from Radar
+    let scrollTop = _radar.getOffsetForIndex(index);
+    _radar._scrollContainer.scrollTop = scrollTop;
+    // To scroll exactly to specified index, we are changing the prevIndex values to specified index
+    _radar._prevFirstVisibleIndex = _radar._prevFirstItemIndex = index;
+    // Components will be rendered after schedule 'measure' inside 'update' method.
+    // In our case, we need to focus the element after component is rendered. So passing the promise.
+    return new Promise ((resolve, reject) => {
+      _radar.scheduleUpdate(false, resolve);
+    });
+  },
+
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
     this.schedule('sync', () => {
@@ -210,6 +228,10 @@ const VerticalCollection = Component.extend({
   willDestroy() {
     this.token.cancel();
     this._radar.destroy();
+    let registerAPI = this.get('registerAPI');
+    if (registerAPI) {
+      registerAPI(null);
+    }
     clearTimeout(this._nextSendActions);
   },
 
@@ -279,6 +301,33 @@ const VerticalCollection = Component.extend({
           this._scheduleSendAction(action, index);
         }
       };
+    }
+
+    /* Public methods to Expose to parent 
+      
+       Usage:
+       {{vertical-collection registerAPI=(action "registerAPI")}}
+       export default Component.extend({
+        actions: {
+          registerAPI(api) {
+              this.set('collectionAPI', api);
+          }
+        } 
+      });
+        
+      Need to pass this property in the vertical-collection template
+      Listen in the component actions and do your custom logic
+       This API will have below methods.
+        1. scrollToItem
+    */
+
+    let registerAPI = get(this, 'registerAPI');
+    if (registerAPI) {
+      /* List of methods to be exposed to public should be added here */
+      let publicAPI = {
+        scrollToItem: this.scrollToItem.bind(this)
+      };
+      registerAPI(publicAPI);
     }
   }
 });
