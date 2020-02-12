@@ -7,6 +7,7 @@ import {
 } from 'ember-native-dom-helpers';
 import wait from 'ember-test-helpers/wait';
 
+import { StaticRadar } from '@html-next/vertical-collection/-private';
 import getNumbers from 'dummy/lib/get-numbers';
 
 import {
@@ -353,3 +354,32 @@ testScenarios(
     assert.equal(scrollContainer.scrollTop, 500, 'scroll position remains the same');
   }
 );
+
+test('The collection renders with a RadarClass set', async function(assert) {
+  assert.expect(1);
+
+  class CustomRadarClass extends StaticRadar {}
+
+  this.setProperties({
+    items: getNumbers(0, 10),
+    customRadarClass: CustomRadarClass
+  });
+
+  this.render(hbs`
+    <div style="height: 100px;">
+      {{#vertical-collection items
+        estimateHeight=10
+        RadarClass=customRadarClass
+        as |item i|
+      }}
+        <vertical-item style="height: 10px">
+          {{item.number}} {{i}}
+        </vertical-item>
+      {{/vertical-collection}}
+    </div>
+  `);
+
+  await wait();
+
+  assert.equal(findAll('vertical-item').length, 10, 'correctly updates the number of items rendered on second pass');
+});
