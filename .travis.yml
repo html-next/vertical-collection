@@ -3,10 +3,9 @@ language: node_js
 node_js:
   # we recommend testing addons with the same minimum supported node version as Ember CLI
   # so that your addon works for all apps
-  - "8"
+  - "10"
 
-sudo: false
-dist: trusty
+dist: xenial
 
 addons:
   chrome: stable
@@ -22,34 +21,42 @@ env:
 branches:
   only:
     - master
+    - 2.0-beta
     # npm version tags
     - /^v\d+\.\d+\.\d+/
 
 jobs:
-  fail_fast: true
+  fast_finish: true
   allow_failures:
     - env: EMBER_TRY_SCENARIO=ember-canary
+    - env: EMBER_TRY_SCENARIO=ember-lts-2.4
+    - env: EMBER_TRY_SCENARIO=ember-lts-2.8
+    - env: EMBER_TRY_SCENARIO=ember-lts-2.12
+    - env: EMBER_TRY_SCENARIO=ember-lts-2.18
 
   include:
-    # runs linting and tests with current locked deps
-
+    # runs linting and tests with locked deps
     - stage: "Tests"
       name: "Tests"
-      install:
-        - travis_retry yarn install --non-interactive
       script:
-        - yarn lint:hbs
-        - yarn lint:js
-        - travis_retry yarn test
+        - yarn lint
+        - yarn test:ember
 
-    - name: "Floating Dependencies"
+    - stage: "Additional Tests"
+      name: "Floating Dependencies"
+      install:
+        - yarn install --no-lockfile --non-interactive
       script:
-        - travis_retry yarn test
+        - yarn test:ember
 
     # we recommend new addons test the current and previous LTS
     # as well as latest stable release (bonus points to beta/canary)
     - stage: "Additional Tests"
-      env: EMBER_TRY_SCENARIO=ember-lts-3.4
+      env: EMBER_TRY_SCENARIO=ember-lts-2.4
+    - env: EMBER_TRY_SCENARIO=ember-lts-2.8
+    - env: EMBER_TRY_SCENARIO=ember-lts-2.12
+    - env: EMBER_TRY_SCENARIO=ember-lts-2.18
+    - env: EMBER_TRY_SCENARIO=ember-lts-3.4
     - env: EMBER_TRY_SCENARIO=ember-lts-3.8
     - env: EMBER_TRY_SCENARIO=ember-release
     - env: EMBER_TRY_SCENARIO=ember-beta
@@ -62,13 +69,14 @@ before_install:
   - yarn global add greenkeeper-lockfile@1
 
 install:
-  - travis_retry yarn install --no-lockfile --non-interactive
+  - yarn install --non-interactive
 
 before_script:
   - greenkeeper-lockfile-update
 
 script:
-  - travis_retry node_modules/.bin/ember try:one $EMBER_TRY_SCENARIO
+  - yarn lint
+  - node_modules/.bin/ember try:one $EMBER_TRY_SCENARIO
 
 after_script:
   - greenkeeper-lockfile-upload
