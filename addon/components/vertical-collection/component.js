@@ -2,7 +2,7 @@ import { empty, readOnly } from '@ember/object/computed';
 
 import Component from '@ember/component';
 import { get, computed } from '@ember/object';
-import { run } from '@ember/runloop';
+import { cancel, once } from '@ember/runloop';
 import layout from './template';
 
 import { scheduler, Token } from 'ember-raf-scheduler';
@@ -173,31 +173,28 @@ const VerticalCollection = Component.extend({
 
   _scheduleSendAction(action, index) {
     this._scheduledActions.push([action, index]);
+    this._nextSendActions = once(this, '_sendActions');
+  },
 
-    if (this._nextSendActions === null) {
-      this._nextSendActions = setTimeout(() => {
-        this._nextSendActions = null;
+  _sendActions() {
+    this._nextSendActions = null;
 
-        run(() => {
-          const items = this.get('items');
-          const keyPath = this.get('key');
+    const items = this.get('items');
+    const keyPath = this.get('key');
 
-          this._scheduledActions.forEach(([action, index]) => {
-            const item = objectAt(items, index);
-            const key = keyForItem(item, keyPath, index);
+    this._scheduledActions.forEach(([action, index]) => {
+      const item = objectAt(items, index);
+      const key = keyForItem(item, keyPath, index);
 
-            // this.sendAction will be deprecated in ember 4.0
-            const _action = get(this, action);
-            if (typeof _action == 'function') {
-              _action(item, index, key);
-            } else if (typeof _action === 'string') {
-              this.sendAction(action, item, index, key);
-            }
-          });
-          this._scheduledActions.length = 0;
-        });
-      });
-    }
+      // this.sendAction will be deprecated in ember 4.0
+      const _action = get(this, action);
+      if (typeof _action == 'function') {
+        _action(item, index, key);
+      } else if (typeof _action === 'string') {
+        this.sendAction(action, item, index, key);
+      }
+    });
+    this._scheduledActions.length = 0;
   },
 
   // –––––––––––––– Setup/Teardown
@@ -210,7 +207,9 @@ const VerticalCollection = Component.extend({
   willDestroy() {
     this.token.cancel();
     this._radar.destroy();
-    clearTimeout(this._nextSendActions);
+    if (this._nextSendActions !== null) {
+      cancel(this._nextSendActions);
+    }
   },
 
   init() {
