@@ -7,22 +7,6 @@ module.exports = async function() {
     useYarn: true,
     scenarios: [
       {
-        name: 'ember-lts-2.4',
-        bower: {
-          dependencies: {
-            ember: 'components/ember#lts-2-4',
-          },
-          resolutions: {
-            ember: 'lts-2-4',
-          },
-        },
-        npm: {
-          devDependencies: {
-            'ember-source': null
-          },
-        },
-      },
-      {
         name: 'ember-lts-2.8',
         bower: {
           dependencies: {
@@ -67,6 +51,30 @@ module.exports = async function() {
         npm: {
           devDependencies: {
             'ember-source': '~3.8.0'
+          }
+        }
+      },
+      {
+        name: 'ember-lts-3.12',
+        npm: {
+          devDependencies: {
+            'ember-source': '~3.12.0'
+          }
+        }
+      },
+      {
+        name: 'ember-lts-3.16',
+        npm: {
+          devDependencies: {
+            'ember-source': '~3.16.0'
+          }
+        }
+      },
+      {
+        name: 'ember-lts-3.20',
+        npm: {
+          devDependencies: {
+            'ember-source': '~3.20.0'
           }
         }
       },
