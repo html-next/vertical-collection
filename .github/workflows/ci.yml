@@ -41,10 +41,9 @@ jobs:
       matrix:
         ember-version:
           [
-            # The test suite only support Ember 3.x
-            # ember-lts-2.8,
-            # ember-lts-2.12,
-            # ember-lts-2.18,
+            ember-lts-2.8,
+            ember-lts-2.12,
+            ember-lts-2.18,
             ember-lts-3.4,
             ember-lts-3.8,
             ember-lts-3.12,
