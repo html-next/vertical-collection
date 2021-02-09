@@ -4158,7 +4158,7 @@ ember-compatibility-helpers@^1.1.1:
     ember-cli-version-checker "^5.1.1"
     semver "^5.4.1"
 
-ember-data@~3.11.4:
+ember-data@3.11.5:
   version "3.11.5"
   resolved "https://registry.yarnpkg.com/ember-data/-/ember-data-3.11.5.tgz#8bb0c6b265d1c5345364f29b6aa5b450b9770e2d"
   integrity sha512-zvsFEigXTQtXyHerqluEz+vPTWSMV4Hld6da/oiC+yGEGfbLk8s2K5UwJ77PVzSWoe2NNtW6sNPLI4n0vHIQoQ==
