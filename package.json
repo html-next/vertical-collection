@@ -60,6 +60,7 @@
     "ember-raf-scheduler": "0.2.0"
   },
   "devDependencies": {
+    "@ember/jquery": "^1.1.0",
     "@ember/optional-features": "^0.7.0",
     "bootstrap": "~3.3.5",
     "broccoli-asset-rev": "^3.0.0",
