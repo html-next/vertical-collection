@@ -18,14 +18,22 @@ module.exports = async function() {
         },
         npm: {
           devDependencies: {
-            'ember-source': null
+            'ember-source': null,
+            'ember-factory-for-polyfill': '1.3.1'
           },
+          dependencies: {
+            'ember-compatibility-helpers': '1.2.1'
+          },
+          resolutions: {
+            'ember-compatibility-helpers': '1.2.1'
+          }
         },
       },
       {
         name: 'ember-lts-2.12',
         npm: {
           devDependencies: {
+            '@ember/jquery': '^1.1.0',
             'ember-source': '~2.12.0'
           },
         },
@@ -34,6 +42,7 @@ module.exports = async function() {
         name: 'ember-lts-2.18',
         npm: {
           devDependencies: {
+            '@ember/jquery': '^1.1.0',
             'ember-source': '~2.18.0'
           },
         },
