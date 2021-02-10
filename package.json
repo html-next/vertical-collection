@@ -97,5 +97,8 @@
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
+  },
+  "resolutions": {
+    "ember-compatibility-helpers": "1.2.1"
   }
 }
