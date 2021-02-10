@@ -18,8 +18,15 @@ module.exports = async function() {
         },
         npm: {
           devDependencies: {
-            'ember-source': null
+            'ember-source': null,
+            'ember-factory-for-polyfill': '1.3.1'
           },
+          dependencies: {
+            'ember-compatibility-helpers': '1.2.1'
+          },
+          resolutions: {
+            'ember-compatibility-helpers': '1.2.1'
+          }
         },
       },
       {
