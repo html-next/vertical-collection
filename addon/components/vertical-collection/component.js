@@ -181,6 +181,7 @@ const VerticalCollection = Component.extend({
         run(() => {
           const items = this.get('items');
           const keyPath = this.get('key');
+          if (!items || items.length === 0) { return; }
 
           this._scheduledActions.forEach(([action, index]) => {
             const item = objectAt(items, index);
