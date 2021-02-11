@@ -149,6 +149,15 @@ const VerticalCollection = Component.extend({
    */
   occlusionTagName: 'occluded-content',
 
+  RadarClass: computed({
+    get() {
+      return this._RadarClass || this.staticHeight ? StaticRadar : DynamicRadar;
+    },
+    set(_, value) {
+      return this._RadarClass = value;
+    }
+  }),
+
   isEmpty: empty('items'),
   shouldYieldToInverse: readOnly('isEmpty'),
 
@@ -217,7 +226,7 @@ const VerticalCollection = Component.extend({
     this._super();
 
     this.token = new Token();
-    const RadarClass = this.staticHeight ? StaticRadar : DynamicRadar;
+    const RadarClass = this.get('RadarClass');
 
     const items = this.get('items') || [];
 
