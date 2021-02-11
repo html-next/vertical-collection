@@ -13,7 +13,7 @@
 table .occluded-content,
 tbody .occluded-content,
 thead .occluded-content,
-tfoot .occluded-content, {
+tfoot .occluded-content {
   display: table-row;
   position: relative;
   width: 100%;
