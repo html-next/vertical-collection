@@ -105,6 +105,7 @@ export default class Radar {
 
     this._componentPool = [];
     this._prependComponentPool = [];
+    this._appendComponentPool = []; // https://github.com/html-next/vertical-collection/issues/296
 
     // Boundaries
     this._occludedContentBefore = new OccludedContent(occlusionTagName);
@@ -554,6 +555,8 @@ export default class Radar {
     const {
       virtualComponents,
       _occludedContentAfter,
+      _appendComponentPool,
+      shouldRecycle,
       _itemContainer
     } = this;
 
@@ -564,6 +567,29 @@ export default class Radar {
     } else {
       virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
       component.rendered = true;
+
+      // shouldRecycle=false breaks UI when scrolling the elements fast. 
+      // Reference https://github.com/html-next/vertical-collection/issues/296
+      // Components that are both new and appended still need to be rendered at the end because Glimmer.
+      // We have to move them _after_ they render, so we schedule that if they exist
+      if(!shouldRecycle) {
+        _appendComponentPool.unshift(component);
+
+        if (this._nextLayout === null) {
+          this._nextLayout = this.schedule('layout', () => {
+            this._nextLayout = null;
+
+            while (_appendComponentPool.length > 0) {
+              const component = _appendComponentPool.pop();
+
+              // Changes with each inserted component
+              const relativeNode = _occludedContentAfter.realUpperBound;
+
+              insertRangeBefore(this._itemContainer, relativeNode, component.realUpperBound, component.realLowerBound);
+            }
+          });
+        }
+      }
     }
   }
 
