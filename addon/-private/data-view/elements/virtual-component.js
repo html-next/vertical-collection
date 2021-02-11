@@ -1,6 +1,7 @@
 import { set } from '@ember/object';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
+import { IS_GLIMMER_2, gte as emberVersionGTE } from 'ember-compatibility-helpers';
 
 import document from '../../utils/document-shim';
 
@@ -21,17 +22,23 @@ export default class VirtualComponent {
 
     this.rendered = false;
 
+    if (!emberVersionGTE('3.0.0')) {
+      // In older versions of Ember, binding anything on an object in the template
+      // adds observers which creates __ember_meta__
+      this.__ember_meta__ = null; // eslint-disable-line camelcase
+    }
+
     if (DEBUG) {
       Object.preventExtensions(this);
     }
   }
 
   get realUpperBound() {
-    return this.upperBound;
+    return IS_GLIMMER_2 ? this.upperBound : this.upperBound.previousSibling;
   }
 
   get realLowerBound() {
-    return this.lowerBound;
+    return IS_GLIMMER_2 ? this.lowerBound : this.lowerBound.nextSibling;
   }
 
   getBoundingClientRect() {

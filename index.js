@@ -139,10 +139,6 @@ module.exports = {
       exclude.push('initializers/debug.js');
     }
 
-    if (this.checker.forEmber().isAbove('1.13.0')) {
-      exclude.push('initializers/vertical-collection-legacy-compat.js');
-    }
-
     return new Funnel(tree, { exclude });
   }
 };
