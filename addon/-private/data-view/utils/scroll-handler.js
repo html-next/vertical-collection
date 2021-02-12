@@ -36,26 +36,22 @@ export class ScrollHandler {
         handlers
       };
       // TODO add explicit test
-      if (SUPPORTS_PASSIVE) {
+      if (this.isUsingPassive) {
         cache.passiveHandler = function() {
           ScrollHandler.triggerElementHandlers(element, cache);
         };
+
+        element.addEventListener('scroll', cache.passiveHandler, { capture: true, passive: true });
+      // TODO add explicit test
       } else {
         cache.passiveHandler = UNDEFINED_VALUE;
+
+        this.poll();
       }
     } else {
       cache = this.handlers[index];
       handlers = cache.handlers;
       handlers.push(handler);
-    }
-
-    // TODO add explicit test
-    if (this.isUsingPassive && handlers.length === 1) {
-      element.addEventListener('scroll', cache.passiveHandler, { capture: true, passive: true });
-
-    // TODO add explicit test
-    } else if (!this.isPolling) {
-      this.poll();
     }
   }
 
