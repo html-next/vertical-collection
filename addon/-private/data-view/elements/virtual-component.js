@@ -1,8 +1,8 @@
 import { set } from '@ember/object';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
-
 import { IS_GLIMMER_2, gte as emberVersionGTE } from 'ember-compatibility-helpers';
+
 import document from '../../utils/document-shim';
 
 let VC_IDENTITY = 0;
@@ -23,11 +23,13 @@ export default class VirtualComponent {
 
     this.rendered = false;
 
-    // In older versions of Ember/IE, binding anything on an object in the template
-    // adds observers which creates __ember_meta__
-    this.__ember_meta__ = null; // eslint-disable-line camelcase
+    if (!emberVersionGTE('3.0.0')) {
+      // In older versions of Ember, binding anything on an object in the template
+      // adds observers which creates __ember_meta__
+      this.__ember_meta__ = null; // eslint-disable-line camelcase
+    }
 
-    if (DEBUG && emberVersionGTE('1.13.0')) {
+    if (DEBUG) {
       Object.preventExtensions(this);
     }
   }

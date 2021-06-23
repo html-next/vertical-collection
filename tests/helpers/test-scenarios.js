@@ -11,7 +11,7 @@ const {
   PromiseArray
 } = DS;
 
-export function testScenarios(description, scenarios, template, testFn, preRenderTestFn) {
+export function testScenarios(description, scenarios, template, testFn, preRenderTestFn, setValuesBeforeRender) {
   for (const scenarioName in scenarios) {
     const scenario = scenarios[scenarioName];
 
@@ -21,11 +21,16 @@ export function testScenarios(description, scenarios, template, testFn, preRende
         this.set(key, value);
       }
 
-      this.render(template);
+      // An extra function to set values before render. Mostly to set the closure actions
+      if (setValuesBeforeRender) {
+        await setValuesBeforeRender.call(this, assert);
+      }
+
+      await this.render(template);
 
       if (preRenderTestFn) {
         await preRenderTestFn.call(this, assert);
-      } else {
+      } else if(testFn) {
         await wait();
         await testFn.call(this, assert);
       }
