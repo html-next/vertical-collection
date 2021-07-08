@@ -213,7 +213,7 @@ const VerticalCollection = Component.extend({
     _radar._prevFirstVisibleIndex = _radar._prevFirstItemIndex = index;
     // Components will be rendered after schedule 'measure' inside 'update' method.
     // In our case, we need to focus the element after component is rendered. So passing the promise.
-    return new Promise ((resolve, reject) => {
+    return new Promise ((resolve) => {
       _radar.scheduleUpdate(false, resolve);
     });
   },

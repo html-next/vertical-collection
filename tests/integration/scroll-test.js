@@ -466,6 +466,40 @@ testScenarios(
 );
 
 testScenarios(
+  'Can scroll to particular item if we pass registerApi in the component and use scrollToItem method in the component',
+  dynamicSimpleScenarioFor(getNumbers(0, 50)),
+  hbs`
+    <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
+      <div style="height: 400px; width: 100px;" class="scroll-child scrollable">
+        {{#vertical-collection items
+          estimateHeight=20
+          bufferSize=0
+          registerAPI=(action registerAPI)
+          as |item i|}}
+          <div class="vertical-item" style="height:40px;">
+            {{item.number}} {{i}}
+          </div>
+        {{/vertical-collection}}
+      </div>
+    </div>
+  `,
+  
+  async function(assert) {
+    assert.expect(1);
+    this.collection.scrollToItem(20);
+    await wait();
+    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '20 20', 'the first item in the list should be the scroll to item');
+  },
+  false,
+  function() {
+    let registerAPI = function(collection) {
+      this.set('collection', collection);
+    };
+    this.set('registerAPI', registerAPI);
+  }
+);
+
+testScenarios(
   'Can scroll to last item when actual item sizes are significantly larger than default item size.',
   dynamicSimpleScenarioFor(getNumbers(0, 50), { itemHeight: 100 }),
   standardTemplate,
