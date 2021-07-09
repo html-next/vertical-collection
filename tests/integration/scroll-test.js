@@ -483,11 +483,10 @@ testScenarios(
       </div>
     </div>
   `,
-  
+
   async function(assert) {
     assert.expect(1);
-    this.collection.scrollToItem(20);
-    await wait();
+    await this.collection.scrollToItem(20);
     assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '20 20', 'the first item in the list should be the scroll to item');
   },
   false,
