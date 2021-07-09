@@ -32,14 +32,14 @@ export default class DynamicRadar extends Radar {
     this.skipList = null;
   }
 
-  scheduleUpdate(didUpdateItems) {
+  scheduleUpdate(didUpdateItems, promiseResolve) {
     // Cancel incremental render check, since we'll be remeasuring anyways
     if (this._nextIncrementalRender !== null) {
       this._nextIncrementalRender.cancel();
       this._nextIncrementalRender = null;
     }
 
-    super.scheduleUpdate(didUpdateItems);
+    super.scheduleUpdate(didUpdateItems, promiseResolve);
   }
 
   afterUpdate() {
