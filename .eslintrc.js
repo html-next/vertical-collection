@@ -25,10 +25,16 @@ module.exports = {
     Float32Array: true
   },
   rules: {
+    'no-setter-return': 'off',
     'quotes': ['error', 'single', { 'allowTemplateLiterals': true, 'avoidEscape': true }],
+
     'ember/closure-actions': 'off',
+    'ember/no-get': 'off',
     'ember/no-jquery': 'error',
-    'ember/no-new-mixins': 'off'
+    'ember/no-new-mixins': 'off',
+    'ember/no-test-module-for': 'off',
+    'ember/require-computed-property-dependencies': 'off',
+    'ember/use-ember-data-rfc-395-imports': 'off'
   },
   overrides: [
     // node files
