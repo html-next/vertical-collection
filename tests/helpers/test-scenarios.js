@@ -3,6 +3,7 @@ import ArrayProxy from '@ember/array/proxy';
 import { Promise } from 'rsvp';
 import Ember from 'ember';
 import { test } from 'ember-qunit';
+// eslint-disable-next-line ember/use-ember-data-rfc-395-imports
 import DS from 'ember-data';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';

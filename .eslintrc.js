@@ -33,8 +33,7 @@ module.exports = {
     'ember/no-jquery': 'error',
     'ember/no-new-mixins': 'off',
     'ember/no-test-module-for': 'off',
-    'ember/require-computed-property-dependencies': 'off',
-    'ember/use-ember-data-rfc-395-imports': 'off'
+    'ember/require-computed-property-dependencies': 'off'
   },
   overrides: [
     // node files
