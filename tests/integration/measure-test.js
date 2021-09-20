@@ -1,5 +1,5 @@
 import { moduleForComponent } from 'ember-qunit';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 
 import {
   find,

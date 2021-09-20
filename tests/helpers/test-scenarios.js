@@ -5,7 +5,7 @@ import Ember from 'ember';
 import { test } from 'ember-qunit';
 // eslint-disable-next-line ember/use-ember-data-rfc-395-imports
 import DS from 'ember-data';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import wait from 'ember-test-helpers/wait';
 
 const {
