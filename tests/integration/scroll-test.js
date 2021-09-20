@@ -14,7 +14,7 @@ import {
 } from 'dummy/tests/helpers/test-scenarios';
 
 import { prepend, append } from 'dummy/tests/helpers/array';
-import { paddingBefore } from 'dummy/tests/helpers/measurement';
+// import { paddingBefore } from 'dummy/tests/helpers/measurement';
 
 moduleForComponent('vertical-collection', 'Integration | Scroll Tests', {
   integration: true
