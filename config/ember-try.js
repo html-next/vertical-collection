@@ -7,24 +7,6 @@ module.exports = async function() {
     useYarn: true,
     scenarios: [
       {
-        name: 'ember-lts-2.12',
-        npm: {
-          devDependencies: {
-            '@ember/jquery': '^1.1.0',
-            'ember-source': '~2.12.0'
-          },
-        },
-      },
-      {
-        name: 'ember-lts-2.18',
-        npm: {
-          devDependencies: {
-            '@ember/jquery': '^1.1.0',
-            'ember-source': '~2.18.0'
-          },
-        },
-      },
-      {
         name: 'ember-lts-3.4',
         npm: {
           devDependencies: {
