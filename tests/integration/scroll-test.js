@@ -423,7 +423,7 @@ testScenarios(
   `,
 
   async function(assert) {
-    assert.expect(2);
+    assert.expect(1);
 
     // Occlude one item
     await scrollTo('.scrollable', 0, 38);
