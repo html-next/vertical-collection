@@ -3,7 +3,6 @@ import Component from '@ember/component';
 import { computed } from '@ember/object';
 
 export default Component.extend({
-
   tagName: 'tr',
 
   queries: alias('db.queries'),
@@ -41,7 +40,6 @@ export default Component.extend({
 
     return countClassName;
   })
-
 });
 
 function elapsedClass(elapsed) {
