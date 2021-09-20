@@ -1,8 +1,12 @@
 module.exports = {
   root: true,
+  parser: 'babel-eslint',
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: 'module'
+    sourceType: 'module',
+    ecmaFeatures: {
+      legacyDecorators: true
+    }
   },
   plugins: [
     'ember'
@@ -20,8 +24,9 @@ module.exports = {
   },
   rules: {
     'quotes': ['error', 'single', { 'allowTemplateLiterals': true, 'avoidEscape': true }],
-
-    'ember/closure-actions': 'off'
+    'ember/closure-actions': 'off',
+    'ember/no-jquery': 'error',
+    'ember/no-new-mixins': 'off'
   },
   overrides: [
     // node files
