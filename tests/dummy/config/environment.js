@@ -1,7 +1,7 @@
 'use strict';
 let pkg = require('../../../package.json');
 
-module.exports = function(environment) {
+module.exports = function (environment) {
   let DEBUG = false;
 
   let ENV = {
@@ -12,7 +12,7 @@ module.exports = function(environment) {
     locationType: 'auto',
     EmberENV: {
       FEATURES: {},
-      EXTEND_PROTOTYPES: false
+      EXTEND_PROTOTYPES: false,
     },
 
     VERSION: pkg.version,
@@ -20,7 +20,7 @@ module.exports = function(environment) {
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created
-    }
+    },
   };
 
   // debugging

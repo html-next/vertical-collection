@@ -1,21 +1,22 @@
 import { moduleForComponent } from 'ember-qunit';
 import { hbs } from 'ember-cli-htmlbars';
-import {
-  findAll
-} from 'ember-native-dom-helpers';
+import { findAll } from 'ember-native-dom-helpers';
 
 import getNumbers from 'dummy/lib/get-numbers';
 
 import {
   testScenarios,
-
   simpleScenariosFor,
-  scenariosFor
+  scenariosFor,
 } from 'dummy/tests/helpers/test-scenarios';
 
-moduleForComponent('vertical-collection', 'Integration | Measurement Unit Tests', {
-  integration: true
-});
+moduleForComponent(
+  'vertical-collection',
+  'Integration | Measurement Unit Tests',
+  {
+    integration: true,
+  }
+);
 
 testScenarios(
   'The collection renders correctly when em estimateHeight is used',
@@ -36,7 +37,7 @@ testScenarios(
     </div>
   `,
 
-  async function(assert) {
+  async function (assert) {
     assert.equal(findAll('vertical-item').length, 5);
   }
 );
@@ -60,7 +61,7 @@ testScenarios(
     </div>
   `,
 
-  async function(assert) {
+  async function (assert) {
     assert.equal(findAll('vertical-item').length, 5);
   }
 );
@@ -84,7 +85,7 @@ testScenarios(
     </div>
   `,
 
-  async function(assert) {
+  async function (assert) {
     assert.equal(findAll('vertical-item').length, 2);
   }
 );
@@ -108,7 +109,7 @@ testScenarios(
     </div>
   `,
 
-  async function(assert) {
+  async function (assert) {
     assert.equal(findAll('vertical-item').length, 5);
   }
 );
@@ -135,7 +136,7 @@ testScenarios(
     </div>
   `,
 
-  function(assert) {
+  function (assert) {
     assert.equal(findAll('vertical-item').length, 10);
   }
 );
@@ -164,7 +165,7 @@ testScenarios(
     </div>
   `,
 
-  function(assert) {
+  function (assert) {
     assert.equal(findAll('vertical-item').length, 10);
   }
 );
@@ -193,7 +194,7 @@ testScenarios(
     </div>
   `,
 
-  function(assert) {
+  function (assert) {
     assert.equal(findAll('vertical-item').length, 10);
   }
 );
@@ -220,7 +221,7 @@ testScenarios(
     </div>
   `,
 
-  function(assert) {
+  function (assert) {
     assert.equal(findAll('vertical-item').length, 10);
   }
 );

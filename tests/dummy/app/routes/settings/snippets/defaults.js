@@ -1,7 +1,6 @@
-export default
-/* !- BEGIN-SNIPPET vertical-collection-defaults-example */
+export default /* !- BEGIN-SNIPPET vertical-collection-defaults-example */
 {
-// basics
+  // basics
   tagName: '',
 
   // required
@@ -72,7 +71,6 @@ export default
   // will traverse its ancestry to find the first element
   // that matches the selector. Defaults to '*', which
   // will match the immediate parent of the collection.
-  containerSelector: '*'
-}
+  containerSelector: '*',
+};
 /* !- END-SNIPPET vertical-collection-defaults-example */
-;

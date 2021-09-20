@@ -39,21 +39,21 @@ module.exports = {
       exclude: [
         '**/**.hbs',
         '-private',
-        isProductionEnv() ? '-debug' : false
+        isProductionEnv() ? '-debug' : false,
       ].filter(Boolean),
 
-      destDir: '@html-next/vertical-collection'
+      destDir: '@html-next/vertical-collection',
     });
 
     let privateTree = babel.transpileTree(withPrivate, {
       babel: this.options.babel,
       'ember-cli-babel': {
-        compileModules: false
-      }
+        compileModules: false,
+      },
     });
 
     const templateTree = new Funnel(tree, {
-      include: ['**/**.hbs']
+      include: ['**/**.hbs'],
     });
 
     // use the default options
@@ -68,23 +68,19 @@ module.exports = {
             file: '@html-next/vertical-collection/-private.js',
             format: 'amd',
             amd: {
-              id: '@html-next/vertical-collection/-private'
-            }
-          }
+              id: '@html-next/vertical-collection/-private',
+            },
+          },
         ],
-        external: ['ember', 'ember-raf-scheduler']
-      }
+        external: ['ember', 'ember-raf-scheduler'],
+      },
     });
 
     let destDir = this.getOutputDirForVersion();
     publicTree = new Funnel(publicTree, { destDir });
     privateTree = new Funnel(privateTree, { destDir });
 
-    return merge([
-      addonTemplateTree,
-      publicTree,
-      privateTree
-    ]);
+    return merge([addonTemplateTree, publicTree, privateTree]);
   },
 
   _hasSetupBabelOptions: false,
@@ -94,7 +90,7 @@ module.exports = {
     const opts = {
       loose: true,
       plugins,
-      postTransformPlugins: [StripClassCallCheckPlugin]
+      postTransformPlugins: [StripClassCallCheckPlugin],
     };
 
     return opts;
@@ -118,8 +114,10 @@ module.exports = {
     }
 
     if (typeof app.import !== 'function') {
-      throw new Error('vertical-collection is being used within another addon or engine '
-        + 'and is having trouble registering itself to the parent application.');
+      throw new Error(
+        'vertical-collection is being used within another addon or engine ' +
+          'and is having trouble registering itself to the parent application.'
+      );
     }
 
     this._env = app.env;
@@ -140,7 +138,7 @@ module.exports = {
     }
 
     return new Funnel(tree, { exclude });
-  }
+  },
 };
 
 function findImporter(addon) {

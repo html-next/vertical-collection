@@ -32,8 +32,8 @@ export default class App extends Application {
     dragleave: null,
     dragover: null,
     drop: null,
-    dragend: null
-  }
+    dragend: null,
+  };
 }
 
 loadInitializers(App, config.modulePrefix);

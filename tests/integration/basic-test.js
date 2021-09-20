@@ -1,26 +1,21 @@
 import { moduleForComponent, test } from 'ember-qunit';
 import { hbs } from 'ember-cli-htmlbars';
-import {
-  find,
-  findAll,
-  scrollTo
-} from 'ember-native-dom-helpers';
+import { find, findAll, scrollTo } from 'ember-native-dom-helpers';
 import wait from 'ember-test-helpers/wait';
 
 import getNumbers from 'dummy/lib/get-numbers';
 
 import {
   testScenarios,
-
   dynamicSimpleScenarioFor,
   staticSimpleScenarioFor,
   simpleScenariosFor,
   scenariosFor,
-  standardTemplate
+  standardTemplate,
 } from 'dummy/tests/helpers/test-scenarios';
 
 moduleForComponent('vertical-collection', 'Integration | Basic Tests', {
-  integration: true
+  integration: true,
 });
 
 testScenarios(
@@ -28,7 +23,7 @@ testScenarios(
   scenariosFor(getNumbers(0, 1)),
   standardTemplate,
 
-  async function(assert) {
+  async function (assert) {
     assert.expect(1);
     assert.equal(findAll('.vertical-item').length, 1);
   }
@@ -39,7 +34,7 @@ testScenarios(
   scenariosFor([]),
   standardTemplate,
 
-  async function(assert) {
+  async function (assert) {
     assert.expect(1);
     assert.equal(findAll('.vertical-item').length, 0);
   }
@@ -50,7 +45,7 @@ testScenarios(
   scenariosFor([{ id: 1 }, { id: 2 }, { id: 3 }], { key: 'id' }),
   standardTemplate,
 
-  async function(assert) {
+  async function (assert) {
     assert.expect(1);
     await wait();
     const items = await findAll('.vertical-item');
@@ -63,7 +58,7 @@ testScenarios(
   scenariosFor(getNumbers(0, 10), { estimateHeight: 200, bufferSize: 1 }),
   standardTemplate,
 
-  async function(assert) {
+  async function (assert) {
     assert.expect(3);
 
     // Should render buffer on the bottom
@@ -103,7 +98,7 @@ testScenarios(
     </div>
   `,
 
-  async function(assert) {
+  async function (assert) {
     assert.expect(1);
     assert.equal(findAll('vertical-item').length, 5);
   }
@@ -131,14 +126,26 @@ testScenarios(
     </div>
   `,
 
-  async function(assert) {
+  async function (assert) {
     assert.expect(3);
 
     let occludedBoundaries = findAll('.occluded-content');
 
-    assert.equal(occludedBoundaries[0].getAttribute('style'), 'height: 0px;', 'Occluded height above is correct');
-    assert.equal(occludedBoundaries[1].getAttribute('style'), 'height: 100px;', 'Occluded height below is correct');
-    assert.equal(findAll('vertical-item').length, 5, 'Rendered correct number of items');
+    assert.equal(
+      occludedBoundaries[0].getAttribute('style'),
+      'height: 0px;',
+      'Occluded height above is correct'
+    );
+    assert.equal(
+      occludedBoundaries[1].getAttribute('style'),
+      'height: 100px;',
+      'Occluded height below is correct'
+    );
+    assert.equal(
+      findAll('vertical-item').length,
+      5,
+      'Rendered correct number of items'
+    );
   }
 );
 
@@ -163,14 +170,26 @@ testScenarios(
     </div>
   `,
 
-  async function(assert) {
+  async function (assert) {
     assert.expect(3);
 
     let occludedBoundaries = findAll('.occluded-content');
 
-    assert.equal(occludedBoundaries[0].getAttribute('style'), 'height: 0px;', 'Occluded height above is correct');
-    assert.equal(occludedBoundaries[1].getAttribute('style'), 'height: 100px;', 'Occluded height below is correct');
-    assert.equal(findAll('vertical-item').length, 5, 'Rendered correct number of items');
+    assert.equal(
+      occludedBoundaries[0].getAttribute('style'),
+      'height: 0px;',
+      'Occluded height above is correct'
+    );
+    assert.equal(
+      occludedBoundaries[1].getAttribute('style'),
+      'height: 100px;',
+      'Occluded height below is correct'
+    );
+    assert.equal(
+      findAll('vertical-item').length,
+      5,
+      'Rendered correct number of items'
+    );
   }
 );
 
@@ -197,12 +216,12 @@ testScenarios(
     </div>
   `,
 
-  async function(assert) {
+  async function (assert) {
     assert.ok(true, 'No errors were thrown in the process');
   }
 );
 
-test('The collection renders the initialRenderCount correctly', async function(assert) {
+test('The collection renders the initialRenderCount correctly', async function (assert) {
   assert.expect(5);
   this.set('items', getNumbers(0, 10));
 
@@ -220,17 +239,37 @@ test('The collection renders the initialRenderCount correctly', async function(a
     </div>
   `);
 
-  assert.equal(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
-  assert.equal(find('vertical-item').textContent.trim(), '0 0', 'correct item rendered');
+  assert.equal(
+    findAll('vertical-item').length,
+    1,
+    'correct number of items rendered on initial pass'
+  );
+  assert.equal(
+    find('vertical-item').textContent.trim(),
+    '0 0',
+    'correct item rendered'
+  );
 
   await wait();
 
-  assert.equal(findAll('vertical-item').length, 10, 'correctly updates the number of items rendered on second pass');
-  assert.equal(find('vertical-item:first-of-type').textContent.trim(), '0 0', 'correct first item rendered');
-  assert.equal(find('vertical-item:last-of-type').textContent.trim(), '9 9', 'correct last item rendered');
+  assert.equal(
+    findAll('vertical-item').length,
+    10,
+    'correctly updates the number of items rendered on second pass'
+  );
+  assert.equal(
+    find('vertical-item:first-of-type').textContent.trim(),
+    '0 0',
+    'correct first item rendered'
+  );
+  assert.equal(
+    find('vertical-item:last-of-type').textContent.trim(),
+    '9 9',
+    'correct last item rendered'
+  );
 });
 
-test('The collection renders the initialRenderCount correctly if idForFirstItem is set', async function(assert) {
+test('The collection renders the initialRenderCount correctly if idForFirstItem is set', async function (assert) {
   assert.expect(5);
   this.set('items', getNumbers(0, 100));
 
@@ -250,17 +289,37 @@ test('The collection renders the initialRenderCount correctly if idForFirstItem 
     </div>
   `);
 
-  assert.equal(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
-  assert.equal(find('vertical-item').textContent.trim(), '20 20', 'correct item rendered');
+  assert.equal(
+    findAll('vertical-item').length,
+    1,
+    'correct number of items rendered on initial pass'
+  );
+  assert.equal(
+    find('vertical-item').textContent.trim(),
+    '20 20',
+    'correct item rendered'
+  );
 
   await wait();
 
-  assert.equal(findAll('vertical-item').length, 12, 'correctly updates the number of items rendered on second pass');
-  assert.equal(find('vertical-item:first-of-type').textContent.trim(), '19 19', 'correct first item rendered');
-  assert.equal(find('vertical-item:last-of-type').textContent.trim(), '30 30', 'correct last item rendered');
+  assert.equal(
+    findAll('vertical-item').length,
+    12,
+    'correctly updates the number of items rendered on second pass'
+  );
+  assert.equal(
+    find('vertical-item:first-of-type').textContent.trim(),
+    '19 19',
+    'correct first item rendered'
+  );
+  assert.equal(
+    find('vertical-item:last-of-type').textContent.trim(),
+    '30 30',
+    'correct last item rendered'
+  );
 });
 
-test('The collection renders the initialRenderCount correctly if the count is more than the number of items', async function(assert) {
+test('The collection renders the initialRenderCount correctly if the count is more than the number of items', async function (assert) {
   assert.expect(4);
   this.set('items', getNumbers(0, 1));
 
@@ -279,14 +338,30 @@ test('The collection renders the initialRenderCount correctly if the count is mo
   `);
 
   requestAnimationFrame(() => {
-    assert.equal(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
-    assert.equal(find('vertical-item').textContent.trim(), '0 0', 'correct item rendered');
+    assert.equal(
+      findAll('vertical-item').length,
+      1,
+      'correct number of items rendered on initial pass'
+    );
+    assert.equal(
+      find('vertical-item').textContent.trim(),
+      '0 0',
+      'correct item rendered'
+    );
   });
 
   await wait();
 
-  assert.equal(findAll('vertical-item').length, 1, 'correctly updates the number of items rendered on second pass');
-  assert.equal(find('vertical-item').textContent.trim(), '0 0', 'correct first item rendered');
+  assert.equal(
+    findAll('vertical-item').length,
+    1,
+    'correctly updates the number of items rendered on second pass'
+  );
+  assert.equal(
+    find('vertical-item').textContent.trim(),
+    '0 0',
+    'correct first item rendered'
+  );
 });
 
 testScenarios(
@@ -310,14 +385,22 @@ testScenarios(
     </div>
   `,
 
-  async function(assert) {
+  async function (assert) {
     assert.expect(2);
 
-    assert.equal(findAll('vertical-item').length, 7, 'Rendered correct number of items');
+    assert.equal(
+      findAll('vertical-item').length,
+      7,
+      'Rendered correct number of items'
+    );
 
     await scrollTo('.scrollable', 0, 500);
 
-    assert.equal(findAll('vertical-item').length, 9, 'Rendered correct number of items');
+    assert.equal(
+      findAll('vertical-item').length,
+      9,
+      'Rendered correct number of items'
+    );
   }
 );
 
@@ -339,17 +422,25 @@ testScenarios(
     </div>
   `,
 
-  async function(assert) {
+  async function (assert) {
     let scrollContainer = find('.scrollable');
 
     await scrollTo('.scrollable', 0, 500);
 
-    assert.equal(scrollContainer.scrollTop, 500, 'scrolled to correct position');
+    assert.equal(
+      scrollContainer.scrollTop,
+      500,
+      'scrolled to correct position'
+    );
 
     this.set('renderCollection', true);
 
     await wait();
 
-    assert.equal(scrollContainer.scrollTop, 500, 'scroll position remains the same');
+    assert.equal(
+      scrollContainer.scrollTop,
+      500,
+      'scroll position remains the same'
+    );
   }
 );

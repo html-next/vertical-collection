@@ -1,9 +1,15 @@
-const VENDOR_MATCH_FNS = ['matches', 'webkitMatchesSelector', 'mozMatchesSelector', 'msMatchesSelector', 'oMatchesSelector'];
+const VENDOR_MATCH_FNS = [
+  'matches',
+  'webkitMatchesSelector',
+  'mozMatchesSelector',
+  'msMatchesSelector',
+  'oMatchesSelector',
+];
 let ELEMENT_MATCH_FN;
 
 function setElementMatchFn(el) {
   VENDOR_MATCH_FNS.forEach((fn) => {
-    if ((ELEMENT_MATCH_FN === undefined) && (typeof el[fn] === 'function')) {
+    if (ELEMENT_MATCH_FN === undefined && typeof el[fn] === 'function') {
       ELEMENT_MATCH_FN = fn;
     }
   });

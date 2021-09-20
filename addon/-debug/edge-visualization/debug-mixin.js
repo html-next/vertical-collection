@@ -6,7 +6,7 @@ import { ViewportContainer } from '../../-private';
 import {
   styleIsOneOf,
   hasStyleValue,
-  hasStyleWithNonZeroValue
+  hasStyleWithNonZeroValue,
 } from '../utils/validate-style';
 
 export default Mixin.create({
@@ -39,30 +39,74 @@ export default Mixin.create({
       styles = window.getComputedStyle(document.body);
     }
 
-    assert(`scrollContainer cannot be inline.`, styleIsOneOf(styles, 'display', ['block', 'inline-block', 'flex', 'inline-flex']));
-    assert(`scrollContainer must define position`, styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute']));
-    assert(`scrollContainer must define height or max-height`, hasStyleWithNonZeroValue(styles, 'height') || hasStyleWithNonZeroValue(styles, 'max-height'));
+    assert(
+      `scrollContainer cannot be inline.`,
+      styleIsOneOf(styles, 'display', [
+        'block',
+        'inline-block',
+        'flex',
+        'inline-flex',
+      ])
+    );
+    assert(
+      `scrollContainer must define position`,
+      styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute'])
+    );
+    assert(
+      `scrollContainer must define height or max-height`,
+      hasStyleWithNonZeroValue(styles, 'height') ||
+        hasStyleWithNonZeroValue(styles, 'max-height')
+    );
 
     // conditional perf check for non-body scrolling
     if (radar.scrollContainer !== ViewportContainer) {
-      assert(`scrollContainer must define overflow-y`, hasStyleValue(styles, 'overflow-y', 'scroll') || hasStyleValue(styles, 'overflow', 'scroll'));
+      assert(
+        `scrollContainer must define overflow-y`,
+        hasStyleValue(styles, 'overflow-y', 'scroll') ||
+          hasStyleValue(styles, 'overflow', 'scroll')
+      );
     }
 
     // check itemContainer
     styles = window.getComputedStyle(radar.itemContainer);
 
-    assert(`itemContainer cannot be inline.`, styleIsOneOf(styles, 'display', ['block', 'inline-block', 'flex', 'inline-flex']));
-    assert(`itemContainer must define position`, styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute']));
+    assert(
+      `itemContainer cannot be inline.`,
+      styleIsOneOf(styles, 'display', [
+        'block',
+        'inline-block',
+        'flex',
+        'inline-flex',
+      ])
+    );
+    assert(
+      `itemContainer must define position`,
+      styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute'])
+    );
 
     // check item defaults
-    assert(`You must supply at least one item to the collection to debug it's CSS.`, this.get('items.length'));
+    assert(
+      `You must supply at least one item to the collection to debug it's CSS.`,
+      this.get('items.length')
+    );
 
     let element = radar._itemContainer.firstElementChild;
 
     styles = window.getComputedStyle(element);
 
-    assert(`Item cannot be inline.`, styleIsOneOf(styles, 'display', ['block', 'inline-block', 'flex', 'inline-flex']));
-    assert(`Item must define position`, styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute']));
+    assert(
+      `Item cannot be inline.`,
+      styleIsOneOf(styles, 'display', [
+        'block',
+        'inline-block',
+        'flex',
+        'inline-flex',
+      ])
+    );
+    assert(
+      `Item must define position`,
+      styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute'])
+    );
   },
 
   updateVisualization() {
@@ -89,5 +133,5 @@ export default Mixin.create({
       this.__visualization.destroy();
       this.__visualization = null;
     }
-  }
+  },
 });

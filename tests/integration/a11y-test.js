@@ -1,9 +1,5 @@
 import { moduleForComponent } from 'ember-qunit';
-import {
-  find,
-  findAll,
-  scrollTo
-} from 'ember-native-dom-helpers';
+import { find, findAll, scrollTo } from 'ember-native-dom-helpers';
 import { click } from '@ember/test-helpers';
 import wait from 'ember-test-helpers/wait';
 
@@ -12,11 +8,11 @@ import getNumbers from 'dummy/lib/get-numbers';
 import {
   testScenarios,
   scenariosFor,
-  standardTemplate
+  standardTemplate,
 } from 'dummy/tests/helpers/test-scenarios';
 
 moduleForComponent('vertical-collection', 'Integration | A11y Tests', {
-  integration: true
+  integration: true,
 });
 
 testScenarios(
@@ -24,8 +20,12 @@ testScenarios(
   scenariosFor(getNumbers(0, 20), { renderAll: true }),
   standardTemplate,
 
-  async function(assert) {
-    assert.equal(findAll('.vertical-item').length, 20, 'correct number of items rendered');
+  async function (assert) {
+    assert.equal(
+      findAll('.vertical-item').length,
+      20,
+      'correct number of items rendered'
+    );
   }
 );
 
@@ -34,13 +34,21 @@ testScenarios(
   scenariosFor(getNumbers(0, 20)),
   standardTemplate,
 
-  async function(assert) {
-    assert.equal(findAll('.vertical-item').length, 10, 'correct number of items rendered before');
+  async function (assert) {
+    assert.equal(
+      findAll('.vertical-item').length,
+      10,
+      'correct number of items rendered before'
+    );
 
     this.set('renderAll', true);
     await wait(); // Wait for changes
 
-    assert.equal(findAll('.vertical-item').length, 20, 'correct number of items rendered before');
+    assert.equal(
+      findAll('.vertical-item').length,
+      20,
+      'correct number of items rendered before'
+    );
   }
 );
 
@@ -49,27 +57,59 @@ testScenarios(
   scenariosFor(getNumbers(0, 20)),
   standardTemplate,
 
-  async function(assert) {
+  async function (assert) {
     const occludedBefore = find('.occluded-content:first-of-type');
     const occludedAfter = find('.occluded-content:last-of-type');
 
-    assert.equal(occludedBefore.textContent.trim(), '', 'occluded before text correct when no items before');
-    assert.equal(occludedAfter.textContent.trim(), 'And 10 items after', 'occluded after text correct when some items after');
+    assert.equal(
+      occludedBefore.textContent.trim(),
+      '',
+      'occluded before text correct when no items before'
+    );
+    assert.equal(
+      occludedAfter.textContent.trim(),
+      'And 10 items after',
+      'occluded after text correct when some items after'
+    );
 
     await scrollTo('.scrollable', 0, 20);
 
-    assert.equal(occludedBefore.textContent.trim(), 'And 1 item before', 'occluded before text correct when one item before');
-    assert.equal(occludedAfter.textContent.trim(), 'And 9 items after', 'occluded after text correct when some items after');
+    assert.equal(
+      occludedBefore.textContent.trim(),
+      'And 1 item before',
+      'occluded before text correct when one item before'
+    );
+    assert.equal(
+      occludedAfter.textContent.trim(),
+      'And 9 items after',
+      'occluded after text correct when some items after'
+    );
 
     await scrollTo('.scrollable', 0, 180);
 
-    assert.equal(occludedBefore.textContent.trim(), 'And 9 items before', 'occluded before text correct when some items before');
-    assert.equal(occludedAfter.textContent.trim(), 'And 1 item after', 'occluded after text correct when one item after');
+    assert.equal(
+      occludedBefore.textContent.trim(),
+      'And 9 items before',
+      'occluded before text correct when some items before'
+    );
+    assert.equal(
+      occludedAfter.textContent.trim(),
+      'And 1 item after',
+      'occluded after text correct when one item after'
+    );
 
     await scrollTo('.scrollable', 0, 200);
 
-    assert.equal(occludedBefore.textContent.trim(), 'And 10 items before', 'occluded before text correct when some items before');
-    assert.equal(occludedAfter.textContent.trim(), '', 'occluded after text correct when no items after');
+    assert.equal(
+      occludedBefore.textContent.trim(),
+      'And 10 items before',
+      'occluded before text correct when some items before'
+    );
+    assert.equal(
+      occludedAfter.textContent.trim(),
+      '',
+      'occluded after text correct when no items after'
+    );
   }
 );
 
@@ -78,22 +118,45 @@ testScenarios(
   scenariosFor(getNumbers(0, 20)),
   standardTemplate,
 
-  async function(assert) {
+  async function (assert) {
     const occludedBefore = find('.occluded-content:first-of-type');
     const occludedAfter = find('.occluded-content:last-of-type');
 
-    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'correct first item rendered');
-    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 9', 'correct last item rendered');
+    assert.equal(
+      find('.vertical-item:first-of-type').textContent.trim(),
+      '0 0',
+      'correct first item rendered'
+    );
+    assert.equal(
+      find('.vertical-item:last-of-type').textContent.trim(),
+      '9 9',
+      'correct last item rendered'
+    );
 
     await click(occludedAfter);
 
-    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '10 10', 'correct first item rendered');
-    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '19 19', 'correct last item rendered');
+    assert.equal(
+      find('.vertical-item:first-of-type').textContent.trim(),
+      '10 10',
+      'correct first item rendered'
+    );
+    assert.equal(
+      find('.vertical-item:last-of-type').textContent.trim(),
+      '19 19',
+      'correct last item rendered'
+    );
 
     await click(occludedBefore);
 
-    assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'correct first item rendered');
-    assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 9', 'correct last item rendered');
+    assert.equal(
+      find('.vertical-item:first-of-type').textContent.trim(),
+      '0 0',
+      'correct first item rendered'
+    );
+    assert.equal(
+      find('.vertical-item:last-of-type').textContent.trim(),
+      '9 9',
+      'correct last item rendered'
+    );
   }
 );
-

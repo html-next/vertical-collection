@@ -21,18 +21,32 @@ module.exports = {
   },
   globals: {
     ArrayBuffer: true,
-    Float32Array: true
+    Float32Array: true,
   },
   rules: {
     'no-setter-return': 'off',
-    'quotes': ['error', 'single', { 'allowTemplateLiterals': true, 'avoidEscape': true }],
+    quotes: [
+      'error',
+      'single',
+      { allowTemplateLiterals: true, avoidEscape: true },
+    ],
 
-    'ember/closure-actions': 'off',
-    'ember/no-get': 'off',
     'ember/no-jquery': 'error',
+
+    // TODO: Fix all of these for Octane
+    'ember/classic-decorator-hooks': 'off',
+    'ember/closure-actions': 'off',
+    'ember/no-actions-hash': 'off',
+    'ember/no-classic-classes': 'off',
+    'ember/no-classic-components': 'off',
+    'ember/no-component-lifecycle-hooks': 'off',
+    'ember/no-controller-access-in-routes': 'off',
+    'ember/no-get': 'off',
     'ember/no-new-mixins': 'off',
     'ember/no-test-module-for': 'off',
-    'ember/require-computed-property-dependencies': 'off'
+    'ember/no-test-this-render': 'off',
+    'ember/require-computed-property-dependencies': 'off',
+    'ember/require-tagless-components': 'off',
   },
   overrides: [
     // node files

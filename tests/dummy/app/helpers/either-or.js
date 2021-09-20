@@ -4,11 +4,11 @@ import Ember from 'ember';
 let eitherOrHelper;
 
 if (Helper) {
-  eitherOrHelper = helper(function(params) {
+  eitherOrHelper = helper(function (params) {
     return params[0] || params[1];
   });
 } else {
-  eitherOrHelper = Ember.Handlebars.makeBoundHelper(function(...params) {
+  eitherOrHelper = Ember.Handlebars.makeBoundHelper(function (...params) {
     return params[0] || params[1];
   });
 }

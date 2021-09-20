@@ -66,7 +66,10 @@ export default class DynamicRadar extends Radar {
 
     // Create the SkipList only after the estimateHeight has been calculated the first time
     if (this.skipList === null) {
-      this.skipList = new SkipList(this.totalItems, this._calculatedEstimateHeight);
+      this.skipList = new SkipList(
+        this.totalItems,
+        this._calculatedEstimateHeight
+      );
     } else {
       this.skipList.defaultValue = this._calculatedEstimateHeight;
     }
@@ -80,7 +83,7 @@ export default class DynamicRadar extends Radar {
       visibleBottom,
       totalItems,
 
-      _didReset
+      _didReset,
     } = this;
 
     if (totalItems === 0) {
@@ -101,8 +104,10 @@ export default class DynamicRadar extends Radar {
 
     const { values } = skipList;
 
-    let { totalBefore, index: firstVisibleIndex } = this.skipList.find(visibleTop);
-    let { totalAfter, index: lastVisibleIndex } = this.skipList.find(visibleBottom);
+    let { totalBefore, index: firstVisibleIndex } =
+      this.skipList.find(visibleTop);
+    let { totalAfter, index: lastVisibleIndex } =
+      this.skipList.find(visibleBottom);
 
     const maxIndex = totalItems - 1;
 
@@ -127,11 +132,8 @@ export default class DynamicRadar extends Radar {
   }
 
   _calculateScrollDiff() {
-    const {
-      firstItemIndex,
-      _prevFirstVisibleIndex,
-      _prevFirstItemIndex
-    } = this;
+    const { firstItemIndex, _prevFirstVisibleIndex, _prevFirstItemIndex } =
+      this;
 
     let beforeVisibleDiff = 0;
 
@@ -142,7 +144,10 @@ export default class DynamicRadar extends Radar {
       // (the delta). We want to measure the delta of exactly this number of items, because
       // items that are after the first visible item should not affect the scroll position,
       // and neither should items already rendered before the first visible item.
-      const measureLimit = Math.min(Math.abs(firstItemIndex - _prevFirstItemIndex), _prevFirstVisibleIndex - firstItemIndex);
+      const measureLimit = Math.min(
+        Math.abs(firstItemIndex - _prevFirstItemIndex),
+        _prevFirstVisibleIndex - firstItemIndex
+      );
 
       beforeVisibleDiff = Math.round(this._measure(measureLimit));
     }
@@ -151,10 +156,7 @@ export default class DynamicRadar extends Radar {
   }
 
   _shouldScheduleRerender() {
-    const {
-      firstItemIndex,
-      lastItemIndex
-    } = this;
+    const { firstItemIndex, lastItemIndex } = this;
 
     this._updateConstants();
     this._measure();
@@ -163,7 +165,9 @@ export default class DynamicRadar extends Radar {
     // case we want to check them _after_ the change.
     const { firstVisibleIndex, lastVisibleIndex } = this;
 
-    return firstVisibleIndex < firstItemIndex || lastVisibleIndex > lastItemIndex;
+    return (
+      firstVisibleIndex < firstItemIndex || lastVisibleIndex > lastItemIndex
+    );
   }
 
   _measure(measureLimit = null) {
@@ -172,12 +176,13 @@ export default class DynamicRadar extends Radar {
       skipList,
 
       _occludedContentBefore,
-      _transformScale
+      _transformScale,
     } = this;
 
-    const numToMeasure = measureLimit !== null
-      ? Math.min(measureLimit, orderedComponents.length)
-      : orderedComponents.length;
+    const numToMeasure =
+      measureLimit !== null
+        ? Math.min(measureLimit, orderedComponents.length)
+        : orderedComponents.length;
 
     let totalDelta = 0;
 
@@ -186,17 +191,19 @@ export default class DynamicRadar extends Radar {
       const previousItem = orderedComponents[i - 1];
       const itemIndex = currentItem.index;
 
-      const {
-        top: currentItemTop,
-        height: currentItemHeight
-      } = getScaledClientRect(currentItem, _transformScale);
+      const { top: currentItemTop, height: currentItemHeight } =
+        getScaledClientRect(currentItem, _transformScale);
 
       let margin;
 
       if (previousItem !== undefined) {
-        margin = currentItemTop - getScaledClientRect(previousItem, _transformScale).bottom;
+        margin =
+          currentItemTop -
+          getScaledClientRect(previousItem, _transformScale).bottom;
       } else {
-        margin = currentItemTop - getScaledClientRect(_occludedContentBefore, _transformScale).bottom;
+        margin =
+          currentItemTop -
+          getScaledClientRect(_occludedContentBefore, _transformScale).bottom;
       }
 
       const newHeight = roundTo(currentItemHeight + margin);
@@ -215,7 +222,7 @@ export default class DynamicRadar extends Radar {
   }
 
   _didEarthquake(scrollDiff) {
-    return scrollDiff > (this._minHeight / 2);
+    return scrollDiff > this._minHeight / 2;
   }
 
   get total() {
@@ -239,9 +246,7 @@ export default class DynamicRadar extends Radar {
   }
 
   get firstVisibleIndex() {
-    const {
-      visibleTop
-    } = this;
+    const { visibleTop } = this;
 
     const { index } = this.skipList.find(visibleTop);
 
@@ -249,10 +254,7 @@ export default class DynamicRadar extends Radar {
   }
 
   get lastVisibleIndex() {
-    const {
-      visibleBottom,
-      totalItems
-    } = this;
+    const { visibleBottom, totalItems } = this;
 
     const { index } = this.skipList.find(visibleBottom);
 

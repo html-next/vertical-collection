@@ -11,5 +11,5 @@ export { default as objectAt } from './data-view/utils/object-at';
 export {
   addScrollHandler,
   removeScrollHandler,
-  ScrollHandler
+  ScrollHandler,
 } from './data-view/utils/scroll-handler';

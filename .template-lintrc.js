@@ -12,6 +12,6 @@ module.exports = {
     'no-unbound': false,
     'no-unnecessary-concat': false,
     'require-button-type': false,
-    'require-valid-alt-text': false
-  }
+    'require-valid-alt-text': false,
+  },
 };

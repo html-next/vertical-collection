@@ -2,7 +2,7 @@ import RSVP from 'rsvp';
 import JSONAPIAdapter from '@ember-data/adapter/json-api';
 
 const NUMBERS = {
-  data: []
+  data: [],
 };
 
 for (let i = 0; i < 100; i++) {
@@ -10,13 +10,13 @@ for (let i = 0; i < 100; i++) {
     type: 'number-item',
     id: `${i}`,
     attributes: {
-      number: i
-    }
+      number: i,
+    },
   });
 }
 
 export default JSONAPIAdapter.extend({
   findAll() {
     return RSVP.Promise.resolve(NUMBERS);
-  }
+  },
 });

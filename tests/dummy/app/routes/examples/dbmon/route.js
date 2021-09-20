@@ -20,7 +20,6 @@ export default Route.extend({
   },
 
   actions: {
-
     addRow() {
       this.numRows++;
     },
@@ -32,8 +31,6 @@ export default Route.extend({
     willTransition() {
       run.cancel(this._nextLoad);
       this.controller.set('model', null);
-    }
-
-  }
-
+    },
+  },
 });
