@@ -1,7 +1,6 @@
 import { A } from '@ember/array';
 import ArrayProxy from '@ember/array/proxy';
 import { Promise } from 'rsvp';
-import Ember from 'ember';
 import { test } from 'ember-qunit';
 // eslint-disable-next-line ember/use-ember-data-rfc-395-imports
 import DS from 'ember-data';
@@ -164,8 +163,8 @@ function generateScenario(name, defaultOptions, initializer) {
       : baseItems.slice();
     const scenario = { items };
 
-    Ember.assign(scenario, options); // eslint-disable-line ember/new-module-imports
-    Ember.assign(scenario, defaultOptions); // eslint-disable-line ember/new-module-imports
+    Object.assign(scenario, options);
+    Object.assign(scenario, defaultOptions);
 
     return { [name]: scenario };
   };
@@ -174,7 +173,7 @@ function generateScenario(name, defaultOptions, initializer) {
 function mergeScenarioGenerators(...scenarioGenerators) {
   return function (items, options) {
     return scenarioGenerators.reduce((scenarios, generator) => {
-      return Ember.assign(scenarios, generator(items, options)); // eslint-disable-line ember/new-module-imports
+      return Object.assign(scenarios, generator(items, options));
     }, {});
   };
 }

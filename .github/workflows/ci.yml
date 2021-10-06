@@ -26,8 +26,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
-        with:
-          node-version: 12.x
       - run: yarn install --no-lockfile
       - run: yarn test:ember
 
@@ -57,8 +55,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
-        with:
-          node-version: 12.x
       - name: install dependencies
         run: yarn install --frozen-lockfile
       - name: test
