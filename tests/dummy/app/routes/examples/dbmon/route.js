@@ -1,5 +1,5 @@
 import Route from '@ember/routing/route';
-import { run } from '@ember/runloop';
+import { cancel, later, next } from '@ember/runloop';
 import getData from 'dummy/lib/get-data';
 
 export default Route.extend({
@@ -11,12 +11,12 @@ export default Route.extend({
   },
 
   afterModel() {
-    run.later(this, this.loadSamples, 100);
+    later(this, this.loadSamples, 100);
   },
 
   loadSamples() {
     this.controller.set('model', getData(this.numRows));
-    this._nextLoad = run.next(this, this.loadSamples);
+    this._nextLoad = next(this, this.loadSamples);
   },
 
   actions: {
@@ -29,7 +29,7 @@ export default Route.extend({
     },
 
     willTransition() {
-      run.cancel(this._nextLoad);
+      cancel(this._nextLoad);
       this.controller.set('model', null);
     },
   },
