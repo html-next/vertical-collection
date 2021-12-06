@@ -71,7 +71,7 @@
     "babel-eslint": "^10.1.0",
     "bootstrap": "~3.3.5",
     "broccoli-asset-rev": "^3.0.0",
-    "ember-auto-import": "^1.10.1",
+    "ember-auto-import": "^2.2.4",
     "ember-cli": "~3.24.0",
     "ember-cli-app-version": "^5.0.0",
     "ember-cli-dependency-checker": "^3.2.0",
@@ -105,7 +105,8 @@
     "prettier": "^2.2.1",
     "qunit-dom": "^1.6.0",
     "release-it": "^14.2.1",
-    "release-it-lerna-changelog": "^3.1.0"
+    "release-it-lerna-changelog": "^3.1.0",
+    "webpack": "^5.65.0"
   },
   "resolutions": {
     "**/ember-cli-babel": "^7.26.6"
