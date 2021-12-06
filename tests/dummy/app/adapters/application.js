@@ -15,8 +15,8 @@ for (let i = 0; i < 100; i++) {
   });
 }
 
-export default JSONAPIAdapter.extend({
+export default class ApplicationAdapter extends JSONAPIAdapter {
   findAll() {
     return RSVP.Promise.resolve(NUMBERS);
-  },
-});
+  }
+}
