@@ -30,7 +30,9 @@ function destroyScrollable(scrollable) {
 
 module('Unit | Radar Utils | Scroll Handler');
 
-test('We can add, trigger, and remove a scroll handler', (assert) => {
+test('We can add, trigger, and remove a scroll handler', function (assert) {
+  assert.expect(12);
+
   let scrollHandlers = new ScrollHandler();
   let done = assert.async(2);
   let scrollable = createScrollable();
@@ -51,12 +53,13 @@ test('We can add, trigger, and remove a scroll handler', (assert) => {
   assert.equal(scrollHandlers.length, 1, `We have one element to watch.`);
 
   let scrollableIndex = scrollHandlers.elements.indexOf(scrollable);
-  assert.ok(
-    scrollableIndex !== -1,
+  assert.notStrictEqual(
+    scrollableIndex,
+    -1,
     `The scrollable was added to the watched elements list.`
   );
   let cache = scrollHandlers.handlers[scrollableIndex];
-  assert.ok(cache.handlers.length === 1);
+  assert.strictEqual(cache.handlers.length, 1);
 
   // test triggering that handler
   assert.equal(
@@ -78,16 +81,19 @@ test('We can add, trigger, and remove a scroll handler', (assert) => {
       scrollHandlers.removeScrollHandler(scrollable, handler);
       let newScrollableIndex = scrollHandlers.elements.indexOf(scrollable);
 
-      assert.ok(
-        cache.handlers.length === 0,
+      assert.strictEqual(
+        cache.handlers.length,
+        0,
         `The handler was removed from the listener cache.`
       );
-      assert.ok(
-        newScrollableIndex === -1,
+      assert.strictEqual(
+        newScrollableIndex,
+        -1,
         `Removing the last handler removed the element from the watched elements list.`
       );
-      assert.ok(
-        scrollHandlers.handlers.indexOf(cache) === -1,
+      assert.strictEqual(
+        scrollHandlers.handlers.indexOf(cache),
+        -1,
         `Removing the last handler removed the cache.`
       );
 
@@ -96,9 +102,8 @@ test('We can add, trigger, and remove a scroll handler', (assert) => {
         0,
         `We have no more elements to watch.`
       );
-      assert.equal(
+      assert.false(
         scrollHandlers.isPolling,
-        false,
         `We are no longer polling the elements.`
       );
 
@@ -108,7 +113,9 @@ test('We can add, trigger, and remove a scroll handler', (assert) => {
   });
 });
 
-test('Adding/removing multiple handlers to an element works as expected', (assert) => {
+test('Adding/removing multiple handlers to an element works as expected', function (assert) {
+  assert.expect(17);
+
   let scrollHandlers = new ScrollHandler();
   let done = assert.async(3);
   let scrollable = createScrollable();
@@ -133,12 +140,13 @@ test('Adding/removing multiple handlers to an element works as expected', (asser
   assert.equal(scrollHandlers.length, 1, `We have one element to watch.`);
 
   let scrollableIndex = scrollHandlers.elements.indexOf(scrollable);
-  assert.ok(
-    scrollableIndex !== -1,
+  assert.notStrictEqual(
+    scrollableIndex,
+    -1,
     `The scrollable was added to the watched elements list.`
   );
   let cache = scrollHandlers.handlers[scrollableIndex];
-  assert.ok(cache.handlers.length === 2);
+  assert.strictEqual(cache.handlers.length, 2);
 
   // test triggering that handler
   assert.equal(
@@ -160,32 +168,38 @@ test('Adding/removing multiple handlers to an element works as expected', (asser
       scrollHandlers.removeScrollHandler(scrollable, handler1);
       let newScrollableIndex = scrollHandlers.elements.indexOf(scrollable);
 
-      assert.ok(
-        cache.handlers.length === 1,
+      assert.strictEqual(
+        cache.handlers.length,
+        1,
         `The handler was removed from the listener cache.`
       );
-      assert.ok(
-        newScrollableIndex !== -1,
+      assert.notStrictEqual(
+        newScrollableIndex,
+        -1,
         `When an element has other handlers, it is not removed from the watched elements list.`
       );
-      assert.ok(
-        scrollHandlers.handlers.indexOf(cache) !== -1,
+      assert.notStrictEqual(
+        scrollHandlers.handlers.indexOf(cache),
+        -1,
         `When an element has other handlers, ths cache is not removed.`
       );
       assert.equal(scrollHandlers.length, 1, `We have one element to watch.`);
 
       scrollHandlers.removeScrollHandler(scrollable, handler2);
       newScrollableIndex = scrollHandlers.elements.indexOf(scrollable);
-      assert.ok(
-        cache.handlers.length === 0,
+      assert.strictEqual(
+        cache.handlers.length,
+        0,
         `The handler was removed from the listener cache.`
       );
-      assert.ok(
-        newScrollableIndex === -1,
+      assert.strictEqual(
+        newScrollableIndex,
+        -1,
         `Removing the last handler removed the element from the watched elements list.`
       );
-      assert.ok(
-        scrollHandlers.handlers.indexOf(cache) === -1,
+      assert.strictEqual(
+        scrollHandlers.handlers.indexOf(cache),
+        -1,
         `Removing the last handler removed the cache.`
       );
 
@@ -194,9 +208,8 @@ test('Adding/removing multiple handlers to an element works as expected', (asser
         0,
         `We have no more elements to watch.`
       );
-      assert.equal(
+      assert.false(
         scrollHandlers.isPolling,
-        false,
         `We are no longer polling the elements.`
       );
 
@@ -206,7 +219,9 @@ test('Adding/removing multiple handlers to an element works as expected', (asser
   });
 });
 
-test('Multiple elements with handlers works as expected', (assert) => {
+test('Multiple elements with handlers works as expected', function (assert) {
+  assert.expect(21);
+
   let scrollHandlers = new ScrollHandler();
   let done = assert.async(3);
   let scrollable1 = createScrollable();
@@ -234,19 +249,21 @@ test('Multiple elements with handlers works as expected', (assert) => {
   let scrollable1Index = scrollHandlers.elements.indexOf(scrollable1);
   let scrollable2Index = scrollHandlers.elements.indexOf(scrollable1);
 
-  assert.ok(
-    scrollable1Index !== -1,
+  assert.notStrictEqual(
+    scrollable1Index,
+    -1,
     `The scrollable was added to the watched elements list.`
   );
-  assert.ok(
-    scrollable2Index !== -1,
+  assert.notStrictEqual(
+    scrollable2Index,
+    -1,
     `The scrollable was added to the watched elements list.`
   );
   let cache1 = scrollHandlers.handlers[scrollable1Index];
   let cache2 = scrollHandlers.handlers[scrollable2Index];
 
-  assert.ok(cache1.handlers.length === 1, `We added the handler`);
-  assert.ok(cache2.handlers.length === 1, `We added the handler`);
+  assert.strictEqual(cache1.handlers.length, 1, `We added the handler`);
+  assert.strictEqual(cache2.handlers.length, 1, `We added the handler`);
 
   // test triggering that handler
   assert.equal(
@@ -279,32 +296,38 @@ test('Multiple elements with handlers works as expected', (assert) => {
       scrollHandlers.removeScrollHandler(scrollable1, handler1);
       let newScrollableIndex = scrollHandlers.elements.indexOf(scrollable1);
 
-      assert.ok(
-        cache1.handlers.length === 0,
+      assert.strictEqual(
+        cache1.handlers.length,
+        0,
         `The handler was removed from the listener cache.`
       );
-      assert.ok(
-        newScrollableIndex === -1,
+      assert.strictEqual(
+        newScrollableIndex,
+        -1,
         `The element was removed from the watched elements list.`
       );
-      assert.ok(
-        scrollHandlers.handlers.indexOf(cache1) === -1,
+      assert.strictEqual(
+        scrollHandlers.handlers.indexOf(cache1),
+        -1,
         `The cache was also removed.`
       );
       assert.equal(scrollHandlers.length, 1, `We were removed entirely`);
 
       scrollHandlers.removeScrollHandler(scrollable2, handler2);
       newScrollableIndex = scrollHandlers.elements.indexOf(scrollable2);
-      assert.ok(
-        cache2.handlers.length === 0,
+      assert.strictEqual(
+        cache2.handlers.length,
+        0,
         `The handler was removed from the listener cache.`
       );
-      assert.ok(
-        newScrollableIndex === -1,
+      assert.strictEqual(
+        newScrollableIndex,
+        -1,
         `Removing the last handler removed the element from the watched elements list.`
       );
-      assert.ok(
-        scrollHandlers.handlers.indexOf(cache2) === -1,
+      assert.strictEqual(
+        scrollHandlers.handlers.indexOf(cache2),
+        -1,
         `Removing the last handler removed the cache.`
       );
 
@@ -313,9 +336,8 @@ test('Multiple elements with handlers works as expected', (assert) => {
         0,
         `We have no more elements to watch.`
       );
-      assert.equal(
+      assert.false(
         scrollHandlers.isPolling,
-        false,
         `We are no longer polling the elements.`
       );
 

@@ -29,5 +29,5 @@ test('Yields to inverse when no content is provided', async function (assert) {
 
   await wait();
 
-  assert.equal(find('.scrollable').textContent.indexOf('Foobar') !== -1, true);
+  assert.true(find('.scrollable').textContent.indexOf('Foobar') !== -1);
 });
