@@ -72,6 +72,7 @@
     "babel-eslint": "^10.1.0",
     "bootstrap": "~3.3.5",
     "broccoli-asset-rev": "^3.0.0",
+    "ember-angle-bracket-invocation-polyfill": "^3.0.1",
     "ember-auto-import": "^2.2.4",
     "ember-cli": "~3.28.4",
     "ember-cli-app-version": "^5.0.0",
