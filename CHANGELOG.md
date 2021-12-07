@@ -1,6 +1,19 @@
 Changelog
 =========
 
+## v2.0.1 (2021-12-07)
+
+#### :bug: Bug Fix
+* [#322](https://github.com/html-next/vertical-collection/pull/322) Remove comma in selector list in css ([@CubeSquared](https://github.com/CubeSquared))
+
+#### :house: Internal
+* [#336](https://github.com/html-next/vertical-collection/pull/336) Add rwjblue release-it setup ([@rwwagner90](https://github.com/rwwagner90))
+
+#### Committers: 2
+- Matthew Jacobs ([@CubeSquared](https://github.com/CubeSquared))
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+
+
 ## 0.5.5
 
 ### Pull Requests
