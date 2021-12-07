@@ -6,7 +6,7 @@ on:
 jobs:
   test:
     name: Run Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     timeout-minutes: 6
 
     steps:
@@ -37,8 +37,11 @@ jobs:
 
   test-ember-try:
     name: Run Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     strategy:
+      fail-fast: false
       matrix:
         ember-version:
           [
