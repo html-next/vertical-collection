@@ -1,4 +1,4 @@
-import { htmlSafe } from '@ember/string';
+import { htmlSafe } from '@ember/template';
 import Helper, { helper } from '@ember/component/helper';
 import Ember from 'ember';
 
