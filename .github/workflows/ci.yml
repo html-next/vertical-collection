@@ -73,4 +73,4 @@ jobs:
         run: yarn install --frozen-lockfile --ignore-engines
 
       - name: Run Tests
-        run: node_modules/.bin/ember try:one ${{ matrix.ember-version }} --skip-cleanup
+        run: node_modules/.bin/ember try:one ${{ matrix.ember-version }} --skip-cleanup --- bin/run-tests-with-retry.sh
