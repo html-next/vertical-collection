@@ -7,44 +7,11 @@ module.exports = async function() {
     useYarn: true,
     scenarios: [
       {
-        name: 'ember-lts-2.8',
-        bower: {
-          dependencies: {
-            ember: 'components/ember#lts-2-8',
-          },
-          resolutions: {
-            ember: 'lts-2-8',
-          },
-        },
-        npm: {
-          devDependencies: {
-            'ember-cli-htmlbars-inline-precompile': '^2.1.0',
-            'ember-source': null,
-            'ember-factory-for-polyfill': '1.3.1'
-          },
-          dependencies: {
-            'ember-compatibility-helpers': '1.2.1'
-          },
-          resolutions: {
-            'ember-compatibility-helpers': '1.2.1'
-          }
-        },
-      },
-      {
-        name: 'ember-lts-2.12',
-        npm: {
-          devDependencies: {
-            'ember-cli-htmlbars-inline-precompile': '^2.1.0',
-            '@ember/jquery': '^1.1.0',
-            'ember-source': '~2.12.0'
-          },
-        },
-      },
-      {
         name: 'ember-lts-2.18',
         npm: {
           devDependencies: {
             '@ember/jquery': '^1.1.0',
+            'ember-angle-bracket-invocation-polyfill': '^3.0.1',
             'ember-source': '~2.18.0'
           },
         },
@@ -53,6 +20,7 @@ module.exports = async function() {
         name: 'ember-lts-3.4',
         npm: {
           devDependencies: {
+            'ember-angle-bracket-invocation-polyfill': '^3.0.1',
             'ember-source': '~3.4.0'
           }
         }
@@ -61,6 +29,7 @@ module.exports = async function() {
         name: 'ember-lts-3.8',
         npm: {
           devDependencies: {
+            'ember-angle-bracket-invocation-polyfill': '^3.0.1',
             'ember-source': '~3.8.0'
           }
         }
@@ -85,6 +54,7 @@ module.exports = async function() {
         name: 'ember-lts-3.20',
         npm: {
           devDependencies: {
+            'ember-data': '~3.20.0',
             'ember-source': '~3.20.0'
           }
         }
@@ -93,15 +63,17 @@ module.exports = async function() {
         name: 'ember-lts-3.24',
         npm: {
           devDependencies: {
+            'ember-data': '~3.24.0',
             'ember-source': '~3.24.0'
           }
         }
       },
       {
-        name: 'ember-lts-3.26',
+        name: 'ember-lts-3.28',
         npm: {
           devDependencies: {
-            'ember-source': '~3.26.0'
+            'ember-data': '~3.28.0',
+            'ember-source': '~3.28.0'
           }
         }
       },
@@ -109,24 +81,57 @@ module.exports = async function() {
         name: 'ember-release',
         npm: {
           devDependencies: {
+            'ember-cli-fastboot': '3.2.0-beta.5',
+            'ember-data': '~3.28.0',
             'ember-source': await getChannelURL('release')
+          },
+          ember: {
+            edition: 'octane'
           }
+        },
+        env: {
+          EMBER_OPTIONAL_FEATURES: JSON.stringify({
+            'application-template-wrapper': false,
+            'template-only-glimmer-components': true,
+          })
         }
       },
       {
         name: 'ember-beta',
         npm: {
           devDependencies: {
+            'ember-cli-fastboot': '3.2.0-beta.5',
+            'ember-data': '~3.28.0',
             'ember-source': await getChannelURL('beta')
+          },
+          ember: {
+            edition: 'octane'
           }
+        },
+        env: {
+          EMBER_OPTIONAL_FEATURES: JSON.stringify({
+            'application-template-wrapper': false,
+            'template-only-glimmer-components': true,
+          })
         }
       },
       {
         name: 'ember-canary',
         npm: {
           devDependencies: {
+            'ember-cli-fastboot': '3.2.0-beta.5',
+            'ember-data': '~3.28.0',
             'ember-source': await getChannelURL('canary')
+          },
+          ember: {
+            edition: 'octane'
           }
+        },
+        env: {
+          EMBER_OPTIONAL_FEATURES: JSON.stringify({
+            'application-template-wrapper': false,
+            'template-only-glimmer-components': true,
+          })
         }
       },
       // The default `.travis.yml` runs this scenario via `yarn test`,
