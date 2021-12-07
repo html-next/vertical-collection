@@ -7,6 +7,7 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-18.04
+    timeout-minutes: 6
 
     steps:
       - name: Checkout
@@ -49,9 +50,8 @@ jobs:
             ember-lts-3.12,
             ember-lts-3.16,
             ember-lts-3.20,
-            ember-release,
-            ember-beta,
-            ember-canary,
+            ember-lts-3.24,
+            ember-lts-3.26,
           ]
 
     steps:

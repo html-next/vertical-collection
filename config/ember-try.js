@@ -18,6 +18,7 @@ module.exports = async function() {
         },
         npm: {
           devDependencies: {
+            'ember-cli-htmlbars-inline-precompile': '^2.1.0',
             'ember-source': null,
             'ember-factory-for-polyfill': '1.3.1'
           },
@@ -33,6 +34,7 @@ module.exports = async function() {
         name: 'ember-lts-2.12',
         npm: {
           devDependencies: {
+            'ember-cli-htmlbars-inline-precompile': '^2.1.0',
             '@ember/jquery': '^1.1.0',
             'ember-source': '~2.12.0'
           },
@@ -84,6 +86,22 @@ module.exports = async function() {
         npm: {
           devDependencies: {
             'ember-source': '~3.20.0'
+          }
+        }
+      },
+      {
+        name: 'ember-lts-3.24',
+        npm: {
+          devDependencies: {
+            'ember-source': '~3.24.0'
+          }
+        }
+      },
+      {
+        name: 'ember-lts-3.26',
+        npm: {
+          devDependencies: {
+            'ember-source': '~3.26.0'
           }
         }
       },

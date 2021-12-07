@@ -62,10 +62,10 @@ ember install @html-next/vertical-collection
 
 ## Support Matrix
 
-| `vertical-collection` version | Supported Ember versions |
-| ----------------------------- | ------------------------ |
-| `^v1.0.0`                     | `v1.12.0 - v3.8.0`       |
-| `^v2.0.0`                     | `v2.8.0+`                |
+| `vertical-collection` version | Supported Ember versions | Supported Node versions |
+| ----------------------------- | ------------------------ | ----------------------- |
+| `^v1.0.0`                     | `v1.12.0 - v3.8.0`       | ?                       |
+| `^v2.0.0`                     | `v2.8.0 - v3.26.0`       | `v12+`                  |
 
 ## Support, Questions, Collaboration
 
