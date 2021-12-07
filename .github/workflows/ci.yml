@@ -50,8 +50,9 @@ jobs:
           - ember-canary
           - ember-default-with-jquery
           - ember-classic
-          - embroider-safe
-          - embroider-optimized
+          # TODO: we need to update to ember-qunit 5.x etc before embroider will work
+          # - embroider-safe
+          # - embroider-optimized
 
     steps:
       - uses: actions/checkout@v2

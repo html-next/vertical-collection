@@ -66,7 +66,7 @@
   "devDependencies": {
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.4.2",
-    "@embroider/test-setup": "^0.43.5",
+    "@embroider/test-setup": "^0.47.2",
     "@glimmer/component": "^1.0.4",
     "@glimmer/tracking": "^1.0.4",
     "babel-eslint": "^10.1.0",
@@ -96,7 +96,7 @@
     "ember-source": "~3.28.8",
     "ember-source-channel-url": "^3.0.0",
     "ember-template-lint": "^3.6.0",
-    "ember-try": "^1.4.0",
+    "ember-try": "^2.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-ember": "^10.5.4",
@@ -108,7 +108,7 @@
     "prettier": "^2.3.2",
     "qunit-dom": "^1.6.0",
     "release-it": "^14.2.1",
-    "release-it-lerna-changelog": "^3.1.0",
+    "release-it-lerna-changelog": "^4.0.1",
     "webpack": "^5.65.0"
   },
   "resolutions": {
