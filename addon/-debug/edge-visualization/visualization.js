@@ -1,4 +1,3 @@
-/* global document */
 import { ViewportContainer } from '../../-private';
 
 function applyVerticalStyles(element, geography) {
@@ -41,9 +40,14 @@ export default class Visualization {
 
   styleViewport() {
     const { _scrollContainer } = this.radar;
-    this.container.style.height = `${_scrollContainer.getBoundingClientRect().height}px`;
+    this.container.style.height = `${
+      _scrollContainer.getBoundingClientRect().height
+    }px`;
 
-    applyVerticalStyles(this.scrollContainer, _scrollContainer.getBoundingClientRect());
+    applyVerticalStyles(
+      this.scrollContainer,
+      _scrollContainer.getBoundingClientRect()
+    );
     applyVerticalStyles(this.screen, ViewportContainer.getBoundingClientRect());
   }
 
@@ -72,7 +76,7 @@ export default class Visualization {
       totalBefore,
       totalAfter,
       skipList,
-      _calculatedEstimateHeight
+      _calculatedEstimateHeight,
     } = this.radar;
 
     const isDynamic = !!skipList;
@@ -95,10 +99,16 @@ export default class Visualization {
       }
     }
 
-    for (let itemIndex = firstVisualizedIndex, i = 0; itemIndex <= lastVisualizedIndex; itemIndex++, i++) {
+    for (
+      let itemIndex = firstVisualizedIndex, i = 0;
+      itemIndex <= lastVisualizedIndex;
+      itemIndex++, i++
+    ) {
       const element = sats[i];
 
-      const itemHeight = isDynamic ? itemHeights[itemIndex] : _calculatedEstimateHeight;
+      const itemHeight = isDynamic
+        ? itemHeights[itemIndex]
+        : _calculatedEstimateHeight;
 
       element.style.height = `${itemHeight}px`;
       element.setAttribute('index', String(itemIndex));

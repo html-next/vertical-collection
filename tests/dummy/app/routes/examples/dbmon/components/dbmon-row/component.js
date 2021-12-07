@@ -3,12 +3,11 @@ import Component from '@ember/component';
 import { computed } from '@ember/object';
 
 export default Component.extend({
-
   tagName: 'tr',
 
   queries: alias('db.queries'),
 
-  topFiveQueries: computed('queries', function() {
+  topFiveQueries: computed('queries', function () {
     let queries = this.get('queries') || [];
     let topFiveQueries = queries.slice(0, 5);
 
@@ -16,18 +15,17 @@ export default Component.extend({
       topFiveQueries.push({ query: '' });
     }
 
-    return topFiveQueries.map(function(query, index) {
+    return topFiveQueries.map(function (query, index) {
       return {
         key: String(index),
         query: query.query,
         elapsed: query.elapsed ? formatElapsed(query.elapsed) : '',
-        className: elapsedClass(query.elapsed)
+        className: elapsedClass(query.elapsed),
       };
     });
-
   }),
 
-  countClassName: computed('queries', function() {
+  countClassName: computed('queries', function () {
     let queries = this.get('queries') || [];
     let countClassName = 'label';
 
@@ -40,8 +38,7 @@ export default Component.extend({
     }
 
     return countClassName;
-  })
-
+  }),
 });
 
 function elapsedClass(elapsed) {
@@ -56,9 +53,13 @@ function elapsedClass(elapsed) {
 
 const _base = String.prototype;
 
-_base.lpad = _base.lpad || function(padding, toLength) {
-  return padding.repeat((toLength - this.length) / padding.length).concat(this);
-};
+_base.lpad =
+  _base.lpad ||
+  function (padding, toLength) {
+    return padding
+      .repeat((toLength - this.length) / padding.length)
+      .concat(this);
+  };
 
 function formatElapsed(value) {
   let str = parseFloat(value).toFixed(2);

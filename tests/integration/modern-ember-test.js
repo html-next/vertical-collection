@@ -1,13 +1,17 @@
 import { moduleForComponent, test } from 'ember-qunit';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import { find } from 'ember-native-dom-helpers';
 import wait from 'ember-test-helpers/wait';
 
-moduleForComponent('vertical-collection', 'Integration | Modern Ember Features Tests', {
-  integration: true
-});
+moduleForComponent(
+  'vertical-collection',
+  'Integration | Modern Ember Features Tests',
+  {
+    integration: true,
+  }
+);
 
-test('Yields to inverse when no content is provided', async function(assert) {
+test('Yields to inverse when no content is provided', async function (assert) {
   assert.expect(1);
   this.set('items', []);
 
@@ -25,5 +29,5 @@ test('Yields to inverse when no content is provided', async function(assert) {
 
   await wait();
 
-  assert.equal(find('.scrollable').textContent.indexOf('Foobar') !== -1, true);
+  assert.true(find('.scrollable').textContent.indexOf('Foobar') !== -1);
 });

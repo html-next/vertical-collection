@@ -1,21 +1,16 @@
 import { moduleForComponent } from 'ember-qunit';
-import hbs from 'htmlbars-inline-precompile';
-import {
-  find,
-  findAll,
-  scrollTo
-} from 'ember-native-dom-helpers';
+import { hbs } from 'ember-cli-htmlbars';
+import { find, findAll, scrollTo } from 'ember-native-dom-helpers';
 
 import getNumbers from 'dummy/lib/get-numbers';
 
 import {
   testScenarios,
-
-  simpleScenariosFor
+  simpleScenariosFor,
 } from 'dummy/tests/helpers/test-scenarios';
 
 moduleForComponent('vertical-collection', 'Integration | Recycle Tests', {
-  integration: true
+  integration: true,
 });
 
 testScenarios(
@@ -41,14 +36,18 @@ testScenarios(
     </div>
   `,
 
-  async function(assert) {
+  async function (assert) {
     assert.expect(2);
 
     assert.equal(findAll('vertical-item').length, 10);
 
     await scrollTo('.scrollable', 0, 20);
 
-    assert.equal(find('vertical-item:last-of-type').textContent.trim(), '10 10', 'component was not recycled');
+    assert.equal(
+      find('vertical-item:last-of-type').textContent.trim(),
+      '10 10',
+      'component was not recycled'
+    );
   }
 );
 
@@ -75,13 +74,17 @@ testScenarios(
     </div>
   `,
 
-  async function(assert) {
+  async function (assert) {
     assert.expect(2);
 
     assert.equal(findAll('vertical-item').length, 10);
 
     await scrollTo('.scrollable', 0, 20);
 
-    assert.equal(find('vertical-item:last-of-type').textContent.trim(), '0 0', 'component was recycled');
+    assert.equal(
+      find('vertical-item:last-of-type').textContent.trim(),
+      '0 0',
+      'component was recycled'
+    );
   }
 );

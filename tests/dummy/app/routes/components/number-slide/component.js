@@ -1,7 +1,7 @@
 import { alias } from '@ember/object/computed';
 import Component from '@ember/component';
 import { computed } from '@ember/object';
-import { htmlSafe } from '@ember/string';
+import { htmlSafe } from '@ember/template';
 import layout from './template';
 
 function numberToOpacity(number) {
@@ -22,14 +22,11 @@ export default Component.extend({
   attributeBindings: ['style'],
   isDynamic: false,
   prefixed: false,
-  style: computed('isDynamic', 'item', function() {
+  style: computed('isDynamic', 'item', function () {
     let item = this.get('item');
     let isDynamic = this.get('isDynamic');
 
-    let {
-      height,
-      number
-    } = item;
+    let { height, number } = item;
 
     let opacity = numberToOpacity(number);
     let styleStr = `background: rgba(0,125,255,${opacity});`;
@@ -43,5 +40,5 @@ export default Component.extend({
   layout,
   itemIndex: 0,
   item: null,
-  number: alias('item.number')
+  number: alias('item.number'),
 });

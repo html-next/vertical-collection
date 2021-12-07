@@ -1,6 +1,9 @@
 import { set } from '@ember/object';
 import { DEBUG } from '@glimmer/env';
-import { IS_GLIMMER_2, gte as emberVersionGTE } from 'ember-compatibility-helpers';
+import {
+  IS_GLIMMER_2,
+  gte as emberVersionGTE,
+} from 'ember-compatibility-helpers';
 
 import document from '../../utils/document-shim';
 

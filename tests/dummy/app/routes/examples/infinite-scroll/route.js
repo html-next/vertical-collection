@@ -7,7 +7,7 @@ export default Route.extend({
     return {
       numbers: A(getNumbers(0, 100)),
       first: 0,
-      last: 100
+      last: 100,
     };
   },
 
@@ -16,6 +16,6 @@ export default Route.extend({
       this.set('controller.model.numbers', null);
       this.controller.set('model', null);
       this.set('currentModel', null);
-    }
-  }
+    },
+  },
 });

@@ -11,7 +11,7 @@ import {
   keyForItem,
   DynamicRadar,
   StaticRadar,
-  objectAt
+  objectAt,
 } from '../../-private';
 
 const VerticalCollection = Component.extend({
@@ -152,20 +152,26 @@ const VerticalCollection = Component.extend({
   isEmpty: empty('items'),
   shouldYieldToInverse: readOnly('isEmpty'),
 
-  virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function() {
-    const { _radar } = this;
+  virtualComponents: computed(
+    'items.[]',
+    'renderAll',
+    'estimateHeight',
+    'bufferSize',
+    function () {
+      const { _radar } = this;
 
-    const items = this.get('items');
+      const items = this.get('items');
 
-    _radar.items = items === null || items === undefined ? [] : items;
-    _radar.estimateHeight = this.get('estimateHeight');
-    _radar.renderAll = this.get('renderAll');
-    _radar.bufferSize = this.get('bufferSize');
+      _radar.items = items === null || items === undefined ? [] : items;
+      _radar.estimateHeight = this.get('estimateHeight');
+      _radar.renderAll = this.get('renderAll');
+      _radar.bufferSize = this.get('bufferSize');
 
-    _radar.scheduleUpdate(true);
+      _radar.scheduleUpdate(true);
 
-    return _radar.virtualComponents;
-  }),
+      return _radar.virtualComponents;
+    }
+  ),
 
   schedule(queueName, job) {
     return scheduler.schedule(queueName, job, this.token);
@@ -202,12 +208,14 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
+    this._super(...arguments);
     this.schedule('sync', () => {
       this._radar.start();
     });
   },
 
   willDestroy() {
+    this._super(...arguments);
     this.token.cancel();
     this._radar.destroy();
     clearTimeout(this._nextSendActions);
@@ -233,24 +241,26 @@ const VerticalCollection = Component.extend({
     const idForFirstItem = this.get('idForFirstItem');
     const key = this.get('key');
 
-    const startingIndex = calculateStartingIndex(items, idForFirstItem, key, renderFromLast);
-
-    this._radar = new RadarClass(
-      this.token,
-      {
-        bufferSize,
-        containerSelector,
-        estimateHeight,
-        initialRenderCount,
-        items,
-        key,
-        renderAll,
-        renderFromLast,
-        shouldRecycle,
-        startingIndex,
-        occlusionTagName
-      }
+    const startingIndex = calculateStartingIndex(
+      items,
+      idForFirstItem,
+      key,
+      renderFromLast
     );
+
+    this._radar = new RadarClass(this.token, {
+      bufferSize,
+      containerSelector,
+      estimateHeight,
+      initialRenderCount,
+      items,
+      key,
+      renderAll,
+      renderFromLast,
+      shouldRecycle,
+      startingIndex,
+      occlusionTagName,
+    });
 
     this._prevItemsLength = 0;
     this._prevFirstKey = null;
@@ -271,7 +281,7 @@ const VerticalCollection = Component.extend({
         lastReached: a,
         firstReached: b,
         lastVisibleChanged: c,
-        firstVisibleChanged: d
+        firstVisibleChanged: d,
       };
 
       this._radar.sendAction = (action, index) => {
@@ -280,11 +290,11 @@ const VerticalCollection = Component.extend({
         }
       };
     }
-  }
+  },
 });
 
 VerticalCollection.reopenClass({
-  positionalParams: ['items']
+  positionalParams: ['items'],
 });
 
 function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {

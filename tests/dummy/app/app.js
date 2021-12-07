@@ -1,14 +1,13 @@
 /* eslint-disable ember/avoid-leaking-state-in-ember-objects */
 import Application from '@ember/application';
-import Resolver from './resolver';
+import Resolver from 'ember-resolver';
 import loadInitializers from 'ember-load-initializers';
-import config from './config/environment';
-
-const App = Application.extend({
-  modulePrefix: config.modulePrefix,
-  podModulePrefix: config.podModulePrefix,
-  Resolver,
-  customEvents: {
+import config from 'dummy/config/environment';
+export default class App extends Application {
+  modulePrefix = config.modulePrefix;
+  podModulePrefix = config.podModulePrefix;
+  Resolver = Resolver;
+  customEvents = {
     touchstart: null,
     touchmove: null,
     touchend: null,
@@ -33,10 +32,8 @@ const App = Application.extend({
     dragleave: null,
     dragover: null,
     drop: null,
-    dragend: null
-  }
-});
+    dragend: null,
+  };
+}
 
 loadInitializers(App, config.modulePrefix);
-
-export default App;

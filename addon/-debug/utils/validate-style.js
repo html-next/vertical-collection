@@ -1,4 +1,3 @@
-
 export function hasStyleValue(styles, key, value) {
   return styles[key] === value;
 }

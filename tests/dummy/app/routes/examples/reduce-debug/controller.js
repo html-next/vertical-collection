@@ -12,11 +12,11 @@ export default Controller.extend({
       if (!isFiltered) {
         this.set('model.filtered', model);
       } else {
-        let filtered = model.filter(function(item) {
+        let filtered = model.filter(function (item) {
           return item.number < 25;
         });
         this.set('model.filtered', filtered);
       }
-    }
-  }
+    },
+  },
 });

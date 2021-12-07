@@ -2,13 +2,11 @@ import Controller from '@ember/controller';
 import getNumbers from 'dummy/lib/get-numbers';
 
 export default Controller.extend({
-
   numImages: 5,
 
   someProperty: 50,
 
   actions: {
-
     loadAbove() {
       let first = this.get('model.first');
       let numbers = getNumbers(first - 20, 20);
@@ -25,6 +23,6 @@ export default Controller.extend({
       model.pushObjects(numbers);
       // this.set('model.numbers', newModel);
       this.set('model.last', last + 20);
-    }
-  }
+    },
+  },
 });
