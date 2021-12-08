@@ -1,10 +1,10 @@
 import { A } from '@ember/array';
 import ArrayProxy from '@ember/array/proxy';
 import { Promise } from 'rsvp';
-import { test } from 'ember-qunit';
+import { test } from 'qunit';
 import DS from 'ember-data';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
+import { settled } from '@ember/test-helpers';
 
 const {
   PromiseArray
@@ -25,14 +25,16 @@ export function testScenarios(description, scenarios, template, testFn, preRende
         await setValuesBeforeRender.call(this, assert);
       }
 
-      await this.render(template);
+      let renderCompletionPromise = this.render(template);
 
       if (preRenderTestFn) {
         await preRenderTestFn.call(this, assert);
       } else if(testFn) {
-        await wait();
+        await settled();
         await testFn.call(this, assert);
       }
+
+      await renderCompletionPromise;
     });
   }
 }
