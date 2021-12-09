@@ -1,4 +1,4 @@
-import { run } from '@ember/runloop';
+import { begin, end } from '@ember/runloop';
 import { scheduler } from 'ember-raf-scheduler';
 import SUPPORTS_PASSIVE from './supports-passive';
 const DEFAULT_ARRAY_SIZE = 10;
@@ -110,11 +110,11 @@ export class ScrollHandler {
 
     // TODO add explicit test
     if (topChanged || leftChanged) {
-      run.begin();
+      begin();
       for (let j = 0; j < meta.handlers.length; j++) {
         meta.handlers[j](event);
       }
-      run.end();
+      end();
     }
   }
 
