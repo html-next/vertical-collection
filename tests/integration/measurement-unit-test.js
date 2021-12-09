@@ -23,9 +23,9 @@ testScenarios(
 
   hbs`
     <div style="height: 100px; font-size: 10px;" class="scrollable">
-      {{#vertical-collection items
+      {{#vertical-collection this.items
         estimateHeight="2em"
-        staticHeight=staticHeight
+        staticHeight=this.staticHeight
         bufferSize=0
 
         as |item i|}}
@@ -47,9 +47,9 @@ testScenarios(
 
   hbs`
     <div style="height: 100px; font-size: 10px;" class="scrollable">
-      {{#vertical-collection items
+      {{#vertical-collection this.items
         estimateHeight="2rem"
-        staticHeight=staticHeight
+        staticHeight=this.staticHeight
         bufferSize=0
 
         as |item i|}}
@@ -71,9 +71,9 @@ testScenarios(
 
   hbs`
     <div style="height: 100px;" class="scrollable">
-      {{#vertical-collection items
+      {{#vertical-collection this.items
         estimateHeight="66%"
-        staticHeight=staticHeight
+        staticHeight=this.staticHeight
         bufferSize=0
 
         as |item i|}}
@@ -95,9 +95,9 @@ testScenarios(
 
   hbs`
     <div style="height: 100px; font-size: 10px;" class="scrollable">
-      {{#vertical-collection items
+      {{#vertical-collection this.items
         estimateHeight="2em"
-        staticHeight=staticHeight
+        staticHeight=this.staticHeight
         bufferSize=0
 
         as |item i|}}
@@ -120,10 +120,10 @@ testScenarios(
   hbs`
     <div class="scrollable with-pixel-max-height">
       <div>
-        {{#vertical-collection items
+        {{#vertical-collection this.items
           containerSelector=".scrollable"
           estimateHeight=20
-          staticHeight=staticHeight
+          staticHeight=this.staticHeight
           bufferSize=0
 
           as |item i|}}
@@ -148,10 +148,10 @@ testScenarios(
     <div style="height: 400px;">
       <div class="scrollable with-percent-max-height">
         <div>
-          {{#vertical-collection items
+          {{#vertical-collection this.items
             containerSelector=".scrollable"
             estimateHeight=20
-            staticHeight=staticHeight
+            staticHeight=this.staticHeight
             bufferSize=0
 
             as |item i|}}
@@ -177,10 +177,10 @@ testScenarios(
     <div style="font-size: 20px;">
       <div class="scrollable with-em-max-height">
         <div>
-          {{#vertical-collection items
+          {{#vertical-collection this.items
             containerSelector=".scrollable"
             estimateHeight=20
-            staticHeight=staticHeight
+            staticHeight=this.staticHeight
             bufferSize=0
 
             as |item i|}}
@@ -205,10 +205,10 @@ testScenarios(
   hbs`
     <div class="scrollable with-rem-max-height">
       <div>
-        {{#vertical-collection items
+        {{#vertical-collection this.items
           containerSelector=".scrollable"
           estimateHeight=20
-          staticHeight=staticHeight
+          staticHeight=this.staticHeight
           bufferSize=0
 
           as |item i|}}

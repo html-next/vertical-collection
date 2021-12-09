@@ -25,10 +25,10 @@ testScenarios(
   hbs`
     <div style="height: 200px" class="scrollable with-max-height">
       <div>
-        {{#vertical-collection items
+        {{#vertical-collection this.items
           containerSelector=".scrollable"
           estimateHeight=20
-          staticHeight=staticHeight
+          staticHeight=this.staticHeight
           shouldRecycle=false
           bufferSize=0
 
@@ -59,10 +59,10 @@ testScenarios(
   hbs`
     <div style="height: 200px" class="scrollable">
       <div>
-        {{#vertical-collection items
+        {{#vertical-collection this.items
           containerSelector=".scrollable"
           estimateHeight=20
-          staticHeight=staticHeight
+          staticHeight=this.staticHeight
           shouldRecycle=true
           bufferSize=0
 

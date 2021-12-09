@@ -405,10 +405,10 @@ testScenarios(
   <div style="height: 370px; width: 200px;" class="scrollable">
     <table class="table table-striped latest-data">
       <tbody>
-        {{#vertical-collection items
+        {{#vertical-collection this.items
           containerSelector=".scrollable"
           estimateHeight=37
-          staticHeight=staticHeight
+          staticHeight=this.staticHeight
           bufferSize=0
 
           as |item i|}}
@@ -441,7 +441,7 @@ testScenarios(
   hbs`
     <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
       <div style="height: 400px; width: 100px;" class="scroll-child scrollable">
-        {{#vertical-collection items
+        {{#vertical-collection this.items
           estimateHeight=20
           bufferSize=0
 
