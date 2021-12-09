@@ -1,6 +1,16 @@
 Changelog
 =========
 
+## v3.0.0-0 (2021-12-09)
+
+#### What's new
+
+* Drop support for Ember < 2.18, add support for Ember 4.0+ (#343) (3343ecc)
+* 4 retries on CI, 1s sleep (#352) (4a75d99)
+* Extend timeout for base tests, tweak retry (#351) (8fff4c7)
+* Remove implicit this in tests (#349) (5f58de6)
+
+
 ## v2.1.0 (2021-12-09)
 
 Changelog:
