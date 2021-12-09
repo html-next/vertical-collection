@@ -1,6 +1,18 @@
 Changelog
 =========
 
+## v2.1.0 (2021-12-09)
+
+Changelog:
+
+* Upgrade ember-cli and dev deps (#348) (e8924e9)
+* Drop Ember global use in favor of native API (#347) (d101d8a)
+* Proper runloop imports (#346) (a765241)
+* Remove property fallback lookup (no implicit this) (#345) (506d798)
+* Modernize `htmlSafe` module imports / More cleanup (#344) (32e9460)
+* Update CI for vertical-collection v2 (#342) (5613faa)
+
+
 ## v2.0.1 (2021-12-07)
 
 #### :bug: Bug Fix
