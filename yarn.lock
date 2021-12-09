@@ -4717,11 +4717,12 @@ ember-qunit@^4.6.0:
     ember-cli-test-loader "^2.2.0"
     qunit "^2.9.3"
 
-ember-raf-scheduler@html-next/ember-raf-scheduler#5c3c55f1493d0db6ec87412141953b39d8601cca:
-  version "0.2.0"
-  resolved "https://codeload.github.com/html-next/ember-raf-scheduler/tar.gz/5c3c55f1493d0db6ec87412141953b39d8601cca"
+ember-raf-scheduler@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/ember-raf-scheduler/-/ember-raf-scheduler-0.3.0.tgz#7657ee5c1d54f852731e61e9d0e0750a9a22f5f4"
+  integrity sha512-i8JWQidNCX7n5TOTIKRDR0bnsQN9aJh/GtOJKINz2Wr+I7L7sYVhli6MFqMYNGKC9j9e6iWsznfAIxddheyEow==
   dependencies:
-    ember-cli-babel "^7.12.0"
+    ember-cli-babel "^7.26.6"
 
 ember-resolver@^8.0.2:
   version "8.0.3"
