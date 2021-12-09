@@ -147,7 +147,7 @@ testScenarios(
   hbs`
     <div style="transform: scale(0.333333)">
       <div style="height: 100px" class="scrollable">
-        {{#vertical-collection items
+        {{#vertical-collection this.items
           estimateHeight=20
           bufferSize=0
 

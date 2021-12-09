@@ -13,7 +13,7 @@ test('Yields to inverse when no content is provided', async function(assert) {
 
   this.render(hbs`
       <div class="scrollable">
-        {{#vertical-collection items
+        {{#vertical-collection this.items
           estimateHeight=20
           staticHeight=true
         }}
