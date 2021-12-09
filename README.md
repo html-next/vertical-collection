@@ -66,6 +66,7 @@ ember install @html-next/vertical-collection
 | ----------------------------- | ------------------------ | ----------------------- |
 | `^v1.x.x`                     | `v1.12.0 - v3.8.x`       | `?`                     |
 | `^v2.x.x`                     | `v2.8.0 - v3.26.x`       | `v12 - ?`               |
+| `^v3.x.x`                     | `v2.18.0+`               | `v14+`                  |
 
 ## Support, Questions, Collaboration
 

@@ -13,10 +13,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Use Node 12
+      - name: Use Node 14
         uses: actions/setup-node@v2-beta
         with:
-          node-version: 12.x
+          node-version: 14.x
 
       - name: Node Modules Cache
         uses: actions/cache@v2
@@ -45,8 +45,6 @@ jobs:
       matrix:
         ember-version:
           [
-            ember-lts-2.8,
-            ember-lts-2.12,
             ember-lts-2.18,
             ember-lts-3.4,
             ember-lts-3.8,
@@ -54,17 +52,20 @@ jobs:
             ember-lts-3.16,
             ember-lts-3.20,
             ember-lts-3.24,
-            ember-lts-3.26,
+            ember-lts-3.28,
+            ember-release,
+            ember-beta,
+            ember-canary,
           ]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Use Node 12
+      - name: Use Node 14
         uses: actions/setup-node@v2-beta
         with:
-          node-version: 12.x
+          node-version: 14.x
 
       - name: Node Modules Cache
         uses: actions/cache@v2
