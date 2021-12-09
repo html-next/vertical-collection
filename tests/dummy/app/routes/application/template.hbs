@@ -1,12 +1,14 @@
 <header class="container-fluid">
   <div class="row">
-    {{#link-to "index" tagName="h1" class="col-sm-6"}}
-      <img alt="HTML Next Logo" src="./HTML-Next.png" style="height: 2em;">
-      Vertical Collection
-    {{/link-to}}
+    <h1 class="col-sm-6">
+      <LinkTo @route="index">
+        <img alt="HTML Next Logo" src="./HTML-Next.png" style="height: 2em;">
+        Vertical Collection
+      </LinkTo>
+    </h1>
     <nav class="col-sm-6 text-small text-right">
-      {{#link-to "examples"}}Demos{{/link-to}}
-      {{#link-to "settings"}}Settings{{/link-to}}
+      <LinkTo @route="examples">Demos</LinkTo>
+      <LinkTo @route="settings">Settings</LinkTo>
     </nav>
   </div>
 </header>
