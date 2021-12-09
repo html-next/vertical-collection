@@ -7,7 +7,7 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 12
 
     steps:
       - name: Checkout
@@ -31,14 +31,14 @@ jobs:
         run: yarn lint
 
       - name: Run Tests
-        run: yarn test:ember
+        run: bin/run-tests-with-retry.sh
         env:
           CI: true
 
   test-ember-try:
     name: Run Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 14
 
     strategy:
       fail-fast: false
