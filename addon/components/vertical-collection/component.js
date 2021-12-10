@@ -184,6 +184,10 @@ const VerticalCollection = Component.extend({
 
           this._scheduledActions.forEach(([action, index]) => {
             const item = objectAt(items, index);
+            if (!item) {
+              return;
+            }
+
             const key = keyForItem(item, keyPath, index);
 
             // this.sendAction will be deprecated in ember 4.0
