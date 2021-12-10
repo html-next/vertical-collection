@@ -1,6 +1,6 @@
 import EmberArray, { A } from '@ember/array';
 import { run } from '@ember/runloop';
-import wait from 'ember-test-helpers/wait';
+import { settled } from '@ember/test-helpers';
 
 export function prepend(context, itemsToPrepend) {
   const items = context.get('items');
@@ -13,7 +13,7 @@ export function prepend(context, itemsToPrepend) {
     }
   });
 
-  return wait();
+  return settled();
 }
 
 export function append(context, itemsToAppend) {
@@ -27,7 +27,7 @@ export function append(context, itemsToAppend) {
     }
   });
 
-  return wait();
+  return settled();
 }
 
 export function emptyArray(context) {
@@ -41,7 +41,7 @@ export function emptyArray(context) {
     }
   });
 
-  return wait();
+  return settled();
 }
 
 export function replaceArray(context, items) {
@@ -55,7 +55,7 @@ export function replaceArray(context, items) {
     }
   });
 
-  return wait();
+  return settled();
 }
 
 export function move(context, sourceItemIdx, destItemIdx) {
@@ -83,5 +83,5 @@ export function move(context, sourceItemIdx, destItemIdx) {
     }
   });
 
-  return wait();
+  return settled();
 }

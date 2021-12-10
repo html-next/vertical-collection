@@ -1,5 +1,1 @@
-{
-  "babel": {
-    "includePolyfill": true
-  }
-}
+{}

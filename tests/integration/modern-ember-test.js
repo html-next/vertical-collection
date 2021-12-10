@@ -1,29 +1,29 @@
-import { moduleForComponent, test } from 'ember-qunit';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
-import { find } from 'ember-native-dom-helpers';
-import wait from 'ember-test-helpers/wait';
+import { find, settled } from '@ember/test-helpers';
 
-moduleForComponent('vertical-collection', 'Integration | Modern Ember Features Tests', {
-  integration: true
-});
+module('vertical-collection', 'Integration | Modern Ember Features Tests', function(hooks) {
+  setupRenderingTest(hooks);
 
-test('Yields to inverse when no content is provided', async function(assert) {
-  assert.expect(1);
-  this.set('items', []);
+  test('Yields to inverse when no content is provided', async function(assert) {
+    assert.expect(1);
+    this.set('items', []);
 
-  this.render(hbs`
-      <div class="scrollable">
-        {{#vertical-collection items
-          estimateHeight=20
-          staticHeight=true
-        }}
-          {{else}}
-            Foobar
-        {{/vertical-collection}}
-      </div>
-    `);
+    this.render(hbs`
+        <div class="scrollable">
+          {{#vertical-collection this.items
+            estimateHeight=20
+            staticHeight=true
+          }}
+            {{else}}
+              Foobar
+          {{/vertical-collection}}
+        </div>
+      `);
 
-  await wait();
+    await settled();
 
-  assert.equal(find('.scrollable').textContent.indexOf('Foobar') !== -1, true);
+    assert.equal(find('.scrollable').textContent.indexOf('Foobar') !== -1, true);
+  });
 });
