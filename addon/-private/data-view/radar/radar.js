@@ -224,7 +224,7 @@ export default class Radar {
    *
    * @private
    */
-  scheduleUpdate(didUpdateItems) {
+  scheduleUpdate(didUpdateItems, promiseResolve) {
     if (didUpdateItems === true) {
       // Set the update items flag first, in case scheduleUpdate has already been called
       // but the RAF hasn't yet run
@@ -239,11 +239,11 @@ export default class Radar {
       this._nextUpdate = null;
       this._scrollTop = this._scrollContainer.scrollTop;
 
-      this.update();
+      this.update(promiseResolve);
     });
   }
 
-  update() {
+  update(promiseResolve) {
     if (this._didUpdateItems === true) {
       this._determineUpdateType();
       this._didUpdateItems = false;
@@ -253,7 +253,12 @@ export default class Radar {
     this._updateIndexes();
     this._updateVirtualComponents();
 
-    this.schedule('measure', this.afterUpdate.bind(this));
+    this.schedule('measure', () => {
+      if (promiseResolve) {
+        promiseResolve();
+      }
+      this.afterUpdate();
+    });
   }
 
   afterUpdate() {
