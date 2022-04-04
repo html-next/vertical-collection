@@ -3,18 +3,15 @@ import hbs from 'htmlbars-inline-precompile';
 import { find } from 'ember-native-dom-helpers';
 import wait from 'ember-test-helpers/wait';
 
-import { SUPPORTS_INVERSE_BLOCK } from 'ember-compatibility-helpers';
+moduleForComponent('vertical-collection', 'Integration | Modern Ember Features Tests', {
+  integration: true
+});
 
-if (SUPPORTS_INVERSE_BLOCK) {
-  moduleForComponent('vertical-collection', 'Integration | Modern Ember Features Tests', {
-    integration: true
-  });
+test('Yields to inverse when no content is provided', async function(assert) {
+  assert.expect(1);
+  this.set('items', []);
 
-  test('Yields to inverse when no content is provided', async function(assert) {
-    assert.expect(1);
-    this.set('items', []);
-
-    this.render(hbs`
+  this.render(hbs`
       <div class="scrollable">
         {{#vertical-collection items
           estimateHeight=20
@@ -26,8 +23,7 @@ if (SUPPORTS_INVERSE_BLOCK) {
       </div>
     `);
 
-    await wait();
+  await wait();
 
-    assert.equal(find('.scrollable').textContent.indexOf('Foobar') !== -1, true);
-  });
-}
+  assert.equal(find('.scrollable').textContent.indexOf('Foobar') !== -1, true);
+});

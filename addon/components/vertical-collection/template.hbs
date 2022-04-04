@@ -1,4 +1,4 @@
-{{#each virtualComponents key="id" as |virtualComponent index| ~}}
+{{#each virtualComponents key="id" as |virtualComponent| ~}}
   {{~unbound virtualComponent.upperBound~}}
   {{~#if virtualComponent.isOccludedContent ~}}
     {{{unbound virtualComponent.element}}}

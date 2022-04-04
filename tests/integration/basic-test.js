@@ -52,7 +52,9 @@ testScenarios(
 
   async function(assert) {
     assert.expect(1);
-    assert.equal(findAll('.vertical-item').length, 3);
+    await wait();
+    const items = await findAll('.vertical-item');
+    assert.equal(items.length, 3);
   }
 );
 

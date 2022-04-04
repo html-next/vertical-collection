@@ -4,6 +4,7 @@ try {
   let opts = Object.defineProperty({}, 'passive', {
     get() {
       supportsPassive = true;
+      return supportsPassive;
     }
   });
 
