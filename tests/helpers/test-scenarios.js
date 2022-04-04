@@ -1,11 +1,10 @@
 import { A } from '@ember/array';
 import ArrayProxy from '@ember/array/proxy';
 import { Promise } from 'rsvp';
-import Ember from 'ember';
-import { test } from 'ember-qunit';
+import { test } from 'qunit';
 import DS from 'ember-data';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
+import { settled } from '@ember/test-helpers';
 
 const {
   PromiseArray
@@ -26,14 +25,16 @@ export function testScenarios(description, scenarios, template, testFn, preRende
         await setValuesBeforeRender.call(this, assert);
       }
 
-      await this.render(template);
+      let renderCompletionPromise = this.render(template);
 
       if (preRenderTestFn) {
         await preRenderTestFn.call(this, assert);
       } else if(testFn) {
-        await wait();
+        await settled();
         await testFn.call(this, assert);
       }
+
+      await renderCompletionPromise;
     });
   }
 }
@@ -77,28 +78,28 @@ export const scenariosFor = mergeScenarioGenerators(
 
 export const standardTemplate = hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection items
-      estimateHeight=(either-or estimateHeight 20)
-      staticHeight=staticHeight
-      bufferSize=(either-or bufferSize 0)
-      renderAll=renderAll
-      debugVis=(either-or debugVis false)
-      debugCSS=(either-or debugCSS false)
+    {{#vertical-collection this.items
+      estimateHeight=(either-or this.estimateHeight 20)
+      staticHeight=this.staticHeight
+      bufferSize=(either-or this.bufferSize 0)
+      renderAll=this.renderAll
+      debugVis=(either-or this.debugVis false)
+      debugCSS=(either-or this.debugCSS false)
 
-      renderFromLast=renderFromLast
-      idForFirstItem=idForFirstItem
+      renderFromLast=this.renderFromLast
+      idForFirstItem=this.idForFirstItem
 
-      firstVisibleChanged=firstVisibleChanged
-      lastVisibleChanged=lastVisibleChanged
-      firstReached=firstReached
-      lastReached=lastReached
+      firstVisibleChanged=this.firstVisibleChanged
+      lastVisibleChanged=this.lastVisibleChanged
+      firstReached=this.firstReached
+      lastReached=this.lastReached
 
-      key=(either-or key "@identity")
+      key=(either-or this.key "@identity")
 
       as |item i|}}
       <div
         class="vertical-item"
-        style={{html-safe (join-strings "height:" (either-or itemHeight (either-or estimateHeight 20)) "px;")}}
+        style={{html-safe (join-strings "height:" (either-or this.itemHeight (either-or this.estimateHeight 20)) "px;")}}
       >
         {{item.number}} {{i}}
       </div>
@@ -123,8 +124,8 @@ function generateScenario(name, defaultOptions, initializer) {
     const items = initializer ? initializer(baseItems.slice()) : baseItems.slice();
     const scenario = { items };
 
-    Ember.assign(scenario, options); // eslint-disable-line ember/new-module-imports
-    Ember.assign(scenario, defaultOptions); // eslint-disable-line ember/new-module-imports
+    Object.assign(scenario, options);
+    Object.assign(scenario, defaultOptions);
 
     return { [name]: scenario };
   };
@@ -133,7 +134,7 @@ function generateScenario(name, defaultOptions, initializer) {
 function mergeScenarioGenerators(...scenarioGenerators) {
   return function(items, options) {
     return scenarioGenerators.reduce((scenarios, generator) => {
-      return Ember.assign(scenarios, generator(items, options)); // eslint-disable-line ember/new-module-imports
+      return Object.assign(scenarios, generator(items, options));
     }, {});
   };
 }

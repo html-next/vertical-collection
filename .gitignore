@@ -12,6 +12,7 @@
 /.env*
 /.pnp*
 /.sass-cache
+/.eslintcache
 /connect.lock
 /coverage/
 /libpeerconnection.log
@@ -24,5 +25,6 @@
 /bower.json.ember-try
 /package.json.ember-try
 
+# custom
 .idea/
 .DS_Store

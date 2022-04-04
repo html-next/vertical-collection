@@ -6,16 +6,17 @@ on:
 jobs:
   test:
     name: Run Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Use Node 12
+      - name: Use Node 14
         uses: actions/setup-node@v2-beta
         with:
-          node-version: 12.x
+          node-version: 14.x
 
       - name: Node Modules Cache
         uses: actions/cache@v2
@@ -30,25 +31,28 @@ jobs:
         run: yarn lint
 
       - name: Run Tests
-        run: yarn test:ember
+        run: bin/run-tests-with-retry.sh
         env:
           CI: true
 
   test-ember-try:
     name: Run Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+
     strategy:
+      fail-fast: false
       matrix:
         ember-version:
           [
-            ember-lts-2.8,
-            ember-lts-2.12,
             ember-lts-2.18,
             ember-lts-3.4,
             ember-lts-3.8,
             ember-lts-3.12,
             ember-lts-3.16,
             ember-lts-3.20,
+            ember-lts-3.24,
+            ember-lts-3.28,
             ember-release,
             ember-beta,
             ember-canary,
@@ -58,10 +62,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Use Node 12
+      - name: Use Node 14
         uses: actions/setup-node@v2-beta
         with:
-          node-version: 12.x
+          node-version: 14.x
 
       - name: Node Modules Cache
         uses: actions/cache@v2
@@ -73,4 +77,4 @@ jobs:
         run: yarn install --frozen-lockfile --ignore-engines
 
       - name: Run Tests
-        run: node_modules/.bin/ember try:one ${{ matrix.ember-version }} --skip-cleanup
+        run: node_modules/.bin/ember try:one ${{ matrix.ember-version }} --skip-cleanup --- bin/run-tests-with-retry.sh

@@ -1,6 +1,44 @@
 Changelog
 =========
 
+## v3.0.0-1 (2022-03-01)
+
+
+## v3.0.0-0 (2021-12-09)
+
+#### What's new
+
+* Drop support for Ember < 2.18, add support for Ember 4.0+ (#343) (3343ecc)
+* 4 retries on CI, 1s sleep (#352) (4a75d99)
+* Extend timeout for base tests, tweak retry (#351) (8fff4c7)
+* Remove implicit this in tests (#349) (5f58de6)
+
+
+## v2.1.0 (2021-12-09)
+
+Changelog:
+
+* Upgrade ember-cli and dev deps (#348) (e8924e9)
+* Drop Ember global use in favor of native API (#347) (d101d8a)
+* Proper runloop imports (#346) (a765241)
+* Remove property fallback lookup (no implicit this) (#345) (506d798)
+* Modernize `htmlSafe` module imports / More cleanup (#344) (32e9460)
+* Update CI for vertical-collection v2 (#342) (5613faa)
+
+
+## v2.0.1 (2021-12-07)
+
+#### :bug: Bug Fix
+* [#322](https://github.com/html-next/vertical-collection/pull/322) Remove comma in selector list in css ([@CubeSquared](https://github.com/CubeSquared))
+
+#### :house: Internal
+* [#336](https://github.com/html-next/vertical-collection/pull/336) Add rwjblue release-it setup ([@rwwagner90](https://github.com/rwwagner90))
+
+#### Committers: 2
+- Matthew Jacobs ([@CubeSquared](https://github.com/CubeSquared))
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+
+
 ## 0.5.5
 
 ### Pull Requests

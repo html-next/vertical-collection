@@ -1,4 +1,3 @@
-/* global document */
 import { ViewportContainer } from '../../-private';
 
 function applyVerticalStyles(element, geography, orientation) {

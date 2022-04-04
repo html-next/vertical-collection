@@ -22,7 +22,7 @@ export function ViewportContainer() {
         || document.documentElement.scrollTop;
     },
     set(v) {
-      return document.body.scrollTop = document.documentElement.scrollTop = v;
+      document.body.scrollTop = document.documentElement.scrollTop = v;
     }
   });
 
@@ -34,7 +34,7 @@ export function ViewportContainer() {
         || document.documentElement.scrollLeft;
     },
     set(v) {
-      return window.scrollX
+      window.scrollX
         = window.pageXOffset
         = document.body.scrollLeft
         = document.documentElement.scrollLeft = v;

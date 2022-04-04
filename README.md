@@ -87,10 +87,11 @@ There are two components you can use, `vertical-collection` for vertical scrolla
 
 ## Support Matrix
 
-| `vertical-collection` version | Supported Ember versions |
-| ----------------------------- | ------------------------ |
-| `^v1.0.0`                     | `v1.12.0 - v3.8.0`       |
-| `^v2.0.0`                     | `v2.8.0+`                |
+| `vertical-collection` version | Supported Ember versions | Supported Node versions |
+| ----------------------------- | ------------------------ | ----------------------- |
+| `^v1.x.x`                     | `v1.12.0 - v3.8.x`       | `?`                     |
+| `^v2.x.x`                     | `v2.8.0 - v3.26.x`       | `v12 - ?`               |
+| `^v3.x.x`                     | `v2.18.0+`               | `v14+`                  |
 
 ## Support, Questions, Collaboration
 
