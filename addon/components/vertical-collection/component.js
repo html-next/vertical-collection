@@ -1,5 +1,16 @@
 import VirtualCollection from '../virtual-collection';
 import layout from './template';
+import { empty, readOnly } from '@ember/object/computed';
+import { get, computed } from '@ember/object';
+import { run } from '@ember/runloop';
+
+import { scheduler, Token } from 'ember-raf-scheduler';
+
+import {
+  keyForItem,
+  objectAt
+} from '../../-private';
+
 
 const VerticalCollection = VirtualCollection.extend({
   layout,
@@ -138,18 +149,18 @@ const VerticalCollection = VirtualCollection.extend({
    */
   occlusionTagName: 'occluded-content',
 
-  isEmpty: empty('items'),
+  isEmpty: empty('items'), 
   shouldYieldToInverse: readOnly('isEmpty'),
 
   virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function() {
     const { _radar } = this;
 
-    const items = this.get('items');
+    const items = this.items;
 
     _radar.items = items === null || items === undefined ? [] : items;
-    _radar.estimateHeight = this.get('estimateHeight');
-    _radar.renderAll = this.get('renderAll');
-    _radar.bufferSize = this.get('bufferSize');
+    _radar.estimateHeight = this.estimateHeight;
+    _radar.renderAll = this.renderAll;
+    _radar.bufferSize = this.bufferSize;
 
     _radar.scheduleUpdate(true);
 
@@ -168,8 +179,8 @@ const VerticalCollection = VirtualCollection.extend({
         this._nextSendActions = null;
 
         run(() => {
-          const items = this.get('items');
-          const keyPath = this.get('key');
+          const items = this.items;
+          const keyPath = this.key;
 
           this._scheduledActions.forEach(([action, index]) => {
             const item = objectAt(items, index);
@@ -217,7 +228,7 @@ const VerticalCollection = VirtualCollection.extend({
   willDestroy() {
     this.token.cancel();
     this._radar.destroy();
-    let registerAPI = this.get('registerAPI');
+    let registerAPI = this.registerAPI;
     if (registerAPI) {
       registerAPI(null);
     }
@@ -230,19 +241,19 @@ const VerticalCollection = VirtualCollection.extend({
     this.token = new Token();
     const RadarClass = this.staticHeight ? StaticRadar : DynamicRadar;
 
-    const items = this.get('items') || [];
+    const items = this.items || [];
 
-    const bufferSize = this.get('bufferSize');
-    const containerSelector = this.get('containerSelector');
-    const estimateHeight = this.get('estimateHeight');
-    const initialRenderCount = this.get('initialRenderCount');
-    const renderAll = this.get('renderAll');
-    const renderFromLast = this.get('renderFromLast');
-    const shouldRecycle = this.get('shouldRecycle');
-    const occlusionTagName = this.get('occlusionTagName');
+    const bufferSize = this.bufferSize;
+    const containerSelector = this.containerSelector;
+    const estimateHeight = this.estimateHeight;
+    const initialRenderCount = this.initialRenderCount;
+    const renderAll = this.renderAll;
+    const renderFromLast = this.renderFromLast;
+    const shouldRecycle = this.shouldRecycle;
+    const occlusionTagName = this.occlusionTagName;
 
-    const idForFirstItem = this.get('idForFirstItem');
-    const key = this.get('key');
+    const idForFirstItem = this.idForFirstItem;
+    const key = this.key;
 
     const startingIndex = calculateStartingIndex(items, idForFirstItem, key, renderFromLast);
 
@@ -309,7 +320,7 @@ const VerticalCollection = VirtualCollection.extend({
           }
         },
         scrollToItem() {
-          let collectionAPI = this.get('collectionAPI');
+          let collectionAPI = this.collectionAPI;
           collectionAPI.scrollToItem(index);
         }
       });
@@ -320,7 +331,7 @@ const VerticalCollection = VirtualCollection.extend({
         1. scrollToItem
     */
 
-    let registerAPI = get(this, 'registerAPI');
+    let registerAPI = this.registerAPI;
     if (registerAPI) {
       /* List of methods to be exposed to public should be added here */
       let publicAPI = {
@@ -336,7 +347,7 @@ VerticalCollection.reopenClass({
 });
 
 function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {
-  const totalItems = get(items, 'length');
+  const totalItems = items.length;
 
   let startingIndex = 0;
 
