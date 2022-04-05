@@ -8,6 +8,8 @@ import { scheduler, Token } from 'ember-raf-scheduler';
 
 import {
   keyForItem,
+  DynamicRadar,
+  StaticRadar,
   objectAt
 } from '../../-private';
 
