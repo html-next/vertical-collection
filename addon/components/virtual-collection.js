@@ -52,7 +52,7 @@ const VirtualCollection = Component.extend({
    * @type Boolean
    */
   staticSize: computed('staticHeight', 'staticWidth', 'orientation', function() {
-    return this.get( 'orientation' ) === 'horizontal' ? this.get( 'staticWidth' ) : this.get( 'staticHeight' );
+     return this.orientation === 'horizontal' ? this.staticWidth : this.staticHeight;
   }),
 
   /**
@@ -148,12 +148,12 @@ const VirtualCollection = Component.extend({
   virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'estimateWidth', 'orientation', 'bufferSize', function() {
     const { _radar } = this;
 
-    const items = this.get('items');
+    const items = this.items;
 
     _radar.items = items === null || items === undefined ? [] : items;
-    _radar.estimateSize = this.get( 'orientation' ) === 'horizontal' ? this.get('estimateWidth') : this.get('estimateHeight');
-    _radar.renderAll = this.get('renderAll');
-    _radar.bufferSize = this.get('bufferSize');
+    _radar.estimateSize = this.orientation === 'horizontal' ? this.estimateWidth : this.estimateHeight;
+    _radar.renderAll = this.renderAll;
+    _radar.bufferSize = this.bufferSize;
 
     _radar.scheduleUpdate(true);
 
@@ -172,8 +172,8 @@ const VirtualCollection = Component.extend({
         this._nextSendActions = null;
 
         run(() => {
-          const items = this.get('items');
-          const keyPath = this.get('key');
+          const items = this.items;
+          const keyPath = this.key;
 
           this._scheduledActions.forEach(([action, index]) => {
             const item = objectAt(items, index);
@@ -207,29 +207,55 @@ const VirtualCollection = Component.extend({
   willDestroy() {
     this.token.cancel();
     this._radar.destroy();
+    let registerAPI = this.registerAPI;
+    if (registerAPI) {
+      /* List of methods to be exposed to public should be added here */
+      let publicAPI = {
+        scrollToItem: this.scrollToItem.bind(this)
+      };
+      registerAPI(publicAPI);
+    }
     clearTimeout(this._nextSendActions);
+  },
+
+  /* Public API Methods 
+     @index => number
+     This will return offset height of the indexed item.
+  */
+  scrollToItem(index) {
+    const { _radar } = this;
+    // Getting the offset height from Radar
+    let scrollTop = _radar.getOffsetForIndex(index);
+    _radar._scrollContainer.scrollTop = scrollTop;
+    // To scroll exactly to specified index, we are changing the prevIndex values to specified index
+    _radar._prevFirstVisibleIndex = _radar._prevFirstItemIndex = index;
+    // Components will be rendered after schedule 'measure' inside 'update' method.
+    // In our case, we need to focus the element after component is rendered. So passing the promise.
+    return new Promise ((resolve) => {
+      _radar.scheduleUpdate(false, resolve);
+    });
   },
 
   init() {
     this._super();
 
     this.token = new Token();
-    const RadarClass = this.get( 'staticSize' ) ? StaticRadar : DynamicRadar;
+    const RadarClass = this.staticSize ? StaticRadar : DynamicRadar;
 
-    const items = this.get('items') || [];
+    const items = this.items || [];
 
-    const bufferSize = this.get('bufferSize');
-    const containerSelector = this.get('containerSelector');
-    const estimateSize = this.get('orientation') === 'horizontal' ? this.get('estimateWidth') : this.get('estimateHeight');
-    const orientation = this.get('orientation') === 'horizontal' ? 'horizontal' : 'vertical';
-    const initialRenderCount = this.get('initialRenderCount');
-    const renderAll = this.get('renderAll');
-    const renderFromLast = this.get('renderFromLast');
-    const shouldRecycle = this.get('shouldRecycle');
-    const occlusionTagName = this.get('occlusionTagName');
+    const bufferSize = this.bufferSize;
+    const containerSelector = this.containerSelector;
+    const estimateSize = this.orientation === 'horizontal' ? this.estimateWidth : this.estimateHeight;
+    const orientation = this.orientation === 'horizontal' ? 'horizontal' : 'vertical';
+    const initialRenderCount = this.initialRenderCount;
+    const renderAll = this.renderAll;
+    const renderFromLast = this.renderFromLast;
+    const shouldRecycle = this.shouldRecycle;
+    const occlusionTagName = this.occlusionTagName;
 
-    const idForFirstItem = this.get('idForFirstItem');
-    const key = this.get('key');
+    const idForFirstItem = this.idForFirstItem;
+    const key = this.key;
 
     const startingIndex = calculateStartingIndex(items, idForFirstItem, key, renderFromLast);
 
