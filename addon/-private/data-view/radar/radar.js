@@ -24,8 +24,6 @@ import estimateElementHeight from '../../utils/element/estimate-element-height';
 import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
 import keyForItem from '../../ember-internals/key-for-item';
 
-import document from '../../utils/document-shim';
-
 export default class Radar {
   constructor(
     parentToken,
@@ -115,11 +113,6 @@ export default class Radar {
     this._occludedContentBefore.addEventListener('click', this._pageUpHandler);
     this._pageDownHandler = this.pageDown.bind(this);
     this._occludedContentAfter.addEventListener('click', this._pageDownHandler);
-
-    // Element to hold pooled component DOM when not in use
-    if (document) {
-      this._domPool = document.createDocumentFragment();
-    }
 
     // Initialize virtual components
     this.virtualComponents = A([this._occludedContentBefore, this._occludedContentAfter]);
@@ -528,18 +521,8 @@ export default class Radar {
 
     // If there are any items remaining in the pool, remove them
     if (_componentPool.length > 0) {
-      if (shouldRecycle === true) {
-        // Grab the DOM of the remaining components and move it to temporary node disconnected from
-        // the body. If we end up using these components again, we'll grab their DOM and put it back
-        for (let i = 0; i < _componentPool.length; i++) {
-          const component = _componentPool[i];
-
-          insertRangeBefore(this._domPool, null, component.realUpperBound, component.realLowerBound);
-        }
-      } else {
-        virtualComponents.removeObjects(_componentPool);
-        _componentPool.length = 0;
-      }
+      virtualComponents.removeObjects(_componentPool);
+      _componentPool.length = 0;
     }
 
     const totalItemsBefore = renderedFirstItemIndex;
