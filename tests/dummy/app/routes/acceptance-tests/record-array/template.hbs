@@ -3,6 +3,9 @@
     estimateHeight=50
     bufferSize=5
     as |item index|}}
-    {{number-slide item=item itemIndex=index}}
+    {{number-slide item=item itemIndex=index prefixed=this.prefixed}}
   {{/vertical-collection}}
 </div>
+
+<button id="update-items-button" {{action "updateItems"}}>Update items</button>
+<button id="show-prefixed-button" {{action "showPrefixed"}}>Show prefixed</button>
