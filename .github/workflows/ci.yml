@@ -79,6 +79,8 @@ jobs:
             yarn.lock
             __env
           key: ci-yarn-v3-${{ matrix.ember-version }}-${{ hashFiles('config/ember-try.js', '__cache-key') }}
+          restore-keys: |
+            ci-yarn-${{ hashFiles('yarn.lock') }}
 
       - name: Install Dependencies
         if: steps.cache-npm.outputs.cache-hit != 'true'
