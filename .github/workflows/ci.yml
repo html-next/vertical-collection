@@ -17,12 +17,14 @@ jobs:
         uses: volta-cli/action@v1
 
       - name: Node Modules Cache
+        id: cache-npm
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
-          key: ci-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ci-yarn-${{ hashFiles('yarn.lock') }}
 
       - name: Install Dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
       - name: Lint
@@ -64,14 +66,27 @@ jobs:
       - name: Use Volta
         uses: volta-cli/action@v1
 
+      - name: Stash yarn.lock for cache key
+        run: cp yarn.lock __cache-key
+
       - name: Node Modules Cache
+        id: cache-npm
         uses: actions/cache@v3
         with:
-          path: '**/node_modules'
-          key: ci-yarn-${{ matrix.ember-version }}-${{ hashFiles('**/yarn.lock') }}
+          path: |
+            node_modules
+            package.json
+            yarn.lock
+            __env
+          key: ci-yarn-v3-${{ matrix.ember-version }}-${{ hashFiles('config/ember-try.js', '__cache-key') }}
 
-      - name: Install
-        run: yarn install --frozen-lockfile --ignore-engines
+      - name: Install Dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: Ember-Try Setup
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: node_modules/.bin/ember try:one ${{ matrix.ember-version }} --skip-cleanup --- bin/stash-env.sh
 
       - name: Run Tests
-        run: node_modules/.bin/ember try:one ${{ matrix.ember-version }} --skip-cleanup --- bin/run-tests-with-retry.sh
+        run: . bin/restore-env.sh && bin/run-tests-with-retry.sh

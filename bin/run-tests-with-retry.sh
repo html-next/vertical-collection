@@ -24,4 +24,4 @@ function retry {
     fi
 }
 
-retry yarn test:ember
+yarn run ember build && retry yarn run ember test --path=dist
