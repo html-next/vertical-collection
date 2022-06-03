@@ -470,10 +470,10 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     hbs`
       <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
         <div style="height: 400px; width: 100px;" class="scroll-child scrollable">
-          {{#vertical-collection items
+          {{#vertical-collection this.items
             estimateHeight=20
             bufferSize=0
-            registerAPI=(action registerAPI)
+            registerAPI=(action this.registerAPI)
             as |item i|}}
             <div class="vertical-item" style="height:40px;">
               {{item.number}} {{i}}
