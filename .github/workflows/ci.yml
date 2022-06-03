@@ -20,7 +20,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
-          key: ci-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ci-yarn-${{ hashFiles('yarn.lock') }}
 
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
@@ -64,14 +64,26 @@ jobs:
       - name: Use Volta
         uses: volta-cli/action@v1
 
+      - name: Stash yarn.lock for cache key
+        run: cp yarn.lock __cache-key
+
       - name: Node Modules Cache
+        id: cache-npm
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
-          key: ci-yarn-${{ matrix.ember-version }}-${{ hashFiles('**/yarn.lock') }}
+          key: ci-yarn-${{ matrix.ember-version }}-${{ hashFiles('yarn.lock') }}
 
-      - name: Install
+      - if: ${{ steps.cache-npm.outputs.cache-hit == 'false' }}
+        name: Base Dependencies
         run: yarn install --frozen-lockfile --ignore-engines
 
-      - name: Run Tests
-        run: node_modules/.bin/ember try:one ${{ matrix.ember-version }} --skip-cleanup --- bin/run-tests-with-retry.sh
+      - if: ${{ steps.cache-npm.outputs.cache-hit == 'false' }}
+        name: Ember Try Setup
+        run: node_modules/.bin/ember try:one ${{ matrix.ember-version }} --skip-cleanup --- echo "success"
+
+        name: Run Tests
+        run: bin/run-tests-with-retry.sh
+
+      - name: Replace yarn.lock for Node Modules Cache
+        run: mv yarn.lock.ember-try yarn.lock
