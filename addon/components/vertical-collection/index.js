@@ -16,7 +16,6 @@ import {
 
 const VerticalCollection = Component.extend({
   layout,
-
   tagName: '',
 
   /**
@@ -200,7 +199,7 @@ const VerticalCollection = Component.extend({
     }
   },
 
-  /* Public API Methods 
+  /* Public API Methods
      @index => number
      This will return offset height of the indexed item.
   */
@@ -303,8 +302,8 @@ const VerticalCollection = Component.extend({
       };
     }
 
-    /* Public methods to Expose to parent 
-      
+    /* Public methods to Expose to parent
+
       Usage:
 
       Template:
@@ -312,7 +311,7 @@ const VerticalCollection = Component.extend({
       {{vertical-collection registerAPI=(action "registerAPI")}}
 
       Component:
-      
+
        export default Component.extend({
         actions: {
           registerAPI(api) {
@@ -324,7 +323,7 @@ const VerticalCollection = Component.extend({
           collectionAPI.scrollToItem(index);
         }
       });
-        
+
       Need to pass this property in the vertical-collection template
       Listen in the component actions and do your custom logic
        This API will have below methods.
