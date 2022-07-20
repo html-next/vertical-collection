@@ -81,12 +81,31 @@ module.exports = async function() {
         }
       },
       {
-        name: 'ember-4.4',
+        name: 'ember-lts-4.4',
         npm: {
           devDependencies: {
             'ember-cli-fastboot': '3.2.0-beta.5',
             'ember-data': '~3.28.0',
             'ember-source': '~4.4.0'
+          },
+          ember: {
+            edition: 'octane'
+          }
+        },
+        env: {
+          EMBER_OPTIONAL_FEATURES: JSON.stringify({
+            'application-template-wrapper': false,
+            'template-only-glimmer-components': true,
+          })
+        }
+      },
+      {
+        name: 'ember-4.5',
+        npm: {
+          devDependencies: {
+            'ember-cli-fastboot': '3.2.0-beta.5',
+            'ember-data': '~3.28.0',
+            'ember-source': '~4.5.0'
           },
           ember: {
             edition: 'octane'
