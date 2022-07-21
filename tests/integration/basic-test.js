@@ -4,7 +4,8 @@ import hbs from 'htmlbars-inline-precompile';
 import {
   find,
   findAll,
-  settled
+  settled,
+  render
 } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
@@ -237,7 +238,7 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     this.set('items', getNumbers(0, 10));
 
     assertAfterInitialRender(() => {
-      this.render(hbs`
+      render(hbs`
         <div style="height: 500px; width: 500px;" class="scrollable">
           {{#vertical-collection this.items
             estimateHeight=50
@@ -267,7 +268,7 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     this.set('items', getNumbers(0, 100));
 
     assertAfterInitialRender(() => {
-      this.render(hbs`
+      render(hbs`
         <div style="height: 500px; width: 500px;" class="scrollable">
           {{#vertical-collection this.items
             estimateHeight=50
@@ -299,7 +300,7 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     this.set('items', getNumbers(0, 1));
 
     assertAfterInitialRender(() => {
-      this.render(hbs`
+      render(hbs`
         <div style="height: 500px; width: 500px;" class="scrollable">
           {{#vertical-collection this.items
             estimateHeight=50
