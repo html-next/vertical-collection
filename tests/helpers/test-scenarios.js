@@ -4,7 +4,7 @@ import { Promise } from 'rsvp';
 import { test } from 'qunit';
 import DS from 'ember-data';
 import hbs from 'htmlbars-inline-precompile';
-import { settled } from '@ember/test-helpers';
+import { settled, render } from '@ember/test-helpers';
 
 const {
   PromiseArray
@@ -25,7 +25,7 @@ export function testScenarios(description, scenarios, template, testFn, preRende
         await setValuesBeforeRender.call(this, assert);
       }
 
-      let renderCompletionPromise = this.render(template);
+      let renderCompletionPromise = render(template);
 
       if (preRenderTestFn) {
         await preRenderTestFn.call(this, assert);
