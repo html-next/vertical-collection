@@ -1,6 +1,5 @@
 import { set } from '@ember/object';
 import { DEBUG } from '@glimmer/env';
-import { IS_GLIMMER_2, gte as emberVersionGTE } from 'ember-compatibility-helpers';
 
 import document from '../../utils/document-shim';
 
@@ -27,12 +26,6 @@ export default class OccludedContent {
     this.isOccludedContent = true;
     this.rendered = false;
 
-    if (!emberVersionGTE('3.0.0')) {
-      // In older versions of Ember, binding anything on an object in the template
-      // adds observers which creates __ember_meta__
-      this.__ember_meta__ = null; // eslint-disable-line camelcase
-    }
-
     if (DEBUG) {
       Object.preventExtensions(this);
     }
@@ -57,11 +50,11 @@ export default class OccludedContent {
   }
 
   get realUpperBound() {
-    return IS_GLIMMER_2 ? this.upperBound : this.upperBound.previousSibling;
+    return this.upperBound;
   }
 
   get realLowerBound() {
-    return IS_GLIMMER_2 ? this.lowerBound : this.lowerBound.nextSibling;
+    return this.lowerBound;
   }
 
   get parentNode() {

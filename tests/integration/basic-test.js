@@ -21,34 +21,12 @@ import {
   standardTemplate
 } from 'dummy/tests/helpers/test-scenarios';
 
-import { scheduler } from 'ember-raf-scheduler';
-import { gte as emberVersionGTE } from 'ember-compatibility-helpers';
-
-// Assert an odd timing: After initial render but before settledness. Because
-// of changes to the `render` helper in test-helpers, this should be done
-// differently in ember-test-helpers 1.x and 2.x.
-//
-// Use ember-compatibility-helpers < 3 as a proxy for identifying
-// ember-test-helpers 1.x.
-//
-// This helpers can be killed off when Ember 2.18 support is dropped. The
-// gte Ember 3 version can be inlined where the helper is used.
+// Assert an odd timing: After initial render but before settledness.
 //
 async function assertAfterInitialRender(renderFn, assertFn) {
-  if (emberVersionGTE('3.0.0')) {
-    renderFn();
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    assertFn();
-  } else {
-    // After ember-raf-schedulers queues have flushed.
-    // The schedule of sync inside measure starts a second flush.
-    scheduler.schedule('measure', () => {
-      scheduler.schedule('sync', () => {
-        assertFn();
-      });
-    });
-    renderFn();
-  }
+  renderFn();
+  await new Promise(resolve => requestAnimationFrame(resolve));
+  assertFn();
 }
 
 module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
