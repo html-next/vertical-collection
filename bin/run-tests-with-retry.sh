@@ -18,10 +18,7 @@ function retry {
             sleep 1
         fi
     done
-    if [[ $retval -ne 0 ]] && [[ $attempt -gt 4 ]]; then
-        # Something is fubar, go ahead and exit
-        exit $retval
-    fi
+    exit $retval
 }
 
 yarn run ember build && retry yarn run ember test --path=dist
