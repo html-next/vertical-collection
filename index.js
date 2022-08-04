@@ -138,7 +138,7 @@ module.exports = {
     const opts = {
       loose: true,
       plugins,
-      postTransformPlugins: [StripClassCallCheckPlugin]
+      postTransformPlugins: [[StripClassCallCheckPlugin, {}]]
     };
 
     return opts;
