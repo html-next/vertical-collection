@@ -155,12 +155,12 @@ const VerticalCollection = Component.extend({
   virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function() {
     const { _radar } = this;
 
-    const items = this.get('items');
+    const items = this.items;
 
     _radar.items = items === null || items === undefined ? [] : items;
-    _radar.estimateHeight = this.get('estimateHeight');
-    _radar.renderAll = this.get('renderAll');
-    _radar.bufferSize = this.get('bufferSize');
+    _radar.estimateHeight = this.estimateHeight;
+    _radar.renderAll = this.renderAll;
+    _radar.bufferSize = this.bufferSize;
 
     _radar.scheduleUpdate(true);
 
@@ -179,8 +179,8 @@ const VerticalCollection = Component.extend({
         this._nextSendActions = null;
 
         run(() => {
-          const items = this.get('items');
-          const keyPath = this.get('key');
+          const items = this.items;
+          const keyPath = this.key;
 
           this._scheduledActions.forEach(([action, index]) => {
             const item = objectAt(items, index);
@@ -228,7 +228,7 @@ const VerticalCollection = Component.extend({
   willDestroy() {
     this.token.cancel();
     this._radar.destroy();
-    let registerAPI = this.get('registerAPI');
+    let registerAPI = this.registerAPI;
     if (registerAPI) {
       registerAPI(null);
     }
@@ -241,19 +241,20 @@ const VerticalCollection = Component.extend({
     this.token = new Token();
     const RadarClass = this.staticHeight ? StaticRadar : DynamicRadar;
 
-    const items = this.get('items') || [];
+    const items = this.items || [];
 
-    const bufferSize = this.get('bufferSize');
-    const containerSelector = this.get('containerSelector');
-    const estimateHeight = this.get('estimateHeight');
-    const initialRenderCount = this.get('initialRenderCount');
-    const renderAll = this.get('renderAll');
-    const renderFromLast = this.get('renderFromLast');
-    const shouldRecycle = this.get('shouldRecycle');
-    const occlusionTagName = this.get('occlusionTagName');
-
-    const idForFirstItem = this.get('idForFirstItem');
-    const key = this.get('key');
+    const {
+      bufferSize,
+      containerSelector,
+      estimateHeight,
+      initialRenderCount,
+      renderAll,
+      renderFromLast,
+      shouldRecycle,
+      occlusionTagName,
+      idForFirstItem,
+      key
+    } = this;
 
     const startingIndex = calculateStartingIndex(items, idForFirstItem, key, renderFromLast);
 
@@ -320,7 +321,7 @@ const VerticalCollection = Component.extend({
           }
         },
         scrollToItem() {
-          let collectionAPI = this.get('collectionAPI');
+          let collectionAPI = this.collectionAPI;
           collectionAPI.scrollToItem(index);
         }
       });

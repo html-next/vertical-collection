@@ -25,7 +25,7 @@ export default Mixin.create({
   },
 
   detectIssuesWithCSS() {
-    if (this.get('debugCSS') === false) {
+    if (this.debugCSS === false) {
       return;
     }
 
@@ -55,7 +55,7 @@ export default Mixin.create({
     assert(`itemContainer must define position`, styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute']));
 
     // check item defaults
-    assert(`You must supply at least one item to the collection to debug it's CSS.`, this.get('items.length'));
+    assert(`You must supply at least one item to the collection to debug it's CSS.`, this.items.length);
 
     let element = radar._itemContainer.firstElementChild;
 
@@ -66,7 +66,7 @@ export default Mixin.create({
   },
 
   updateVisualization() {
-    if (this.get('debugVis') === false) {
+    if (this.debugVis === false) {
       if (this.__visualization !== null) {
         console.info('tearing down existing visualization'); // eslint-disable-line no-console
         this.__visualization.destroy();
