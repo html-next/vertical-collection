@@ -1,6 +1,21 @@
 Changelog
 =========
 
+
+## v3.1.0 (2022-08-04)
+
+#### :rocket: Enhancement
+* [#380](https://github.com/html-next/vertical-collection/pull/380) fix: enable parallel builds ([@runspired](https://github.com/runspired))
+
+#### :bug: Bug Fix
+* [#380](https://github.com/html-next/vertical-collection/pull/380) fix: enable parallel builds ([@runspired](https://github.com/runspired))
+* [#358](https://github.com/html-next/vertical-collection/pull/358) Delete virtual element ([@Atrue](https://github.com/Atrue))
+
+#### Committers: 3
+- Chris Thoburn ([@runspired](https://github.com/runspired))
+- Matthew Beale ([@mixonic](https://github.com/mixonic))
+- [@Atrue](https://github.com/Atrue)
+
 ## v3.0.0 (2022-05-03)
 
 
