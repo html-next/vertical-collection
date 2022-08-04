@@ -1,6 +1,6 @@
 'use strict';
 
-const StripClassCallCheckPlugin = require('babel6-plugin-strip-class-callcheck');
+const StripClassCallCheckPlugin = require.resolve('babel6-plugin-strip-class-callcheck');
 const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
 const merge = require('broccoli-merge-trees');
@@ -138,7 +138,7 @@ module.exports = {
     const opts = {
       loose: true,
       plugins,
-      postTransformPlugins: [StripClassCallCheckPlugin]
+      postTransformPlugins: [[StripClassCallCheckPlugin, {}]]
     };
 
     return opts;

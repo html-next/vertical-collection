@@ -7,7 +7,11 @@ module.exports = function(defaults) {
   defaults.snippetSearchPaths = ['tests/dummy/app'];
   defaults.snippetPaths = ['tests/dummy/snippets'];
 
-  let app = new EmberAddon(defaults);
+  let app = new EmberAddon(defaults, {
+    'ember-cli-babel': {
+      throwUnlessParallelizable: true
+    }
+  });
 
   app.isDevelopingAddon = () => {
     return true;
