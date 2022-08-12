@@ -23,13 +23,7 @@ module.exports = {
   },
 
   getOutputDirForVersion() {
-    let VersionChecker = require('ember-cli-version-checker');
-    let checker = new VersionChecker(this);
-    let emberCli = checker.for('ember-cli', 'npm');
-
-    let requiresModulesDir = emberCli.satisfies('< 3.0.0');
-
-    return requiresModulesDir ? 'modules' : '';
+    return '';
   },
 
   // Borrowed from ember-cli-babel
