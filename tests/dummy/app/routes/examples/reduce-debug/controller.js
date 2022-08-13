@@ -6,7 +6,7 @@ export default Controller.extend({
 
   actions: {
     filter() {
-      let model = this.get('model.numbers');
+      let model = this.model.numbers;
       let isFiltered = this.toggleProperty('isFiltered');
 
       if (!isFiltered) {
