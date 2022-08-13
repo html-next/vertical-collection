@@ -5,6 +5,6 @@ export default Route.extend({
   store: service(),
 
   model() {
-    return this.get('store').findAll('number-item');
+    return this.store.findAll('number-item');
   }
 });

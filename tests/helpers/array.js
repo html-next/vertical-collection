@@ -3,7 +3,7 @@ import { run } from '@ember/runloop';
 import { settled } from '@ember/test-helpers';
 
 export function prepend(context, itemsToPrepend) {
-  const items = context.get('items');
+  const items = context.items;
 
   run(() => {
     if (items.unshiftObjects) {
@@ -17,7 +17,7 @@ export function prepend(context, itemsToPrepend) {
 }
 
 export function append(context, itemsToAppend) {
-  const items = context.get('items');
+  const items = context.items;
 
   run(() => {
     if (items.pushObjects) {
@@ -31,7 +31,7 @@ export function append(context, itemsToAppend) {
 }
 
 export function emptyArray(context) {
-  const items = context.get('items');
+  const items = context.items;
 
   run(() => {
     if (items.clear) {
@@ -45,7 +45,7 @@ export function emptyArray(context) {
 }
 
 export function replaceArray(context, items) {
-  const oldItems = context.get('items');
+  const oldItems = context.items;
 
   run(() => {
     if (EmberArray.detect(oldItems)) {
@@ -59,7 +59,7 @@ export function replaceArray(context, items) {
 }
 
 export function move(context, sourceItemIdx, destItemIdx) {
-  const items = context.get('items');
+  const items = context.items;
   let destItem, sourceItem;
 
   run(() => {
