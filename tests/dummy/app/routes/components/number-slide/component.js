@@ -23,8 +23,8 @@ export default Component.extend({
   isDynamic: false,
   prefixed: false,
   style: computed('isDynamic', 'item', function() {
-    let item = this.get('item');
-    let isDynamic = this.get('isDynamic');
+    let item = this.item;
+    let isDynamic = this.isDynamic;
 
     let {
       height,

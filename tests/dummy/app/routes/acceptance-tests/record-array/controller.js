@@ -7,8 +7,8 @@ export default Controller.extend({
 
   actions: {
     updateItems() {
-      this.get('store').unloadAll('number-item');
-      this.get('store').query('number-item', { length: 5 });
+      this.store.unloadAll('number-item');
+      this.store.query('number-item', { length: 5 });
     },
 
     showPrefixed() {

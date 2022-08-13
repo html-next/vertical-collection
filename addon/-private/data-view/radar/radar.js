@@ -579,7 +579,7 @@ export default class Radar {
     if (component.rendered === true) {
       insertRangeBefore(_itemContainer, relativeNode, component.realUpperBound, component.realLowerBound);
     } else {
-      virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
+      virtualComponents.insertAt(virtualComponents.length - 1, component);
       component.rendered = true;
 
       // shouldRecycle=false breaks UI when scrolling the elements fast. 
@@ -620,7 +620,7 @@ export default class Radar {
     if (component.rendered === true) {
       insertRangeBefore(_itemContainer, relativeNode, component.realUpperBound, component.realLowerBound);
     } else {
-      virtualComponents.insertAt(virtualComponents.get('length') - 1, component);
+      virtualComponents.insertAt(virtualComponents.length - 1, component);
       component.rendered = true;
 
       // Components that are both new and prepended still need to be rendered at the end because Glimmer.
