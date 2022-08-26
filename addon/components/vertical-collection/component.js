@@ -43,7 +43,7 @@ const VerticalCollection = Component.extend({
 
   /**
    * List of objects to svelte-render.
-   * Can be called like `{{#vertical-collection <items-array>}}`, since it's the first positional parameter of this component.
+   * Can be called like `<VerticalCollection @items={{itemsArray}} />`.
    *
    * @property items
    * @type Array
@@ -310,11 +310,11 @@ const VerticalCollection = Component.extend({
 
       Template:
 
-      {{vertical-collection registerAPI=(action "registerAPI")}}
+      <VerticalCollection @registerAPI={{action "registerAPI"}} />
 
       Component:
       
-       export default Component.extend({
+      export default Component.extend({
         actions: {
           registerAPI(api) {
               this.set('collectionAPI', api);
@@ -341,10 +341,6 @@ const VerticalCollection = Component.extend({
       registerAPI(publicAPI);
     }
   }
-});
-
-VerticalCollection.reopenClass({
-  positionalParams: ['items']
 });
 
 function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {

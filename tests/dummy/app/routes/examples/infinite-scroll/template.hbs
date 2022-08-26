@@ -4,16 +4,16 @@
       <h3>Demo</h3>
       {{!- BEGIN-SNIPPET infinite-scroll-example }}
       <div class="table-wrapper dark">
-        {{#vertical-collection
-          this.model.numbers
-          estimateHeight=90
-          staticHeight=true
-          bufferSize=5
-          firstReached=(action "loadAbove")
-          lastReached=(action "loadBelow") as |item index|
-        }}
-          {{number-slide item=item index=index}}
-        {{/vertical-collection}}
+        <VerticalCollection
+          @items={{this.model.numbers}}
+          @estimateHeight={{90}}
+          @staticHeight={{true}}
+          @bufferSize={{5}}
+          @firstReached={{action "loadAbove"}}
+          @lastReached={{action "loadBelow"}} as |item index|
+        >
+          <NumberSlide @item={{item}} @index={{index}} />
+        </VerticalCollection>
       </div>
       {{!- END-SNIPPET }}
     </div>

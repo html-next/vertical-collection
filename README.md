@@ -30,24 +30,24 @@ ember install @html-next/vertical-collection
 ## Usage
 
 ```htmlbars
-{{#vertical-collection
-    items
-    tagName='ul'
-    estimateHeight=50
-    staticHeight=false
-    bufferSize=1
-    renderAll=false
-    renderFromLast=false
-    idForFirstItem=idForFirstItem
-    firstReached=(action firstReached)
-    lastReached=(action lastReached)
-    firstVisibleChanged=(action firstVisibleChanged)
-    lastVisibleChanged=(action lastVisibleChanged)
-     as |item i|}}
+<VerticalCollection
+    @items={{items}}
+    @tagName="ul"
+    @estimateHeight={{50}}
+    @staticHeight={{false}}
+    @bufferSize={{1}}
+    @renderAll={{false}}
+    @renderFromLast={{false}}
+    @idForFirstItem={{idForFirstItem}}
+    @firstReached={{firstReachedCallback}}
+    @lastReached={{lastReachedCallback}}
+    @firstVisibleChanged={{firstVisibleChangedCallback}}
+    @lastVisibleChanged={{lastVisibleChangedCallback}}
+     as |item i|>
     <li>
       {{item.number}} {{i}}
     </li>
-{{/vertical-collection}}
+</VerticalCollection>
 ```
 
 ### Actions
@@ -67,6 +67,7 @@ ember install @html-next/vertical-collection
 | `^v1.x.x`                     | `v1.12.0 - v3.8.x`       | `?`                     |
 | `^v2.x.x`                     | `v2.8.0 - v3.26.x`       | `v12 - ?`               |
 | `^v3.x.x`                     | `v2.18.0+`               | `v14+`                  |
+| `^v4.x.x`                     | `v3.12.0+`               | `v14+`                  |
 
 ## Support, Questions, Collaboration
 
