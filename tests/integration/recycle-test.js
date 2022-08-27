@@ -25,18 +25,18 @@ module('vertical-collection', 'Integration | Recycle Tests', function(hooks) {
     hbs`
       <div style="height: 200px" class="scrollable with-max-height">
         <div>
-          {{#vertical-collection this.items
-            containerSelector=".scrollable"
-            estimateHeight=20
-            staticHeight=this.staticHeight
-            shouldRecycle=false
-            bufferSize=0
+          <VerticalCollection @items={{this.items}}
+            @containerSelector=".scrollable"
+            @estimateHeight={{20}}
+            @staticHeight={{this.staticHeight}}
+            @shouldRecycle={{false}}
+            @bufferSize={{0}}
 
-            as |item i|}}
+            as |item i|>
             <vertical-item style="height: 20px">
               {{unbound item.number}} {{unbound i}}
             </vertical-item>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       </div>
     `,
@@ -59,18 +59,18 @@ module('vertical-collection', 'Integration | Recycle Tests', function(hooks) {
     hbs`
       <div style="height: 200px" class="scrollable">
         <div>
-          {{#vertical-collection this.items
-            containerSelector=".scrollable"
-            estimateHeight=20
-            staticHeight=this.staticHeight
-            shouldRecycle=true
-            bufferSize=0
+          <VerticalCollection @items={{this.items}}
+            @containerSelector=".scrollable"
+            @estimateHeight={{20}}
+            @staticHeight={{this.staticHeight}}
+            @shouldRecycle={{true}}
+            @bufferSize={{0}}
 
-            as |item i|}}
+            as |item i|>
             <vertical-item style="height: 20px">
               {{unbound item.number}} {{unbound i}}
             </vertical-item>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       </div>
     `,

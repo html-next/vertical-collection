@@ -3,16 +3,15 @@
     <div class="col-sm-5">
       <h3>Demo</h3>
       <div class="table-wrapper dark">
-        {{#vertical-collection
-          items=this.model.filtered
-          defaultHeight=270
-          useContentProxy=false
-        as |item index|
-        }}
+        <VerticalCollection
+          @items={{this.model.filtered}}
+          @defaultHeight={{270}}
+          @useContentProxy={{false}}
+        as |item index|>
           <div class="image-slide">
-            {{examples/infinite-scroll/components/number-slide number=item.number index=index}}
+            <Examples::InfiniteScroll::Components::NumberSlide @number={{item.number}} @index={{index}} />
           </div>
-        {{/vertical-collection}}
+        </VerticalCollection>
       </div>
     </div>
     <div class="col-sm-7">

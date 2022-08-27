@@ -147,15 +147,15 @@ module('vertical-collection', 'Integration | Measure Tests', function(hooks) {
     hbs`
       <div style="transform: scale(0.333333)">
         <div style="height: 100px" class="scrollable">
-          {{#vertical-collection this.items
-            estimateHeight=20
-            bufferSize=0
+          <VerticalCollection @items={{this.items}}
+            @estimateHeight={{20}}
+            @bufferSize={{0}}
 
-            as |item i|}}
+            as |item i|>
             <vertical-item style="height: 30px">
               {{item.number}} {{i}}
             </vertical-item>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       </div>
     `,

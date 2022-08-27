@@ -1,10 +1,10 @@
 <div class="table-wrapper dark">
-  {{#vertical-collection this.model
-    estimateHeight=50
-    bufferSize=5
-    as |item index|}}
-    {{number-slide item=item itemIndex=index prefixed=this.prefixed}}
-  {{/vertical-collection}}
+  <VerticalCollection @items={{this.model}}
+    @estimateHeight={{50}}
+    @bufferSize={{5}}
+    as |item index|>
+    <NumberSlide @item={{item}} @itemIndex={{index}} @prefixed={{this.prefixed}} />
+  </VerticalCollection>
 </div>
 
 <button id="update-items-button" {{action "updateItems"}}>Update items</button>
