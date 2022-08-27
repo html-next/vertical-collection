@@ -8,7 +8,7 @@ export default
 
   // Positional parameter, e.g.
   //
-  // `{{#vertical-collection items as |item|}}`
+  // `<VerticalCollection @items={{items}} as |item|>`
   //
   // Note: An alias for this property named `content`
   // exists solely for Ember 1.11 support. The alias

@@ -72,6 +72,8 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
         count++;
         called();
       });
+
+      await settled();
     }
   );
 
@@ -98,6 +100,8 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
         count++;
         called();
       });
+
+      await settled();
     }
   );
 
@@ -309,6 +313,8 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
         assert.equal(index, 49, 'the lastReached item is correct');
         called();
       });
+
+      await settled();
     }
   );
 
@@ -404,18 +410,18 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     <div style="height: 370px; width: 200px;" class="scrollable">
       <table class="table table-striped latest-data">
         <tbody>
-          {{#vertical-collection this.items
-            containerSelector=".scrollable"
-            estimateHeight=37
-            staticHeight=this.staticHeight
-            bufferSize=0
+          <VerticalCollection @items={{this.items}}
+            @containerSelector=".scrollable"
+            @estimateHeight={{37}}
+            @staticHeight={{this.staticHeight}}
+            @bufferSize={{0}}
 
-            as |item i|}}
+            as |item i|>
             <tr>
               <td>{{item.number}}</td>
               <td>{{i}}</td>
             </tr>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </tbody>
       </table>
     </div>
@@ -440,15 +446,15 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     hbs`
       <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
         <div style="height: 400px; width: 100px;" class="scroll-child scrollable">
-          {{#vertical-collection this.items
-            estimateHeight=20
-            bufferSize=0
+          <VerticalCollection @items={{this.items}}
+            @estimateHeight={{20}}
+            @bufferSize={{0}}
 
-            as |item i|}}
+            as |item i|>
             <div class="vertical-item" style="height:40px;">
               {{item.number}} {{i}}
             </div>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       </div>
     `,
@@ -470,15 +476,15 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     hbs`
       <div style="height: 200px; width: 200px;" class="scroll-parent scrollable">
         <div style="height: 400px; width: 100px;" class="scroll-child scrollable">
-          {{#vertical-collection this.items
-            estimateHeight=20
-            bufferSize=0
-            registerAPI=(action this.registerAPI)
-            as |item i|}}
+          <VerticalCollection @items={{this.items}}
+            @estimateHeight={{20}}
+            @bufferSize={{0}}
+            @registerAPI={{this.registerAPI}}
+            as |item i|>
             <div class="vertical-item" style="height:40px;">
               {{item.number}} {{i}}
             </div>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       </div>
     `,
@@ -490,7 +496,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     },
     false,
     function() {
-      let registerAPI = function(collection) {
+      let registerAPI = collection => {
         this.set('collection', collection);
       };
       this.set('registerAPI', registerAPI);

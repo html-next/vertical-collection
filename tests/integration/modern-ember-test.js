@@ -12,12 +12,13 @@ module('vertical-collection', 'Integration | Modern Ember Features Tests', funct
 
     await render(hbs`
         <div class="scrollable">
-          {{#vertical-collection this.items
+          {{#vertical-collection
+            items=this.items
             estimateHeight=20
             staticHeight=true
           }}
-            {{else}}
-              Foobar
+          {{else}}
+            Foobar
           {{/vertical-collection}}
         </div>
       `);

@@ -7,17 +7,17 @@
         <div class="table-wrapper">
           <table class="table table-striped latest-data">
             <tbody>
-              {{#vertical-collection
-                model.databases
-                containerSelector=".table-wrapper"
-                key="id"
+              <VerticalCollection
+                @items={{model.databases}}
+                @containerSelector=".table-wrapper"
+                @key="id"
 
-                estimateHeight=37
-                staticHeight=true
-                bufferSize=5 as |db|
-              }}
-                {{examples/dbmon/components/dbmon-row tagName="tr" db=db}}
-              {{/vertical-collection}}
+                @estimateHeight={{37}}
+                @staticHeight={{true}}
+                @bufferSize={{5}}
+              as |db|>
+                <Examples::Dbmon::Components::DbmonRow @tagName="tr" @db={{db}} />
+              </VerticalCollection>
             </tbody>
           </table>
         </div>
@@ -34,7 +34,7 @@
         focusing only on what's on screen now.
       </p>
       <h4>Code for Demo</h4>
-      {{code-snippet name="dbmon-example.hbs"}}
+      <CodeSnippet @name="dbmon-example.hbs" />
     </div>
   </div>
 </div>
