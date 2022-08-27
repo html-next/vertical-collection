@@ -7,7 +7,7 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
 
     steps:
       - name: Checkout
@@ -30,15 +30,20 @@ jobs:
       - name: Lint
         run: yarn lint
 
+      - name: Run Build
+        run: . bin/restore-env.sh && yarn run ember build
+
       - name: Run Tests
-        run: bin/run-tests-with-retry.sh
-        env:
-          CI: true
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 2
+          max_attempts: 5
+          command: . bin/restore-env.sh && CI=true yarn run ember test --path=dist
 
   test-ember-try:
     name: Run Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 9
+    timeout-minutes: 12
 
     strategy:
       fail-fast: false
@@ -91,5 +96,12 @@ jobs:
         if: steps.cache-npm.outputs.cache-hit != 'true'
         run: node_modules/.bin/ember try:one ${{ matrix.ember-version }} --skip-cleanup --- bin/stash-env.sh
 
+      - name: Run Build
+        run: . bin/restore-env.sh && yarn run ember build
+
       - name: Run Tests
-        run: . bin/restore-env.sh && bin/run-tests-with-retry.sh
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 2
+          max_attempts: 5
+          command: . bin/restore-env.sh && CI=true yarn run ember test --path=dist
