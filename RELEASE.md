@@ -58,3 +58,17 @@ release process. It will prompt you to to choose the version number after which
 you will have the chance to hand tweak the changelog to be used (for the
 `CHANGELOG.md` and GitHub release), then `release-it` continues on to tagging,
 pushing the tag and commits, etc.
+
+To start a prerelease branch for a new major use:
+
+```sh
+npx release-it major --preRelease=beta
+```
+
+On subsequent prerelease run:
+
+```sh
+npx release-it --preRelease
+```
+
+For more guidance see https://github.com/release-it/release-it/blob/master/docs/pre-releases.md
