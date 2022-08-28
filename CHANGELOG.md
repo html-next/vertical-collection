@@ -2,6 +2,15 @@ Changelog
 =========
 
 
+## v4.0.0-beta.0 (2022-08-28)
+
+* Drop support for Ember versions prior to 3.12
+* Drop support for Ember CLI 2.x
+* Adopt native getters
+* Adopt angle bracket invocation
+* Drop positional param argument for `item`
+
+
 ## v3.1.0 (2022-08-04)
 
 #### :rocket: Enhancement
