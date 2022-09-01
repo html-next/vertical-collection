@@ -1,4 +1,3 @@
-import '@html-next/vertical-collection/-debug';
 import registerWaiter from 'ember-raf-scheduler/test-support/register-waiter';
 import Application from '../app';
 import config from '../config/environment';
