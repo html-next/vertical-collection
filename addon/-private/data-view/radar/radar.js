@@ -539,6 +539,9 @@ export default class Radar {
           if (item) {
             insertRangeBefore(this._domPool, null, component.realUpperBound, component.realLowerBound);
           } else {
+            // Insert the virtual component bound back to make sure Glimmer is
+            // not confused about the state of the DOM.
+            insertRangeBefore(this._itemContainer, null, component.realUpperBound, component.realLowerBound);
             run(() => {
               virtualComponents.removeObject(component);
             });
