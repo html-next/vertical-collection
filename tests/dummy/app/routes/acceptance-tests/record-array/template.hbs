@@ -1,11 +1,16 @@
-<div class="table-wrapper dark">
-  {{#vertical-collection this.model
-    estimateHeight=50
-    bufferSize=5
-    as |item index|}}
-    {{number-slide item=item itemIndex=index prefixed=this.prefixed}}
-  {{/vertical-collection}}
-</div>
+{{#if this.vcShown}}
+  <div class="table-wrapper dark">
+    {{#vertical-collection this.model
+      estimateHeight=50
+      bufferSize=5
+      as |item index|}}
+      {{number-slide item=item itemIndex=index prefixed=this.prefixed}}
+    {{/vertical-collection}}
+  </div>
+{{/if}}
 
+<button id="hide-vc-button" {{action "hideVC"}}>Hide VC</button>
+<button id="show-vc-button" {{action "showVC"}}>Show VC</button>
+<button id="partial-update-button" {{action "partialUpdate"}}>Partial Update</button>
 <button id="update-items-button" {{action "updateItems"}}>Update items</button>
 <button id="show-prefixed-button" {{action "showPrefixed"}}>Show prefixed</button>
