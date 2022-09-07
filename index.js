@@ -14,7 +14,7 @@ function isProductionEnv() {
 }
 
 module.exports = {
-  name: require('./package').name,
+  name: '@html-next/virtual-collection',
 
   init() {
     this._super.init && this._super.init.apply(this, arguments);
@@ -53,7 +53,7 @@ module.exports = {
         isProductionEnv() ? '-debug' : false
       ].filter(Boolean),
 
-      destDir: '@html-next/vertical-collection'
+      destDir: '@html-next/virtual-collection'
     });
 
     // When compiling with `compileModules: false`, ember-cli-babel defaults to
@@ -104,10 +104,10 @@ module.exports = {
         input: '-private/index.js',
         output: [
           {
-            file: '@html-next/vertical-collection/-private.js',
+            file: '@html-next/virtual-collection/-private.js',
             format: 'amd',
             amd: {
-              id: '@html-next/vertical-collection/-private'
+              id: '@html-next/virtual-collection/-private'
             }
           }
         ],
@@ -162,7 +162,7 @@ module.exports = {
     }
 
     if (typeof app.import !== 'function') {
-      throw new Error('vertical-collection is being used within another addon or engine '
+      throw new Error('virtual-collection is being used within another addon or engine '
         + 'and is having trouble registering itself to the parent application.');
     }
 

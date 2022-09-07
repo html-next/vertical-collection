@@ -41,11 +41,26 @@ export default Mixin.create({
 
     assert(`scrollContainer cannot be inline.`, styleIsOneOf(styles, 'display', ['block', 'inline-block', 'flex', 'inline-flex']));
     assert(`scrollContainer must define position`, styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute']));
-    assert(`scrollContainer must define height or max-height`, hasStyleWithNonZeroValue(styles, 'height') || hasStyleWithNonZeroValue(styles, 'max-height'));
+
+    if( this.get( 'orientation' ) === 'horizontal' )
+    {
+      assert(`scrollContainer must define width or max-width`, hasStyleWithNonZeroValue(styles, 'width') || hasStyleWithNonZeroValue(styles, 'max-width'));
+    }
+    else
+    {
+      assert(`scrollContainer must define height or max-height`, hasStyleWithNonZeroValue(styles, 'height') || hasStyleWithNonZeroValue(styles, 'max-height'));
+    }
 
     // conditional perf check for non-body scrolling
     if (radar.scrollContainer !== ViewportContainer) {
-      assert(`scrollContainer must define overflow-y`, hasStyleValue(styles, 'overflow-y', 'scroll') || hasStyleValue(styles, 'overflow', 'scroll'));
+      if( this.get( 'orientation' ) === 'horizontal' )
+      {
+        assert(`scrollContainer must define overflow-x`, hasStyleValue(styles, 'overflow-x', 'scroll') || hasStyleValue(styles, 'overflow', 'scroll'));
+      }
+      else
+      {
+        assert(`scrollContainer must define overflow-y`, hasStyleValue(styles, 'overflow-y', 'scroll') || hasStyleValue(styles, 'overflow', 'scroll'));
+      }
     }
 
     // check itemContainer

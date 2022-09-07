@@ -1,4 +1,4 @@
-# vertical-collection
+virtual-collection
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/html-next/vertical-collection.svg)](https://greenkeeper.io/)
 
@@ -6,7 +6,7 @@
 
 Infinite Scroll and Occlusion at > 60FPS
 
-`vertical-collection` is an `ember-addon` that is part of the `smoke-and-mirrors` framework. It
+`virtual-collection` is an `ember-addon` that is part of the `smoke-and-mirrors` framework. It
 focuses on improving initial and re-render performance in high-stress situations by providing a
 component for performant lists and `svelte renders` to match a core belief:
 **Don't render the universe, render the scene.**
@@ -18,16 +18,18 @@ out-of-scene content, your application should smartly cull the content it doesn'
 excess content lets the browser perform both initial renders and re-renders at far higher frame-rates, as the only
 content it needs to focus on for layout is the content the user can see.
 
-`vertical-collection` augments your existing app, it doesn't ask you to rewrite layouts or logic in order to use it.
+`virtual-collection` augments your existing app, it doesn't ask you to rewrite layouts or logic in order to use it.
 It will try its best to allow you to keep the conventions, structures, and layouts you want.
 
 ## Install
 
 ```bash
-ember install @html-next/vertical-collection
+ember install @html-next/virtual-collection
 ```
 
 ## Usage
+
+There are two components you can use, `vertical-collection` for vertical scrollables:
 
 ```htmlbars
 {{#vertical-collection
@@ -47,6 +49,29 @@ ember install @html-next/vertical-collection
     <li>
       {{item.number}} {{i}}
     </li>
+{{/vertical-collection}}
+```
+
+... and `horizontal-collection` for horizontal scrollables:
+
+```htmlbars
+{{#horizontal-collection
+    items
+    tagName='div'
+    estimateWidth=50
+    staticWidth=false
+    bufferSize=1
+    renderAll=false
+    renderFromLast=false
+    idForFirstItem=idForFirstItem
+    firstReached=firstReached
+    lastReached=lastReached
+    firstVisibleChanged=firstVisibleChanged
+    lastVisibleChanged=lastVisibleChanged
+     as |item i|}}
+    <div>
+      {{item.number}} {{i}}
+    </div>
 {{/vertical-collection}}
 ```
 

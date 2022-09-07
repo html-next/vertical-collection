@@ -7,16 +7,18 @@ import document from '../../utils/document-shim';
 let OC_IDENTITY = 0;
 
 export default class OccludedContent {
-  constructor(tagName) {
+  constructor(tagName, orientation = 'vertical') {
     this.id = `OC-${OC_IDENTITY++}`;
     this.isOccludedContent = true;
+
+    this.orientation = orientation
 
     // We check to see if the document exists in Fastboot. Since RAF won't run in
     // Fastboot, we'll never have to use these text nodes for measurements, so they
     // can be empty
     if (document !== undefined) {
       this.element = document.createElement(tagName);
-      this.element.className += 'occluded-content';
+      this.element.className += `occluded-content ${this.orientation}`;
 
       this.upperBound = document.createTextNode('');
       this.lowerBound = document.createTextNode('');

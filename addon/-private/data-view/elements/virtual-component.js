@@ -8,11 +8,12 @@ import document from '../../utils/document-shim';
 let VC_IDENTITY = 0;
 
 export default class VirtualComponent {
-  constructor(content = null, index = null) {
+  constructor(content = null, index = null, orientation = 'vertical') {
     this.id = `VC-${VC_IDENTITY++}`;
 
     this.content = content;
     this.index = index;
+    this.orientation = orientation;
 
     // We check to see if the document exists in Fastboot. Since RAF won't run in
     // Fastboot, we'll never have to use these text nodes for measurements, so they
@@ -46,6 +47,8 @@ export default class VirtualComponent {
 
     let top = Infinity;
     let bottom = -Infinity;
+    let left = Infinity;
+    let right = -Infinity;
 
     while (upperBound !== lowerBound) {
       upperBound = upperBound.nextSibling;
@@ -53,6 +56,8 @@ export default class VirtualComponent {
       if (upperBound instanceof Element) {
         top = Math.min(top, upperBound.getBoundingClientRect().top);
         bottom = Math.max(bottom, upperBound.getBoundingClientRect().bottom);
+        left = Math.min(left, upperBound.getBoundingClientRect().left);
+        right = Math.max(right, upperBound.getBoundingClientRect().right);
       }
 
       if (DEBUG) {
@@ -62,15 +67,23 @@ export default class VirtualComponent {
 
         const text = upperBound.textContent;
 
-        assert(`All content inside of vertical-collection must be wrapped in an element. Detected a text node with content: ${text}`, text === '' || text.match(/^\s+$/));
+        assert(`All content inside of ${this.orientation}-collection must be wrapped in an element. Detected a text node with content: ${text}`, text === '' || text.match(/^\s+$/));
       }
     }
 
-    assert('Items in a vertical collection require atleast one element in them', top !== Infinity && bottom !== -Infinity);
+    if( this.orientation === 'horizontal' )
+    {
+      assert(`Items in a ${this.orientation} collection require atleast one element in them`, left !== Infinity && right !== -Infinity);
+    }
+    else
+    {
+      assert(`Items in a ${this.orientation} collection require atleast one element in them`, top !== Infinity && bottom !== -Infinity);
+    }
 
     const height = bottom - top;
+    const width = right - left;
 
-    return { top, bottom, height };
+    return { top, bottom, height, left, right, width };
   }
 
   recycle(newContent, newIndex) {
