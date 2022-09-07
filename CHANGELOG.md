@@ -2,6 +2,9 @@ Changelog
 =========
 
 
+## v4.0.0-beta.1 (2022-09-07)
+
+
 ## v4.0.0-beta.0 (2022-08-28)
 
 * Drop support for Ember versions prior to 3.12
