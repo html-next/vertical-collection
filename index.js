@@ -44,8 +44,7 @@ module.exports = {
       exclude: [
         '**/**.hbs',
         '-private',
-        isProductionEnv() ? '-debug' : false
-      ].filter(Boolean),
+      ],
 
       destDir: '@html-next/vertical-collection'
     });

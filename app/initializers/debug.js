@@ -1,4 +1,4 @@
-import '@html-next/vertical-collection/-debug';
+// import '@html-next/vertical-collection/-debug';
 
 export default {
   name: 'vertical-collection-debug',
