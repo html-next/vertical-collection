@@ -9,7 +9,7 @@ export default Component.extend({
   queries: alias('db.queries'),
 
   topFiveQueries: computed('queries', function() {
-    let queries = this.get('queries') || [];
+    let queries = this.queries || [];
     let topFiveQueries = queries.slice(0, 5);
 
     while (topFiveQueries.length < 5) {
@@ -28,7 +28,7 @@ export default Component.extend({
   }),
 
   countClassName: computed('queries', function() {
-    let queries = this.get('queries') || [];
+    let queries = this.queries || [];
     let countClassName = 'label';
 
     if (queries.length >= 20) {

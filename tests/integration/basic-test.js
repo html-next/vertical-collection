@@ -4,7 +4,8 @@ import hbs from 'htmlbars-inline-precompile';
 import {
   find,
   findAll,
-  settled
+  settled,
+  render
 } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
@@ -20,34 +21,12 @@ import {
   standardTemplate
 } from 'dummy/tests/helpers/test-scenarios';
 
-import { scheduler } from 'ember-raf-scheduler';
-import { gte as emberVersionGTE } from 'ember-compatibility-helpers';
-
-// Assert an odd timing: After initial render but before settledness. Because
-// of changes to the `render` helper in test-helpers, this should be done
-// differently in ember-test-helpers 1.x and 2.x.
-//
-// Use ember-compatibility-helpers < 3 as a proxy for identifying
-// ember-test-helpers 1.x.
-//
-// This helpers can be killed off when Ember 2.18 support is dropped. The
-// gte Ember 3 version can be inlined where the helper is used.
+// Assert an odd timing: After initial render but before settledness.
 //
 async function assertAfterInitialRender(renderFn, assertFn) {
-  if (emberVersionGTE('3.0.0')) {
-    renderFn();
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    assertFn();
-  } else {
-    // After ember-raf-schedulers queues have flushed.
-    // The schedule of sync inside measure starts a second flush.
-    scheduler.schedule('measure', () => {
-      scheduler.schedule('sync', () => {
-        assertFn();
-      });
-    });
-    renderFn();
-  }
+  renderFn();
+  await new Promise(resolve => requestAnimationFrame(resolve));
+  assertFn();
 }
 
 module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
@@ -118,17 +97,17 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     hbs`
       <div style="height: 100px;" class="scrollable">
         <div>
-          {{#vertical-collection this.items
-            containerSelector=".scrollable"
-            estimateHeight=20
-            staticHeight=true
-            bufferSize=0
+          <VerticalCollection @items={{this.items}}
+            @containerSelector=".scrollable"
+            @estimateHeight={{20}}
+            @staticHeight={{true}}
+            @bufferSize={{0}}
 
-            as |item i|}}
+            as |item i|>
             <vertical-item style="height: 20px">
               {{item.number}} {{i}}
             </vertical-item>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       </div>
     `,
@@ -146,17 +125,17 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     hbs`
       <div style="height: 100px; padding-top: 50px;" class="scrollable">
         <div>
-          {{#vertical-collection this.items
-            containerSelector=".scrollable"
-            estimateHeight=20
-            staticHeight=true
-            bufferSize=0
+          <VerticalCollection @items={{this.items}}
+            @containerSelector=".scrollable"
+            @estimateHeight={{20}}
+            @staticHeight={{true}}
+            @bufferSize={{0}}
 
-            as |item i|}}
+            as |item i|>
             <vertical-item style="height: 20px">
               {{item.number}} {{i}}
             </vertical-item>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       </div>
     `,
@@ -179,16 +158,16 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     hbs`
       <div style="position: relative; background: red; box-sizing: content-box; height: 100px; overflow-y: scroll;" class="scrollable">
         <div style="padding: 200px;">
-          {{#vertical-collection this.items
-            containerSelector=".scrollable"
-            estimateHeight=20
-            bufferSize=0
+          <VerticalCollection @items={{this.items}}
+            @containerSelector=".scrollable"
+            @estimateHeight={{20}}
+            @bufferSize={{0}}
 
-            as |item i|}}
+            as |item i|>
             <vertical-item style="height: 28px">
               {{item.number}} {{i}}
             </vertical-item>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       </div>
     `,
@@ -210,11 +189,11 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
 
     hbs`
       <div style="height: 500px; width: 500px;">
-        {{#vertical-collection this.items
-          estimateHeight=10
-          containerSelector="body"
+        <VerticalCollection @items={{this.items}}
+          @estimateHeight={{10}}
+          @containerSelector="body"
           as |item|
-        }}
+        >
           <div>
             Content
             {{#if item.shouldRender}}
@@ -223,7 +202,7 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
               </section>
             {{/if}}
           </div>
-        {{/vertical-collection}}
+        </VerticalCollection>
       </div>
     `,
 
@@ -237,17 +216,17 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     this.set('items', getNumbers(0, 10));
 
     assertAfterInitialRender(() => {
-      this.render(hbs`
+      render(hbs`
         <div style="height: 500px; width: 500px;" class="scrollable">
-          {{#vertical-collection this.items
-            estimateHeight=50
-            initialRenderCount=1
+          <VerticalCollection @items={{this.items}}
+            @estimateHeight={{50}}
+            @initialRenderCount={{1}}
             as |item i|
-          }}
+          >
             <vertical-item style="height: 50px">
               {{item.number}} {{i}}
             </vertical-item>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       `);
     }, () => {
@@ -267,19 +246,19 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     this.set('items', getNumbers(0, 100));
 
     assertAfterInitialRender(() => {
-      this.render(hbs`
+      render(hbs`
         <div style="height: 500px; width: 500px;" class="scrollable">
-          {{#vertical-collection this.items
-            estimateHeight=50
-            initialRenderCount=1
-            idForFirstItem="20"
-            key="number"
+          <VerticalCollection @items={{this.items}}
+            @estimateHeight={{50}}
+            @initialRenderCount={{1}}
+            @idForFirstItem="20"
+            @key="number"
             as |item i|
-          }}
+          >
             <vertical-item style="height: 50px">
               {{item.number}} {{i}}
             </vertical-item>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       `);
     }, () => {
@@ -299,17 +278,17 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     this.set('items', getNumbers(0, 1));
 
     assertAfterInitialRender(() => {
-      this.render(hbs`
+      render(hbs`
         <div style="height: 500px; width: 500px;" class="scrollable">
-          {{#vertical-collection this.items
-            estimateHeight=50
-            initialRenderCount=5
+          <VerticalCollection @items={{this.items}}
+            @estimateHeight={{50}}
+            @initialRenderCount={{5}}
             as |item i|
-          }}
+          >
             <vertical-item style="height: 50px">
               {{item.number}} {{i}}
             </vertical-item>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       `);
     }, () => {
@@ -330,16 +309,16 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     hbs`
       <div style="height: 100px;" class="scrollable">
         <div style="padding-top: 400px;">
-          {{#vertical-collection this.items
-            containerSelector=".scrollable"
-            estimateHeight=20
-            bufferSize=2
+          <VerticalCollection @items={{this.items}}
+            @containerSelector=".scrollable"
+            @estimateHeight={{20}}
+            @bufferSize={{2}}
 
-            as |item i|}}
+            as |item i|>
             <vertical-item style="height: 20px">
               {{item.number}} {{i}}
             </vertical-item>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       </div>
     `,
@@ -364,11 +343,11 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
         <div style="height: 1000px; width: 500px;"></div>
 
         {{#if this.renderCollection}}
-          {{#vertical-collection this.items estimateHeight="20" as |item|}}
+          <VerticalCollection @items={{this.items}} @estimateHeight="20" as |item|>
             <div>
               Content
             </div>
-          {{/vertical-collection}}
+          </VerticalCollection>
         {{/if}}
       </div>
     `,

@@ -236,7 +236,7 @@ module('vertical-collection', 'Integration | Mutation Tests', function(hooks) {
       assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '1 1', 'first item rendered correctly after initial scroll set');
       assert.equal(paddingBefore(itemContainer), 40, 'itemContainer padding correct before same items set');
 
-      await replaceArray(this, this.get('items').slice());
+      await replaceArray(this, this.items.slice());
 
       assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '1 1', 'first item rendered correctly after same items set');
       assert.equal(paddingBefore(itemContainer), 40, 'itemContainer padding correct after same items set');

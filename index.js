@@ -6,13 +6,6 @@ const Rollup = require('broccoli-rollup');
 const merge = require('broccoli-merge-trees');
 const VersionChecker = require('ember-cli-version-checker');
 
-function isProductionEnv() {
-  const isProd = /production/.test(process.env.EMBER_ENV);
-  const isTest = process.env.EMBER_CLI_TEST_COMMAND;
-
-  return isProd && !isTest;
-}
-
 module.exports = {
   name: require('./package').name,
 
@@ -23,13 +16,7 @@ module.exports = {
   },
 
   getOutputDirForVersion() {
-    let VersionChecker = require('ember-cli-version-checker');
-    let checker = new VersionChecker(this);
-    let emberCli = checker.for('ember-cli', 'npm');
-
-    let requiresModulesDir = emberCli.satisfies('< 3.0.0');
-
-    return requiresModulesDir ? 'modules' : '';
+    return '';
   },
 
   // Borrowed from ember-cli-babel
@@ -49,10 +36,8 @@ module.exports = {
     let withoutPrivate = new Funnel(tree, {
       exclude: [
         '**/**.hbs',
-        '-private',
-        isProductionEnv() ? '-debug' : false
-      ].filter(Boolean),
-
+        '-private'
+      ],
       destDir: '@html-next/vertical-collection'
     });
 
@@ -170,34 +155,7 @@ module.exports = {
     this._setupBabelOptions(app.env);
 
     if (!/production/.test(app.env) && !/test/.test(app.env)) {
-      findImporter(this).import('vendor/debug.css');
+      this.import('vendor/debug.css');
     }
-  },
-
-  treeForApp() {
-    const tree = this._super.treeForApp.apply(this, arguments);
-
-    const exclude = [];
-
-    if (isProductionEnv()) {
-      exclude.push('initializers/debug.js');
-    }
-
-    return new Funnel(tree, { exclude });
   }
 };
-
-function findImporter(addon) {
-  if (typeof addon.import === 'function') {
-    // If addon.import() is present (CLI 2.7+) use that
-    return addon;
-  } else {
-    // Otherwise, reuse the _findHost implementation that would power addon.import()
-    let current = addon;
-    let app;
-    do {
-      app = current.app || app;
-    } while (current.parent.parent && (current = current.parent));
-    return app;
-  }
-}

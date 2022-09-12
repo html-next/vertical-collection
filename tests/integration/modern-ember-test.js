@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
-import { find, settled } from '@ember/test-helpers';
+import { find, settled, render } from '@ember/test-helpers';
 
 module('vertical-collection', 'Integration | Modern Ember Features Tests', function(hooks) {
   setupRenderingTest(hooks);
@@ -10,14 +10,15 @@ module('vertical-collection', 'Integration | Modern Ember Features Tests', funct
     assert.expect(1);
     this.set('items', []);
 
-    this.render(hbs`
+    await render(hbs`
         <div class="scrollable">
-          {{#vertical-collection this.items
+          {{#vertical-collection
+            items=this.items
             estimateHeight=20
             staticHeight=true
           }}
-            {{else}}
-              Foobar
+          {{else}}
+            Foobar
           {{/vertical-collection}}
         </div>
       `);

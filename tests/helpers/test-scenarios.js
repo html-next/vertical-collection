@@ -4,7 +4,7 @@ import { Promise } from 'rsvp';
 import { test } from 'qunit';
 import DS from 'ember-data';
 import hbs from 'htmlbars-inline-precompile';
-import { settled } from '@ember/test-helpers';
+import { settled, render } from '@ember/test-helpers';
 
 const {
   PromiseArray
@@ -25,7 +25,7 @@ export function testScenarios(description, scenarios, template, testFn, preRende
         await setValuesBeforeRender.call(this, assert);
       }
 
-      let renderCompletionPromise = this.render(template);
+      let renderCompletionPromise = render(template);
 
       if (preRenderTestFn) {
         await preRenderTestFn.call(this, assert);
@@ -78,32 +78,32 @@ export const scenariosFor = mergeScenarioGenerators(
 
 export const standardTemplate = hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
-    {{#vertical-collection this.items
-      estimateHeight=(either-or this.estimateHeight 20)
-      staticHeight=this.staticHeight
-      bufferSize=(either-or this.bufferSize 0)
-      renderAll=this.renderAll
-      debugVis=(either-or this.debugVis false)
-      debugCSS=(either-or this.debugCSS false)
+    <VerticalCollection @items={{this.items}}
+      @estimateHeight={{either-or this.estimateHeight 20}}
+      @staticHeight={{this.staticHeight}}
+      @bufferSize={{either-or this.bufferSize 0}}
+      @renderAll={{this.renderAll}}
+      @debugVis={{either-or this.debugVis false}}
+      @debugCSS={{either-or this.debugCSS false}}
 
-      renderFromLast=this.renderFromLast
-      idForFirstItem=this.idForFirstItem
+      @renderFromLast={{this.renderFromLast}}
+      @idForFirstItem={{this.idForFirstItem}}
 
-      firstVisibleChanged=this.firstVisibleChanged
-      lastVisibleChanged=this.lastVisibleChanged
-      firstReached=this.firstReached
-      lastReached=this.lastReached
+      @firstVisibleChanged={{this.firstVisibleChanged}}
+      @lastVisibleChanged={{this.lastVisibleChanged}}
+      @firstReached={{this.firstReached}}
+      @lastReached={{this.lastReached}}
 
-      key=(either-or this.key "@identity")
+      @key={{either-or this.key "@identity"}}
 
-      as |item i|}}
+      as |item i|>
       <div
         class="vertical-item"
         style={{html-safe (join-strings "height:" (either-or this.itemHeight (either-or this.estimateHeight 20)) "px;")}}
       >
         {{item.number}} {{i}}
       </div>
-    {{/vertical-collection}}
+    </VerticalCollection>
   </div>
 `;
 

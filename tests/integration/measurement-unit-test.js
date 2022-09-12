@@ -23,16 +23,16 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
 
     hbs`
       <div style="height: 100px; font-size: 10px;" class="scrollable">
-        {{#vertical-collection this.items
-          estimateHeight="2em"
-          staticHeight=this.staticHeight
-          bufferSize=0
+        <VerticalCollection @items={{this.items}}
+          @estimateHeight="2em"
+          @staticHeight={{this.staticHeight}}
+          @bufferSize={{0}}
 
-          as |item i|}}
+          as |item i|>
           <vertical-item style="height: 2em">
             {{item.number}} {{i}}
           </vertical-item>
-        {{/vertical-collection}}
+        </VerticalCollection>
       </div>
     `,
 
@@ -47,16 +47,16 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
 
     hbs`
       <div style="height: 100px; font-size: 10px;" class="scrollable">
-        {{#vertical-collection this.items
-          estimateHeight="2rem"
-          staticHeight=this.staticHeight
-          bufferSize=0
+        <VerticalCollection @items={{this.items}}
+          @estimateHeight="2rem"
+          @staticHeight={{this.staticHeight}}
+          @bufferSize={{0}}
 
-          as |item i|}}
+          as |item i|>
           <vertical-item style="height: 2rem">
             {{item.number}} {{i}}
           </vertical-item>
-        {{/vertical-collection}}
+        </VerticalCollection>
       </div>
     `,
 
@@ -71,16 +71,16 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
 
     hbs`
       <div style="height: 100px;" class="scrollable">
-        {{#vertical-collection this.items
-          estimateHeight="66%"
-          staticHeight=this.staticHeight
-          bufferSize=0
+        <VerticalCollection @items={{this.items}}
+          @estimateHeight="66%"
+          @staticHeight={{this.staticHeight}}
+          @bufferSize={{0}}
 
-          as |item i|}}
+          as |item i|>
           <vertical-item style="height: 66%">
             {{item.number}} {{i}}
           </vertical-item>
-        {{/vertical-collection}}
+        </VerticalCollection>
       </div>
     `,
 
@@ -95,16 +95,16 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
 
     hbs`
       <div style="height: 100px; font-size: 10px;" class="scrollable">
-        {{#vertical-collection this.items
-          estimateHeight="2em"
-          staticHeight=this.staticHeight
-          bufferSize=0
+        <VerticalCollection @items={{this.items}}
+          @estimateHeight="2em"
+          @staticHeight={{this.staticHeight}}
+          @bufferSize={{0}}
 
-          as |item i|}}
+          as |item i|>
           <vertical-item style="height: 2em">
             {{item.number}} {{i}}
           </vertical-item>
-        {{/vertical-collection}}
+        </VerticalCollection>
       </div>
     `,
 
@@ -120,17 +120,17 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
     hbs`
       <div class="scrollable with-pixel-max-height">
         <div>
-          {{#vertical-collection this.items
-            containerSelector=".scrollable"
-            estimateHeight=20
-            staticHeight=this.staticHeight
-            bufferSize=0
+          <VerticalCollection @items={{this.items}}
+            @containerSelector=".scrollable"
+            @estimateHeight={{20}}
+            @staticHeight={{this.staticHeight}}
+            @bufferSize={{0}}
 
-            as |item i|}}
+            as |item i|>
             <vertical-item style="height: 20px">
               {{item.number}} {{i}}
             </vertical-item>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       </div>
     `,
@@ -148,17 +148,17 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
       <div style="height: 400px;">
         <div class="scrollable with-percent-max-height">
           <div>
-            {{#vertical-collection this.items
-              containerSelector=".scrollable"
-              estimateHeight=20
-              staticHeight=this.staticHeight
-              bufferSize=0
+            <VerticalCollection @items={{this.items}}
+              @containerSelector=".scrollable"
+              @estimateHeight={{20}}
+              @staticHeight={{this.staticHeight}}
+              @bufferSize={{0}}
 
-              as |item i|}}
+              as |item i|>
               <vertical-item style="height: 20px">
                 {{item.number}} {{i}}
               </vertical-item>
-            {{/vertical-collection}}
+            </VerticalCollection>
           </div>
         </div>
       </div>
@@ -177,17 +177,17 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
       <div style="font-size: 20px;">
         <div class="scrollable with-em-max-height">
           <div>
-            {{#vertical-collection this.items
-              containerSelector=".scrollable"
-              estimateHeight=20
-              staticHeight=this.staticHeight
-              bufferSize=0
+            <VerticalCollection @items={{this.items}}
+              @containerSelector=".scrollable"
+              @estimateHeight={{20}}
+              @staticHeight={{this.staticHeight}}
+              @bufferSize={{0}}
 
-              as |item i|}}
+              as |item i|>
               <vertical-item style="height: 20px">
                 {{item.number}} {{i}}
               </vertical-item>
-            {{/vertical-collection}}
+            </VerticalCollection>
           </div>
         </div>
       </div>
@@ -205,17 +205,17 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
     hbs`
       <div class="scrollable with-rem-max-height">
         <div>
-          {{#vertical-collection this.items
-            containerSelector=".scrollable"
-            estimateHeight=20
-            staticHeight=this.staticHeight
-            bufferSize=0
+          <VerticalCollection @items={{this.items}}
+            @containerSelector=".scrollable"
+            @estimateHeight={{20}}
+            @staticHeight={{this.staticHeight}}
+            @bufferSize={{0}}
 
-            as |item i|}}
+            as |item i|>
             <vertical-item style="height: 20px">
               {{item.number}} {{i}}
             </vertical-item>
-          {{/vertical-collection}}
+          </VerticalCollection>
         </div>
       </div>
     `,
