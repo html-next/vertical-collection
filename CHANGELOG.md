@@ -2,6 +2,18 @@ Changelog
 =========
 
 
+## v4.0.0 (2022-09-12)
+
+* Drops support for Ember < 3.12-LTS.
+* Drops support for Ember CLI 2.x. https://github.com/html-next/vertical-collection/pull/379
+* No change in Node support.
+* Drop the positional param for `items` on the vertical collection component.
+* Drop ember-compatibility-helpers https://github.com/html-next/vertical-collection/pull/375
+* Refactor a bunch of debug code to DEBUG https://github.com/html-next/vertical-collection/pull/388
+* Adopt angle bracket invocation
+* Adopt native getters
+
+
 ## v4.0.0-beta.2 (2022-09-08)
 
 
