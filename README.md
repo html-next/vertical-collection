@@ -88,7 +88,7 @@ It works via a scrollable div or scrollable body.
 
 ### Svelte Everything
 
-If it can be trimmer, smoke-and-mirrors likes to trim it.
+If it can be trimmer, vertical-collection likes to trim it.
 
 ## Status
 
