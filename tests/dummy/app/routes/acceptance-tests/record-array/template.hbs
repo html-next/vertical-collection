@@ -1,16 +1,24 @@
 {{#if this.vcShown}}
   <div class="table-wrapper dark">
-    <VerticalCollection @items={{this.model}}
+    <VerticalCollection
+      @key="id"
+      @items={{this.items}}
       @estimateHeight={{50}}
       @bufferSize={{5}}
-      as |item index|>
+      @firstVisibleChanged={{action "firstVisibleChanged"}}
+      as |item index|
+    >
       <NumberSlide @item={{item}} @itemIndex={{index}} @prefixed={{this.prefixed}} />
     </VerticalCollection>
   </div>
 {{/if}}
 
+<input id="first-visible-id" type="hidden" value={{this.firstVisibleId}}/>
+
 <button id="hide-vc-button" {{action "hideVC"}}>Hide VC</button>
 <button id="show-vc-button" {{action "showVC"}}>Show VC</button>
-<button id="partial-update-button" {{action "partialUpdate"}}>Partial Update</button>
+<button id="partial-update-button" {{action "showLast" 5}}>Show Last 5</button>
+<button id="last-25-button" {{action "showLast" 25}}>Show Last 25</button>
+<button id="show-all" {{action "showAll"}}>Show All</button>
 <button id="update-items-button" {{action "updateItems"}}>Update items</button>
-<button id="show-prefixed-button" {{action "showPrefixed"}}>Show prefixed</button>
+<button id="show-prefixed-button" {{action "showPrefixed"}}>Show prefixed (computed)</button>

@@ -1,5 +1,6 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
+import { scheduler } from 'ember-raf-scheduler';
 
 import { click, find, findAll, visit as newVisit } from '@ember/test-helpers';
 import scrollTo from '../../helpers/scroll-to';
@@ -61,5 +62,37 @@ module('Acceptance | Record Array', function(hooks) {
     await click('#show-prefixed-button');
     assert.equal(findAll('number-slide').length, 5, 'correct number of items rendered and nothing crashes');
     assert.deepEqual(findAll('number-slide').map(s => s.textContent.trim()[0]), ['0', '1', '2', '3', '4'], 'correct items order');
+  });
+
+  test('RecordArrays fires firstVisibleChanged correctly after scrolling and fast-switching items', async function(assert) {
+    function waitForMeasure() {
+      return new Promise(resolve => {
+        scheduler.schedule('sync', () => {
+          scheduler.schedule('measure', resolve);
+        });
+      });
+    }
+
+    await newVisit('/acceptance-tests/record-array');
+
+    assert.equal(find('#first-visible-id').value, 0, 'the first item is the first visible id');
+
+    await click('#last-25-button');
+    assert.equal(find('#first-visible-id').value, 75, 'the first visible id is updated correctly after updating items');
+
+    await scrollTo('.table-wrapper', 0, 1000);
+    assert.equal(find('#first-visible-id').value, 86, 'the first visible id is updated correctly after scrolling');
+
+
+    click('#show-all');
+    await waitForMeasure();
+    await click('#last-25-button');
+    await scrollTo('.table-wrapper', 0, 0);
+    await scrollTo('.table-wrapper', 0, 1000); // restore sort position
+
+    assert.equal(find('#first-visible-id').value, 86, 'the first visible id is the same after fast-switching items');
+
+    await scrollTo('.table-wrapper', 0, 0);
+    assert.equal(find('#first-visible-id').value, 75, 'the first visible id is updated correctly after scrolling');
   });
 });

@@ -1,10 +1,14 @@
 import Controller from '@ember/controller';
 import { inject as service } from '@ember/service';
+import { or } from '@ember/object/computed';
 
 export default Controller.extend({
   store: service(),
   prefixed: true,
   vcShown: true,
+  partial: undefined,
+  items: or('partial', 'model'),
+  firstVisibleId: undefined,
 
   actions: {
     updateItems() {
@@ -12,9 +16,13 @@ export default Controller.extend({
       this.store.query('number-item', { length: 5 });
     },
 
-    partialUpdate() {
-      let length = this.model.content.length;
-      this.set('model', this.model.toArray().removeAt(0, length - 5));
+    showLast(count) {
+      let length = this.model.length;
+      this.set('partial', this.model.slice(length - count));
+    },
+
+    showAll() {
+      this.set('partial', undefined);
     },
 
     showPrefixed() {
@@ -27,6 +35,10 @@ export default Controller.extend({
 
     showVC() {
       this.set('vcShown', true);
-    }
+    },
+
+    firstVisibleChanged(item) {
+      this.set('firstVisibleId', item.id);
+    },
   }
 });
