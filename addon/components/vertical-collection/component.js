@@ -327,12 +327,19 @@ const VerticalCollection = Component.extend({
     _radar.bufferSize = this.bufferSize;
 
     _radar.scheduleUpdate(true);
+    this._clearScheduledActions();
 
     return _radar.virtualComponents;
   }),
 
   schedule(queueName, job) {
     return scheduler.schedule(queueName, job, this.token);
+  },
+
+  _clearScheduledActions() {
+    clearTimeout(this._nextSendActions);
+    this._nextSendActions = null;
+    this._scheduledActions.length = 0;
   },
 
   _scheduleSendAction(action, index) {
