@@ -2,6 +2,19 @@ Changelog
 =========
 
 
+
+## v4.0.1 (2022-11-07)
+
+#### :memo: Documentation
+* [#381](https://github.com/html-next/vertical-collection/pull/381) Fix README ([@runspired](https://github.com/runspired))
+
+#### Committers: 4
+- Alex Navasardyan ([@twokul](https://github.com/twokul))
+- Chris Thoburn ([@runspired](https://github.com/runspired))
+- Matthew Beale ([@mixonic](https://github.com/mixonic))
+- [@Atrue](https://github.com/Atrue)
+
+
 ## v4.0.0 (2022-09-12)
 
 * Drops support for Ember < 3.12-LTS.
