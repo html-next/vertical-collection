@@ -19,17 +19,6 @@ module.exports = {
     return '';
   },
 
-  // Borrowed from ember-cli-babel
-  _emberVersionRequiresModulesAPIPolyfill() {
-    let checker = this.checker.for('ember-source', 'npm');
-
-    if (!checker.exists()) {
-      return true;
-    }
-
-    return checker.lt('3.27.0-alpha.1');
-  },
-
   treeForAddon(tree) {
     let babel = this.addons.find((addon) => addon.name === 'ember-cli-babel');
     let withPrivate = new Funnel(tree, { include: ['-private/**'] });
@@ -41,38 +30,34 @@ module.exports = {
       destDir: '@html-next/vertical-collection'
     });
 
-    // When compiling with `compileModules: false`, ember-cli-babel defaults to
-    // using the modules polyfill, since it assumes we are concatenating the
-    // output script using `app.import` without an AMD wrapper.
-    //
-    // This does not apply to us, since we are compiling the `-private` modules
-    // into a single AMD module (via rollup below), which can in fact have
-    // external dependencies.
-    //
-    // We can opt-out of this with `disableEmberModulesAPIPolyfill: true`. In
-    // Ember versions with "real modules", that is what we want in order to
-    // avoid the Ember global deprecation (or just completely not working in
-    // 4.0+).
-    //
-    // It seems like the intent may have been that we should be able to set
-    // this to `true` unconditionally, and `ember-cli-babel` will ignore this
-    // setting if the Ember verion requires the modules API polyfill. However,
-    // presumably due to a bug, ember-cli-babel actually checks for this value
-    // first and return out of the function early if its value is truthy. This
-    // means that if we set this to true unconditionally, then we would have
-    // disabled the modules polyfill for Ember versions that needs it, which
-    // would be incorrect. Therefore, we have to duplicate the detection logic
-    // here in order to set this value appropriately.
-    //
-    // Ideally, we should just stop trying to rollup the -private modules and
-    // let the modern build pipeline optimizes things for us, then none of this
-    // would have been necessary.
     let privateTree = babel.transpileTree(withPrivate, {
       babel: this.options.babel,
       'ember-cli-babel': {
+        // we leave our output as valid ES
+        // for the consuming app's config to transpile as desired
+        // so we don't want to compileModules to amd here
         compileModules: false,
-        disableEmberModulesAPIPolyfill:
-          !this._emberVersionRequiresModulesAPIPolyfill(),
+
+        disableEmberModulesAPIPolyfill: true,
+
+        // TODO for the embroider world we want to leave our -private module
+        // as an es module and only transpile the few things we genuinely care about.
+        // ideally this would occur as a pre-publish step so that consuming apps would
+        // just see a `-private.js` file and not pay any additional costs.
+        // CURRENTLY we transpile the -private module fully acccording to the
+        // consuming app's config, so we must leave these enabled.
+        disablePresetEnv: false,
+        disableDebugTooling: false,
+        disableDecoratorTransforms: false,
+        enableTypeScriptTransform: true,
+
+        throwUnlessParallelizable: true,
+
+        // consuming app will take care of this if needed,
+        // we don't need to also include
+        includePolyfill: false,
+
+        extensions: ['js', 'ts'],
       },
     });
 
