@@ -3,6 +3,15 @@ Changelog
 
 
 
+
+## v4.0.2 (2022-11-17)
+
+#### :bug: Bug Fix
+* [#396](https://github.com/html-next/vertical-collection/pull/396) Fix build for ember-source 4.0+ ([@wagenet](https://github.com/wagenet))
+
+#### Committers: 1
+- Peter Wagenet ([@wagenet](https://github.com/wagenet))
+
 ## v4.0.1 (2022-11-07)
 
 #### :memo: Documentation
