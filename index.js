@@ -19,6 +19,17 @@ module.exports = {
     return '';
   },
 
+    // Borrowed from ember-cli-babel
+    _emberVersionRequiresModulesAPIPolyfill() {
+      let checker = this.checker.for('ember-source', 'npm');
+
+      if (!checker.exists()) {
+        return true;
+      }
+
+      return checker.lt('3.27.0-alpha.1');
+    },
+
   treeForAddon(tree) {
     let babel = this.addons.find((addon) => addon.name === 'ember-cli-babel');
     let withPrivate = new Funnel(tree, { include: ['-private/**'] });
@@ -38,7 +49,7 @@ module.exports = {
         // so we don't want to compileModules to amd here
         compileModules: false,
 
-        disableEmberModulesAPIPolyfill: true,
+        disableEmberModulesAPIPolyfill: !this._emberVersionRequiresModulesAPIPolyfill(),
 
         // TODO for the embroider world we want to leave our -private module
         // as an es module and only transpile the few things we genuinely care about.
