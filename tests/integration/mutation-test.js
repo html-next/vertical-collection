@@ -1,8 +1,10 @@
-import { module } from 'qunit';
+import { module,test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
+import hbs from 'htmlbars-inline-precompile';
 import {
   find,
   findAll,
+  settled
 } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
@@ -265,4 +267,51 @@ module('vertical-collection', 'Integration | Mutation Tests', function(hooks) {
       assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '4 4', 'last item rendered correctly before move');
     }
   );
+
+  test('Collection updates correctly when a key is given', async function(assert) {
+    assert.expect(5);
+
+    const initialItems = [
+      { id: 'item-1', props: [{ name: 'prop', value: 'v1'}]},
+      { id: 'item-2', props: [{ name: 'prop', value: 'v2'}]},
+    ];
+
+    const updatedItems = [
+      { id: 'item-1', props: [{ name: 'prop', value: 'v1'}]},
+      { id: 'item-2', props: [{ name: 'prop', value: 'v2-updated'}]},
+      { id: 'item-3', props: [{ name: 'prop', value: 'v3-added'}]},
+    ];
+
+    this.set('items', initialItems);
+
+    this.render(hbs`
+      <div style="height: 500px; width: 500px;" class="scrollable">
+        {{#vertical-collection this.items
+          key="id"
+          estimateHeight=50
+          initialRenderCount=5
+          as |item i|
+        }}
+          <vertical-item style="height: 50px">
+            {{#each item.props as |prop|}}
+              {{i}} - {{prop.name}}: {{prop.value}}
+            {{/each}}
+          </vertical-item>
+        {{/vertical-collection}}
+      </div>
+    `);
+
+    await settled();
+
+    assert.equal(findAll('vertical-item').length, 2, 'correctly renders initial items');
+
+    this.set('items', updatedItems);
+
+    await settled();
+
+    assert.equal(findAll('vertical-item').length, 3, 'correctly updates items');
+    assert.equal(find('vertical-item:first-of-type').textContent.trim(), '0 - prop: v1', 'correct 1st item rendered');
+    assert.equal(find('vertical-item:nth-of-type(2)').textContent.trim(), '1 - prop: v2-updated', 'correct 2nd item rendered');
+    assert.equal(find('vertical-item:last-of-type').textContent.trim(), '2 - prop: v3-added', 'correct last item rendered');
+  });
 });
