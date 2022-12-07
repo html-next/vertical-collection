@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## v3.2.0 (2022-12-07)
+## v3.1.1 (2022-12-07)
 
 #### :bug: Bug Fix
 * [#389](https://github.com/html-next/vertical-collection/pull/389) Fix for detached Node element exception ([@twokul](https://github.com/twokul))
