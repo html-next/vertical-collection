@@ -35,14 +35,13 @@ export class ScrollHandler {
         left: element.scrollLeft,
         handlers
       };
-      // TODO add explicit test
-      if (SUPPORTS_PASSIVE) {
+
+      if (this.isUsingPassive) {
         cache.passiveHandler = function() {
           ScrollHandler.triggerElementHandlers(element, cache);
         };
 
         element.addEventListener('scroll', cache.passiveHandler, { capture: true, passive: true });
-      // TODO add explicit test
       } else {
         cache.passiveHandler = UNDEFINED_VALUE;
 
