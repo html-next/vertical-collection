@@ -32,6 +32,8 @@ module('Unit | Radar Utils | Scroll Handler');
 
 test('We can add, trigger, and remove a scroll handler', (assert) => {
   let scrollHandlers = new ScrollHandler();
+  scrollHandlers.isUsingPassive = true;
+
   let done = assert.async(2);
   let scrollable = createScrollable();
   let handler = () => {
@@ -44,31 +46,81 @@ test('We can add, trigger, and remove a scroll handler', (assert) => {
   // test adding a single handler
   scrollHandlers.addScrollHandler(scrollable, handler);
 
-  assert.equal(scrollHandlers.length, 1, `We have one element to watch.`);
+  assert.strictEqual(scrollHandlers.length, 1, `We have one element to watch.`);
+  assert.false(scrollHandlers.isPolling, 'polling is inactive, using a passive handler');
 
   let scrollableIndex = scrollHandlers.elements.indexOf(scrollable);
-  assert.ok(scrollableIndex !== -1, `The scrollable was added to the watched elements list.`);
+  assert.true(scrollableIndex !== -1, `The scrollable was added to the watched elements list.`);
   let cache = scrollHandlers.handlers[scrollableIndex];
-  assert.ok(cache.handlers.length === 1);
+  assert.strictEqual(cache.handlers.length, 1);
 
   // test triggering that handler
-  assert.equal(scrollable.scrollTop, 0, `The scrollable is initially unscrolled`);
+  assert.strictEqual(scrollable.scrollTop, 0, `The scrollable is initially unscrolled`);
 
   afterNextScrollUpdate(() => {
     scrollable.scrollTop = 10;
-    assert.equal(scrollable.scrollTop, 10, `We updated the scrollable's scroll position`);
+    assert.strictEqual(scrollable.scrollTop, 10, `We updated the scrollable's scroll position`);
 
     afterNextScrollUpdate(() => {
       // test removing that handler
       scrollHandlers.removeScrollHandler(scrollable, handler);
       let newScrollableIndex = scrollHandlers.elements.indexOf(scrollable);
 
-      assert.ok(cache.handlers.length === 0, `The handler was removed from the listener cache.`);
-      assert.ok(newScrollableIndex === -1, `Removing the last handler removed the element from the watched elements list.`);
-      assert.ok(scrollHandlers.handlers.indexOf(cache) === -1, `Removing the last handler removed the cache.`);
+      assert.strictEqual(cache.handlers.length, 0, `The handler was removed from the listener cache.`);
+      assert.strictEqual(newScrollableIndex, -1, `Removing the last handler removed the element from the watched elements list.`);
+      assert.strictEqual(scrollHandlers.handlers.indexOf(cache), -1, `Removing the last handler removed the cache.`);
 
-      assert.equal(scrollHandlers.length, 0, `We have no more elements to watch.`);
-      assert.equal(scrollHandlers.isPolling, false, `We are no longer polling the elements.`);
+      assert.strictEqual(scrollHandlers.length, 0, `We have no more elements to watch.`);
+      assert.false(scrollHandlers.isPolling, `polling is still inactive`);
+
+      destroyScrollable(scrollable);
+      done();
+    });
+  });
+});
+
+test('Polling', (assert) => {
+  let scrollHandlers = new ScrollHandler();
+  scrollHandlers.isUsingPassive = false;
+
+  let done = assert.async(2);
+  let scrollable = createScrollable();
+  let handler = () => {
+    assert.ok('handler was triggered');
+    done();
+  };
+
+  assert.strictEqual(scrollHandlers.length, 0, `We initially have no elements to watch.`);
+
+  // test adding a single handler
+  scrollHandlers.addScrollHandler(scrollable, handler);
+
+  assert.strictEqual(scrollHandlers.length, 1, `We have one element to watch.`);
+  assert.true(scrollHandlers.isPolling, 'polling is active');
+
+  let scrollableIndex = scrollHandlers.elements.indexOf(scrollable);
+  assert.true(scrollableIndex !== -1, `The scrollable was added to the watched elements list.`);
+  let cache = scrollHandlers.handlers[scrollableIndex];
+  assert.strictEqual(cache.handlers.length, 1);
+
+  // test triggering that handler
+  assert.strictEqual(scrollable.scrollTop, 0, `The scrollable is initially unscrolled`);
+
+  afterNextScrollUpdate(() => {
+    scrollable.scrollTop = 10;
+    assert.strictEqual(scrollable.scrollTop, 10, `We updated the scrollable's scroll position`);
+
+    afterNextScrollUpdate(() => {
+      // test removing that handler
+      scrollHandlers.removeScrollHandler(scrollable, handler);
+      let newScrollableIndex = scrollHandlers.elements.indexOf(scrollable);
+
+      assert.strictEqual(cache.handlers.length, 0, `The handler was removed from the listener cache.`);
+      assert.strictEqual(newScrollableIndex, -1, `Removing the last handler removed the element from the watched elements list.`);
+      assert.strictEqual(scrollHandlers.handlers.indexOf(cache), -1, `Removing the last handler removed the cache.`);
+
+      assert.strictEqual(scrollHandlers.length, 0, `We have no more elements to watch.`);
+      assert.false(scrollHandlers.isPolling, `We are no longer polling the elements.`);
 
       destroyScrollable(scrollable);
       done();
@@ -125,7 +177,6 @@ test('Adding/removing multiple handlers to an element works as expected', (asser
       assert.ok(scrollHandlers.handlers.indexOf(cache) === -1, `Removing the last handler removed the cache.`);
 
       assert.equal(scrollHandlers.length, 0, `We have no more elements to watch.`);
-      assert.equal(scrollHandlers.isPolling, false, `We are no longer polling the elements.`);
 
       destroyScrollable(scrollable);
       done();
@@ -192,11 +243,68 @@ test('Multiple elements with handlers works as expected', (assert) => {
       assert.ok(scrollHandlers.handlers.indexOf(cache2) === -1, `Removing the last handler removed the cache.`);
 
       assert.equal(scrollHandlers.length, 0, `We have no more elements to watch.`);
-      assert.equal(scrollHandlers.isPolling, false, `We are no longer polling the elements.`);
 
       destroyScrollable(scrollable1);
       destroyScrollable(scrollable2);
       done();
+    });
+  });
+});
+
+test('multiple handlers with same scrollable', (assert) => {
+  let scrollHandlers = new ScrollHandler();
+  let done = assert.async(3);
+  let scrollable = createScrollable();
+  let handler1 = () => {
+    assert.ok('handler1 was triggered');
+    done();
+  };
+  let handler2 = () => {
+    assert.ok('handler2 was triggered');
+    done();
+  };
+
+  // test adding the handlers
+  assert.strictEqual(scrollHandlers.length, 0, `We initially have no elements to watch.`);
+  scrollHandlers.addScrollHandler(scrollable, handler1);
+  scrollHandlers.addScrollHandler(scrollable, handler2);
+
+  assert.strictEqual(scrollHandlers.length, 1, `We have one element to watch.`);
+
+  let scrollable1Index = scrollHandlers.elements.indexOf(scrollable);
+
+  assert.strictEqual(scrollable1Index, 0, `The scrollable was added to the watched elements list.`);
+
+  let cache1 = scrollHandlers.handlers[0];
+
+  assert.true(cache1.handlers.length === 2, `We added the handler`);
+
+  // test triggering that handler
+  assert.strictEqual(scrollable.scrollTop, 0, `The scrollable is initially unscrolled`);
+
+  assert.false(scrollHandlers.isPolling, 'polling is inactive');
+
+  afterNextScrollUpdate(() => {
+    scrollable.scrollTop = 10;
+    assert.equal(scrollable.scrollTop, 10, `We updated the scrollable's scroll position`);
+
+    afterNextScrollUpdate(() => {
+      // test removing that handler
+      scrollHandlers.removeScrollHandler(scrollable, handler1);
+        let newScrollableIndex = scrollHandlers.elements.indexOf(scrollable);
+        assert.strictEqual(newScrollableIndex, 0, `The element remains in the watched elements list.`);
+        assert.strictEqual(scrollHandlers.length, 1, `We have an element to watch.`);
+        assert.strictEqual(cache1.handlers.length, 1, `The first handler was removed from the listener cache.`);
+        assert.strictEqual(scrollHandlers.handlers.indexOf(cache1), 0, `The cache still exists.`);
+
+        scrollHandlers.removeScrollHandler(scrollable, handler2);
+        newScrollableIndex = scrollHandlers.elements.indexOf(scrollable);
+        assert.strictEqual(newScrollableIndex, -1, `Removing the last handler removed the element from the watched elements list.`);
+        assert.strictEqual(scrollHandlers.length, 0, `We have no more elements to watch.`);
+        assert.strictEqual(cache1.handlers.length, 0, `The last handler was removed from the listener cache.`);
+
+        destroyScrollable(scrollable);
+        done();
     });
   });
 });
