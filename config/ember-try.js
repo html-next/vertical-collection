@@ -7,35 +7,9 @@ module.exports = async function() {
     useYarn: true,
     scenarios: [
       {
-        name: 'ember-lts-3.12',
-        npm: {
-          devDependencies: {
-            'ember-source': '~3.12.0'
-          }
-        }
-      },
-      {
-        name: 'ember-lts-3.16',
-        npm: {
-          devDependencies: {
-            'ember-source': '~3.16.0'
-          }
-        }
-      },
-      {
-        name: 'ember-lts-3.20',
-        npm: {
-          devDependencies: {
-            'ember-data': '~3.20.0',
-            'ember-source': '~3.20.0'
-          }
-        }
-      },
-      {
         name: 'ember-lts-3.28',
         npm: {
           devDependencies: {
-            'ember-data': '~3.28.0',
             'ember-source': '~3.28.0'
           }
         }
@@ -45,7 +19,6 @@ module.exports = async function() {
         npm: {
           devDependencies: {
             'ember-cli-fastboot': '3.2.0-beta.5',
-            'ember-data': '~3.28.0',
             'ember-source': '~4.4.0'
           },
           ember: {
@@ -64,7 +37,7 @@ module.exports = async function() {
         npm: {
           devDependencies: {
             'ember-cli-fastboot': '3.2.0-beta.5',
-            'ember-data': '~3.28.0',
+            'ember-data': '^5.0.0',
             'ember-source': await getChannelURL('release')
           },
           ember: {
@@ -83,7 +56,7 @@ module.exports = async function() {
         npm: {
           devDependencies: {
             'ember-cli-fastboot': '3.2.0-beta.5',
-            'ember-data': '~3.28.0',
+            'ember-data': '^5.0.0',
             'ember-source': await getChannelURL('beta')
           },
           ember: {
@@ -102,7 +75,7 @@ module.exports = async function() {
         npm: {
           devDependencies: {
             'ember-cli-fastboot': '3.2.0-beta.5',
-            'ember-data': '~3.28.0',
+            'ember-data': '^5.0.0',
             'ember-source': await getChannelURL('canary')
           },
           ember: {
