@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
-import { setupRenderingTest } from 'ember-qunit';
-import hbs from 'htmlbars-inline-precompile';
+import { setupRenderingTest } from '../helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import {
   find,
   findAll,
@@ -38,8 +38,7 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     standardTemplate,
 
     async function(assert) {
-      assert.expect(1);
-      assert.equal(findAll('.vertical-item').length, 1);
+      assert.strictEqual(findAll('.vertical-item').length, 1);
     }
   );
 
@@ -49,8 +48,7 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     standardTemplate,
 
     async function(assert) {
-      assert.expect(1);
-      assert.equal(findAll('.vertical-item').length, 0);
+      assert.strictEqual(findAll('.vertical-item').length, 0);
     }
   );
 
@@ -60,10 +58,9 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     standardTemplate,
 
     async function(assert) {
-      assert.expect(1);
       await settled();
       const items = await findAll('.vertical-item');
-      assert.equal(items.length, 3);
+      assert.strictEqual(items.length, 3);
     }
   );
 
@@ -73,20 +70,18 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     standardTemplate,
 
     async function(assert) {
-      assert.expect(3);
-
       // Should render buffer on the bottom
-      assert.equal(findAll('.vertical-item').length, 2);
+      assert.strictEqual(findAll('.vertical-item').length, 2);
 
       await scrollTo('.scrollable', 0, 200);
 
       // Should render buffers on both sides
-      assert.equal(findAll('.vertical-item').length, 3);
+      assert.strictEqual(findAll('.vertical-item').length, 3);
 
       await scrollTo('.scrollable', 0, 2000);
 
       // Should render buffer on the top
-      assert.equal(findAll('.vertical-item').length, 2);
+      assert.strictEqual(findAll('.vertical-item').length, 2);
     }
   );
 
@@ -113,8 +108,7 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     `,
 
     async function(assert) {
-      assert.expect(1);
-      assert.equal(findAll('vertical-item').length, 5);
+      assert.strictEqual(findAll('vertical-item').length, 5);
     }
   );
 
@@ -141,13 +135,11 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     `,
 
     async function(assert) {
-      assert.expect(3);
-
       let occludedBoundaries = findAll('.occluded-content');
 
-      assert.equal(occludedBoundaries[0].getAttribute('style'), 'height: 0px;', 'Occluded height above is correct');
-      assert.equal(occludedBoundaries[1].getAttribute('style'), 'height: 100px;', 'Occluded height below is correct');
-      assert.equal(findAll('vertical-item').length, 5, 'Rendered correct number of items');
+      assert.strictEqual(occludedBoundaries[0].getAttribute('style'), 'height: 0px;', 'Occluded height above is correct');
+      assert.strictEqual(occludedBoundaries[1].getAttribute('style'), 'height: 100px;', 'Occluded height below is correct');
+      assert.strictEqual(findAll('vertical-item').length, 5, 'Rendered correct number of items');
     }
   );
 
@@ -173,13 +165,11 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     `,
 
     async function(assert) {
-      assert.expect(3);
-
       let occludedBoundaries = findAll('.occluded-content');
 
-      assert.equal(occludedBoundaries[0].getAttribute('style'), 'height: 0px;', 'Occluded height above is correct');
-      assert.equal(occludedBoundaries[1].getAttribute('style'), 'height: 100px;', 'Occluded height below is correct');
-      assert.equal(findAll('vertical-item').length, 5, 'Rendered correct number of items');
+      assert.strictEqual(occludedBoundaries[0].getAttribute('style'), 'height: 0px;', 'Occluded height above is correct');
+      assert.strictEqual(occludedBoundaries[1].getAttribute('style'), 'height: 100px;', 'Occluded height below is correct');
+      assert.strictEqual(findAll('vertical-item').length, 5, 'Rendered correct number of items');
     }
   );
 
@@ -211,6 +201,7 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     }
   );
 
+  // eslint-disable-next-line qunit/require-expect
   test('The collection renders the initialRenderCount correctly', async function(assert) {
     assert.expect(5);
     this.set('items', getNumbers(0, 10));
@@ -230,17 +221,18 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
         </div>
       `);
     }, () => {
-      assert.equal(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
-      assert.equal(find('vertical-item').textContent.trim(), '0 0', 'correct item rendered');
+      assert.strictEqual(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
+      assert.strictEqual(find('vertical-item').textContent.trim(), '0 0', 'correct item rendered');
     });
 
     await settled();
 
-    assert.equal(findAll('vertical-item').length, 10, 'correctly updates the number of items rendered on second pass');
-    assert.equal(find('vertical-item:first-of-type').textContent.trim(), '0 0', 'correct first item rendered');
-    assert.equal(find('vertical-item:last-of-type').textContent.trim(), '9 9', 'correct last item rendered');
+    assert.strictEqual(findAll('vertical-item').length, 10, 'correctly updates the number of items rendered on second pass');
+    assert.strictEqual(find('vertical-item:first-of-type').textContent.trim(), '0 0', 'correct first item rendered');
+    assert.strictEqual(find('vertical-item:last-of-type').textContent.trim(), '9 9', 'correct last item rendered');
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('The collection renders the initialRenderCount correctly if idForFirstItem is set', async function(assert) {
     assert.expect(5);
     this.set('items', getNumbers(0, 100));
@@ -262,17 +254,18 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
         </div>
       `);
     }, () => {
-      assert.equal(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
-      assert.equal(find('vertical-item').textContent.trim(), '20 20', 'correct item rendered');
+      assert.strictEqual(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
+      assert.strictEqual(find('vertical-item').textContent.trim(), '20 20', 'correct item rendered');
     });
 
     await settled();
 
-    assert.equal(findAll('vertical-item').length, 12, 'correctly updates the number of items rendered on second pass');
-    assert.equal(find('vertical-item:first-of-type').textContent.trim(), '19 19', 'correct first item rendered');
-    assert.equal(find('vertical-item:last-of-type').textContent.trim(), '30 30', 'correct last item rendered');
+    assert.strictEqual(findAll('vertical-item').length, 12, 'correctly updates the number of items rendered on second pass');
+    assert.strictEqual(find('vertical-item:first-of-type').textContent.trim(), '19 19', 'correct first item rendered');
+    assert.strictEqual(find('vertical-item:last-of-type').textContent.trim(), '30 30', 'correct last item rendered');
   });
 
+  // eslint-disable-next-line qunit/require-expect
   test('The collection renders the initialRenderCount correctly if the count is more than the number of items', async function(assert) {
     assert.expect(4);
     this.set('items', getNumbers(0, 1));
@@ -292,14 +285,14 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
         </div>
       `);
     }, () => {
-      assert.equal(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
-      assert.equal(find('vertical-item').textContent.trim(), '0 0', 'correct item rendered');
+      assert.strictEqual(findAll('vertical-item').length, 1, 'correct number of items rendered on initial pass');
+      assert.strictEqual(find('vertical-item').textContent.trim(), '0 0', 'correct item rendered');
     });
 
     await settled();
 
-    assert.equal(findAll('vertical-item').length, 1, 'correctly updates the number of items rendered on second pass');
-    assert.equal(find('vertical-item').textContent.trim(), '0 0', 'correct first item rendered');
+    assert.strictEqual(findAll('vertical-item').length, 1, 'correctly updates the number of items rendered on second pass');
+    assert.strictEqual(find('vertical-item').textContent.trim(), '0 0', 'correct first item rendered');
   });
 
   testScenarios(
@@ -326,11 +319,11 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
     async function(assert) {
       assert.expect(2);
 
-      assert.equal(findAll('vertical-item').length, 7, 'Rendered correct number of items');
+      assert.strictEqual(findAll('vertical-item').length, 7, 'Rendered correct number of items');
 
       await scrollTo('.scrollable', 0, 500);
 
-      assert.equal(findAll('vertical-item').length, 9, 'Rendered correct number of items');
+      assert.strictEqual(findAll('vertical-item').length, 9, 'Rendered correct number of items');
     }
   );
 
@@ -357,13 +350,13 @@ module('vertical-collection', 'Integration | Basic Tests', function(hooks) {
 
       await scrollTo('.scrollable', 0, 500);
 
-      assert.equal(scrollContainer.scrollTop, 500, 'scrolled to correct position');
+      assert.strictEqual(scrollContainer.scrollTop, 500, 'scrolled to correct position');
 
       this.set('renderCollection', true);
 
       await settled();
 
-      assert.equal(scrollContainer.scrollTop, 500, 'scroll position remains the same');
+      assert.strictEqual(scrollContainer.scrollTop, 500, 'scroll position remains the same');
     }
   );
 });

@@ -1,14 +1,12 @@
 import { A } from '@ember/array';
 import ArrayProxy from '@ember/array/proxy';
+import PromiseProxyMixin from '@ember/object/promise-proxy-mixin';
 import { Promise } from 'rsvp';
 import { test } from 'qunit';
-import DS from 'ember-data';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import { settled, render } from '@ember/test-helpers';
 
-const {
-  PromiseArray
-} = DS;
+const PromiseArray = ArrayProxy.extend(PromiseProxyMixin);
 
 export function testScenarios(description, scenarios, template, testFn, preRenderTestFn, setValuesBeforeRender) {
   for (const scenarioName in scenarios) {

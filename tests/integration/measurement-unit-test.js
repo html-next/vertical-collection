@@ -1,6 +1,6 @@
 import { module } from 'qunit';
-import { setupRenderingTest } from 'ember-qunit';
-import hbs from 'htmlbars-inline-precompile';
+import { setupRenderingTest } from '../helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import {
   findAll
 } from '@ember/test-helpers';
@@ -37,7 +37,7 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
     `,
 
     async function(assert) {
-      assert.equal(findAll('vertical-item').length, 5);
+      assert.strictEqual(findAll('vertical-item').length, 5);
     }
   );
 
@@ -61,7 +61,7 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
     `,
 
     async function(assert) {
-      assert.equal(findAll('vertical-item').length, 5);
+      assert.strictEqual(findAll('vertical-item').length, 5);
     }
   );
 
@@ -109,7 +109,7 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
     `,
 
     async function(assert) {
-      assert.equal(findAll('vertical-item').length, 5);
+      assert.strictEqual(findAll('vertical-item').length, 5);
     }
   );
 
@@ -136,7 +136,7 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
     `,
 
     function(assert) {
-      assert.equal(findAll('vertical-item').length, 10);
+      assert.strictEqual(findAll('vertical-item').length, 10);
     }
   );
 
@@ -165,7 +165,7 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
     `,
 
     function(assert) {
-      assert.equal(findAll('vertical-item').length, 10);
+      assert.strictEqual(findAll('vertical-item').length, 10);
     }
   );
 
@@ -194,7 +194,7 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
     `,
 
     function(assert) {
-      assert.equal(findAll('vertical-item').length, 10);
+      assert.strictEqual(findAll('vertical-item').length, 10);
     }
   );
 
@@ -221,7 +221,7 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
     `,
 
     function(assert) {
-      assert.equal(findAll('vertical-item').length, 10);
+      assert.strictEqual(findAll('vertical-item').length, 10);
     }
   );
 });

@@ -2,20 +2,10 @@
 
 const EmberAddon = require('ember-cli/lib/broccoli/ember-addon');
 
-module.exports = function(defaults) {
-
-  defaults.snippetSearchPaths = ['tests/dummy/app'];
-  defaults.snippetPaths = ['tests/dummy/snippets'];
-
-  let app = new EmberAddon(defaults, {
-    'ember-cli-babel': {
-      throwUnlessParallelizable: true
-    }
+module.exports = function (defaults) {
+  const app = new EmberAddon(defaults, {
+    // Add options here
   });
-
-  app.isDevelopingAddon = () => {
-    return true;
-  };
 
   let bootstrapPath = 'node_modules/bootstrap/dist/';
   app.import(`${bootstrapPath}css/bootstrap.css`);

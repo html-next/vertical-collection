@@ -26,9 +26,8 @@ export default class DynamicRadar extends Radar {
     }
   }
 
-  destroy() {
-    super.destroy();
-
+  willDestroy() {
+    super.willDestroy();
     this.skipList = null;
   }
 

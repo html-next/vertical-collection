@@ -1,6 +1,15 @@
 import { DEBUG } from '@glimmer/env';
 import { assert } from '@ember/debug';
 
+/*
+ * This lint rule is incorrectly trigged by the presence of native
+ * classes in this file. Computed properties are not actually used
+ * as part of the native classes.
+ *
+ * This disable can likely be removed once the base component is
+ * refactored to a native class (and likely Glimmer component).
+ */
+/* eslint-disable ember/no-computed-properties-in-native-classes, ember/no-component-lifecycle-hooks */
 import { empty, readOnly } from '@ember/object/computed';
 
 import Component from '@ember/component';
@@ -391,6 +400,7 @@ const VerticalCollection = Component.extend({
 
   // –––––––––––––– Setup/Teardown
   didInsertElement() {
+    this._super();
     this.schedule('sync', () => {
       this._radar.start();
     });
@@ -412,6 +422,7 @@ const VerticalCollection = Component.extend({
         this.__visualization = null;
       }
     }
+    this._super();
   },
 
   init() {

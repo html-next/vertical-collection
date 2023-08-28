@@ -1,5 +1,5 @@
 import { module } from 'qunit';
-import { setupRenderingTest } from 'ember-qunit';
+import { setupRenderingTest } from '../helpers';
 import scrollTo from '../helpers/scroll-to';
 
 import getNumbers from 'dummy/lib/get-numbers';
