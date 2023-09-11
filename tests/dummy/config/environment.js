@@ -1,18 +1,21 @@
 'use strict';
 let pkg = require('../../../package.json');
 
-module.exports = function(environment) {
+module.exports = function (environment) {
   let DEBUG = false;
 
-  let ENV = {
+  const ENV = {
     modulePrefix: 'dummy',
     podModulePrefix: 'dummy/routes',
     environment,
     rootURL: '/',
-    locationType: 'auto',
+    locationType: 'hash',
     EmberENV: {
-      FEATURES: {},
-      EXTEND_PROTOTYPES: false
+      EXTEND_PROTOTYPES: false,
+      FEATURES: {
+        // Here you can enable experimental features on an ember canary build
+        // e.g. EMBER_NATIVE_DECORATOR_SUPPORT: true
+      },
     },
 
     VERSION: pkg.version,

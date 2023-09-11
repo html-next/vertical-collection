@@ -2,9 +2,9 @@
   <div class="row">
     <div class="col-sm-6">
       <h3>Demo</h3>
-      {{!- BEGIN-SNIPPET flexible-layout-example }}
+      {{! BEGIN-SNIPPET flexible-layout-example }}
       <div class="table-wrapper dark">
-        <VerticalCollection @items={{this.model.numbers}}
+        <VerticalCollection @items={{@model.data.numbers}}
           @estimateHeight={{270}}
           @firstReached={{action "loadAbove"}}
           @lastReached={{action "loadBelow"}}
@@ -13,7 +13,7 @@
           <NumberSlide @isDynamic={{true}} @item={{item}} @index={{index}} />
         </VerticalCollection>
       </div>
-      {{!- END-SNIPPET }}
+      {{! END-SNIPPET }}
     </div>
     <div class="col-sm-6">
       <h3>Flexible Layouts</h3>
@@ -26,7 +26,7 @@
         with integration with the pre-render component.
       </p>
       <h4>Code for Demo</h4>
-      <CodeSnippet @name="flexible-layout-example.hbs" />
+      <CodeSnippet @name="flexible-layout-example" />
     </div>
   </div>
 </div>

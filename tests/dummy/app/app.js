@@ -4,11 +4,11 @@ import Resolver from './resolver';
 import loadInitializers from 'ember-load-initializers';
 import config from './config/environment';
 
-const App = Application.extend({
-  modulePrefix: config.modulePrefix,
-  podModulePrefix: config.podModulePrefix,
-  Resolver,
-  customEvents: {
+class App extends Application {
+  modulePrefix=config.modulePrefix
+  podModulePrefix=config.podModulePrefix
+  Resolver=Resolver
+  customEvents = {
     touchstart: null,
     touchmove: null,
     touchend: null,
@@ -35,7 +35,7 @@ const App = Application.extend({
     drop: null,
     dragend: null
   }
-});
+}
 
 loadInitializers(App, config.modulePrefix);
 

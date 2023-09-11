@@ -7,7 +7,7 @@
   min-height: 0.01px;
 
   /* hides text visually while still being readable by screen readers */
-  color: rgba(0,0,0,0);
+  color: rgb(0 0 0 / 0%);
 }
 
 table .occluded-content,

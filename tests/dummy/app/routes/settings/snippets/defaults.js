@@ -1,5 +1,5 @@
 export default
-/* !- BEGIN-SNIPPET vertical-collection-defaults-example */
+/* ! BEGIN-SNIPPET vertical-collection-defaults-example */
 {
 // basics
   tagName: '',
@@ -74,5 +74,5 @@ export default
   // will match the immediate parent of the collection.
   containerSelector: '*'
 }
-/* !- END-SNIPPET vertical-collection-defaults-example */
+/* ! END-SNIPPET vertical-collection-defaults-example */
 ;

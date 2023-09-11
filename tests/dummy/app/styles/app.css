@@ -6,12 +6,12 @@ h1 {
   color: #222;
   font-size: 2rem;
   line-height: 2.1em;
-  margin: .25em auto;
+  margin: 0.25em auto;
   padding: 0;
 }
 
 header {
-  background: #EFD967;
+  background: #efd967;
   border-bottom: solid 1px #e4ce5c;
 }
 
@@ -37,12 +37,11 @@ nav a {
   display: block;
 }
 
-.table-wrapper, .scrollable {
+.table-wrapper,
+.scrollable {
   display: block;
   height: 500px;
   overflow: scroll;
-  -webkit-overflow-scrolling: touch;
-  overflow-scrolling: touch;
   position: relative;
   background: #fff;
 }
@@ -67,7 +66,8 @@ nav a {
   max-height: 20rem;
 }
 
-.table-wrapper.dark, .bg-dark {
+.table-wrapper.dark,
+.bg-dark {
   background: #d0d0d0;
 }
 
@@ -93,14 +93,8 @@ nav a {
 }
 
 number-slide {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
-  -webkit-align-items: center;
   align-items: center;
-  -webkit-justify-content: center;
   justify-content: center;
   font-size: 2rem;
   width: 250px;
@@ -114,9 +108,9 @@ number-slide {
 }
 
 .grid-item number-slide {
-   width: 100px;
-   height: 100px;
-   margin: 0 auto;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
 }
 
 number-slide .number {
@@ -125,17 +119,13 @@ number-slide .number {
 }
 
 .grid-item number-slide .number {
-  font-size: .8em;
+  font-size: 0.8em;
 }
 
 number-slide .index {
   font-size: 2rem;
   color: #555;
-  margin: 0 .5em;
-}
-
-.grid-page {
-  min-height: 500px;
+  margin: 0 0.5em;
 }
 
 .grid-item number-slide .index {
@@ -167,10 +157,11 @@ img.async-image.grid-image {
   width: 100%;
   float: left;
   height: auto;
+  min-height: 500px;
 }
 
 .grid-page::after {
-  content: ' ';
+  content: " ";
   display: block;
   float: none;
   clear: both;
@@ -187,7 +178,7 @@ img.async-image.grid-image {
 }
 
 .image-slide .loading-spinner {
-  background: url('../spinnerLarge.gif') center center no-repeat;
+  background: url("../spinnerLarge.gif") center center no-repeat;
   width: 100%;
   height: 100%;
   display: block;
@@ -195,19 +186,24 @@ img.async-image.grid-image {
   float: left;
 }
 
-.text-white, .text-white:hover, .text-white:active, .text-white:focus {
+.text-white,
+.text-white:hover,
+.text-white:active,
+.text-white:focus {
   color: #fff;
 }
+
 .text-small {
   font-size: 1.4rem;
 }
+
 nav.text-small {
   line-height: 4.2rem;
-  margin: .55rem 0
+  margin: 0.55rem 0;
 }
 
 nav.text-small a {
-  margin: 0 .5em;
+  margin: 0 0.5em;
 }
 
 img.auto-size {

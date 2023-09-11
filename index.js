@@ -62,8 +62,6 @@ module.exports = {
         disableDecoratorTransforms: false,
         enableTypeScriptTransform: true,
 
-        throwUnlessParallelizable: true,
-
         // consuming app will take care of this if needed,
         // we don't need to also include
         includePolyfill: false,

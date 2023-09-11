@@ -1,5 +1,5 @@
 import { module } from 'qunit';
-import { setupRenderingTest } from 'ember-qunit';
+import { setupRenderingTest } from '../helpers';
 import {
   find,
   findAll,
