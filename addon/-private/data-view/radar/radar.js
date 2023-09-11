@@ -687,7 +687,7 @@ export default class Radar {
     this._prevFirstItemIndex += numPrepended;
     this._prevLastItemIndex += numPrepended;
 
-    this.orderedComponents.forEach((c) => set(c, 'index', get(c, 'index') + numPrepended));
+    this.orderedComponents.forEach((c) => set(c, 'index', c.index + numPrepended));
 
     this._firstReached = false;
 

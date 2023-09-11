@@ -4446,7 +4446,7 @@ ember-cache-primitive-polyfill@^1.0.1:
     ember-compatibility-helpers "^1.2.1"
     silent-error "^1.1.1"
 
-ember-cached-decorator-polyfill@^1.0.1:
+ember-cached-decorator-polyfill@^1.0.1, ember-cached-decorator-polyfill@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/ember-cached-decorator-polyfill/-/ember-cached-decorator-polyfill-1.0.2.tgz#26445056ebee3776c340e28652ce59be73dd3958"
   integrity sha512-hUX6OYTKltAPAu8vsVZK02BfMTV0OUXrPqvRahYPhgS7D0I6joLjlskd7mhqJMcaXLywqceIy8/s+x8bxF8bpQ==
