@@ -218,3 +218,12 @@ img.auto-size {
 vertical-item {
   display: block;
 }
+
+pre {
+  --ember-shiki-font-size: 12px;
+
+  /* Override Bootstrap defaults */
+  border: 0;
+  background-color: transparent;
+  padding: 0;
+}
