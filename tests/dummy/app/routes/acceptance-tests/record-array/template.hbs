@@ -5,7 +5,7 @@
       @items={{this.items}}
       @estimateHeight={{50}}
       @bufferSize={{5}}
-      @firstVisibleChanged={{action "firstVisibleChanged"}}
+      @firstVisibleChanged={{this.firstVisibleChanged}}
       as |item index|
     >
       <NumberSlide @item={{item}} @itemIndex={{index}} @prefixed={{this.prefixed}} />
