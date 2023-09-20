@@ -2,20 +2,17 @@ import { DEBUG } from '@glimmer/env';
 import { assert } from '@ember/debug';
 
 /*
- * This lint rule is incorrectly trigged by the presence of native
- * classes in this file. Computed properties are not actually used
- * as part of the native classes.
- *
- * This disable can likely be removed once the base component is
- * refactored to a native class (and likely Glimmer component).
+ * Computed properties are used in this file to maintain backwards
+ * compatibility with array proxies.
  */
-/* eslint-disable ember/no-computed-properties-in-native-classes, ember/no-component-lifecycle-hooks */
-import { empty, readOnly } from '@ember/object/computed';
+/* eslint-disable ember/no-computed-properties-in-native-classes */
+import { action, computed, get } from '@ember/object';
+import { dependentKeyCompat } from '@ember/object/compat';
 
-import Component from '@ember/component';
-import { get, computed } from '@ember/object';
+import Component from '@glimmer/component';
 import { run } from '@ember/runloop';
 import layout from './template';
+import { setComponentTemplate } from '@ember/component';
 import { ViewportContainer } from '../../-private';
 
 import { scheduler, Token } from 'ember-raf-scheduler';
@@ -187,20 +184,19 @@ class Visualization {
  * END DEBUG HELPERS
  */
 
-const VerticalCollection = Component.extend({
-  layout,
-
-  tagName: '',
+class VerticalCollection extends Component {
 
   /**
    * Property name used for storing references to each item in items. Accessing this attribute for each item
    * should yield a unique result for every item in the list.
    *
-   * @property key
+   * @property key // TODO also an argument, how to represent this?
    * @type String
    * @default '@identity'
    */
-  key: '@identity',
+  get key() {
+    return this.args.identity ?? '@identity';
+  }
 
   // –––––––––––––– Required Settings
 
@@ -208,21 +204,19 @@ const VerticalCollection = Component.extend({
    * Estimated height of an item to be rendered. Use best guess as this will be used to determine how many items
    * are displayed virtually, before and after the vertical-collection viewport.
    *
-   * @property estimateHeight
+   * @argument estimateHeight // TODO: How to represent this
    * @type Number
    * @required
    */
-  estimateHeight: null,
 
   /**
    * List of objects to svelte-render.
    * Can be called like `<VerticalCollection @items={{itemsArray}} />`.
    *
-   * @property items
+   * @argument items // TODO: How to represent this
    * @type Array
    * @required
    */
-  items: null,
 
   // –––––––––––––– Optional Settings
   /**
@@ -230,10 +224,12 @@ const VerticalCollection = Component.extend({
    * If true, the vertical-collection will assume that items' heights are always equal to estimateHeight;
    * this is more performant, but less flexible.
    *
-   * @property staticHeight
+   * @property staticHeight // TODO also an argument, how to represent this?
    * @type Boolean
    */
-  staticHeight: false,
+  get staticHeight() {
+    return this.args.staticHeight ?? false;
+  }
 
   /**
    * Indicates whether or not list items in the Radar should be reused on update of virtual components (e.g. scroll).
@@ -245,10 +241,12 @@ const VerticalCollection = Component.extend({
    *  - When templates for individual items vary widely or are based on conditionals that are likely to change
    *      (i.e. would defeat any benefits of DOM recycling anyway)
    *
-   * @property shouldRecycle
+   * @property shouldRecycle // TODO also an argument, how to represent this?
    * @type Boolean
    */
-  shouldRecycle: true,
+  get shouldRecycle() {
+    return this.args.shouldRecycle ?? true;
+  }
 
   /*
    * A selector string that will select the element from
@@ -260,8 +258,13 @@ const VerticalCollection = Component.extend({
    * if so, you can leave this null.
    *
    * Set this to "body" to scroll the entire web page.
+   *
+   * @property containerSelector // TODO also an argument, how to represent this?
+   * @type String
    */
-  containerSelector: '*',
+  get containerSelector() {
+    return this.args.containerSelector ?? '*';
+  }
 
   // –––––––––––––– Performance Tuning
   /**
@@ -269,11 +272,14 @@ const VerticalCollection = Component.extend({
    * Increasing this value is useful when doing infinite scrolling and loading data from a remote service,
    * with the desire to allow records to show as the user scrolls and the backend API takes time to respond.
    *
-   * @property bufferSize
+   * @property bufferSize // TODO also an argument, how to represent this?
    * @type Number
    * @default 1
    */
-  bufferSize: 1,
+  @dependentKeyCompat
+  get bufferSize() {
+    return this.args.bufferSize ?? 1;
+  }
 
   // –––––––––––––– Initial Scroll State
   /**
@@ -284,19 +290,22 @@ const VerticalCollection = Component.extend({
    *
    * If the item cannot be found, scrollTop
    * is set to 0.
-   * @property idForFirstItem
+   *
+   * @argument idForFirstItem // TODO: How to represent this
    */
-  idForFirstItem: null,
 
   /**
    * If set, if scrollPosition is empty
    * at initialization, the component will
    * render starting at the bottom.
-   * @property renderFromLast
+   *
+   * @property renderFromLast // TODO also an argument, how to represent this?
    * @type Boolean
    * @default false
    */
-  renderFromLast: false,
+  get renderFromLast() {
+    return this.args.renderFromLast ?? false;
+  }
 
   /**
    * If set to true, the collection will render all of the items passed into the component.
@@ -308,48 +317,70 @@ const VerticalCollection = Component.extend({
    * - Can be used to respond to the keyboard input for Find (i.e. ctrl+F/cmd+F) to show all elements, which then
    *    allows the list items to be searchable
    *
-   * @property renderAll
+   * @property renderAll // TODO also an argument, how to represent this?
    * @type Boolean
    * @default false
    */
-  renderAll: false,
+  @dependentKeyCompat
+  get renderAll() {
+    return this.args.renderAll ?? false;
+  }
 
   /**
    * The tag name used in DOM elements before and after the rendered list. By default, it is set to
    * 'occluded-content' to avoid any confusion with user's CSS settings. However, it could be
    * overriden to provide custom behavior (for example, in table user wants to set it to 'tr' to
    * comply with table semantics).
+   *
+   * @property occlusionTagName // TODO also an argument, how to represent this?
+   * @type String
+   * @default occluded-content
    */
-  occlusionTagName: 'occluded-content',
+  get occlusionTagName() {
+    return this.args.occlusionTagName ?? 'occluded-content';
+  }
 
-  isEmpty: empty('items'),
-  shouldYieldToInverse: readOnly('isEmpty'),
+  get isEmpty() {
+    return !!(this.args.items?.length);
+  }
 
-  virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function() {
-    const { _radar } = this;
+  get shouldYieldToInverse() {
+    return this.isEmpty;
+  }
 
-    const items = this.items;
+  // eslint-disable-next-line ember/use-brace-expansion
+  @computed('args.estimateHeight', 'args.items.[]', 'bufferSize', 'renderAll')
+  get virtualComponents() {
+    const {
+      _radar,
+      args: {
+        estimateHeight,
+        items
+      },
+      bufferSize,
+      renderAll
+    } = this;
 
     _radar.items = items === null || items === undefined ? [] : items;
-    _radar.estimateHeight = this.estimateHeight;
-    _radar.renderAll = this.renderAll;
-    _radar.bufferSize = this.bufferSize;
+    _radar.estimateHeight = estimateHeight;
+    _radar.renderAll = renderAll;
+    _radar.bufferSize = bufferSize;
 
     _radar.scheduleUpdate(true);
     this._clearScheduledActions();
 
     return _radar.virtualComponents;
-  }),
+  }
 
   schedule(queueName, job) {
-    return scheduler.schedule(queueName, job, this.token);
-  },
+    scheduler.schedule(queueName, job, this.token);
+  }
 
   _clearScheduledActions() {
     clearTimeout(this._nextSendActions);
     this._nextSendActions = null;
     this._scheduledActions.length = 0;
-  },
+  }
 
   _scheduleSendAction(action, index) {
     this._scheduledActions.push([action, index]);
@@ -359,7 +390,7 @@ const VerticalCollection = Component.extend({
         this._nextSendActions = null;
 
         run(() => {
-          const items = this.items;
+          const items = this.args.items;
           const keyPath = this.key;
 
           this._scheduledActions.forEach(([action, index]) => {
@@ -367,18 +398,21 @@ const VerticalCollection = Component.extend({
             const key = keyForItem(item, keyPath, index);
 
             // this.sendAction will be deprecated in ember 4.0
-            const _action = get(this, action);
+            const _action = this.args[action];
             if (typeof _action == 'function') {
               _action(item, index, key);
             } else if (typeof _action === 'string') {
-              this.sendAction(action, item, index, key);
+              /*
+               * This check and exception should be removed in Vertical Collection 6
+               */
+              throw new Error('vertical-collection no longer supports string based action')
             }
           });
           this._scheduledActions.length = 0;
         });
       });
     }
-  },
+  }
 
   /* Public API Methods
      @index => number
@@ -396,15 +430,15 @@ const VerticalCollection = Component.extend({
     return new Promise ((resolve) => {
       _radar.scheduleUpdate(false, resolve);
     });
-  },
+  }
 
   // –––––––––––––– Setup/Teardown
-  didInsertElement() {
-    this._super();
+  @action
+  templateDidRender() {
     this.schedule('sync', () => {
       this._radar.start();
     });
-  },
+  }
 
   willDestroy() {
     this.token.cancel();
@@ -422,27 +456,29 @@ const VerticalCollection = Component.extend({
         this.__visualization = null;
       }
     }
-    this._super();
-  },
+    super.willDestroy();
+  }
 
-  init() {
-    this._super();
+  constructor(...args) {
+    super(...args);
 
     this.token = new Token();
     const RadarClass = this.staticHeight ? StaticRadar : DynamicRadar;
 
-    const items = this.items || [];
+    const items = this.args.items || [];
 
     const {
+      args: {
+        estimateHeight,
+        idForFirstItem,
+        initialRenderCount
+      },
       bufferSize,
       containerSelector,
-      estimateHeight,
-      initialRenderCount,
       renderAll,
       renderFromLast,
       shouldRecycle,
       occlusionTagName,
-      idForFirstItem,
       key
     } = this;
 
@@ -473,10 +509,10 @@ const VerticalCollection = Component.extend({
     this._scheduledActions = [];
     this._nextSendActions = null;
 
-    let a = !!this.lastReached;
-    let b = !!this.firstReached;
-    let c = !!this.lastVisibleChanged;
-    let d = !!this.firstVisibleChanged;
+    let a = !!this.args.lastReached;
+    let b = !!this.args.firstReached;
+    let c = !!this.args.lastVisibleChanged;
+    let d = !!this.args.firstVisibleChanged;
     let any = a || b || c || d;
 
     if (any) {
@@ -590,7 +626,7 @@ const VerticalCollection = Component.extend({
         assert(`itemContainer must define position`, styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute']));
 
         // check item defaults
-        assert(`You must supply at least one item to the collection to debug it's CSS.`, this.items.length);
+        assert(`You must supply at least one item to the collection to debug it's CSS.`, this.args.items.length);
 
         let element = radar._itemContainer.firstElementChild;
 
@@ -601,7 +637,7 @@ const VerticalCollection = Component.extend({
       };
     }
   }
-});
+}
 
 function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {
   const totalItems = get(items, 'length');
@@ -622,5 +658,7 @@ function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {
 
   return startingIndex;
 }
+
+setComponentTemplate(layout, VerticalCollection);
 
 export default VerticalCollection;
