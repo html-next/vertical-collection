@@ -60,7 +60,7 @@
     "ember-cli-babel": "^8.0.0",
     "ember-cli-htmlbars": "^6.3.0",
     "ember-cli-version-checker": "^5.1.2",
-    "ember-raf-scheduler": "^0.3.0"
+    "ember-raf-scheduler": "github:Mikek2252/ember-raf-scheduler"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.22.10",

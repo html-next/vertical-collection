@@ -4982,12 +4982,11 @@ ember-qunit@^7.0.0:
     silent-error "^1.1.1"
     validate-peer-dependencies "^2.2.0"
 
-ember-raf-scheduler@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/ember-raf-scheduler/-/ember-raf-scheduler-0.3.0.tgz#7657ee5c1d54f852731e61e9d0e0750a9a22f5f4"
-  integrity sha512-i8JWQidNCX7n5TOTIKRDR0bnsQN9aJh/GtOJKINz2Wr+I7L7sYVhli6MFqMYNGKC9j9e6iWsznfAIxddheyEow==
+"ember-raf-scheduler@github:Mikek2252/ember-raf-scheduler":
+  version "0.4.1"
+  resolved "https://codeload.github.com/Mikek2252/ember-raf-scheduler/tar.gz/452f8c21023753d1e34248bfe5bd9be1d93127ee"
   dependencies:
-    ember-cli-babel "^7.26.6"
+    ember-cli-babel "^7.26.11"
 
 ember-resolver@^11.0.1:
   version "11.0.1"
