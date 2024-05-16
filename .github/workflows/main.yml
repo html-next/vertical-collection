@@ -1,0 +1,33 @@
+name: Ember rAF Scheduler CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request: {}
+
+concurrency:
+  group: ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: "Tests"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: ${{inputs.cache}}
+      - run: |
+            if [ -f ./pnpm-lock.yaml ]; then
+              pnpm i
+            elif [ -f ./yarn.lock ]; then
+              yarn 
+            else
+              npm i 
+            fi
+        shell: bash
