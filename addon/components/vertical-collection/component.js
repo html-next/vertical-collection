@@ -500,21 +500,21 @@ const VerticalCollection = Component.extend({
 
       Template:
 
-      <VerticalCollection @registerAPI={{action "registerAPI"}} />
+      <VerticalCollection @registerAPI={{this.registerAPI}} />
 
       Component:
       
-      export default Component.extend({
-        actions: {
-          registerAPI(api) {
-              this.set('collectionAPI', api);
-          }
-        },
-        scrollToItem() {
-          let collectionAPI = this.collectionAPI;
-          collectionAPI.scrollToItem(index);
+      export default class extends Component {
+        @action
+        registerAPI(api) {
+          this.collectionAPI = api;
         }
-      });
+
+        @action
+        scrollToItem(index) {
+          this.collectionAPI.scrollToItem(index);
+        }
+      }
         
       Need to pass this property in the vertical-collection template
       Listen in the component actions and do your custom logic

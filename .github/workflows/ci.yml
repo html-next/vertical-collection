@@ -72,9 +72,9 @@ jobs:
       matrix:
         try-scenario:
           - ember-lts-3.28
-          - ember-lts-4.4
           - ember-lts-4.12
-          - ember-5.2
+          - ember-lts-5.12
+          - ember-6.1
           - ember-release
           - ember-beta
           - ember-canary

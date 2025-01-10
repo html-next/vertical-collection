@@ -1,30 +1,28 @@
 import Controller from '@ember/controller';
 import getNumbers from 'dummy/lib/get-numbers';
+import { action } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
 
-export default Controller.extend({
+export default class extends Controller {
 
-  numImages: 5,
+  @tracked numImages = 5;
+  @tracked someProperty = 50;
 
-  someProperty: 50,
-
-  actions: {
-
-    loadAbove() {
-      let first = this.model.data.first;
-      let numbers = getNumbers(first - 20, 20);
-      let model = this.model.data.numbers;
-      model.unshiftObjects(numbers);
-      // this.set('model.numbers', newModel);
-      this.set('model.data.first', first - 20);
-    },
-
-    loadBelow() {
-      let last = this.model.data.last;
-      let numbers = getNumbers(last, 20);
-      let model = this.model.data.numbers;
-      model.pushObjects(numbers);
-      // this.set('model.numbers', newModel);
-      this.set('model.data.last', last + 20);
-    }
+  @action
+  loadAbove() {
+    let first = this.model.data.first;
+    let numbers = getNumbers(first - 20, 20);
+    let model = this.model.data.numbers;
+    model.unshiftObjects(numbers);
+    this.model.set('data.first', first - 20);
   }
-});
+
+  @action
+  loadBelow() {
+    let last = this.model.data.last;
+    let numbers = getNumbers(last, 20);
+    let model = this.model.data.numbers;
+    model.pushObjects(numbers);
+    this.model.set('data.last', last + 20);
+  }
+}
