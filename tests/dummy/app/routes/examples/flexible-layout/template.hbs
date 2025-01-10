@@ -6,8 +6,8 @@
       <div class="table-wrapper dark">
         <VerticalCollection @items={{@model.data.numbers}}
           @estimateHeight={{270}}
-          @firstReached={{action "loadAbove"}}
-          @lastReached={{action "loadBelow"}}
+          @firstReached={{this.loadAbove}}
+          @lastReached={{this.loadBelow}}
           @bufferSize={{0}} as |item index|
           >
           <NumberSlide @isDynamic={{true}} @item={{item}} @index={{index}} />

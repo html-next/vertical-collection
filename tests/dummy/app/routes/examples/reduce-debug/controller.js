@@ -1,22 +1,22 @@
 import Controller from '@ember/controller';
+import { action } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
 
-export default Controller.extend({
-  numImages: 50,
-  isFiltered: false,
+export default class extends Controller {
+  @tracked numImages = 50;
 
-  actions: {
-    filter() {
-      let model = this.model.numbers;
-      let isFiltered = this.toggleProperty('isFiltered');
+  @tracked isFiltered = false;
 
-      if (!isFiltered) {
-        this.set('model.filtered', model);
-      } else {
-        let filtered = model.filter(function(item) {
-          return item.number < 25;
-        });
-        this.set('model.filtered', filtered);
-      }
+  @action
+  filter() {
+    let model = this.model.numbers;
+    this.isFiltered = !this.isFiltered;
+
+    if (!this.isFiltered) {
+      this.model.set('filtered', model);
+    } else {
+      let filtered = model.filter((item) => item.number < 25);
+      this.model.set('filtered', filtered);
     }
   }
-});
+}
