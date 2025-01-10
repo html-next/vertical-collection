@@ -5456,9 +5456,9 @@ eslint-plugin-prettier@^5.0.0:
     synckit "^0.8.5"
 
 eslint-plugin-qunit@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-qunit/-/eslint-plugin-qunit-8.0.0.tgz#92df9b8cc144a67edaf961e9c4db75d98065ce85"
-  integrity sha512-ly2x/pmJPcS0ztGAPap6qLC13GjOFwhBbvun0K1dAjaxaC6KB3TYjeBo+5pGvXqL3WdicmYxEKhTGwmhvoxMBQ==
+  version "8.1.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-qunit/-/eslint-plugin-qunit-8.1.2.tgz#ac740615e73377dd531429da02769dc2ca205fe1"
+  integrity sha512-2gDQdHlQW8GVXD7YYkO8vbm9Ldc60JeGMuQN5QlD48OeZ8znBvvoHWZZMeXjvoDPReGaLEvyuWrDtrI8bDbcqw==
   dependencies:
     eslint-utils "^3.0.0"
     requireindex "^1.2.0"
