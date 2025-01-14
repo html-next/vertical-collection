@@ -1,4 +1,5 @@
 import { DEBUG } from '@glimmer/env';
+import { tracked } from '@glimmer/tracking';
 
 import Radar from './radar';
 import SkipList from '../skip-list';
@@ -6,16 +7,17 @@ import roundTo from '../utils/round-to';
 import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
 
 export default class DynamicRadar extends Radar {
+  @tracked _firstItemIndex=0;
+  @tracked _lastItemIndex=0;
+
+  @tracked _totalBefore=0;
+  @tracked _totalAfter=0;
+
+  @tracked _minHeight = Infinity;
+
   constructor(parentToken, options) {
     super(parentToken, options);
 
-    this._firstItemIndex = 0;
-    this._lastItemIndex = 0;
-
-    this._totalBefore = 0;
-    this._totalAfter = 0;
-
-    this._minHeight = Infinity;
 
     this._nextIncrementalRender = null;
 
