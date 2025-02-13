@@ -1,11 +1,13 @@
-import { set } from '@ember/object';
 import { DEBUG } from '@glimmer/env';
+import { tracked } from '@glimmer/tracking';
 
 import document from '../../utils/document-shim';
 
 let OC_IDENTITY = 0;
 
 export default class OccludedContent {
+  @tracked element;
+
   constructor(tagName) {
     this.id = `OC-${OC_IDENTITY++}`;
     this.isOccludedContent = true;
@@ -72,6 +74,6 @@ export default class OccludedContent {
   }
 
   destroy() {
-    set(this, 'element', null);
+    this.element = null;
   }
 }
