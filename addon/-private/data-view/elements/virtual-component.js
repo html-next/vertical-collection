@@ -1,4 +1,5 @@
 import { set } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
@@ -7,6 +8,9 @@ import document from '../../utils/document-shim';
 let VC_IDENTITY = 0;
 
 export default class VirtualComponent {
+  @tracked upperBound;
+  @tracked lowerBound;
+
   constructor(content = null, index = null) {
     this.id = `VC-${VC_IDENTITY++}`;
 
@@ -79,8 +83,8 @@ export default class VirtualComponent {
   }
 
   destroy() {
-    set(this, 'upperBound', null);
-    set(this, 'lowerBound', null);
+    this.upperBound = null;
+    this.lowerBound = null;
     set(this, 'content', null);
     set(this, 'index', null);
   }
