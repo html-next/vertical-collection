@@ -57,6 +57,7 @@
     "broccoli-funnel": "^3.0.8",
     "broccoli-merge-trees": "^4.2.0",
     "broccoli-rollup": "^5.0.0",
+    "ember-cached-decorator-polyfill": "^1.0.2",
     "ember-cli-babel": "^8.0.0",
     "ember-cli-htmlbars": "^6.3.0",
     "ember-cli-version-checker": "^5.1.2",
