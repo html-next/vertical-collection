@@ -60,6 +60,9 @@ importers:
       '@glimmer/tracking':
         specifier: ^1.0.0
         version: 1.1.2
+      '@warp-drive/build-config':
+        specifier: 4.13.0-alpha.8
+        version: 4.13.0-alpha.8
       bootstrap:
         specifier: ~3.3.5
         version: 3.3.7

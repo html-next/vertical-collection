@@ -5,6 +5,15 @@ const EmberAddon = require('ember-cli/lib/broccoli/ember-addon');
 module.exports = function (defaults) {
   const app = new EmberAddon(defaults, {
     // Add options here
+    emberData: {
+      deprecations: {
+        // New projects can safely leave this deprecation disabled.
+        // If upgrading, to opt-into the deprecated behavior, set this to true and then follow:
+        // https://deprecations.emberjs.com/id/ember-data-deprecate-store-extends-ember-object
+        // before upgrading to Ember Data 6.0
+        DEPRECATE_STORE_EXTENDS_EMBER_OBJECT: false,
+      },
+    },
   });
 
   let bootstrapPath = 'node_modules/bootstrap/dist/';
