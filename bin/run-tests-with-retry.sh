@@ -21,4 +21,4 @@ function retry {
     exit $retval
 }
 
-yarn run ember build && retry yarn run ember test --path=dist
+pnpm ember build && retry pnpm ember test --path=dist

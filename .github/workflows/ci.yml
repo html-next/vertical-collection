@@ -12,35 +12,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  lint:
+    name: "Lints"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
+      - run: pnpm lint
+
   test:
     name: "Tests"
     runs-on: ubuntu-latest
     timeout-minutes: 12
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Use Volta
-        uses: volta-cli/action@v4
-      - name: Node Modules Cache
-        id: cache-npm
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ci-yarn-${{ hashFiles('yarn.lock') }}
-      - name: Install Dependencies
-        if: steps.cache-npm.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
-      - name: Lint
-        run: yarn lint
-      - name: Run Build
-        run: . bin/restore-env.sh && yarn run ember build
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
+      - run: . bin/restore-env.sh && pnpm ember build
       - name: Run Tests
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: . bin/restore-env.sh && CI=true yarn run ember test --path=dist
+          command: . bin/restore-env.sh && CI=true pnpm ember test --path=dist
 
   floating:
     name: "Floating Dependencies"
@@ -48,19 +42,17 @@ jobs:
     timeout-minutes: 12
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Volta
-        uses: volta-cli/action@v4
-      - name: Install Dependencies
-        run: yarn install --no-lockfile
-      - name: Run Build
-        run: yarn run ember build
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
+        with:
+          args: --no-lockfile
+      - run: pnpm ember build
       - name: Run Tests
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: CI=true yarn run ember test --path=dist
+          command: CI=true pnpm ember test --path=dist
 
   try-scenarios:
     name: ${{ matrix.try-scenario }}
@@ -82,35 +74,15 @@ jobs:
           - embroider-optimized
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Use Volta
-        uses: volta-cli/action@v4
-      - name: Stash yarn.lock for cache key
-        run: cp yarn.lock __cache-key
-      - name: Node Modules Cache
-        id: cache-npm
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            package.json
-            yarn.lock
-            __env
-          key: ci-yarn-v3-${{ matrix.try-scenario }}-${{ hashFiles('config/ember-try.js', '__cache-key') }}
-          restore-keys: |
-            ci-yarn-${{ hashFiles('yarn.lock') }}
-      - name: Install Dependencies
-        if: steps.cache-npm.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
       - name: Ember-Try Setup
-        if: steps.cache-npm.outputs.cache-hit != 'true'
         run: node_modules/.bin/ember try:one ${{ matrix.try-scenario }} --skip-cleanup --- bin/stash-env.sh
       - name: Run Build
-        run: . bin/restore-env.sh && yarn run ember build
+        run: . bin/restore-env.sh && pnpm ember build
       - name: Run Tests
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: . bin/restore-env.sh && CI=true yarn run ember test --path=dist
+          command: . bin/restore-env.sh && CI=true pnpm ember test --path=dist
