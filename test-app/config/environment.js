@@ -5,8 +5,8 @@ module.exports = function (environment) {
   let DEBUG = false;
 
   const ENV = {
-    modulePrefix: 'dummy',
-    podModulePrefix: 'dummy/routes',
+    modulePrefix: 'test-app',
+    podModulePrefix: 'test-app/routes',
     environment,
     rootURL: '/',
     locationType: 'hash',

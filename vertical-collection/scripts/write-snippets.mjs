@@ -39,6 +39,6 @@ const buildSnippetsListData = (dir, snippetsData={}) => {
 }
 
 let snippetsData = {};
-buildSnippetsListData('tests/dummy/app/', snippetsData);
+buildSnippetsListData('app/', snippetsData);
 
-fs.writeSync(fs.openSync('tests/dummy/app/snippets.js', 'w'), `export default ${JSON.stringify(snippetsData)}`, 0, 'utf8');
+fs.writeSync(fs.openSync('app/snippets.js', 'w'), `export default ${JSON.stringify(snippetsData)}`, 0, 'utf8');

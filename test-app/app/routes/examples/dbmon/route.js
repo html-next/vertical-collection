@@ -1,7 +1,7 @@
 import Route from '@ember/routing/route';
 import { action } from '@ember/object';
 import { later, next, cancel } from '@ember/runloop';
-import getData from 'dummy/lib/get-data';
+import getData from 'test-app/lib/get-data';
 import { tracked } from '@glimmer/tracking';
 
 class ModelData {

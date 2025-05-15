@@ -1,5 +1,5 @@
 import Route from '@ember/routing/route';
-import getNumbers from 'dummy/lib/get-numbers';
+import getNumbers from 'test-app/lib/get-numbers';
 
 export default Route.extend({
 

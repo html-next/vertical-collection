@@ -85,8 +85,6 @@
     "prettier": "^3.0.2",
     "qunit": "^2.19.4",
     "qunit-dom": "^2.0.0",
-    "release-it": "^14.2.1",
-    "release-it-lerna-changelog": "^3.1.0",
     "stylelint": "^15.10.3",
     "stylelint-config-standard": "^34.0.0",
     "stylelint-prettier": "^4.0.2",

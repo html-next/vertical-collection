@@ -124,7 +124,7 @@
     "edition": "octane"
   },
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/test-app/config"
   },
   "release-it": {
     "plugins": {

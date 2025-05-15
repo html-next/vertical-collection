@@ -5,7 +5,7 @@ const DEFAULT_ROWS = 20;
 export default function getData(ROWS) {
   ROWS = ROWS || DEFAULT_ROWS;
 
-  // generate some dummy data
+  // generate some test-app data
   const data = {
     start_at: new Date().getTime() / 1000,
     databases: []

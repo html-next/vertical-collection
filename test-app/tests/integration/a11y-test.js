@@ -8,13 +8,13 @@ import {
 } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
-import getNumbers from 'dummy/lib/get-numbers';
+import getNumbers from 'test-app/lib/get-numbers';
 
 import {
   testScenarios,
   scenariosFor,
   standardTemplate
-} from 'dummy/tests/helpers/test-scenarios';
+} from 'test-app/tests/helpers/test-scenarios';
 
 module('vertical-collection', 'Integration | A11y Tests', function(hooks) {
   setupRenderingTest(hooks);

@@ -5,14 +5,14 @@ import {
   findAll
 } from '@ember/test-helpers';
 
-import getNumbers from 'dummy/lib/get-numbers';
+import getNumbers from 'test-app/lib/get-numbers';
 
 import {
   testScenarios,
 
   simpleScenariosFor,
   scenariosFor
-} from 'dummy/tests/helpers/test-scenarios';
+} from 'test-app/tests/helpers/test-scenarios';
 
 module('vertical-collection', 'Integration | Measurement Unit Tests', function(hooks) {
   setupRenderingTest(hooks);

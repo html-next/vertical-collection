@@ -4,17 +4,17 @@ import { hbs } from 'ember-cli-htmlbars';
 import { find, findAll, settled } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
-import getNumbers from 'dummy/lib/get-numbers';
+import getNumbers from 'test-app/lib/get-numbers';
 import {
   testScenarios,
   dynamicSimpleScenarioFor,
   scenariosFor,
   standardScenariosFor,
   standardTemplate
-} from 'dummy/tests/helpers/test-scenarios';
+} from 'test-app/tests/helpers/test-scenarios';
 
-import { prepend, append } from 'dummy/tests/helpers/array';
-import { paddingBefore } from 'dummy/tests/helpers/measurement';
+import { prepend, append } from 'test-app/tests/helpers/array';
+import { paddingBefore } from 'test-app/tests/helpers/measurement';
 
 module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
   setupRenderingTest(hooks);
