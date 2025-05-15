@@ -35,7 +35,7 @@ jobs:
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: test:ci 
+          command: pnpm test:ci 
 
   floating:
     name: "Floating Dependencies"
@@ -89,4 +89,4 @@ jobs:
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: test:ci 
+          command: pnpm test:ci 
