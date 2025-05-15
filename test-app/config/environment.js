@@ -1,5 +1,5 @@
 'use strict';
-let pkg = require('../../../package.json');
+let pkg = require('../../vertical-collection/package.json');
 
 module.exports = function (environment) {
   let DEBUG = false;
@@ -23,7 +23,7 @@ module.exports = function (environment) {
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created
-    }
+    },
   };
 
   // debugging

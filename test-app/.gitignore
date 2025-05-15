@@ -27,4 +27,4 @@
 # custom
 .idea/
 .DS_Store
-tests/dummy/app/snippets.js
+app/snippets.js
