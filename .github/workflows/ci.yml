@@ -34,7 +34,7 @@ jobs:
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: . bin/restore-env.sh && CI=true pnpm ember test --path=dist
+          command: test:ci 
 
   floating:
     name: "Floating Dependencies"
@@ -52,7 +52,7 @@ jobs:
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: CI=true pnpm ember test --path=dist
+          command: cd vertical-collection && CI=true pnpm ember test --path=dist
 
   try-scenarios:
     name: ${{ matrix.try-scenario }}
@@ -78,6 +78,7 @@ jobs:
       - uses: wyvox/action-setup-pnpm@v3
       - name: Ember-Try Setup
         run: node_modules/.bin/ember try:one ${{ matrix.try-scenario }} --skip-cleanup --- bin/stash-env.sh
+        working-directory: vertical-collection
       - name: Run Build
         run: . bin/restore-env.sh && pnpm ember build
       - name: Run Tests
@@ -85,4 +86,4 @@ jobs:
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: . bin/restore-env.sh && CI=true pnpm ember test --path=dist
+          command: test:ci 

@@ -1,148 +1,15 @@
 {
-  "name": "@html-next/vertical-collection",
-  "version": "4.0.2",
-  "description": "infinite-scroll, done right. done.",
-  "keywords": [
-    "occlusion",
-    "infinite",
-    "infinite-scroll",
-    "collection",
-    "grid",
-    "list-view",
-    "recycling",
-    "cloaking",
-    "performance",
-    "lists",
-    "ember-addon"
-  ],
-  "homepage": "https://github.com/html-next/vertical-collection",
-  "bugs": "https://github.com/html-next/vertical-collection/issues",
-  "repository": "https://github.com/html-next/vertical-collection.git",
-  "license": "MIT",
-  "author": {
-    "name": "Chris Thoburn (@runspired)",
-    "url": "https://runspired.com"
-  },
-  "contributors": [
-    {
-      "name": "Chris Garrett (@pzuraq)",
-      "email": "me@pzuraq.com",
-      "url": "https://github.com/pzuraq"
-    },
-    {
-      "name": "Robert Wagner (@rwwagner90)",
-      "email": "rwwagner90@gmail.com",
-      "url": "https://github.com/rwwagner90"
-    }
-  ],
-  "directories": {
-    "doc": "doc",
-    "test": "tests"
-  },
+  "name": "root",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.10.0",
   "scripts": {
-    "build": "node ./scripts/write-snipets.mjs && ember build --environment=production",
-    "lint": "concurrently \"npm:lint:*(!fix)\" --names \"lint:\"",
-    "lint:css": "stylelint \"**/*.css\"",
-    "lint:css:fix": "concurrently \"npm:lint:css -- --fix\"",
-    "lint:fix": "concurrently \"npm:lint:*:fix\" --names \"fix:\"",
-    "lint:js": "eslint . --cache",
-    "lint:js:fix": "eslint . --fix",
-    "start": "node ./scripts/write-snippets.mjs && ember serve",
-    "test": "concurrently \"npm:lint\" \"npm:test:*\" --names \"lint,test:\"",
-    "test:ember": "ember test",
-    "test:ember-compatibility": "ember try:each"
-  },
-  "dependencies": {
-    "babel6-plugin-strip-class-callcheck": "^6.0.0",
-    "broccoli-funnel": "^3.0.8",
-    "broccoli-merge-trees": "^4.2.0",
-    "broccoli-rollup": "^5.0.0",
-    "ember-cli-babel": "^8.0.0",
-    "ember-auto-import": "^2.6.3",
-    "ember-cli-htmlbars": "^6.3.0",
-    "ember-cli-version-checker": "^5.1.2",
-    "ember-raf-scheduler": "^0.3.0"
-  },
-  "devDependencies": {
-    "ember-inflector": "^6.0.0",
-    "@babel/eslint-parser": "^7.22.10",
-    "@babel/plugin-proposal-decorators": "^7.22.10",
-    "@ember/optional-features": "^2.0.0",
-    "@ember/string": "^3.1.1",
-    "@ember/test-helpers": "~3.3.1",
-    "@ember/test-waiters": "~3.1.0",
-    "@embroider/test-setup": "^3.0.1",
-    "@glimmer/component": "^1.0.0",
-    "@glimmer/tracking": "^1.0.0",
-    "@warp-drive/build-config": "4.13.0-alpha.8",
-    "bootstrap": "~3.3.5",
-    "broccoli-asset-rev": "^3.0.0",
-    "concurrently": "^8.2.0",
-    "ember-cli": "~5.2.0",
-    "ember-cli-clean-css": "^3.0.0",
-    "ember-cli-dependency-checker": "^3.3.2",
-    "ember-cli-github-pages": "^0.2.2",
-    "ember-cli-inject-live-reload": "^2.1.0",
-    "ember-cli-sri": "^2.1.1",
-    "ember-cli-terser": "^4.0.2",
-    "ember-data": "~4.13.0-alpha.8",
-    "ember-load-initializers": "^2.1.2",
-    "ember-perf-timeline": "^2.0.0",
-    "ember-qunit": "^7.0.0",
-    "ember-resolver": "^11.0.1",
-    "ember-source": "~5.2.0",
-    "ember-source-channel-url": "^3.0.0",
-    "ember-template-lint": "^5.11.2",
-    "ember-try": "^3.0.0",
-    "eslint": "^8.47.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-ember": "^11.10.0",
-    "eslint-plugin-n": "^16.0.1",
-    "eslint-plugin-prettier": "^5.0.0",
-    "eslint-plugin-qunit": "^8.0.0",
-    "loader.js": "^4.7.0",
-    "prettier": "^3.0.2",
-    "qunit": "^2.19.4",
-    "qunit-dom": "^2.0.0",
-    "release-it": "^14.2.1",
-    "release-it-lerna-changelog": "^3.1.0",
-    "stylelint": "^15.10.3",
-    "stylelint-config-standard": "^34.0.0",
-    "stylelint-prettier": "^4.0.2",
-    "webpack": "^5.88.2"
-  },
-  "peerDependencies": {
-    "ember-source": ">= 3.28.0"
-  },
-  "engines": {
-    "node": ">= 18"
+    "lint": "pnpm --filter '*' lint",
+    "lint:fix": "pnpm --filter '*' lint:fix",
+    "test:ci": "pnpm --filter '*' test:ci"
   },
   "volta": {
     "node": "18.20.5",
     "pnpm": "10.10.0"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
-  "ember": {
-    "edition": "octane"
-  },
-  "ember-addon": {
-    "configPath": "tests/dummy/config"
-  },
-  "release-it": {
-    "plugins": {
-      "release-it-lerna-changelog": {
-        "infile": "CHANGELOG.md",
-        "launchEditor": true
-      }
-    },
-    "git": {
-      "tagName": "v${version}"
-    },
-    "github": {
-      "release": true,
-      "tokenRef": "GITHUB_AUTH"
-    }
   }
 }
