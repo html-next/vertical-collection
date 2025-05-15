@@ -46,12 +46,7 @@
     "lint:css:fix": "concurrently \"npm:lint:css -- --fix\"",
     "lint:fix": "concurrently \"npm:lint:*:fix\" --names \"fix:\"",
     "lint:js": "eslint . --cache",
-    "lint:js:fix": "eslint . --fix",
-    "start": "node ./scripts/write-snippets.mjs && ember serve",
-    "test": "concurrently \"npm:lint\" \"npm:test:*\" --names \"lint,test:\"",
-    "test:ember": "ember test",
-    "test:ci": ". bin/restore-env.sh && CI=true pnpm ember test --path=dist",
-    "test:ember-compatibility": "ember try:each"
+    "lint:js:fix": "eslint . --fix"
   },
   "dependencies": {
     "babel6-plugin-strip-class-callcheck": "^6.0.0",

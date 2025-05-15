@@ -1,9 +1,9 @@
 'use strict';
 
-const EmberAddon = require('ember-cli/lib/broccoli/ember-addon');
+const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 
 module.exports = function (defaults) {
-  const app = new EmberAddon(defaults, {
+  const app = new EmberApp(defaults, {
     // Add options here
     emberData: {
       deprecations: {
@@ -18,11 +18,21 @@ module.exports = function (defaults) {
 
   let bootstrapPath = 'node_modules/bootstrap/dist/';
   app.import(`${bootstrapPath}css/bootstrap.css`);
-  app.import(`${bootstrapPath}fonts/glyphicons-halflings-regular.eot`, { destDir: '/fonts' });
-  app.import(`${bootstrapPath}fonts/glyphicons-halflings-regular.svg`, { destDir: '/fonts' });
-  app.import(`${bootstrapPath}fonts/glyphicons-halflings-regular.ttf`, { destDir: '/fonts' });
-  app.import(`${bootstrapPath}fonts/glyphicons-halflings-regular.woff`, { destDir: '/fonts' });
-  app.import(`${bootstrapPath}fonts/glyphicons-halflings-regular.woff2`, { destDir: '/fonts' });
+  app.import(`${bootstrapPath}fonts/glyphicons-halflings-regular.eot`, {
+    destDir: '/fonts',
+  });
+  app.import(`${bootstrapPath}fonts/glyphicons-halflings-regular.svg`, {
+    destDir: '/fonts',
+  });
+  app.import(`${bootstrapPath}fonts/glyphicons-halflings-regular.ttf`, {
+    destDir: '/fonts',
+  });
+  app.import(`${bootstrapPath}fonts/glyphicons-halflings-regular.woff`, {
+    destDir: '/fonts',
+  });
+  app.import(`${bootstrapPath}fonts/glyphicons-halflings-regular.woff2`, {
+    destDir: '/fonts',
+  });
 
   /*
     This build file specifes the options for the dummy test app of this
