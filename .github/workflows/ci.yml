@@ -29,6 +29,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
       - run: . bin/restore-env.sh && pnpm ember build
+        working-directory: vertical-collection
       - name: Run Tests
         uses: nick-fields/retry@v2
         with:
@@ -47,6 +48,7 @@ jobs:
         with:
           args: --no-lockfile
       - run: pnpm ember build
+        working-directory: vertical-collection
       - name: Run Tests
         uses: nick-fields/retry@v2
         with:
@@ -81,6 +83,7 @@ jobs:
         working-directory: vertical-collection
       - name: Run Build
         run: . bin/restore-env.sh && pnpm ember build
+        working-directory: vertical-collection
       - name: Run Tests
         uses: nick-fields/retry@v2
         with:

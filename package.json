@@ -4,6 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.10.0",
   "scripts": {
+    "build": "pnpm --filter '*' build",
     "lint": "pnpm --filter '*' lint",
     "lint:fix": "pnpm --filter '*' lint:fix",
     "test:ci": "ls -la ; pnpm --filter '*' test:ci"
