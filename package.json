@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "pnpm --filter '*' lint",
     "lint:fix": "pnpm --filter '*' lint:fix",
-    "test:ci": "pnpm --filter '*' test:ci"
+    "test:ci": "ls -la ; pnpm --filter '*' test:ci"
   },
   "volta": {
     "node": "18.20.5",
