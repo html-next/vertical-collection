@@ -1,0 +1,63 @@
+/** !
+  Visualization Classes for debugging the vertical-collection
+  */
+.vertical-collection-visual-debugger {
+  height: 100%;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  background: rgb(50 50 50 / 100%);
+  width: 125px;
+}
+
+.vertical-collection-visual-debugger .vc_visualization-container {
+  transform: scale(0.25);
+  left: 0;
+  position: relative;
+}
+
+.vertical-collection-visual-debugger .vc_visualization-screen {
+  position: absolute;
+  background: transparent;
+  box-sizing: content-box;
+  border-top: 2px dashed yellow;
+  border-bottom: 2px dashed yellow;
+  width: 500px;
+}
+
+.vertical-collection-visual-debugger .vc_visualization-scroll-container {
+  position: absolute;
+  width: 500px;
+  background: rgb(100 230 100 / 65%);
+}
+
+.vertical-collection-visual-debugger .vc_visualization-item-container {
+  position: absolute;
+  width: 500px;
+  background: rgb(255 255 255 / 15%);
+}
+
+.vertical-collection-visual-debugger .vc_visualization-virtual-component {
+  box-sizing: border-box;
+  background: rgb(230 100 230 / 60%);
+  border: 1px dotted #bbb;
+  border-top: 0;
+  color: #fff;
+  text-align: center;
+  font-size: 2.5em;
+  width: 250px;
+}
+
+.vertical-collection-visual-debugger
+  .vc_visualization-virtual-component:first-of-type {
+  border-top: 1px dotted #bbb;
+}
+
+.vertical-collection-visual-debugger
+  .vc_visualization-virtual-component.culled {
+  background: transparent;
+}
