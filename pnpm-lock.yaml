@@ -13,9 +13,6 @@ importers:
       '@html-next/vertical-collection':
         specifier: workspace:*
         version: link:../vertical-collection
-      babel6-plugin-strip-class-callcheck:
-        specifier: ^6.0.0
-        version: 6.0.0
       ember-auto-import:
         specifier: ^2.6.3
         version: 2.10.0(webpack@5.99.8)
@@ -25,9 +22,6 @@ importers:
       ember-cli-htmlbars:
         specifier: ^6.3.0
         version: 6.3.0
-      ember-cli-version-checker:
-        specifier: ^5.1.2
-        version: 5.1.2
       ember-raf-scheduler:
         specifier: ^0.3.0
         version: 0.3.0
