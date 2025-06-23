@@ -112,9 +112,6 @@
     "stylelint-prettier": "^4.0.2",
     "webpack": "^5.88.2"
   },
-  "peerDependencies": {
-    "ember-source": ">= 3.28.0"
-  },
   "engines": {
     "node": ">= 18"
   },
