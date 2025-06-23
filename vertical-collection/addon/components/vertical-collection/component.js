@@ -24,7 +24,7 @@ import {
   keyForItem,
   DynamicRadar,
   StaticRadar,
-  objectAt
+  objectAt,
 } from '../../-private';
 
 /*
@@ -93,7 +93,10 @@ class Visualization {
     const { _scrollContainer } = this.radar;
     this.container.style.height = `${_scrollContainer.getBoundingClientRect().height}px`;
 
-    applyVerticalStyles(this.scrollContainer, _scrollContainer.getBoundingClientRect());
+    applyVerticalStyles(
+      this.scrollContainer,
+      _scrollContainer.getBoundingClientRect(),
+    );
     applyVerticalStyles(this.screen, ViewportContainer.getBoundingClientRect());
   }
 
@@ -122,7 +125,7 @@ class Visualization {
       totalBefore,
       totalAfter,
       skipList,
-      _calculatedEstimateHeight
+      _calculatedEstimateHeight,
     } = this.radar;
 
     const isDynamic = !!skipList;
@@ -145,10 +148,16 @@ class Visualization {
       }
     }
 
-    for (let itemIndex = firstVisualizedIndex, i = 0; itemIndex <= lastVisualizedIndex; itemIndex++, i++) {
+    for (
+      let itemIndex = firstVisualizedIndex, i = 0;
+      itemIndex <= lastVisualizedIndex;
+      itemIndex++, i++
+    ) {
       const element = sats[i];
 
-      const itemHeight = isDynamic ? itemHeights[itemIndex] : _calculatedEstimateHeight;
+      const itemHeight = isDynamic
+        ? itemHeights[itemIndex]
+        : _calculatedEstimateHeight;
 
       element.style.height = `${itemHeight}px`;
       element.setAttribute('index', String(itemIndex));
@@ -325,21 +334,27 @@ const VerticalCollection = Component.extend({
   isEmpty: empty('items'),
   shouldYieldToInverse: readOnly('isEmpty'),
 
-  virtualComponents: computed('items.[]', 'renderAll', 'estimateHeight', 'bufferSize', function() {
-    const { _radar } = this;
+  virtualComponents: computed(
+    'items.[]',
+    'renderAll',
+    'estimateHeight',
+    'bufferSize',
+    function () {
+      const { _radar } = this;
 
-    const items = this.items;
+      const items = this.items;
 
-    _radar.items = items === null || items === undefined ? [] : items;
-    _radar.estimateHeight = this.estimateHeight;
-    _radar.renderAll = this.renderAll;
-    _radar.bufferSize = this.bufferSize;
+      _radar.items = items === null || items === undefined ? [] : items;
+      _radar.estimateHeight = this.estimateHeight;
+      _radar.renderAll = this.renderAll;
+      _radar.bufferSize = this.bufferSize;
 
-    _radar.scheduleUpdate(true);
-    this._clearScheduledActions();
+      _radar.scheduleUpdate(true);
+      this._clearScheduledActions();
 
-    return _radar.virtualComponents;
-  }),
+      return _radar.virtualComponents;
+    },
+  ),
 
   schedule(queueName, job) {
     return scheduler.schedule(queueName, job, this.token);
@@ -393,7 +408,7 @@ const VerticalCollection = Component.extend({
     _radar._prevFirstVisibleIndex = _radar._prevFirstItemIndex = index;
     // Components will be rendered after schedule 'measure' inside 'update' method.
     // In our case, we need to focus the element after component is rendered. So passing the promise.
-    return new Promise ((resolve) => {
+    return new Promise((resolve) => {
       _radar.scheduleUpdate(false, resolve);
     });
   },
@@ -443,27 +458,29 @@ const VerticalCollection = Component.extend({
       shouldRecycle,
       occlusionTagName,
       idForFirstItem,
-      key
+      key,
     } = this;
 
-    const startingIndex = calculateStartingIndex(items, idForFirstItem, key, renderFromLast);
-
-    this._radar = new RadarClass(
-      this.token,
-      {
-        bufferSize,
-        containerSelector,
-        estimateHeight,
-        initialRenderCount,
-        items,
-        key,
-        renderAll,
-        renderFromLast,
-        shouldRecycle,
-        startingIndex,
-        occlusionTagName
-      }
+    const startingIndex = calculateStartingIndex(
+      items,
+      idForFirstItem,
+      key,
+      renderFromLast,
     );
+
+    this._radar = new RadarClass(this.token, {
+      bufferSize,
+      containerSelector,
+      estimateHeight,
+      initialRenderCount,
+      items,
+      key,
+      renderAll,
+      renderFromLast,
+      shouldRecycle,
+      startingIndex,
+      occlusionTagName,
+    });
 
     this._prevItemsLength = 0;
     this._prevFirstKey = null;
@@ -484,7 +501,7 @@ const VerticalCollection = Component.extend({
         lastReached: a,
         firstReached: b,
         lastVisibleChanged: c,
-        firstVisibleChanged: d
+        firstVisibleChanged: d,
       };
 
       this._radar.sendAction = (action, index) => {
@@ -526,7 +543,7 @@ const VerticalCollection = Component.extend({
     if (registerAPI) {
       /* List of methods to be exposed to public should be added here */
       let publicAPI = {
-        scrollToItem: this.scrollToItem.bind(this)
+        scrollToItem: this.scrollToItem.bind(this),
       };
       registerAPI(publicAPI);
     }
@@ -534,7 +551,6 @@ const VerticalCollection = Component.extend({
     if (DEBUG) {
       this.__visualization = null;
       this._radar._debugDidUpdate = () => {
-
         // Update visualization
         //
         // This debugging mode can be controlled via the argument
@@ -574,33 +590,77 @@ const VerticalCollection = Component.extend({
           styles = window.getComputedStyle(document.body);
         }
 
-        assert(`scrollContainer cannot be inline.`, styleIsOneOf(styles, 'display', ['block', 'inline-block', 'flex', 'inline-flex']));
-        assert(`scrollContainer must define position`, styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute']));
-        assert(`scrollContainer must define height or max-height`, hasStyleWithNonZeroValue(styles, 'height') || hasStyleWithNonZeroValue(styles, 'max-height'));
+        assert(
+          `scrollContainer cannot be inline.`,
+          styleIsOneOf(styles, 'display', [
+            'block',
+            'inline-block',
+            'flex',
+            'inline-flex',
+          ]),
+        );
+        assert(
+          `scrollContainer must define position`,
+          styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute']),
+        );
+        assert(
+          `scrollContainer must define height or max-height`,
+          hasStyleWithNonZeroValue(styles, 'height') ||
+            hasStyleWithNonZeroValue(styles, 'max-height'),
+        );
 
         // conditional perf check for non-body scrolling
         if (radar.scrollContainer !== ViewportContainer) {
-          assert(`scrollContainer must define overflow-y`, hasStyleValue(styles, 'overflow-y', 'scroll') || hasStyleValue(styles, 'overflow', 'scroll'));
+          assert(
+            `scrollContainer must define overflow-y`,
+            hasStyleValue(styles, 'overflow-y', 'scroll') ||
+              hasStyleValue(styles, 'overflow', 'scroll'),
+          );
         }
 
         // check itemContainer
         styles = window.getComputedStyle(radar.itemContainer);
 
-        assert(`itemContainer cannot be inline.`, styleIsOneOf(styles, 'display', ['block', 'inline-block', 'flex', 'inline-flex']));
-        assert(`itemContainer must define position`, styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute']));
+        assert(
+          `itemContainer cannot be inline.`,
+          styleIsOneOf(styles, 'display', [
+            'block',
+            'inline-block',
+            'flex',
+            'inline-flex',
+          ]),
+        );
+        assert(
+          `itemContainer must define position`,
+          styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute']),
+        );
 
         // check item defaults
-        assert(`You must supply at least one item to the collection to debug it's CSS.`, this.items.length);
+        assert(
+          `You must supply at least one item to the collection to debug it's CSS.`,
+          this.items.length,
+        );
 
         let element = radar._itemContainer.firstElementChild;
 
         styles = window.getComputedStyle(element);
 
-        assert(`Item cannot be inline.`, styleIsOneOf(styles, 'display', ['block', 'inline-block', 'flex', 'inline-flex']));
-        assert(`Item must define position`, styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute']));
+        assert(
+          `Item cannot be inline.`,
+          styleIsOneOf(styles, 'display', [
+            'block',
+            'inline-block',
+            'flex',
+            'inline-flex',
+          ]),
+        );
+        assert(
+          `Item must define position`,
+          styleIsOneOf(styles, 'position', ['static', 'relative', 'absolute']),
+        );
       };
     }
-  }
+  },
 });
 
 function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {

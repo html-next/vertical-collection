@@ -9,8 +9,8 @@ class ModelData {
 }
 
 export default class extends Route {
-  numRows=100;
-  _nextLoad=null;
+  numRows = 100;
+  _nextLoad = null;
 
   model() {
     let model = new ModelData();

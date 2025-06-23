@@ -42,10 +42,10 @@
   "scripts": {
     "build": "node ./scripts/write-snipets.mjs && ember build --environment=production",
     "format": "prettier . --cache --write",
-    "lint": "concurrently \"npm:lint:*(!fix)\" --names \"lint:\" && pnpm run format",
+    "lint": "concurrently \"npm:lint:*(!fix)\" --names \"lint:\"",
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css:fix": "concurrently \"npm:lint:css -- --fix\"",
-    "lint:fix": "concurrently \"npm:lint:*:fix\" --names \"fix:\"",
+    "lint:fix": "concurrently \"npm:lint:*:fix\" --names \"fix:\" && pnpm run format",
     "lint:js": "eslint . --cache",
     "lint:format": "prettier . --cache --check",
     "lint:js:fix": "eslint . --fix",

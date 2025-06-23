@@ -1,27 +1,27 @@
 import { module } from 'qunit';
 import { setupRenderingTest } from '../helpers';
 import { hbs } from 'ember-cli-htmlbars';
-import {
-  findAll
-} from '@ember/test-helpers';
+import { findAll } from '@ember/test-helpers';
 
 import getNumbers from 'dummy/lib/get-numbers';
 
 import {
   testScenarios,
-
   simpleScenariosFor,
-  scenariosFor
+  scenariosFor,
 } from 'dummy/tests/helpers/test-scenarios';
 
-module('vertical-collection', 'Integration | Measurement Unit Tests', function(hooks) {
-  setupRenderingTest(hooks);
+module(
+  'vertical-collection',
+  'Integration | Measurement Unit Tests',
+  function (hooks) {
+    setupRenderingTest(hooks);
 
-  testScenarios(
-    'The collection renders correctly when em estimateHeight is used',
-    scenariosFor(getNumbers(0, 10)),
+    testScenarios(
+      'The collection renders correctly when em estimateHeight is used',
+      scenariosFor(getNumbers(0, 10)),
 
-    hbs`
+      hbs`
       <div style="height: 100px; font-size: 10px;" class="scrollable">
         <VerticalCollection @items={{this.items}}
           @estimateHeight="2em"
@@ -36,16 +36,16 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
       </div>
     `,
 
-    async function(assert) {
-      assert.strictEqual(findAll('vertical-item').length, 5);
-    }
-  );
+      async function (assert) {
+        assert.strictEqual(findAll('vertical-item').length, 5);
+      },
+    );
 
-  testScenarios(
-    'The collection renders correctly when rem estimateHeight is used',
-    scenariosFor(getNumbers(0, 10)),
+    testScenarios(
+      'The collection renders correctly when rem estimateHeight is used',
+      scenariosFor(getNumbers(0, 10)),
 
-    hbs`
+      hbs`
       <div style="height: 100px; font-size: 10px;" class="scrollable">
         <VerticalCollection @items={{this.items}}
           @estimateHeight="2rem"
@@ -60,16 +60,16 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
       </div>
     `,
 
-    async function(assert) {
-      assert.strictEqual(findAll('vertical-item').length, 5);
-    }
-  );
+      async function (assert) {
+        assert.strictEqual(findAll('vertical-item').length, 5);
+      },
+    );
 
-  testScenarios(
-    'The collection renders correctly when percent estimateHeight is used',
-    scenariosFor(getNumbers(0, 10)),
+    testScenarios(
+      'The collection renders correctly when percent estimateHeight is used',
+      scenariosFor(getNumbers(0, 10)),
 
-    hbs`
+      hbs`
       <div style="height: 100px;" class="scrollable">
         <VerticalCollection @items={{this.items}}
           @estimateHeight="66%"
@@ -84,16 +84,16 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
       </div>
     `,
 
-    async function(assert) {
-      assert.equal(findAll('vertical-item').length, 2);
-    }
-  );
+      async function (assert) {
+        assert.equal(findAll('vertical-item').length, 2);
+      },
+    );
 
-  testScenarios(
-    'The collection renders correctly when em height is used',
-    scenariosFor(getNumbers(0, 10)),
+    testScenarios(
+      'The collection renders correctly when em height is used',
+      scenariosFor(getNumbers(0, 10)),
 
-    hbs`
+      hbs`
       <div style="height: 100px; font-size: 10px;" class="scrollable">
         <VerticalCollection @items={{this.items}}
           @estimateHeight="2em"
@@ -108,16 +108,16 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
       </div>
     `,
 
-    async function(assert) {
-      assert.strictEqual(findAll('vertical-item').length, 5);
-    }
-  );
+      async function (assert) {
+        assert.strictEqual(findAll('vertical-item').length, 5);
+      },
+    );
 
-  testScenarios(
-    'The collection renders correctly with a scroll parent with a pixel based max height',
-    simpleScenariosFor(getNumbers(0, 20)),
+    testScenarios(
+      'The collection renders correctly with a scroll parent with a pixel based max height',
+      simpleScenariosFor(getNumbers(0, 20)),
 
-    hbs`
+      hbs`
       <div class="scrollable with-pixel-max-height">
         <div>
           <VerticalCollection @items={{this.items}}
@@ -135,16 +135,16 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
       </div>
     `,
 
-    function(assert) {
-      assert.strictEqual(findAll('vertical-item').length, 10);
-    }
-  );
+      function (assert) {
+        assert.strictEqual(findAll('vertical-item').length, 10);
+      },
+    );
 
-  testScenarios(
-    'The collection renders correctly with a scroll parent with a percentage based max height',
-    simpleScenariosFor(getNumbers(0, 20)),
+    testScenarios(
+      'The collection renders correctly with a scroll parent with a percentage based max height',
+      simpleScenariosFor(getNumbers(0, 20)),
 
-    hbs`
+      hbs`
       <div style="height: 400px;">
         <div class="scrollable with-percent-max-height">
           <div>
@@ -164,16 +164,16 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
       </div>
     `,
 
-    function(assert) {
-      assert.strictEqual(findAll('vertical-item').length, 10);
-    }
-  );
+      function (assert) {
+        assert.strictEqual(findAll('vertical-item').length, 10);
+      },
+    );
 
-  testScenarios(
-    'The collection renders correctly with a scroll parent with an em based max height',
-    simpleScenariosFor(getNumbers(0, 20)),
+    testScenarios(
+      'The collection renders correctly with a scroll parent with an em based max height',
+      simpleScenariosFor(getNumbers(0, 20)),
 
-    hbs`
+      hbs`
       <div style="font-size: 20px;">
         <div class="scrollable with-em-max-height">
           <div>
@@ -193,16 +193,16 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
       </div>
     `,
 
-    function(assert) {
-      assert.strictEqual(findAll('vertical-item').length, 10);
-    }
-  );
+      function (assert) {
+        assert.strictEqual(findAll('vertical-item').length, 10);
+      },
+    );
 
-  testScenarios(
-    'The collection renders correctly with a scroll parent with a rem based max height',
-    simpleScenariosFor(getNumbers(0, 20)),
+    testScenarios(
+      'The collection renders correctly with a scroll parent with a rem based max height',
+      simpleScenariosFor(getNumbers(0, 20)),
 
-    hbs`
+      hbs`
       <div class="scrollable with-rem-max-height">
         <div>
           <VerticalCollection @items={{this.items}}
@@ -220,8 +220,9 @@ module('vertical-collection', 'Integration | Measurement Unit Tests', function(h
       </div>
     `,
 
-    function(assert) {
-      assert.strictEqual(findAll('vertical-item').length, 10);
-    }
-  );
-});
+      function (assert) {
+        assert.strictEqual(findAll('vertical-item').length, 10);
+      },
+    );
+  },
+);

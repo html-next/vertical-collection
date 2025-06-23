@@ -1,6 +1,8 @@
 'use strict';
 
-const StripClassCallCheckPlugin = require.resolve('babel6-plugin-strip-class-callcheck');
+const StripClassCallCheckPlugin = require.resolve(
+  'babel6-plugin-strip-class-callcheck',
+);
 const Funnel = require('broccoli-funnel');
 const Rollup = require('broccoli-rollup');
 const merge = require('broccoli-merge-trees');
@@ -19,26 +21,23 @@ module.exports = {
     return '';
   },
 
-    // Borrowed from ember-cli-babel
-    _emberVersionRequiresModulesAPIPolyfill() {
-      let checker = this.checker.for('ember-source', 'npm');
+  // Borrowed from ember-cli-babel
+  _emberVersionRequiresModulesAPIPolyfill() {
+    let checker = this.checker.for('ember-source', 'npm');
 
-      if (!checker.exists()) {
-        return true;
-      }
+    if (!checker.exists()) {
+      return true;
+    }
 
-      return checker.lt('3.27.0-alpha.1');
-    },
+    return checker.lt('3.27.0-alpha.1');
+  },
 
   treeForAddon(tree) {
     let babel = this.addons.find((addon) => addon.name === 'ember-cli-babel');
     let withPrivate = new Funnel(tree, { include: ['-private/**'] });
     let withoutPrivate = new Funnel(tree, {
-      exclude: [
-        '**/**.hbs',
-        '-private'
-      ],
-      destDir: '@html-next/vertical-collection'
+      exclude: ['**/**.hbs', '-private'],
+      destDir: '@html-next/vertical-collection',
     });
 
     let privateTree = babel.transpileTree(withPrivate, {
@@ -49,7 +48,8 @@ module.exports = {
         // so we don't want to compileModules to amd here
         compileModules: false,
 
-        disableEmberModulesAPIPolyfill: !this._emberVersionRequiresModulesAPIPolyfill(),
+        disableEmberModulesAPIPolyfill:
+          !this._emberVersionRequiresModulesAPIPolyfill(),
 
         // TODO for the embroider world we want to leave our -private module
         // as an es module and only transpile the few things we genuinely care about.
@@ -71,7 +71,7 @@ module.exports = {
     });
 
     const templateTree = new Funnel(tree, {
-      include: ['**/**.hbs']
+      include: ['**/**.hbs'],
     });
 
     // use the default options
@@ -86,9 +86,9 @@ module.exports = {
             file: '@html-next/vertical-collection/-private.js',
             format: 'amd',
             amd: {
-              id: '@html-next/vertical-collection/-private'
-            }
-          }
+              id: '@html-next/vertical-collection/-private',
+            },
+          },
         ],
         external(id) {
           return (
@@ -103,11 +103,7 @@ module.exports = {
     publicTree = new Funnel(publicTree, { destDir });
     privateTree = new Funnel(privateTree, { destDir });
 
-    return merge([
-      addonTemplateTree,
-      publicTree,
-      privateTree
-    ]);
+    return merge([addonTemplateTree, publicTree, privateTree]);
   },
 
   _hasSetupBabelOptions: false,
@@ -117,7 +113,7 @@ module.exports = {
     const opts = {
       loose: true,
       plugins,
-      postTransformPlugins: [[StripClassCallCheckPlugin, {}]]
+      postTransformPlugins: [[StripClassCallCheckPlugin, {}]],
     };
 
     return opts;
@@ -141,8 +137,10 @@ module.exports = {
     }
 
     if (typeof app.import !== 'function') {
-      throw new Error('vertical-collection is being used within another addon or engine '
-        + 'and is having trouble registering itself to the parent application.');
+      throw new Error(
+        'vertical-collection is being used within another addon or engine ' +
+          'and is having trouble registering itself to the parent application.',
+      );
     }
 
     this._env = app.env;
@@ -151,5 +149,5 @@ module.exports = {
     if (!/production/.test(app.env) && !/test/.test(app.env)) {
       this.import('vendor/debug.css');
     }
-  }
+  },
 };

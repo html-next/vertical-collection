@@ -4,7 +4,6 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
 export default class extends Controller {
-
   @tracked numImages = 5;
   @tracked someProperty = 50;
 

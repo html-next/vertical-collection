@@ -4,11 +4,11 @@ import Ember from 'ember';
 let joinStringsHelper;
 
 if (Helper) {
-  joinStringsHelper = helper(function(params) {
+  joinStringsHelper = helper(function (params) {
     return params.join('');
   });
 } else {
-  joinStringsHelper = Ember.Handlebars.makeBoundHelper(function(...params) {
+  joinStringsHelper = Ember.Handlebars.makeBoundHelper(function (...params) {
     return params.join('');
   });
 }

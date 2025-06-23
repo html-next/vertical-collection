@@ -11,12 +11,15 @@
                 @items={{@model.data.databases}}
                 @containerSelector=".table-wrapper"
                 @key="id"
-
                 @estimateHeight={{37}}
                 @staticHeight={{true}}
                 @bufferSize={{5}}
-              as |db|>
-                <Examples::Dbmon::Components::DbmonRow @tagName="tr" @db={{db}} />
+                as |db|
+              >
+                <Examples::Dbmon::Components::DbmonRow
+                  @tagName="tr"
+                  @db={{db}}
+                />
               </VerticalCollection>
             </tbody>
           </table>
@@ -30,8 +33,8 @@
         The Vertical Collection smartly hides and removes off screen content.
       </p>
       <p>
-        This makes building high frame-rate or render expensive components easier by
-        focusing only on what's on screen now.
+        This makes building high frame-rate or render expensive components
+        easier by focusing only on what's on screen now.
       </p>
       <h4>Code for Demo</h4>
       <CodeSnippet @name="dbmon-example" />

@@ -1,4 +1,9 @@
-export default function insertRangeBefore(parent, element, firstNode, lastNode) {
+export default function insertRangeBefore(
+  parent,
+  element,
+  firstNode,
+  lastNode,
+) {
   let nextNode;
 
   while (firstNode) {

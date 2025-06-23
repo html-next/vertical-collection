@@ -33,11 +33,11 @@ export class ScrollHandler {
       cache = this.handlers[index] = {
         top: element.scrollTop,
         left: element.scrollLeft,
-        handlers
+        handlers,
       };
       // TODO add explicit test
       if (SUPPORTS_PASSIVE) {
-        cache.passiveHandler = function() {
+        cache.passiveHandler = function () {
           ScrollHandler.triggerElementHandlers(element, cache);
         };
       } else {
@@ -51,9 +51,12 @@ export class ScrollHandler {
 
     // TODO add explicit test
     if (this.isUsingPassive && handlers.length === 1) {
-      element.addEventListener('scroll', cache.passiveHandler, { capture: true, passive: true });
+      element.addEventListener('scroll', cache.passiveHandler, {
+        capture: true,
+        passive: true,
+      });
 
-    // TODO add explicit test
+      // TODO add explicit test
     } else if (!this.isPolling) {
       this.poll();
     }
@@ -88,12 +91,16 @@ export class ScrollHandler {
 
         // TODO add explicit test
         if (this.isUsingPassive) {
-          element.removeEventListener('scroll', elementCache.passiveHandler, { capture: true, passive: true });
+          element.removeEventListener('scroll', elementCache.passiveHandler, {
+            capture: true,
+            passive: true,
+          });
         }
       }
-
     } else {
-      throw new Error('Attempted to remove a handler from an unknown element or an element with no handlers');
+      throw new Error(
+        'Attempted to remove a handler from an unknown element or an element with no handlers',
+      );
     }
   }
 

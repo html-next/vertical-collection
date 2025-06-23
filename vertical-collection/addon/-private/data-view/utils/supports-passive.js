@@ -5,11 +5,11 @@ try {
     get() {
       supportsPassive = true;
       return supportsPassive;
-    }
+    },
   });
 
   window.addEventListener('test', null, opts);
-} catch(e) {
+} catch (e) {
   // do nothing
 }
 

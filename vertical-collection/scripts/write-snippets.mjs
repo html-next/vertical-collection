@@ -15,16 +15,16 @@ const extractAndAppendSnippets = (filepath, snippetsList) => {
           break;
         }
         snippetContent.push(row);
-      } while (rows.length)
+      } while (rows.length);
       snippetsData[match[1]] = {
         source: filepath,
-        content: snippetContent.join('\n')
+        content: snippetContent.join('\n'),
       };
     }
   }
-}
+};
 
-const buildSnippetsListData = (dir, snippetsData={}) => {
+const buildSnippetsListData = (dir, snippetsData = {}) => {
   const files = fs.readdirSync(dir);
 
   for (let file of files) {
@@ -36,9 +36,14 @@ const buildSnippetsListData = (dir, snippetsData={}) => {
       extractAndAppendSnippets(filepath, snippetsData);
     }
   }
-}
+};
 
 let snippetsData = {};
 buildSnippetsListData('tests/dummy/app/', snippetsData);
 
-fs.writeSync(fs.openSync('tests/dummy/app/snippets.js', 'w'), `export default ${JSON.stringify(snippetsData)}`, 0, 'utf8');
+fs.writeSync(
+  fs.openSync('tests/dummy/app/snippets.js', 'w'),
+  `export default ${JSON.stringify(snippetsData)}`,
+  0,
+  'utf8',
+);
