@@ -8,17 +8,23 @@
       @firstVisibleChanged={{this.firstVisibleChanged}}
       as |item index|
     >
-      <NumberSlide @item={{item}} @itemIndex={{index}} @prefixed={{this.prefixed}} />
+      <NumberSlide
+        @item={{item}}
+        @itemIndex={{index}}
+        @prefixed={{this.prefixed}}
+      />
     </VerticalCollection>
   </div>
 {{/if}}
 
-<input id="first-visible-id" type="hidden" value={{this.firstVisibleId}}/>
+<input id="first-visible-id" type="hidden" value={{this.firstVisibleId}} />
 
 <button id="hide-vc-button" {{on "click" this.hideVC}}>Hide VC</button>
 <button id="show-vc-button" {{on "click" this.showVC}}>Show VC</button>
-<button id="partial-update-button" {{on "click" (fn this.showLast 5)}}>Show Last 5</button>
+<button id="partial-update-button" {{on "click" (fn this.showLast 5)}}>Show Last
+  5</button>
 <button id="last-25-button" {{on "click" (fn this.showLast 25)}}>Show Last 25</button>
 <button id="show-all" {{on "click" this.showAll}}>Show All</button>
 <button id="update-items-button" {{on "click" this.updateItems}}>Update items</button>
-<button id="show-prefixed-button" {{on "click" this.showPrefixed}}>Show prefixed (computed)</button>
+<button id="show-prefixed-button" {{on "click" this.showPrefixed}}>Show prefixed
+  (computed)</button>

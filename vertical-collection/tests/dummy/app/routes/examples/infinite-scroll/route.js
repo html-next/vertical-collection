@@ -13,7 +13,7 @@ export default Route.extend({
     model.data = {
       numbers: A(getNumbers(0, 100)),
       first: 0,
-      last: 100
+      last: 100,
     };
     return model;
   },
@@ -21,6 +21,6 @@ export default Route.extend({
   actions: {
     willTransition() {
       this.currentModel = null;
-    }
-  }
+    },
+  },
 });

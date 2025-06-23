@@ -4,12 +4,14 @@
       <h3>Demo</h3>
       {{! BEGIN-SNIPPET flexible-layout-example }}
       <div class="table-wrapper dark">
-        <VerticalCollection @items={{@model.data.numbers}}
+        <VerticalCollection
+          @items={{@model.data.numbers}}
           @estimateHeight={{270}}
           @firstReached={{this.loadAbove}}
           @lastReached={{this.loadBelow}}
-          @bufferSize={{0}} as |item index|
-          >
+          @bufferSize={{0}}
+          as |item index|
+        >
           <NumberSlide @isDynamic={{true}} @item={{item}} @index={{index}} />
         </VerticalCollection>
       </div>
@@ -18,12 +20,12 @@
     <div class="col-sm-6">
       <h3>Flexible Layouts</h3>
       <p>
-        The Vertical Collection doesn't care if your items are of a uniform
-        size or type.
+        The Vertical Collection doesn't care if your items are of a uniform size
+        or type.
       </p>
       <p>
-        This layout agnostic behavior will improve even more in upcoming releases
-        with integration with the pre-render component.
+        This layout agnostic behavior will improve even more in upcoming
+        releases with integration with the pre-render component.
       </p>
       <h4>Code for Demo</h4>
       <CodeSnippet @name="flexible-layout-example" />

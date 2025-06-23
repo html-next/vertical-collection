@@ -8,13 +8,13 @@ import { or } from '@ember/object/computed';
 
 export default class extends Controller {
   @service() store;
-  @tracked prefixed=true;
-  @tracked vcShown=true;
+  @tracked prefixed = true;
+  @tracked vcShown = true;
 
-  @tracked partial=undefined;
+  @tracked partial = undefined;
   @or('partial', 'model') items;
 
-  @tracked firstVisibleId=undefined;
+  @tracked firstVisibleId = undefined;
 
   @action
   updateItems() {

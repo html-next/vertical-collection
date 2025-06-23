@@ -1,11 +1,11 @@
 module.exports = {
   env: {
-    'embertest': true
+    embertest: true,
   },
   globals: {
-    server: true
+    server: true,
   },
   rules: {
-    'ember-suave/no-direct-property-access': 0
-  }
+    'ember-suave/no-direct-property-access': 0,
+  },
 };

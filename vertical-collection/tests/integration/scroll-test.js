@@ -10,13 +10,13 @@ import {
   dynamicSimpleScenarioFor,
   scenariosFor,
   standardScenariosFor,
-  standardTemplate
+  standardTemplate,
 } from 'dummy/tests/helpers/test-scenarios';
 
 import { prepend, append } from 'dummy/tests/helpers/array';
 import { paddingBefore } from 'dummy/tests/helpers/measurement';
 
-module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
+module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
   setupRenderingTest(hooks);
 
   testScenarios(
@@ -24,29 +24,48 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     standardScenariosFor(getNumbers(0, 50), { renderFromLast: true }),
     standardTemplate,
 
-    function(assert) {
-      assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '49 49', 'the last item in the list should be rendered');
-    }
+    function (assert) {
+      assert.equal(
+        find('.vertical-item:last-of-type').textContent.trim(),
+        '49 49',
+        'the last item in the list should be rendered',
+      );
+    },
   );
 
   testScenarios(
     'Setting idForFirstItem starts it with the first item at the top',
-    standardScenariosFor(getNumbers(0, 50), { idForFirstItem: '25', key: '@index' }),
+    standardScenariosFor(getNumbers(0, 50), {
+      idForFirstItem: '25',
+      key: '@index',
+    }),
     standardTemplate,
 
-    function(assert) {
-      assert.equal(find('.scrollable').scrollTop, 500, 'the scroll container offset is correct');
-    }
+    function (assert) {
+      assert.equal(
+        find('.scrollable').scrollTop,
+        500,
+        'the scroll container offset is correct',
+      );
+    },
   );
 
   testScenarios(
     'Setting renderFromLast and idForFirstItem starts it with the first item at the bottom',
-    standardScenariosFor(getNumbers(0, 50), { renderFromLast: true, idForFirstItem: '25', key: '@index' }),
+    standardScenariosFor(getNumbers(0, 50), {
+      renderFromLast: true,
+      idForFirstItem: '25',
+      key: '@index',
+    }),
     standardTemplate,
 
-    function(assert) {
-      assert.equal(find('.scrollable').scrollTop, 320, 'the scroll container offset is correct');
-    }
+    function (assert) {
+      assert.equal(
+        find('.scrollable').scrollTop,
+        320,
+        'the scroll container offset is correct',
+      );
+    },
   );
 
   testScenarios(
@@ -55,11 +74,11 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     standardTemplate,
 
     false, // Run test function before render
-    async function() {
+    async function () {
       await settled();
       await scrollTo('.scrollable', 0, 200);
     },
-    async function(assert) {
+    async function (assert) {
       const called = assert.async(2);
       let count = 0;
 
@@ -67,14 +86,18 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
         if (count === 0) {
           assert.equal(index, 0, 'the first visible item is correct');
         } else {
-          assert.equal(index, 10, 'after scroll the first visible item is correct');
+          assert.equal(
+            index,
+            10,
+            'after scroll the first visible item is correct',
+          );
         }
         count++;
         called();
       });
 
       await settled();
-    }
+    },
   );
 
   testScenarios(
@@ -83,11 +106,11 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     standardTemplate,
 
     false, // Run test function before render
-    async function() {
+    async function () {
       await settled();
       await scrollTo('.scrollable', 0, 200);
     },
-    async function(assert) {
+    async function (assert) {
       const called = assert.async(2);
       let count = 0;
 
@@ -95,14 +118,18 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
         if (count === 0) {
           assert.equal(index, 9, 'the first last visible changed is correct');
         } else {
-          assert.equal(index, 19, 'after scroll the last visible change is correct');
+          assert.equal(
+            index,
+            19,
+            'after scroll the last visible change is correct',
+          );
         }
         count++;
         called();
       });
 
       await settled();
-    }
+    },
   );
 
   testScenarios(
@@ -112,7 +139,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
 
     false, // Run test function before render
     false,
-    async function(assert) {
+    async function (assert) {
       const called = assert.async(1);
 
       this.set('firstReached', (item, index) => {
@@ -121,7 +148,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
       });
 
       await settled();
-    }
+    },
   );
 
   testScenarios(
@@ -130,18 +157,18 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     standardTemplate,
 
     false, // Run test function before render
-    async function() {
+    async function () {
       await settled();
       await scrollTo('.scrollable', 0, 800);
     },
-    async function(assert) {
+    async function (assert) {
       const called = assert.async(1);
 
       this.set('lastReached', (item, index) => {
         assert.equal(index, 49, 'the lastReached item is correct');
         called();
       });
-    }
+    },
   );
 
   testScenarios(
@@ -151,7 +178,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
 
     false, // Run test function before render
     false,
-    function(assert) {
+    function (assert) {
       assert.expect(0);
       const called = assert.async(2);
 
@@ -159,7 +186,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
         prepend(this, getNumbers(number - 3, 5));
         called();
       });
-    }
+    },
   );
 
   testScenarios(
@@ -169,7 +196,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
 
     false, // Run test function before render
     false,
-    async function(assert) {
+    async function (assert) {
       assert.expect(0);
       const called = assert.async(2);
 
@@ -179,7 +206,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
       });
 
       await settled();
-    }
+    },
   );
 
   testScenarios(
@@ -188,19 +215,19 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     standardTemplate,
 
     false, // Run test function before render
-    async function() {
+    async function () {
       await settled();
       await scrollTo('.scrollable', 0, 800);
       await scrollTo('.scrollable', 0, 0);
     },
-    async function(assert) {
+    async function (assert) {
       assert.expect(0);
       const called = assert.async(1);
 
       this.set('firstReached', () => {
         called();
       });
-    }
+    },
   );
 
   testScenarios(
@@ -209,20 +236,20 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     standardTemplate,
 
     false, // Run test function before render
-    async function() {
+    async function () {
       await settled();
       await scrollTo('.scrollable', 0, 800);
       await scrollTo('.scrollable', 0, 0);
       await scrollTo('.scrollable', 0, 800);
     },
-    async function(assert) {
+    async function (assert) {
       assert.expect(0);
       const called = assert.async(1);
 
       this.set('lastReached', () => {
         called();
       });
-    }
+    },
   );
 
   testScenarios(
@@ -231,11 +258,11 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     standardTemplate,
 
     false, // Run test function before render
-    async function() {
+    async function () {
       await settled();
       await scrollTo('.scrollable', 0, 200);
     },
-    async function(assert) {
+    async function (assert) {
       const called = assert.async(2);
       let count = 0;
 
@@ -243,12 +270,16 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
         if (count === 0) {
           assert.equal(index, 0, 'the first visible item is correct');
         } else {
-          assert.equal(index, 10, 'after scroll the first visible item is correct');
+          assert.equal(
+            index,
+            10,
+            'after scroll the first visible item is correct',
+          );
         }
         count++;
         called();
       });
-    }
+    },
   );
 
   testScenarios(
@@ -257,11 +288,11 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     standardTemplate,
 
     false, // Run test function before render
-    async function() {
+    async function () {
       await settled();
       await scrollTo('.scrollable', 0, 200);
     },
-    async function(assert) {
+    async function (assert) {
       const called = assert.async(2);
       let count = 0;
 
@@ -269,12 +300,16 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
         if (count === 0) {
           assert.equal(index, 9, 'the first last visible changed is correct');
         } else {
-          assert.equal(index, 19, 'after scroll the last visible change is correct');
+          assert.equal(
+            index,
+            19,
+            'after scroll the last visible change is correct',
+          );
         }
         count++;
         called();
       });
-    }
+    },
   );
 
   testScenarios(
@@ -284,7 +319,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
 
     false, // Run test function before render
     false,
-    async function(assert) {
+    async function (assert) {
       const called = assert.async(1);
 
       this.set('firstReached', (item, index) => {
@@ -293,7 +328,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
       });
 
       await settled();
-    }
+    },
   );
 
   testScenarios(
@@ -302,11 +337,11 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     standardTemplate,
 
     false, // Run test function before render
-    async function() {
+    async function () {
       await settled();
       await scrollTo('.scrollable', 0, 800);
     },
-    async function(assert) {
+    async function (assert) {
       const called = assert.async(1);
 
       this.set('lastReached', (item, index) => {
@@ -315,7 +350,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
       });
 
       await settled();
-    }
+    },
   );
 
   testScenarios(
@@ -325,7 +360,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
 
     false, // Run test function before render
     false,
-    function(assert) {
+    function (assert) {
       assert.expect(0);
       const called = assert.async(2);
 
@@ -333,7 +368,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
         prepend(this, getNumbers(number - 3, 5));
         called();
       });
-    }
+    },
   );
 
   testScenarios(
@@ -343,7 +378,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
 
     false, // Run test function before render
     false,
-    async function(assert) {
+    async function (assert) {
       assert.expect(0);
       const called = assert.async(2);
 
@@ -353,7 +388,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
       });
 
       await settled();
-    }
+    },
   );
 
   testScenarios(
@@ -362,19 +397,19 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     standardTemplate,
 
     false, // Run test function before render
-    async function() {
+    async function () {
       await settled();
       await scrollTo('.scrollable', 0, 800);
       await scrollTo('.scrollable', 0, 0);
     },
-    async function(assert) {
+    async function (assert) {
       assert.expect(0);
       const called = assert.async(1);
 
       this.set('firstReached', () => {
         called();
       });
-    }
+    },
   );
 
   testScenarios(
@@ -383,27 +418,27 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     standardTemplate,
 
     false, // Run test function before render
-    async function() {
+    async function () {
       await settled();
       await scrollTo('.scrollable', 0, 800);
       await scrollTo('.scrollable', 0, 0);
       await scrollTo('.scrollable', 0, 800);
     },
-    async function(assert) {
+    async function (assert) {
       assert.expect(0);
       const called = assert.async(1);
 
       this.set('lastReached', () => {
         called();
       });
-    }
+    },
   );
 
   testScenarios(
     'Collection scrolls and measures correctly when parent is a table',
     {
       staticScenario: { items: getNumbers(0, 100), staticHeight: true },
-      dynamicScenario: { items: getNumbers(0, 100), staticHeight: false }
+      dynamicScenario: { items: getNumbers(0, 100), staticHeight: false },
     },
 
     hbs`
@@ -427,7 +462,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     </div>
     `,
 
-    async function(assert) {
+    async function (assert) {
       assert.expect(2);
 
       // Occlude one item
@@ -435,9 +470,17 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
 
       const row = find('tr:first-of-type');
 
-      assert.equal(row.textContent.replace(/\s/g, ''), '11', 'correct first row is rendered');
-      assert.equal(paddingBefore(find('tbody')), 37, 'first row offset is correct');
-    }
+      assert.equal(
+        row.textContent.replace(/\s/g, ''),
+        '11',
+        'correct first row is rendered',
+      );
+      assert.equal(
+        paddingBefore(find('tbody')),
+        37,
+        'first row offset is correct',
+      );
+    },
   );
 
   testScenarios(
@@ -459,15 +502,23 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
       </div>
     `,
 
-    async function(assert) {
+    async function (assert) {
       assert.expect(2);
 
       await scrollTo('.scroll-parent', 0, 200);
       await scrollTo('.scroll-child', 0, 400);
 
-      assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '10 10', 'correct first item rendered');
-      assert.equal(findAll('.vertical-item').length, 10, 'correct number of items rendered');
-    }
+      assert.equal(
+        find('.vertical-item:first-of-type').textContent.trim(),
+        '10 10',
+        'correct first item rendered',
+      );
+      assert.equal(
+        findAll('.vertical-item').length,
+        10,
+        'correct number of items rendered',
+      );
+    },
   );
 
   testScenarios(
@@ -489,18 +540,22 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
       </div>
     `,
 
-    async function(assert) {
+    async function (assert) {
       assert.expect(1);
       await this.collection.scrollToItem(20);
-      assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '20 20', 'the first item in the list should be the scroll to item');
+      assert.equal(
+        find('.vertical-item:first-of-type').textContent.trim(),
+        '20 20',
+        'the first item in the list should be the scroll to item',
+      );
     },
     false,
-    function() {
-      let registerAPI = collection => {
+    function () {
+      let registerAPI = (collection) => {
         this.set('collection', collection);
       };
       this.set('registerAPI', registerAPI);
-    }
+    },
   );
 
   testScenarios(
@@ -508,13 +563,17 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     dynamicSimpleScenarioFor(getNumbers(0, 50), { itemHeight: 100 }),
     standardTemplate,
 
-    async function(assert) {
+    async function (assert) {
       assert.expect(1);
 
       await scrollTo('.scrollable', 0, 10000);
 
-      assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '49 49', 'the last item in the list should be rendered');
-    }
+      assert.equal(
+        find('.vertical-item:last-of-type').textContent.trim(),
+        '49 49',
+        'the last item in the list should be rendered',
+      );
+    },
   );
 
   testScenarios(
@@ -523,7 +582,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
     standardTemplate,
 
     false, // Run test function before render
-    async function(assert) {
+    async function (assert) {
       assert.expect(2);
 
       prepend(this, getNumbers(10, 10));
@@ -531,8 +590,16 @@ module('vertical-collection', 'Integration | Scroll Tests', function(hooks) {
 
       await settled();
 
-      assert.equal(find('.vertical-item:first-of-type').textContent.trim(), '0 0', 'Rendered correct number of items');
-      assert.equal(find('.vertical-item:last-of-type').textContent.trim(), '9 9', 'Rendered correct number of items');
-    }
+      assert.equal(
+        find('.vertical-item:first-of-type').textContent.trim(),
+        '0 0',
+        'Rendered correct number of items',
+      );
+      assert.equal(
+        find('.vertical-item:last-of-type').textContent.trim(),
+        '9 9',
+        'Rendered correct number of items',
+      );
+    },
   );
 });

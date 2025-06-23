@@ -3,13 +3,16 @@ import { setupRenderingTest } from '../helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { find, render } from '@ember/test-helpers';
 
-module('vertical-collection', 'Integration | Modern Ember Features Tests', function(hooks) {
-  setupRenderingTest(hooks);
+module(
+  'vertical-collection',
+  'Integration | Modern Ember Features Tests',
+  function (hooks) {
+    setupRenderingTest(hooks);
 
-  test('Yields to inverse when no content is provided', async function(assert) {
-    this.set('items', []);
+    test('Yields to inverse when no content is provided', async function (assert) {
+      this.set('items', []);
 
-    await render(hbs`
+      await render(hbs`
         <div class="scrollable">
           {{#vertical-collection
             items=this.items
@@ -22,6 +25,10 @@ module('vertical-collection', 'Integration | Modern Ember Features Tests', funct
         </div>
       `);
 
-    assert.notStrictEqual(find('.scrollable').textContent.indexOf('Foobar'), -1);
-  });
-});
+      assert.notStrictEqual(
+        find('.scrollable').textContent.indexOf('Foobar'),
+        -1,
+      );
+    });
+  },
+);

@@ -11,22 +11,21 @@ module.exports = {
       ],
     },
   },
-  plugins: [
-    'ember'
-  ],
-  extends: [
-    'eslint:recommended',
-    'plugin:ember/recommended'
-  ],
+  plugins: ['ember'],
+  extends: ['eslint:recommended', 'plugin:ember/recommended'],
   env: {
-    browser: true
+    browser: true,
   },
   globals: {
     ArrayBuffer: true,
-    Float32Array: true
+    Float32Array: true,
   },
   rules: {
-    'quotes': ['error', 'single', { 'allowTemplateLiterals': true, 'avoidEscape': true }],
+    quotes: [
+      'error',
+      'single',
+      { allowTemplateLiterals: true, avoidEscape: true },
+    ],
 
     'ember/closure-actions': 'off',
     'ember/no-get': 'off',
@@ -51,11 +50,11 @@ module.exports = {
         './tests/dummy/config/**/*.js',
       ],
       parserOptions: {
-        sourceType: 'script'
+        sourceType: 'script',
       },
       env: {
         browser: false,
-        node: true
+        node: true,
       },
       extends: ['plugin:n/recommended'],
     },

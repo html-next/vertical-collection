@@ -5,9 +5,10 @@
       <VerticalCollection
         @items={{@model.data.numbers}}
         @estimateHeight={{40}}
-        @containerSelector="body" as |item index|
+        @containerSelector="body"
+        as |item index|
       >
-      <NumberSlide @isDynamic={{true}} @item={{item}} @index={{index}} />
+        <NumberSlide @isDynamic={{true}} @item={{item}} @index={{index}} />
       </VerticalCollection>
       {{! END-SNIPPET }}
     </div>

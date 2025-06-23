@@ -83,7 +83,7 @@ export default class SkipList {
         fill(layer, defaultValue);
 
         left = prevLayer[(length - 1) * 2] || 0;
-        right = prevLayer[((length - 1) * 2) + 1] || 0;
+        right = prevLayer[(length - 1) * 2 + 1] || 0;
 
         // Layers are not powers of 2, and sometimes they may by odd sizes.
         // Only the last value of a layer will be different, so we calculate
@@ -92,7 +92,7 @@ export default class SkipList {
       } else {
         for (i = 0; i < length; i++) {
           left = prevLayer[i * 2];
-          right = prevLayer[(i * 2) + 1];
+          right = prevLayer[i * 2 + 1];
           layer[i] = right ? left + right : left;
         }
       }
@@ -101,7 +101,12 @@ export default class SkipList {
       prevLayer = layer;
     }
 
-    this.total = layer.length > 0 ? layer.length > 1 ? layer[0] + layer[1] : layer[0] : 0;
+    this.total =
+      layer.length > 0
+        ? layer.length > 1
+          ? layer[0] + layer[1]
+          : layer[0]
+        : 0;
 
     assert('total must be a number', typeof this.total === 'number');
 
@@ -147,7 +152,10 @@ export default class SkipList {
     index = index / 2;
 
     assert('index must be a number', typeof index === 'number');
-    assert('index must be within bounds', index >= 0 && index < this.values.length);
+    assert(
+      'index must be within bounds',
+      index >= 0 && index < this.values.length,
+    );
 
     totalAfter = total - (totalBefore + values[index]);
 
@@ -190,7 +198,10 @@ export default class SkipList {
     assert('value must be a number', typeof value === 'number');
     assert('value must non-negative', value >= 0);
     assert('index must be a number', typeof index === 'number');
-    assert('index must be within bounds', index >= 0 && index < this.values.length);
+    assert(
+      'index must be within bounds',
+      index >= 0 && index < this.values.length,
+    );
 
     const { layers } = this;
     const oldValue = layers[layers.length - 1][index];
@@ -216,11 +227,7 @@ export default class SkipList {
   }
 
   prepend(numPrepended) {
-    const {
-      values: oldValues,
-      length: oldLength,
-      defaultValue
-    } = this;
+    const { values: oldValues, length: oldLength, defaultValue } = this;
 
     const newLength = numPrepended + oldLength;
 
@@ -234,11 +241,7 @@ export default class SkipList {
   }
 
   append(numAppended) {
-    const {
-      values: oldValues,
-      length: oldLength,
-      defaultValue
-    } = this;
+    const { values: oldValues, length: oldLength, defaultValue } = this;
 
     const newLength = numAppended + oldLength;
 
@@ -252,11 +255,7 @@ export default class SkipList {
   }
 
   reset(newLength) {
-    const {
-      values: oldValues,
-      length: oldLength,
-      defaultValue
-    } = this;
+    const { values: oldValues, length: oldLength, defaultValue } = this;
 
     if (oldLength === newLength) {
       return;

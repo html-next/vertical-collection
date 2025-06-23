@@ -16,8 +16,10 @@ export default class VirtualComponent {
     // We check to see if the document exists in Fastboot. Since RAF won't run in
     // Fastboot, we'll never have to use these text nodes for measurements, so they
     // can be empty
-    this.upperBound = document !== undefined ? document.createTextNode('') : null;
-    this.lowerBound = document !== undefined ? document.createTextNode('') : null;
+    this.upperBound =
+      document !== undefined ? document.createTextNode('') : null;
+    this.lowerBound =
+      document !== undefined ? document.createTextNode('') : null;
 
     this.rendered = false;
 
@@ -55,11 +57,17 @@ export default class VirtualComponent {
 
         const text = upperBound.textContent;
 
-        assert(`All content inside of vertical-collection must be wrapped in an element. Detected a text node with content: ${text}`, text === '' || text.match(/^\s+$/));
+        assert(
+          `All content inside of vertical-collection must be wrapped in an element. Detected a text node with content: ${text}`,
+          text === '' || text.match(/^\s+$/),
+        );
       }
     }
 
-    assert('Items in a vertical collection require atleast one element in them', top !== Infinity && bottom !== -Infinity);
+    assert(
+      'Items in a vertical collection require atleast one element in them',
+      top !== Infinity && bottom !== -Infinity,
+    );
 
     const height = bottom - top;
 

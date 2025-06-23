@@ -26,33 +26,28 @@ import { Promise } from 'rsvp';
   scrollTo('#my-long-div', 0, 0); // scroll to top
   scrollTo('#my-long-div', 0, 100); // scroll down
 */
-export default function scrollTo(
-  target,
-  x,
-  y
-) {
-  return Promise.resolve()
-    .then(() => {
-      if (!target) {
-        throw new Error('Must pass an element or selector to `scrollTo`.');
-      }
+export default function scrollTo(target, x, y) {
+  return Promise.resolve().then(() => {
+    if (!target) {
+      throw new Error('Must pass an element or selector to `scrollTo`.');
+    }
 
-      if (x === undefined || y === undefined) {
-        throw new Error('Must pass both x and y coordinates to `scrollTo`.');
-      }
+    if (x === undefined || y === undefined) {
+      throw new Error('Must pass both x and y coordinates to `scrollTo`.');
+    }
 
-      let element = document.querySelector(target);
-      if (!element) {
-        throw new Error(
-          `Element not found when calling \`scrollTo('${target}')\`.`
-        );
-      }
+    let element = document.querySelector(target);
+    if (!element) {
+      throw new Error(
+        `Element not found when calling \`scrollTo('${target}')\`.`,
+      );
+    }
 
-      element.scrollTop = y;
-      element.scrollLeft = x;
+    element.scrollTop = y;
+    element.scrollLeft = x;
 
-      triggerEvent(element, 'scroll');
+    triggerEvent(element, 'scroll');
 
-      return settled();
-    });
+    return settled();
+  });
 }

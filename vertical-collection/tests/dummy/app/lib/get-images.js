@@ -12,7 +12,7 @@ const CATEGORIES = [
   'sports',
   'cats',
   'fashion',
-  'technics'
+  'technics',
 ];
 
 export function booleanToss() {
@@ -36,11 +36,11 @@ export function getDynamicHeight() {
 }
 
 export function getDynamicWidth(height, isPortrait) {
-  return Math.round(isPortrait ? height / 16 * 9 : height / 9 * 16);
+  return Math.round(isPortrait ? (height / 16) * 9 : (height / 9) * 16);
 }
 
 function generateImageId(index) {
-  return `${((new Date()).getTime())}-${index}`;
+  return `${new Date().getTime()}-${index}`;
 }
 function getId() {
   return getRandomNumber(0, 10);
@@ -83,7 +83,7 @@ function generateImageSrc(index) {
   return {
     large: parts.join('/'),
     small: preview.join('/'),
-    id: generateImageId(index)
+    id: generateImageId(index),
   };
 }
 
@@ -128,7 +128,7 @@ function generateDynamicImageSrc(index) {
     width,
     height,
     previewWidth: smallWidth,
-    previewHeight: smallHeight
+    previewHeight: smallHeight,
   };
 }
 
@@ -156,7 +156,4 @@ function getDynamicImages(count) {
 
 export default getImages;
 
-export {
-  getImages,
-  getDynamicImages
-};
+export { getImages, getDynamicImages };

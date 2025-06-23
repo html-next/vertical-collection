@@ -1,7 +1,10 @@
 import { assert } from '@ember/debug';
 
 export default function estimateElementHeight(element, fallbackHeight) {
-  assert(`You called estimateElement height without a fallbackHeight`, fallbackHeight);
+  assert(
+    `You called estimateElement height without a fallbackHeight`,
+    fallbackHeight,
+  );
   assert(`You called estimateElementHeight without an element`, element);
 
   if (fallbackHeight.indexOf('%') !== -1) {
@@ -21,12 +24,15 @@ function getPercentageHeight(element, fallbackHeight) {
   let parentHeight = element.offsetHeight;
   let percent = parseFloat(fallbackHeight);
 
-  return (percent * parentHeight / 100.0);
+  return (percent * parentHeight) / 100.0;
 }
 
 function getEmHeight(element, fallbackHeight) {
-  const fontSizeElement = fallbackHeight.indexOf('rem') !== -1 ? document.documentElement : element;
-  const fontSize = window.getComputedStyle(fontSizeElement).getPropertyValue('font-size');
+  const fontSizeElement =
+    fallbackHeight.indexOf('rem') !== -1 ? document.documentElement : element;
+  const fontSize = window
+    .getComputedStyle(fontSizeElement)
+    .getPropertyValue('font-size');
 
-  return (parseFloat(fallbackHeight) * parseFloat(fontSize));
+  return parseFloat(fallbackHeight) * parseFloat(fontSize);
 }

@@ -8,25 +8,23 @@ export default function getData(ROWS) {
   // generate some dummy data
   const data = {
     start_at: new Date().getTime() / 1000,
-    databases: []
+    databases: [],
   };
 
   for (let i = 1; i <= ROWS; i++) {
-
     data.databases.push({
       id: `cluster${i}`,
-      queries: []
+      queries: [],
     });
 
     data.databases.push({
       id: `cluster${i}slave`,
-      queries: []
+      queries: [],
     });
-
   }
 
-  data.databases.forEach(function(info) {
-    const r = Math.floor((Math.random() * 10) + 1);
+  data.databases.forEach(function (info) {
+    const r = Math.floor(Math.random() * 10 + 1);
 
     for (let i = 0; i < r; i++) {
       const q = {
@@ -38,7 +36,7 @@ export default function getData(ROWS) {
         canvas_pid: null,
         elapsed: Math.random() * 15,
         query: 'SELECT blah FROM something',
-        waiting: Math.random() < 0.5
+        waiting: Math.random() < 0.5,
       };
 
       if (Math.random() < 0.2) {
@@ -52,7 +50,7 @@ export default function getData(ROWS) {
       info.queries.push(q);
     }
 
-    info.queries = info.queries.sort(function(a, b) {
+    info.queries = info.queries.sort(function (a, b) {
       return b.elapsed - a.elapsed;
     });
   });

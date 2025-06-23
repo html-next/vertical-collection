@@ -5,9 +5,9 @@ import loadInitializers from 'ember-load-initializers';
 import config from './config/environment';
 
 class App extends Application {
-  modulePrefix=config.modulePrefix
-  podModulePrefix=config.podModulePrefix
-  Resolver=Resolver
+  modulePrefix = config.modulePrefix;
+  podModulePrefix = config.podModulePrefix;
+  Resolver = Resolver;
   customEvents = {
     touchstart: null,
     touchmove: null,
@@ -33,8 +33,8 @@ class App extends Application {
     dragleave: null,
     dragover: null,
     drop: null,
-    dragend: null
-  }
+    dragend: null,
+  };
 }
 
 loadInitializers(App, config.modulePrefix);
