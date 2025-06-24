@@ -23,12 +23,9 @@ importers:
       ember-cli-htmlbars:
         specifier: ^6.3.0
         version: 6.3.0
-      ember-cli-version-checker:
-        specifier: ^5.1.2
-        version: 5.1.2
       ember-raf-scheduler:
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.5.0
+        version: 0.5.0
     devDependencies:
       '@babel/eslint-parser':
         specifier: ^7.22.10
@@ -931,6 +928,15 @@ packages:
 
   '@embroider/macros@1.17.3':
     resolution: {integrity: sha512-ag0QUiawjSwEqOhNqscZN5O2Q0gjQ6TS5weepamn4MGGVwIC4/9MpLUAZKmbVh5dmPhCvRp9jTmYvCykx0vB2Q==}
+    engines: {node: 12.* || 14.* || >= 16}
+    peerDependencies:
+      '@glint/template': ^1.0.0
+    peerDependenciesMeta:
+      '@glint/template':
+        optional: true
+
+  '@embroider/macros@1.18.0':
+    resolution: {integrity: sha512-KanP80XxNK4bmQ1HKTcUjy/cdCt9n7knPMLK1vzHdOFymACHo+GbhgUjXjYdOCuBTv+ZwcjL2P2XDmBcYS9r8g==}
     engines: {node: 12.* || 14.* || >= 16}
     peerDependencies:
       '@glint/template': ^1.0.0
@@ -2864,9 +2870,8 @@ packages:
       '@ember/test-helpers': '>=3.0.3'
       qunit: ^2.13.0
 
-  ember-raf-scheduler@0.3.0:
-    resolution: {integrity: sha512-i8JWQidNCX7n5TOTIKRDR0bnsQN9aJh/GtOJKINz2Wr+I7L7sYVhli6MFqMYNGKC9j9e6iWsznfAIxddheyEow==}
-    engines: {node: 12.* || 14.* || >= 16}
+  ember-raf-scheduler@0.5.0:
+    resolution: {integrity: sha512-YB9qXLPcaKD0ihqWAgrkOwbHEcUJbT2n/AXCQZDhzbAGqqQDhFez5TAnJNaSkAuLFR0XTHGmJ+me88cR+5jubg==}
 
   ember-resolver@13.1.1:
     resolution: {integrity: sha512-rA4RDuTm/F9AzYX2+g7EY3QWU48kyF9+Ck8IE8VQipnlwv2Q42kdRWiw7hfeQbRxx6XoSZCak6nzAG9ePd/+Ug==}
@@ -7495,6 +7500,19 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@embroider/macros@1.18.0':
+    dependencies:
+      '@embroider/shared-internals': 3.0.0
+      assert-never: 1.4.0
+      babel-import-util: 3.0.1
+      ember-cli-babel: 7.26.11
+      find-up: 5.0.0
+      lodash: 4.17.21
+      resolve: 1.22.10
+      semver: 7.7.2
+    transitivePeerDependencies:
+      - supports-color
+
   '@embroider/shared-internals@2.9.0':
     dependencies:
       babel-import-util: 2.1.1
@@ -10110,10 +10128,13 @@ snapshots:
       - '@glint/template'
       - supports-color
 
-  ember-raf-scheduler@0.3.0:
+  ember-raf-scheduler@0.5.0:
     dependencies:
-      ember-cli-babel: 7.26.11
+      '@ember/test-waiters': 4.1.0
+      '@embroider/addon-shim': 1.10.0
+      '@embroider/macros': 1.18.0
     transitivePeerDependencies:
+      - '@glint/template'
       - supports-color
 
   ember-resolver@13.1.1:
