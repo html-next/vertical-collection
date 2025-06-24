@@ -103,7 +103,9 @@ module.exports = {
     publicTree = new Funnel(publicTree, { destDir });
     privateTree = new Funnel(privateTree, { destDir });
 
-    return merge([addonTemplateTree, publicTree, privateTree]);
+    return merge([addonTemplateTree, publicTree, privateTree], {
+      overwrite: true,
+    });
   },
 
   _hasSetupBabelOptions: false,

@@ -15,8 +15,7 @@ import { empty, readOnly } from '@ember/object/computed';
 import Component from '@ember/component';
 import { get, computed } from '@ember/object';
 import { run } from '@ember/runloop';
-import layout from './template';
-import { ViewportContainer } from '../../-private';
+import { ViewportContainer } from '../-private';
 
 import { scheduler, Token } from 'ember-raf-scheduler';
 
@@ -197,8 +196,6 @@ class Visualization {
  */
 
 const VerticalCollection = Component.extend({
-  layout,
-
   tagName: '',
 
   /**
@@ -512,7 +509,7 @@ const VerticalCollection = Component.extend({
     }
 
     /* Public methods to Expose to parent
-      
+
       Usage:
 
       Template:
@@ -520,7 +517,7 @@ const VerticalCollection = Component.extend({
       <VerticalCollection @registerAPI={{this.registerAPI}} />
 
       Component:
-      
+
       export default class extends Component {
         @action
         registerAPI(api) {
@@ -532,7 +529,7 @@ const VerticalCollection = Component.extend({
           this.collectionAPI.scrollToItem(index);
         }
       }
-        
+
       Need to pass this property in the vertical-collection template
       Listen in the component actions and do your custom logic
        This API will have below methods.
