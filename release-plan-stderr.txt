@@ -1,0 +1,13 @@
+# Unlabeled Changes
+
+* `@html-next/vertical-collection`
+  * [#441](https://github.com/html-next/vertical-collection/pull/441) Convert to monorepo ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+* Other
+  * [#438](https://github.com/html-next/vertical-collection/pull/438) Move to pnpm ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+  * [#414](https://github.com/html-next/vertical-collection/pull/414) Vertical collection tests compatible with Ember 6 ([@mixonic](https://github.com/mixonic))
+  * [#408](https://github.com/html-next/vertical-collection/pull/408) Bump dev Node to v18, reroll lockfile ([@mixonic](https://github.com/mixonic))
+  * [#407](https://github.com/html-next/vertical-collection/pull/407) Add dependabot ([@mixonic](https://github.com/mixonic))
+  * [#402](https://github.com/html-next/vertical-collection/pull/402) Ember v3.28.0...v5.2.0 ([@mixonic](https://github.com/mixonic))
+
+
+*Cannot plan release until the above changes are labeled*.
