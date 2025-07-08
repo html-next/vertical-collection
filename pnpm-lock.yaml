@@ -7552,7 +7552,7 @@ snapshots:
       '@embroider/shared-internals': 3.0.0
       broccoli-funnel: 3.0.8
       common-ancestor-path: 1.0.1
-      semver: 7.7.2
+      semver: 7.7.1
     transitivePeerDependencies:
       - supports-color
 
@@ -7599,7 +7599,7 @@ snapshots:
       pkg-entry-points: 1.1.1
       resolve-package-path: 4.0.3
       resolve.exports: 2.0.3
-      semver: 7.7.2
+      semver: 7.7.1
       typescript-memoize: 1.1.1
     transitivePeerDependencies:
       - supports-color
