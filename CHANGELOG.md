@@ -1,5 +1,34 @@
 # Changelog
 
+## Release (2025-07-10)
+
+* @html-next/vertical-collection 5.0.0 (major)
+
+#### :boom: Breaking Change
+* `@html-next/vertical-collection`
+  * [#444](https://github.com/html-next/vertical-collection/pull/444) Use co-located components instead of pods ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+
+#### :bug: Bug Fix
+* `@html-next/vertical-collection`
+  * [#443](https://github.com/html-next/vertical-collection/pull/443) Remove unneeded peer declaration ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+
+#### :house: Internal
+* `@html-next/vertical-collection`
+  * [#459](https://github.com/html-next/vertical-collection/pull/459) Remove V1 Add complexity in the index.js ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+  * [#452](https://github.com/html-next/vertical-collection/pull/452) Setup Release plan ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+  * [#451](https://github.com/html-next/vertical-collection/pull/451) Configure the prettier commands in package.json ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+  * [#441](https://github.com/html-next/vertical-collection/pull/441) Convert to monorepo ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+* Other
+  * [#438](https://github.com/html-next/vertical-collection/pull/438) Move to pnpm ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+  * [#414](https://github.com/html-next/vertical-collection/pull/414) Vertical collection tests compatible with Ember 6 ([@mixonic](https://github.com/mixonic))
+  * [#408](https://github.com/html-next/vertical-collection/pull/408) Bump dev Node to v18, reroll lockfile ([@mixonic](https://github.com/mixonic))
+  * [#407](https://github.com/html-next/vertical-collection/pull/407) Add dependabot ([@mixonic](https://github.com/mixonic))
+  * [#402](https://github.com/html-next/vertical-collection/pull/402) Ember v3.28.0...v5.2.0 ([@mixonic](https://github.com/mixonic))
+
+#### Committers: 2
+- Matthew Beale ([@mixonic](https://github.com/mixonic))
+- [@NullVoxPopuli](https://github.com/NullVoxPopuli)
+
 Changelog
 =========
 
