@@ -28,14 +28,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
-      - run: . bin/restore-env.sh && pnpm ember build
-        working-directory: vertical-collection
+      - run: pnpm build:test
+        working-directory: test-app
       - name: Run Tests
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: pnpm test:ci 
+          command: cd test-app && pnpm run test 
 
   floating:
     name: "Floating Dependencies"
@@ -47,14 +47,14 @@ jobs:
       - uses: wyvox/action-setup-pnpm@v3
         with:
           args: --no-lockfile
-      - run: pnpm ember build
-        working-directory: vertical-collection
+      - run: pnpm build:test
+        working-directory: test-app
       - name: Run Tests
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: cd vertical-collection && CI=true pnpm ember test --path=dist
+          command: cd test-app && pnpm run test 
 
   setup:
     name: 'Prepare Try Scenarios'
