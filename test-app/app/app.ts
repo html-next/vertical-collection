@@ -1,13 +1,18 @@
-/* eslint-disable ember/avoid-leaking-state-in-ember-objects */
 import Application from '@ember/application';
-import Resolver from './resolver';
+import compatModules from '@embroider/virtual/compat-modules';
+import Resolver from 'ember-resolver';
 import loadInitializers from 'ember-load-initializers';
-import config from './config/environment';
+import config from 'test-app/config/environment';
+import { importSync, isDevelopingApp, macroCondition } from '@embroider/macros';
 
-class App extends Application {
+if (macroCondition(isDevelopingApp())) {
+  importSync('./deprecation-workflow');
+}
+
+export default class App extends Application {
   modulePrefix = config.modulePrefix;
   podModulePrefix = config.podModulePrefix;
-  Resolver = Resolver;
+  Resolver = Resolver.withModules(compatModules);
   customEvents = {
     touchstart: null,
     touchmove: null,
@@ -37,6 +42,4 @@ class App extends Application {
   };
 }
 
-loadInitializers(App, config.modulePrefix);
-
-export default App;
+loadInitializers(App, config.modulePrefix, compatModules);
