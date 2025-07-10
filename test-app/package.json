@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "vite build",
-    "build:test": "vite build --mode development"
+    "build:test": "vite build --mode development",
     "format": "prettier . --cache --write",
     "lint": "concurrently \"pnpm:lint:*(!fix)\" --names \"lint:\" --prefixColors auto",
     "lint:css": "stylelint \"**/*.css\"",
