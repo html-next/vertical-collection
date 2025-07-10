@@ -3,7 +3,7 @@ import { setupRenderingTest } from '../helpers';
 import { click, find, findAll, settled } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
-import getNumbers from 'dummy/lib/get-numbers';
+import getNumbers from 'test-app/lib/get-numbers';
 
 import {
   testScenarios,

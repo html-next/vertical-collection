@@ -5,7 +5,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import { find, findAll } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
-import getNumbers from 'dummy/lib/get-numbers';
+import getNumbers from 'test-app/lib/get-numbers';
 
 import { paddingBefore, paddingAfter } from 'dummy/tests/helpers/measurement';
 import { prepend, replaceArray } from 'dummy/tests/helpers/array';

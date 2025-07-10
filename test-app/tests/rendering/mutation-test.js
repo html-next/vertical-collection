@@ -3,7 +3,7 @@ import { setupRenderingTest } from '../helpers';
 import { find, findAll } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
-import getNumbers from 'dummy/lib/get-numbers';
+import getNumbers from 'test-app/lib/get-numbers';
 import {
   testScenarios,
   dynamicSimpleScenarioFor,

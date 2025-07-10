@@ -1,6 +1,6 @@
 import { A } from '@ember/array';
 import Route from '@ember/routing/route';
-import getNumbers from 'dummy/lib/get-numbers';
+import getNumbers from 'test-app/lib/get-numbers';
 import { tracked } from '@glimmer/tracking';
 
 class ModelData {

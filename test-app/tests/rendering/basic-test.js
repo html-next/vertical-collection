@@ -4,7 +4,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import { find, findAll, settled, render } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
-import getNumbers from 'dummy/lib/get-numbers';
+import getNumbers from 'test-app/lib/get-numbers';
 
 import {
   testScenarios,
