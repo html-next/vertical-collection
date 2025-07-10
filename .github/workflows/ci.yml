@@ -28,14 +28,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
-      - run: . bin/restore-env.sh && pnpm ember build
-        working-directory: vertical-collection
+      - run: pnpm build:test
+        working-directory: test-app
       - name: Run Tests
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: pnpm test:ci 
+          command: cd test-app && pnpm run test 
 
   floating:
     name: "Floating Dependencies"
@@ -47,46 +47,52 @@ jobs:
       - uses: wyvox/action-setup-pnpm@v3
         with:
           args: --no-lockfile
-      - run: pnpm ember build
-        working-directory: vertical-collection
+      - run: pnpm build:test
+        working-directory: test-app
       - name: Run Tests
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: cd vertical-collection && CI=true pnpm ember test --path=dist
+          command: cd test-app && pnpm run test 
+
+  setup:
+    name: 'Prepare Try Scenarios'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: pnpm
+      - id: set-matrix
+        run: |
+          echo "matrix=$(pnpm -s dlx @embroider/try list)" >> $GITHUB_OUTPUT
+
 
   try-scenarios:
-    name: ${{ matrix.try-scenario }}
     runs-on: ubuntu-latest
-    timeout-minutes: 12
-
+    needs: [setup]
+    timeout-minutes: 10
     strategy:
       fail-fast: false
-      matrix:
-        try-scenario:
-          - ember-lts-3.28
-          - ember-lts-4.12
-          - ember-lts-5.12
-          - ember-6.1
-          - ember-release
-          - ember-beta
-          - ember-canary
-          - embroider-safe
-          - embroider-optimized
+      matrix: ${{fromJson(needs.setup.outputs.matrix)}}
+
+    name: "${{ matrix.name }}"
 
     steps:
       - uses: actions/checkout@v4
-      - uses: wyvox/action-setup-pnpm@v3
-      - name: Ember-Try Setup
-        run: node_modules/.bin/ember try:one ${{ matrix.try-scenario }} --skip-cleanup --- bin/stash-env.sh
-        working-directory: vertical-collection
-      - name: Run Build
-        run: . bin/restore-env.sh && pnpm ember build
-        working-directory: vertical-collection
-      - name: Run Tests
-        uses: nick-fields/retry@v2
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
-          timeout_minutes: 2
-          max_attempts: 5
-          command: pnpm test:ci 
+          cache: pnpm
+      - run: pnpm dlx @embroider/try apply ${{ matrix.name }}
+        working-directory: 'test-app'
+      - run: pnpm install --no-lockfile
+      - run: pnpm test:ci
+        env: ${{ matrix.env }}
+        working-directory: 'test-app'
