@@ -165,6 +165,9 @@ importers:
       qunit-dom:
         specifier: ^2.0.0
         version: 2.0.0
+      release-plan:
+        specifier: ^0.16.0
+        version: 0.16.0
       stylelint:
         specifier: ^15.10.3
         version: 15.11.0
