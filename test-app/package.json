@@ -32,10 +32,10 @@
   },
   "devDependencies": {
     "@babel/core": "^7.27.1",
-    "@babel/runtime": "^7.27.1",
+    "@babel/eslint-parser": "^7.27.1",
     "@babel/plugin-transform-runtime": "^7.27.1",
     "@babel/plugin-transform-typescript": "^7.27.1",
-    "@babel/eslint-parser": "^7.27.1",
+    "@babel/runtime": "^7.27.1",
     "@ember-data/adapter": "~5.5.0",
     "@ember-data/graph": "~5.5.0",
     "@ember-data/json-api": "~5.5.0",
@@ -50,12 +50,12 @@
     "@ember/string": "^4.0.1",
     "@ember/test-helpers": "^5.2.2",
     "@ember/test-waiters": "^4.1.0",
-    "@embroider/macros": "^1.18.0",
-    "@embroider/core": "^4.1.0",
-    "@embroider/vite": "^1.1.5",
     "@embroider/compat": "^4.1.0",
-    "@embroider/router": "^3.0.1",
     "@embroider/config-meta-loader": "^1.0.0",
+    "@embroider/core": "^4.1.0",
+    "@embroider/macros": "^1.18.0",
+    "@embroider/router": "^3.0.1",
+    "@embroider/vite": "^1.1.5",
     "@eslint/js": "^9.27.0",
     "@glimmer/component": "^2.0.0",
     "@glint/core": "^1.5.2",
@@ -105,5 +105,8 @@
   },
   "ember": {
     "edition": "octane"
+  },
+  "dependencies": {
+    "@html-next/vertical-collection": "workspace:*"
   }
 }
