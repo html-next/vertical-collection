@@ -76,7 +76,7 @@ jobs:
 
   try-scenarios:
     runs-on: ubuntu-latest
-    needs: ["setup"]
+    needs: [setup]
     timeout-minutes: 10
     strategy:
       fail-fast: false
