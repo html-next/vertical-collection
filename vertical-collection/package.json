@@ -56,10 +56,6 @@
     "test:ember-compatibility": "ember try:each"
   },
   "dependencies": {
-    "babel6-plugin-strip-class-callcheck": "^6.0.0",
-    "broccoli-funnel": "^3.0.8",
-    "broccoli-merge-trees": "^4.2.0",
-    "broccoli-rollup": "^5.0.0",
     "ember-auto-import": "^2.6.3",
     "ember-cli-babel": "^8.0.0",
     "ember-cli-htmlbars": "^6.3.0",
