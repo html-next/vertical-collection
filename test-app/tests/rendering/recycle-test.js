@@ -9,7 +9,7 @@ import getNumbers from 'test-app/lib/get-numbers';
 import {
   testScenarios,
   simpleScenariosFor,
-} from 'dummy/tests/helpers/test-scenarios';
+} from 'test-app/tests/helpers/test-scenarios';
 
 module('vertical-collection', 'Integration | Recycle Tests', function (hooks) {
   setupRenderingTest(hooks);

@@ -13,7 +13,7 @@ import {
   simpleScenariosFor,
   scenariosFor,
   standardTemplate,
-} from 'dummy/tests/helpers/test-scenarios';
+} from 'test-app/tests/helpers/test-scenarios';
 
 // Assert an odd timing: After initial render but before settledness.
 //

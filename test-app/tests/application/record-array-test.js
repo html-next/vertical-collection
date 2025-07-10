@@ -1,9 +1,9 @@
 import { module, test } from 'qunit';
-import { setupApplicationTest } from '../../helpers';
+import { setupApplicationTest } from '#tests/helpers/index';
 import { scheduler } from 'ember-raf-scheduler';
 
 import { click, find, findAll, visit as newVisit } from '@ember/test-helpers';
-import scrollTo from '../../helpers/scroll-to';
+import scrollTo from '#tests/helpers/scroll-to';
 
 module('Acceptance | Record Array', function (hooks) {
   setupApplicationTest(hooks);
@@ -14,17 +14,17 @@ module('Acceptance | Record Array', function (hooks) {
     assert.strictEqual(
       findAll('number-slide').length,
       15,
-      'correct number of items rendered',
+      'correct number of items rendered'
     );
     assert.strictEqual(
       find('number-slide:first-of-type').textContent.replace(/\s/g, ''),
       '0(0)',
-      'correct first item rendered',
+      'correct first item rendered'
     );
     assert.strictEqual(
       find('number-slide:last-of-type').textContent.replace(/\s/g, ''),
       '14(14)',
-      'correct last item rendered',
+      'correct last item rendered'
     );
   });
 
@@ -34,7 +34,7 @@ module('Acceptance | Record Array', function (hooks) {
     assert.strictEqual(
       findAll('number-slide').length,
       15,
-      'correct number of items rendered',
+      'correct number of items rendered'
     );
 
     await scrollTo('.table-wrapper', 0, 600);
@@ -44,7 +44,7 @@ module('Acceptance | Record Array', function (hooks) {
     assert.strictEqual(
       findAll('number-slide').length,
       5,
-      'correct number of items rendered',
+      'correct number of items rendered'
     );
   });
 
@@ -54,7 +54,7 @@ module('Acceptance | Record Array', function (hooks) {
     assert.strictEqual(
       findAll('number-slide').length,
       15,
-      'correct number of items rendered',
+      'correct number of items rendered'
     );
 
     await click('#partial-update-button');
@@ -62,7 +62,7 @@ module('Acceptance | Record Array', function (hooks) {
     assert.strictEqual(
       findAll('number-slide').length,
       5,
-      'correct number of items rendered',
+      'correct number of items rendered'
     );
   });
 
@@ -72,7 +72,7 @@ module('Acceptance | Record Array', function (hooks) {
     assert.strictEqual(
       findAll('number-slide').length,
       15,
-      'correct number of items rendered',
+      'correct number of items rendered'
     );
 
     await click('#hide-vc-button');
@@ -80,7 +80,7 @@ module('Acceptance | Record Array', function (hooks) {
     assert.strictEqual(
       findAll('number-slide').length,
       0,
-      'correct number of items rendered',
+      'correct number of items rendered'
     );
 
     await click('#show-vc-button');
@@ -88,7 +88,7 @@ module('Acceptance | Record Array', function (hooks) {
     assert.strictEqual(
       findAll('number-slide').length,
       15,
-      'correct number of items rendered',
+      'correct number of items rendered'
     );
   });
 
@@ -98,29 +98,29 @@ module('Acceptance | Record Array', function (hooks) {
     assert.strictEqual(
       findAll('number-slide').length,
       15,
-      'correct number of items rendered',
+      'correct number of items rendered'
     );
     await click('#update-items-button');
     assert.strictEqual(
       findAll('number-slide').length,
       5,
-      'correct number of items rendered',
+      'correct number of items rendered'
     );
     assert.deepEqual(
       findAll('number-slide').map((s) => s.textContent.trim()[0]),
       ['0', '1', '2', '3', '4'],
-      'correct items order',
+      'correct items order'
     );
     await click('#show-prefixed-button');
     assert.strictEqual(
       findAll('number-slide').length,
       5,
-      'correct number of items rendered and nothing crashes',
+      'correct number of items rendered and nothing crashes'
     );
     assert.deepEqual(
       findAll('number-slide').map((s) => s.textContent.trim()[0]),
       ['0', '1', '2', '3', '4'],
-      'correct items order',
+      'correct items order'
     );
   });
 
@@ -134,25 +134,26 @@ module('Acceptance | Record Array', function (hooks) {
     }
 
     await newVisit('/acceptance-tests/record-array');
+    await this.pauseTest();
 
     assert.strictEqual(
       find('#first-visible-id').value,
       '0',
-      'the first item is the first visible id',
+      'the first item is the first visible id'
     );
 
     await click('#last-25-button');
     assert.strictEqual(
       find('#first-visible-id').value,
       '75',
-      'the first visible id is updated correctly after updating items',
+      'the first visible id is updated correctly after updating items'
     );
 
     await scrollTo('.table-wrapper', 0, 1000);
     assert.strictEqual(
       find('#first-visible-id').value,
       '86',
-      'the first visible id is updated correctly after scrolling',
+      'the first visible id is updated correctly after scrolling'
     );
 
     click('#show-all');
@@ -164,14 +165,14 @@ module('Acceptance | Record Array', function (hooks) {
     assert.strictEqual(
       find('#first-visible-id').value,
       '86',
-      'the first visible id is the same after fast-switching items',
+      'the first visible id is the same after fast-switching items'
     );
 
     await scrollTo('.table-wrapper', 0, 0);
     assert.strictEqual(
       find('#first-visible-id').value,
       '75',
-      'the first visible id is updated correctly after scrolling',
+      'the first visible id is updated correctly after scrolling'
     );
   });
 });

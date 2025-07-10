@@ -7,14 +7,14 @@ import scrollTo from '../helpers/scroll-to';
 
 import getNumbers from 'test-app/lib/get-numbers';
 
-import { paddingBefore, paddingAfter } from 'dummy/tests/helpers/measurement';
-import { prepend, replaceArray } from 'dummy/tests/helpers/array';
+import { paddingBefore, paddingAfter } from 'test-app/tests/helpers/measurement';
+import { prepend, replaceArray } from 'test-app/tests/helpers/array';
 
 import {
   testScenarios,
   dynamicSimpleScenarioFor,
   standardTemplate,
-} from 'dummy/tests/helpers/test-scenarios';
+} from 'test-app/tests/helpers/test-scenarios';
 
 module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
   setupRenderingTest(hooks);

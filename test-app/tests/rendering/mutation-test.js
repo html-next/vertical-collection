@@ -9,7 +9,7 @@ import {
   dynamicSimpleScenarioFor,
   scenariosFor,
   standardTemplate,
-} from 'dummy/tests/helpers/test-scenarios';
+} from 'test-app/tests/helpers/test-scenarios';
 
 import {
   prepend,
@@ -17,8 +17,8 @@ import {
   emptyArray,
   replaceArray,
   move,
-} from 'dummy/tests/helpers/array';
-import { paddingBefore, paddingAfter } from 'dummy/tests/helpers/measurement';
+} from 'test-app/tests/helpers/array';
+import { paddingBefore, paddingAfter } from 'test-app/tests/helpers/measurement';
 
 module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
   setupRenderingTest(hooks);

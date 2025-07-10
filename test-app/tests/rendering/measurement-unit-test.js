@@ -9,7 +9,7 @@ import {
   testScenarios,
   simpleScenariosFor,
   scenariosFor,
-} from 'dummy/tests/helpers/test-scenarios';
+} from 'test-app/tests/helpers/test-scenarios';
 
 module(
   'vertical-collection',

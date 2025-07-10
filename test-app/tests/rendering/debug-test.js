@@ -8,7 +8,7 @@ import {
   testScenarios,
   scenariosFor,
   standardTemplate,
-} from 'dummy/tests/helpers/test-scenarios';
+} from 'test-app/tests/helpers/test-scenarios';
 
 module('vertical-collection', 'Integration | Debug Tests', function (hooks) {
   setupRenderingTest(hooks);

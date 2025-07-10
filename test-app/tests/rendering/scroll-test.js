@@ -11,10 +11,10 @@ import {
   scenariosFor,
   standardScenariosFor,
   standardTemplate,
-} from 'dummy/tests/helpers/test-scenarios';
+} from 'test-app/tests/helpers/test-scenarios';
 
-import { prepend, append } from 'dummy/tests/helpers/array';
-import { paddingBefore } from 'dummy/tests/helpers/measurement';
+import { prepend, append } from 'test-app/tests/helpers/array';
+import { paddingBefore } from 'test-app/tests/helpers/measurement';
 
 module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
   setupRenderingTest(hooks);

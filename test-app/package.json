@@ -26,6 +26,10 @@
     "start": "vite",
     "test": "vite build --mode development && testem ci"
   },
+  "imports": {
+    "#tests/*": "./tests/*",
+    "#app/*": "./app/*"
+  },
   "exports": {
     "./tests/*": "./tests/*",
     "./*": "./app/*"
