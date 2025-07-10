@@ -15,7 +15,6 @@ import { empty, readOnly } from '@ember/object/computed';
 import Component from '@ember/component';
 import { get, computed } from '@ember/object';
 import { run } from '@ember/runloop';
-import layout from './template';
 
 import { scheduler, Token } from 'ember-raf-scheduler';
 
@@ -25,7 +24,7 @@ import {
   DynamicRadar,
   StaticRadar,
   objectAt,
-} from '../../-private/index';
+} from '../-private/index';
 
 /*
  * BEGIN DEBUG HELPERS
@@ -197,8 +196,6 @@ class Visualization {
  */
 
 const VerticalCollection = Component.extend({
-  layout,
-
   tagName: '',
 
   /**
