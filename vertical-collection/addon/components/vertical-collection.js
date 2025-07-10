@@ -24,7 +24,7 @@ import {
   DynamicRadar,
   StaticRadar,
   objectAt,
-} from '../../-private/index';
+} from '../-private/index';
 
 /*
  * BEGIN DEBUG HELPERS
