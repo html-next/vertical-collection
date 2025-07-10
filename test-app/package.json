@@ -12,6 +12,7 @@
   },
   "scripts": {
     "build": "vite build",
+    "build:test": "vite build --mode development"
     "format": "prettier . --cache --write",
     "lint": "concurrently \"pnpm:lint:*(!fix)\" --names \"lint:\" --prefixColors auto",
     "lint:css": "stylelint \"**/*.css\"",
@@ -24,7 +25,8 @@
     "lint:js:fix": "eslint . --fix",
     "lint:types": "glint",
     "start": "vite",
-    "test": "vite build --mode development && testem ci"
+    "test": "testem ci",
+    "test:ci": "bin/restore-env.sh && CI=true pnpm build:test && pnpm run test"
   },
   "imports": {
     "#tests/*": "./tests/*",
