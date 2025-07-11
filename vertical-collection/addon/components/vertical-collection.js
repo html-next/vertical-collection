@@ -12,8 +12,9 @@ import { assert } from '@ember/debug';
 /* eslint-disable ember/no-computed-properties-in-native-classes, ember/no-component-lifecycle-hooks */
 import { empty, readOnly } from '@ember/object/computed';
 
-import Component from '@ember/component';
-import { get, computed } from '@ember/object';
+import Component from '@glimmer/component';
+import { helper } from '@ember/component/helper';
+import { action, computed, get } from '@ember/object';
 import { run } from '@ember/runloop';
 
 import { scheduler, Token } from 'ember-raf-scheduler';
@@ -25,6 +26,10 @@ import {
   StaticRadar,
   objectAt,
 } from '../-private/index';
+
+let callHelper = helper(function callHelper([fn]) {
+  fn();
+});
 
 /*
  * BEGIN DEBUG HELPERS
@@ -195,9 +200,7 @@ class Visualization {
  * END DEBUG HELPERS
  */
 
-const VerticalCollection = Component.extend({
-  tagName: '',
-
+class VerticalCollection extends Component {
   /**
    * Property name used for storing references to each item in items. Accessing this attribute for each item
    * should yield a unique result for every item in the list.
@@ -206,7 +209,9 @@ const VerticalCollection = Component.extend({
    * @type String
    * @default '@identity'
    */
-  key: '@identity',
+  get key() {
+    return this.args.key || '@identity';
+  }
 
   // –––––––––––––– Required Settings
 
@@ -218,7 +223,9 @@ const VerticalCollection = Component.extend({
    * @type Number
    * @required
    */
-  estimateHeight: null,
+  get estimateHeight() {
+    return this.args.estimateHeight ?? null;
+  }
 
   /**
    * List of objects to svelte-render.
@@ -228,7 +235,9 @@ const VerticalCollection = Component.extend({
    * @type Array
    * @required
    */
-  items: null,
+  get items() {
+    return this.args.items ?? null;
+  }
 
   // –––––––––––––– Optional Settings
   /**
@@ -239,7 +248,9 @@ const VerticalCollection = Component.extend({
    * @property staticHeight
    * @type Boolean
    */
-  staticHeight: false,
+  get staticHeight() {
+    return this.args.staticHeight ?? false;
+  }
 
   /**
    * Indicates whether or not list items in the Radar should be reused on update of virtual components (e.g. scroll).
@@ -254,7 +265,9 @@ const VerticalCollection = Component.extend({
    * @property shouldRecycle
    * @type Boolean
    */
-  shouldRecycle: true,
+  get shouldRecycle() {
+    return this.args.shouldRecycle ?? true;
+  }
 
   /*
    * A selector string that will select the element from
@@ -267,7 +280,9 @@ const VerticalCollection = Component.extend({
    *
    * Set this to "body" to scroll the entire web page.
    */
-  containerSelector: '*',
+  get containerSelector() {
+    return this.args.containerSelector || '*';
+  }
 
   // –––––––––––––– Performance Tuning
   /**
@@ -279,7 +294,9 @@ const VerticalCollection = Component.extend({
    * @type Number
    * @default 1
    */
-  bufferSize: 1,
+  get bufferSize() {
+    return this.args.bufferSize || 1;
+  }
 
   // –––––––––––––– Initial Scroll State
   /**
@@ -292,7 +309,9 @@ const VerticalCollection = Component.extend({
    * is set to 0.
    * @property idForFirstItem
    */
-  idForFirstItem: null,
+  get idForFirstItem() {
+    return this.args.idForFirstItem ?? null;
+  }
 
   /**
    * If set, if scrollPosition is empty
@@ -302,7 +321,9 @@ const VerticalCollection = Component.extend({
    * @type Boolean
    * @default false
    */
-  renderFromLast: false,
+  get renderFromLast() {
+    return this.args.renderFromLast ?? false;
+  }
 
   /**
    * If set to true, the collection will render all of the items passed into the component.
@@ -318,7 +339,9 @@ const VerticalCollection = Component.extend({
    * @type Boolean
    * @default false
    */
-  renderAll: false,
+  get renderAll() {
+    return this.args.renderAll ?? false;
+  }
 
   /**
    * The tag name used in DOM elements before and after the rendered list. By default, it is set to
@@ -326,12 +349,18 @@ const VerticalCollection = Component.extend({
    * overriden to provide custom behavior (for example, in table user wants to set it to 'tr' to
    * comply with table semantics).
    */
-  occlusionTagName: 'occluded-content',
+  get occlusionTagName() {
+    return this.args.occlusionTagName ?? 'occluded-content';
+  }
 
-  isEmpty: empty('items'),
-  shouldYieldToInverse: readOnly('isEmpty'),
+  @empty('items')
+  isEmpty;
 
-  virtualComponents: computed(
+
+  @readOnly('isEmpty')
+  shouldYieldToInverse;
+
+  @computed(
     'items.[]',
     'renderAll',
     'estimateHeight',
@@ -351,17 +380,18 @@ const VerticalCollection = Component.extend({
 
       return _radar.virtualComponents;
     },
-  ),
+  )
+  virtualComponents;
 
   schedule(queueName, job) {
     return scheduler.schedule(queueName, job, this.token);
-  },
+  }
 
   _clearScheduledActions() {
     clearTimeout(this._nextSendActions);
     this._nextSendActions = null;
     this._scheduledActions.length = 0;
-  },
+  }
 
   _scheduleSendAction(action, index) {
     this._scheduledActions.push([action, index]);
@@ -390,7 +420,7 @@ const VerticalCollection = Component.extend({
         });
       });
     }
-  },
+  }
 
   /* Public API Methods
      @index => number
@@ -408,15 +438,18 @@ const VerticalCollection = Component.extend({
     return new Promise((resolve) => {
       _radar.scheduleUpdate(false, resolve);
     });
-  },
+  }
+
+  callHelper = callHelper;
 
   // –––––––––––––– Setup/Teardown
-  didInsertElement() {
-    this._super();
+
+  @action
+  templateDidRender() {
     this.schedule('sync', () => {
       this._radar.start();
     });
-  },
+  }
 
   willDestroy() {
     this.token.cancel();
@@ -434,11 +467,11 @@ const VerticalCollection = Component.extend({
         this.__visualization = null;
       }
     }
-    this._super();
-  },
+    super.willDestroy();
+  }
 
-  init() {
-    this._super();
+  constructor(...args) {
+    super(...args);
 
     this.token = new Token();
     const RadarClass = this.staticHeight ? StaticRadar : DynamicRadar;
@@ -657,8 +690,8 @@ const VerticalCollection = Component.extend({
         );
       };
     }
-  },
-});
+  }
+}
 
 function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {
   const totalItems = get(items, 'length');
