@@ -50,11 +50,14 @@ export class ScrollHandler {
     }
 
     // TODO add explicit test
-    if (this.isUsingPassive && handlers.length === 1) {
-      element.addEventListener('scroll', cache.passiveHandler, {
-        capture: true,
-        passive: true,
-      });
+    if (this.isUsingPassive) {
+      // Only add the event listener once, if more handlers are present.
+      if (handlers.length === 1) {
+        element.addEventListener('scroll', cache.passiveHandler, {
+          capture: true,
+          passive: true,
+        });
+      }
 
       // TODO add explicit test
     } else if (!this.isPolling) {
