@@ -1,3 +1,5 @@
+{{this.callHelper this.templateDidRender}}
+
 {{#each this.virtualComponents key="id" as |virtualComponent|~}}
   {{~unbound virtualComponent.upperBound~}}
   {{~#if virtualComponent.isOccludedContent~}}
