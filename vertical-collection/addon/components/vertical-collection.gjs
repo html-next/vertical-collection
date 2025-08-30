@@ -195,7 +195,7 @@ class Visualization {
  * END DEBUG HELPERS
  */
 
-const VerticalCollection = Component.extend({
+class VerticalCollection extends Component.extend({
   tagName: '',
 
   /**
@@ -658,7 +658,23 @@ const VerticalCollection = Component.extend({
       };
     }
   },
-});
+}) {
+  <template>
+    {{#each this.virtualComponents key="id" as |virtualComponent|~}}
+      {{~unbound virtualComponent.upperBound~}}
+      {{~#if virtualComponent.isOccludedContent~}}
+        {{{unbound virtualComponent.element}}}
+      {{~else~}}
+        {{~yield virtualComponent.content virtualComponent.index~}}
+      {{~/if~}}
+      {{~unbound virtualComponent.lowerBound~}}
+    {{~/each}}
+
+    {{#if this.shouldYieldToInverse}}
+      {{yield to="inverse"}}
+    {{/if}}
+  </template>
+};
 
 function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {
   const totalItems = get(items, 'length');
