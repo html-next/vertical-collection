@@ -674,7 +674,7 @@ class VerticalCollection extends Component.extend({
       {{yield to="inverse"}}
     {{/if}}
   </template>
-};
+}
 
 function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {
   const totalItems = get(items, 'length');
