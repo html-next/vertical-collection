@@ -1,102 +1,92 @@
-name: Vertical Collection CI
+name: CI
+
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches:
+      - main
+      - master
+  pull_request: {}
+
+concurrency:
+  group: ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  lint:
+    name: "Lints"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
+      - run: pnpm lint
+
   test:
-    name: Run Tests
+    name: "Tests"
     runs-on: ubuntu-latest
     timeout-minutes: 12
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Use Volta
-        uses: volta-cli/action@v1
-
-      - name: Node Modules Cache
-        id: cache-npm
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ci-yarn-${{ hashFiles('yarn.lock') }}
-
-      - name: Install Dependencies
-        if: steps.cache-npm.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
-
-      - name: Lint
-        run: yarn lint
-
-      - name: Run Build
-        run: . bin/restore-env.sh && yarn run ember build
-
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
+      - run: . bin/restore-env.sh && pnpm ember build
+        working-directory: vertical-collection
       - name: Run Tests
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: . bin/restore-env.sh && CI=true yarn run ember test --path=dist
+          command: pnpm test:ci 
 
-  test-ember-try:
-    name: Run Tests
+  floating:
+    name: "Floating Dependencies"
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
+        with:
+          args: --no-lockfile
+      - run: pnpm ember build
+        working-directory: vertical-collection
+      - name: Run Tests
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 2
+          max_attempts: 5
+          command: cd vertical-collection && CI=true pnpm ember test --path=dist
+
+  try-scenarios:
+    name: ${{ matrix.try-scenario }}
     runs-on: ubuntu-latest
     timeout-minutes: 12
 
     strategy:
       fail-fast: false
       matrix:
-        ember-version:
-          [
-            ember-lts-3.12,
-            ember-lts-3.16,
-            ember-lts-3.20,
-            ember-lts-3.28,
-            ember-lts-4.4,
-            ember-release,
-            ember-beta,
-            ember-canary,
-          ]
+        try-scenario:
+          - ember-lts-3.28
+          - ember-lts-4.12
+          - ember-lts-5.12
+          - ember-6.1
+          - ember-release
+          - ember-beta
+          - ember-canary
+          - embroider-safe
+          - embroider-optimized
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Use Volta
-        uses: volta-cli/action@v1
-
-      - name: Stash yarn.lock for cache key
-        run: cp yarn.lock __cache-key
-
-      - name: Node Modules Cache
-        id: cache-npm
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            package.json
-            yarn.lock
-            __env
-          key: ci-yarn-v3-${{ matrix.ember-version }}-${{ hashFiles('config/ember-try.js', '__cache-key') }}
-          restore-keys: |
-            ci-yarn-${{ hashFiles('yarn.lock') }}
-
-      - name: Install Dependencies
-        if: steps.cache-npm.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
-
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
       - name: Ember-Try Setup
-        if: steps.cache-npm.outputs.cache-hit != 'true'
-        run: node_modules/.bin/ember try:one ${{ matrix.ember-version }} --skip-cleanup --- bin/stash-env.sh
-
+        run: node_modules/.bin/ember try:one ${{ matrix.try-scenario }} --skip-cleanup --- bin/stash-env.sh
+        working-directory: vertical-collection
       - name: Run Build
-        run: . bin/restore-env.sh && yarn run ember build
-
+        run: . bin/restore-env.sh && pnpm ember build
+        working-directory: vertical-collection
       - name: Run Tests
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: . bin/restore-env.sh && CI=true yarn run ember test --path=dist
+          command: pnpm test:ci 

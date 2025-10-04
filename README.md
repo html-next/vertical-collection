@@ -1,4 +1,4 @@
-# vertical-collection
+# @html-next/vertical-collection
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/html-next/vertical-collection.svg)](https://greenkeeper.io/)
 
@@ -11,6 +11,12 @@ focuses on improving initial and re-render performance in high-stress situations
 component for performant lists and `svelte renders` to match a core belief:
 **Don't render the universe, render the scene.**
 
+## Compatibility
+
+* Ember.js v3.28.0 or above
+* Ember CLI v4.4 or above
+* Node.js v16 or above
+
 #### TL;DR svelte render: the fewer things you need to render, the faster your renders will be.
 
 Your web page is a universe, your viewport is the scene. Much like you wouldn't expect a video game to render
@@ -21,7 +27,7 @@ content it needs to focus on for layout is the content the user can see.
 `vertical-collection` augments your existing app, it doesn't ask you to rewrite layouts or logic in order to use it.
 It will try its best to allow you to keep the conventions, structures, and layouts you want.
 
-## Install
+## Installation
 
 ```bash
 ember install @html-next/vertical-collection
@@ -116,7 +122,6 @@ Make sure you register the test waiter from [ember-raf-scheduler](https://github
 
 An example can be found [here](https://github.com/html-next/vertical-collection/blob/master/tests/test-helper.js#L2)
 
-License
-------------------------------------------------------------------------------
+## License
 
 This project is licensed under the [MIT License](LICENSE.md).

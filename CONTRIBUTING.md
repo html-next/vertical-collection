@@ -2,15 +2,15 @@
 
 ## Installation
 
-* `git clone <repository-url>`
-* `cd @html-next/vertical-collection`
-* `yarn install`
+* `git clone <repository-url> html-next-vertical-collection`
+* `cd html-next-vertical-collection`
+* `pnpm install`
 
 ## Linting
 
-* `yarn lint:hbs`
-* `yarn lint:js`
-* `yarn lint:js --fix`
+* `pnpm lint:hbs`
+* `pnpm lint:js`
+* `pnpm lint:js --fix`
 
 ## Running tests
 
@@ -23,4 +23,4 @@
 * `ember serve`
 * Visit the dummy application at [http://localhost:4200](http://localhost:4200).
 
-For more information on using ember-cli, visit [https://ember-cli.com/](https://ember-cli.com/).
+For more information on using ember-cli, visit [https://cli.emberjs.com/release/](https://cli.emberjs.com/release/).
