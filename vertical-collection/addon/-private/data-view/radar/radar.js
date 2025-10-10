@@ -410,7 +410,7 @@ export default class Radar {
       const maxHeightStyle =
         window.getComputedStyle(_scrollContainer).maxHeight;
 
-      if (maxHeightStyle !== 'none') {
+      if (maxHeightStyle && maxHeightStyle !== 'none') {
         scrollContainerMaxHeight = estimateElementHeight(
           _scrollContainer.parentElement,
           maxHeightStyle,
