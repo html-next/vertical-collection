@@ -4,6 +4,10 @@ Changelog
 =========
 
 
+## v3.1.1 (2022-12-07)
+
+#### :bug: Bug Fix
+* [#389](https://github.com/html-next/vertical-collection/pull/389) Fix for detached Node element exception ([@twokul](https://github.com/twokul))
 
 
 ## v4.0.2 (2022-11-17)
@@ -36,6 +40,9 @@ Changelog
 * Refactor a bunch of debug code to DEBUG https://github.com/html-next/vertical-collection/pull/388
 * Adopt angle bracket invocation
 * Adopt native getters
+
+#### :bug: Bug Fix
+* [#389](https://github.com/html-next/vertical-collection/pull/389) Fix for detached Node element exception ([@twokul](https://github.com/twokul))
 
 
 ## v4.0.0-beta.2 (2022-09-08)
