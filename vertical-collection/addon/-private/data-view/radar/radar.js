@@ -419,7 +419,7 @@ export default class Radar {
     }
 
     const calculatedEstimateHeight =
-      typeof estimateHeight === 'string'
+      typeof estimateHeight === 'string' && estimateHeight
         ? estimateElementHeight(_itemContainer, estimateHeight)
         : estimateHeight;
 
