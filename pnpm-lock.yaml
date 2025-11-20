@@ -132,9 +132,6 @@ importers:
       ember-modifier:
         specifier: ^4.2.2
         version: 4.2.2(@babel/core@7.28.5)
-      ember-page-title:
-        specifier: ^9.0.3
-        version: 9.0.3
       ember-qunit:
         specifier: ^9.0.4
         version: 9.0.4(@ember/test-helpers@5.4.1(@babel/core@7.28.5)(@glint/template@1.7.3))(@glint/template@1.7.3)(qunit@2.24.2)
@@ -3794,10 +3791,6 @@ packages:
 
   ember-modifier@4.2.2:
     resolution: {integrity: sha512-pPYBAGyczX0hedGWQFQOEiL9s45KS9efKxJxUQkMLjQyh+1Uef1mcmAGsdw2KmvNupITkE/nXxmVO1kZ9tt3ag==}
-
-  ember-page-title@9.0.3:
-    resolution: {integrity: sha512-fedRHUsvq8tIZgOii8jTrfAyeq+la/9H5eAzhNNwEyzo7nDMmqK2SxsyBUGXprd8fOacsPabLlzlucMi/4mUpA==}
-    engines: {node: 16.* || >= 18}
 
   ember-perf-timeline@2.1.0:
     resolution: {integrity: sha512-Y+rd9sI54UgO5cvcQ38oOrRdDJ1fzD8wtQ8N5KD5FCJY3LaD8GVcx7UFzx0NM0/X33pqQZjSS/2VmKRHRPdggg==}
@@ -12613,13 +12606,6 @@ snapshots:
       ember-cli-string-utils: 1.1.0
     transitivePeerDependencies:
       - '@babel/core'
-      - supports-color
-
-  ember-page-title@9.0.3:
-    dependencies:
-      '@embroider/addon-shim': 1.10.2
-      '@simple-dom/document': 1.4.0
-    transitivePeerDependencies:
       - supports-color
 
   ember-perf-timeline@2.1.0:
