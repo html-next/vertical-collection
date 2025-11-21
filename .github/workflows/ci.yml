@@ -20,8 +20,8 @@ jobs:
       - uses: wyvox/action-setup-pnpm@v3
       - run: pnpm lint
 
-  test:
-    name: "Tests"
+  test_old:
+    name: "Old: Tests"
     runs-on: ubuntu-latest
     timeout-minutes: 12
 
@@ -35,10 +35,22 @@ jobs:
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: pnpm test:ci 
+          command: pnpm test:ci
 
-  floating:
-    name: "Floating Dependencies"
+  test:
+    name: "Tests"
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
+      - run: pnpm test
+        working-directory: test-app
+
+  # TODO: Delete when tests are moved to test app
+  floating_old:
+    name: "Old: Floating Dependencies"
     runs-on: ubuntu-latest
     timeout-minutes: 12
 
@@ -56,8 +68,21 @@ jobs:
           max_attempts: 5
           command: cd vertical-collection && CI=true pnpm ember test --path=dist
 
-  try-scenarios:
-    name: ${{ matrix.try-scenario }}
+  floating:
+    name: "Floating Dependencies"
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
+        with:
+          args: --no-lockfile
+      - run: pnpm test
+        working-directory: test-app
+
+  try-scenarios_old:
+    name: "Old: ${{ matrix.try-scenario }}"
     runs-on: ubuntu-latest
     timeout-minutes: 12
 
@@ -89,4 +114,29 @@ jobs:
         with:
           timeout_minutes: 2
           max_attempts: 5
-          command: pnpm test:ci 
+          command: pnpm test:ci
+
+  try-scenarios:
+    name: ${{ matrix.try-scenario }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    strategy:
+      fail-fast: false
+      matrix:
+        try-scenario:
+          - ember-lts-3.28
+          - ember-lts-4.12
+          - ember-lts-5.12
+          - ember-lts-6.4
+          - ember-lts-6.8
+          - ember-release
+          - ember-beta
+          - ember-canary
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
+      - name: Ember-Try Setup
+        run: node_modules/.bin/ember try:one ${{ matrix.try-scenario }} --skip-cleanup --- pnpm test
+        working-directory: test-app
