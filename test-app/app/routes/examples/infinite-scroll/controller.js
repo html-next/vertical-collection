@@ -1,5 +1,5 @@
 import Controller from '@ember/controller';
-import getNumbers from 'dummy/lib/get-numbers';
+import getNumbers from 'test-app/lib/get-numbers';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 

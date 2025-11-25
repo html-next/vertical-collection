@@ -4,7 +4,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import { find, findAll, settled, render } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
-import getNumbers from 'dummy/lib/get-numbers';
+import getNumbers from 'test-app/lib/get-numbers';
 
 import {
   testScenarios,
@@ -13,7 +13,7 @@ import {
   simpleScenariosFor,
   scenariosFor,
   standardTemplate,
-} from 'dummy/tests/helpers/test-scenarios';
+} from 'test-app/tests/helpers/test-scenarios';
 
 // Assert an odd timing: After initial render but before settledness.
 //
