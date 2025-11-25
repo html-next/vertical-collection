@@ -3,13 +3,13 @@ import { setupRenderingTest } from '../helpers';
 import { find, findAll } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
-import getNumbers from 'dummy/lib/get-numbers';
+import getNumbers from 'test-app/lib/get-numbers';
 import {
   testScenarios,
   dynamicSimpleScenarioFor,
   scenariosFor,
   standardTemplate,
-} from 'dummy/tests/helpers/test-scenarios';
+} from 'test-app/tests/helpers/test-scenarios';
 
 import {
   prepend,
@@ -17,8 +17,8 @@ import {
   emptyArray,
   replaceArray,
   move,
-} from 'dummy/tests/helpers/array';
-import { paddingBefore, paddingAfter } from 'dummy/tests/helpers/measurement';
+} from 'test-app/tests/helpers/array';
+import { paddingBefore, paddingAfter } from 'test-app/tests/helpers/measurement';
 
 module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
   setupRenderingTest(hooks);
