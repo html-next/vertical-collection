@@ -60,7 +60,7 @@
     "ember-cli-babel": "^8.0.0",
     "ember-cli-htmlbars": "^7.0.0",
     "ember-cli-version-checker": "^5.1.2",
-    "ember-raf-scheduler": "^0.3.0",
+    "ember-raf-scheduler": "^0.5.0",
     "ember-template-imports": "^4.0.0"
   },
   "devDependencies": {
