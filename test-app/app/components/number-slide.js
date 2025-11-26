@@ -2,7 +2,6 @@ import { alias } from '@ember/object/computed';
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { htmlSafe } from '@ember/template';
-import layout from './template';
 
 function numberToOpacity(number) {
   let r = number % 255;
@@ -37,7 +36,6 @@ export default Component.extend({
 
     return htmlSafe(styleStr);
   }),
-  layout,
   itemIndex: 0,
   item: null,
   number: alias('item.number'),
