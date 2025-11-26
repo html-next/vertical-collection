@@ -7,6 +7,7 @@
     "url": "git@github.com:html-next/vertical-collection.git"
   },
   "scripts": {
+    "update:snippets": "node ./scripts/write-snippets.mjs",
     "build": "pnpm --filter '*' build",
     "lint": "pnpm --filter '*' lint",
     "lint:fix": "pnpm --filter '*' lint:fix",
@@ -17,7 +18,7 @@
   },
   "packageManager": "pnpm@10.10.0",
   "volta": {
-    "node": "18.20.5",
+    "node": "24.11.0",
     "pnpm": "10.10.0"
   }
 }

@@ -1,0 +1,21 @@
+<header class="container-fluid">
+  <div class="row">
+    <h1 class="col-sm-6">
+      <LinkTo @route="index" style="color:#222">
+        <img alt="HTML Next Logo" src="/HTML-Next.png" style="height: 2em" />
+        Vertical Collection
+      </LinkTo>
+    </h1>
+    <nav class="col-sm-6 text-small text-right">
+      <LinkTo @route="examples">Demos</LinkTo>
+      <LinkTo @route="settings">Settings</LinkTo>
+    </nav>
+  </div>
+</header>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      {{outlet}}
+    </div>
+  </div>
+</div>
