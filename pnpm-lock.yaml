@@ -14,9 +14,9 @@ importers:
 
   test-app:
     dependencies:
-      ember-try:
-        specifier: ^4.0.0
-        version: 4.0.0
+      '@html-next/vertical-collection':
+        specifier: workspace:*
+        version: link:../vertical-collection
     devDependencies:
       '@babel/core':
         specifier: ^7.28.4
@@ -144,6 +144,9 @@ importers:
       ember-template-lint:
         specifier: ^7.9.3
         version: 7.9.3
+      ember-try:
+        specifier: ^4.0.0
+        version: 4.0.0
       eslint:
         specifier: ^9.37.0
         version: 9.39.1(jiti@2.4.2)
