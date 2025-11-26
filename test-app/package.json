@@ -28,6 +28,9 @@
     "./tests/*": "./tests/*",
     "./*": "./app/*"
   },
+  "dependencies": {
+    "@html-next/vertical-collection": "workspace:*"
+  },
   "devDependencies": {
     "@babel/core": "^7.28.4",
     "@babel/eslint-parser": "^7.28.4",
