@@ -74,6 +74,7 @@
     "ember-resolver": "^13.1.1",
     "ember-source": "~6.10.0-alpha.1",
     "ember-template-lint": "^7.9.3",
+    "ember-try": "^4.0.0",
     "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-ember": "^12.7.4",
@@ -96,8 +97,5 @@
   },
   "ember": {
     "edition": "octane"
-  },
-  "dependencies": {
-    "ember-try": "^4.0.0"
   }
 }
