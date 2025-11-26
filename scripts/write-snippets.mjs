@@ -39,10 +39,16 @@ const buildSnippetsListData = (dir, snippetsData = {}) => {
 };
 
 let snippetsData = {};
-buildSnippetsListData('tests/dummy/app/', snippetsData);
+buildSnippetsListData(
+  path.join(import.meta.dirname, '../test-app/app/'),
+  snippetsData,
+);
 
 fs.writeSync(
-  fs.openSync('tests/dummy/app/snippets.js', 'w'),
+  fs.openSync(
+    path.join(import.meta.dirname, '../test-app/app/snippets.js'),
+    'w',
+  ),
   `export default ${JSON.stringify(snippetsData)}`,
   0,
   'utf8',
