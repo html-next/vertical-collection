@@ -7,7 +7,7 @@ import { tracked } from '@glimmer/tracking';
 import { or } from '@ember/object/computed';
 
 export default class extends Controller {
-  @service() store;
+  @service store;
   @tracked prefixed = true;
   @tracked vcShown = true;
 
