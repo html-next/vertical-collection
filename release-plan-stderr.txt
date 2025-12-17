@@ -1,0 +1,7 @@
+# Unlabeled Changes
+
+* `@html-next/vertical-collection`
+  * [#482](https://github.com/html-next/vertical-collection/pull/482) Add defensive checks for cases where maxHeight is empty string ([@johanrd](https://github.com/johanrd))
+
+
+*Cannot plan release until the above changes are labeled*.
