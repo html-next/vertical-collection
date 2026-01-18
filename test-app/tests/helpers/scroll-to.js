@@ -39,7 +39,7 @@ export default function scrollTo(target, x, y) {
     let element = document.querySelector(target);
     if (!element) {
       throw new Error(
-        `Element not found when calling \`scrollTo('${target}')\`.`,
+        `Element not found when calling \`scrollTo('${target}')\`.`
       );
     }
 

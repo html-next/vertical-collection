@@ -161,7 +161,7 @@ img.async-image.grid-image {
 }
 
 .grid-page::after {
-  content: " ";
+  content: ' ';
   display: block;
   float: none;
   clear: both;
@@ -178,7 +178,7 @@ img.async-image.grid-image {
 }
 
 .image-slide .loading-spinner {
-  background: url("/spinnerLarge.svg") center center no-repeat;
+  background: url('/spinnerLarge.svg') center center no-repeat;
   background-size: 64px 64px;
   width: 100%;
   height: 100%;

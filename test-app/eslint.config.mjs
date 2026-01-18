@@ -150,5 +150,5 @@ export default ts.config(
       'qunit/require-expect': 'off',
       'warp-drive/no-legacy-request-patterns': 'off',
     },
-  }
+  },
 );

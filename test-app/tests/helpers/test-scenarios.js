@@ -14,7 +14,7 @@ export function testScenarios(
   template,
   testFn,
   preRenderTestFn,
-  setValuesBeforeRender,
+  setValuesBeforeRender
 ) {
   for (const scenarioName in scenarios) {
     const scenario = scenarios[scenarioName];
@@ -47,47 +47,47 @@ export function testScenarios(
 
 export const dynamicSimpleScenarioFor = generateScenario(
   'Dynamic Standard Array',
-  {},
+  {}
 );
 export const dynamicEmberArrayScenarioFor = generateScenario(
   'Dynamic Ember Array',
   {},
-  A,
+  A
 );
 export const dynamicArrayProxyScenarioFor = generateScenario(
   'Dynamic ArrayProxy',
   {},
-  createArrayProxy,
+  createArrayProxy
 );
 export const dynamicPromiseArrayScenarioFor = generateScenario(
   'Dynamic PromiseArray',
   {},
-  createPromiseArrayFunction,
+  createPromiseArrayFunction
 );
 
 export const staticSimpleScenarioFor = generateScenario(
   'Static Standard Array',
-  { staticHeight: true },
+  { staticHeight: true }
 );
 export const staticEmberArrayScenarioFor = generateScenario(
   'Static Standard Array',
   { staticHeight: true },
-  A,
+  A
 );
 export const staticArrayProxyScenarioFor = generateScenario(
   'Static ArrayProxy',
   { staticHeight: true },
-  createArrayProxy,
+  createArrayProxy
 );
 export const staticPromiseArrayScenarioFor = generateScenario(
   'Static PromiseArray',
   { staticHeight: true },
-  createPromiseArrayFunction,
+  createPromiseArrayFunction
 );
 
 export const simpleScenariosFor = mergeScenarioGenerators(
   dynamicSimpleScenarioFor,
-  staticSimpleScenarioFor,
+  staticSimpleScenarioFor
 );
 
 export const standardScenariosFor = mergeScenarioGenerators(
@@ -97,7 +97,7 @@ export const standardScenariosFor = mergeScenarioGenerators(
 
   staticSimpleScenarioFor,
   staticEmberArrayScenarioFor,
-  staticArrayProxyScenarioFor,
+  staticArrayProxyScenarioFor
 );
 
 export const scenariosFor = mergeScenarioGenerators(
@@ -109,7 +109,7 @@ export const scenariosFor = mergeScenarioGenerators(
   staticSimpleScenarioFor,
   staticEmberArrayScenarioFor,
   staticArrayProxyScenarioFor,
-  staticPromiseArrayScenarioFor,
+  staticPromiseArrayScenarioFor
 );
 
 export const standardTemplate = hbs`
@@ -150,7 +150,7 @@ function createArrayProxy(items) {
 function createPromiseArrayFunction(items) {
   return function () {
     const promise = new Promise((resolve) =>
-      setTimeout(() => resolve(A(items.slice())), 10),
+      setTimeout(() => resolve(A(items.slice())), 10)
     );
 
     return PromiseArray.create({ promise });

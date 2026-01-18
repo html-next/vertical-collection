@@ -47,9 +47,9 @@ module('vertical-collection', 'Integration | Recycle Tests', function (hooks) {
       assert.equal(
         find('vertical-item:last-of-type').textContent.trim(),
         '10 10',
-        'component was not recycled',
+        'component was not recycled'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -85,8 +85,8 @@ module('vertical-collection', 'Integration | Recycle Tests', function (hooks) {
       assert.equal(
         find('vertical-item:last-of-type').textContent.trim(),
         '0 0',
-        'component was recycled',
+        'component was recycled'
       );
-    },
+    }
   );
 });

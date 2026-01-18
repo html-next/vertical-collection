@@ -38,7 +38,7 @@ module(
 
       async function (assert) {
         assert.strictEqual(findAll('vertical-item').length, 5);
-      },
+      }
     );
 
     testScenarios(
@@ -62,7 +62,7 @@ module(
 
       async function (assert) {
         assert.strictEqual(findAll('vertical-item').length, 5);
-      },
+      }
     );
 
     testScenarios(
@@ -86,7 +86,7 @@ module(
 
       async function (assert) {
         assert.equal(findAll('vertical-item').length, 2);
-      },
+      }
     );
 
     testScenarios(
@@ -110,7 +110,7 @@ module(
 
       async function (assert) {
         assert.strictEqual(findAll('vertical-item').length, 5);
-      },
+      }
     );
 
     testScenarios(
@@ -137,7 +137,7 @@ module(
 
       function (assert) {
         assert.strictEqual(findAll('vertical-item').length, 10);
-      },
+      }
     );
 
     testScenarios(
@@ -166,7 +166,7 @@ module(
 
       function (assert) {
         assert.strictEqual(findAll('vertical-item').length, 10);
-      },
+      }
     );
 
     testScenarios(
@@ -195,7 +195,7 @@ module(
 
       function (assert) {
         assert.strictEqual(findAll('vertical-item').length, 10);
-      },
+      }
     );
 
     testScenarios(
@@ -222,7 +222,7 @@ module(
 
       function (assert) {
         assert.strictEqual(findAll('vertical-item').length, 10);
-      },
+      }
     );
-  },
+  }
 );

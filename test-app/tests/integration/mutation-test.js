@@ -18,7 +18,10 @@ import {
   replaceArray,
   move,
 } from 'test-app/tests/helpers/array';
-import { paddingBefore, paddingAfter } from 'test-app/tests/helpers/measurement';
+import {
+  paddingBefore,
+  paddingAfter,
+} from 'test-app/tests/helpers/measurement';
 
 module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
   setupRenderingTest(hooks);
@@ -36,27 +39,27 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly before prepend',
+        'first item rendered correctly before prepend'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 9',
-        'last item rendered correctly before prepnd',
+        'last item rendered correctly before prepnd'
       );
       assert.equal(
         scrollContainer.scrollTop,
         0,
-        'scrollTop is correct before prepend',
+        'scrollTop is correct before prepend'
       );
       assert.equal(
         paddingBefore(scrollContainer),
         0,
-        'padding before is correct before prepend',
+        'padding before is correct before prepend'
       );
       assert.equal(
         paddingAfter(scrollContainer),
         1800,
-        'padding after is correct before prepend',
+        'padding after is correct before prepend'
       );
 
       await prepend(this, getNumbers(-20, 20));
@@ -64,29 +67,29 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 20',
-        'first item rendered correctly after prepend',
+        'first item rendered correctly after prepend'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 29',
-        'last item rendered correctly after prepend',
+        'last item rendered correctly after prepend'
       );
       assert.equal(
         scrollContainer.scrollTop,
         400,
-        'scrollTop is correct after prepend',
+        'scrollTop is correct after prepend'
       );
       assert.equal(
         paddingBefore(scrollContainer),
         400,
-        'padding before is correct after prepend',
+        'padding before is correct after prepend'
       );
       assert.equal(
         paddingAfter(scrollContainer),
         1800,
-        'padding after is correct after prepend',
+        'padding after is correct after prepend'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -102,27 +105,27 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly before append',
+        'first item rendered correctly before append'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 9',
-        'last item rendered correctly before append',
+        'last item rendered correctly before append'
       );
       assert.equal(
         scrollContainer.scrollTop,
         0,
-        'scrollTop is correct before append',
+        'scrollTop is correct before append'
       );
       assert.equal(
         paddingBefore(scrollContainer),
         0,
-        'padding after is correct after append',
+        'padding after is correct after append'
       );
       assert.equal(
         paddingAfter(scrollContainer),
         1800,
-        'padding after is correct before prepend',
+        'padding after is correct before prepend'
       );
 
       await append(this, getNumbers(100, 20));
@@ -130,29 +133,29 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly after append',
+        'first item rendered correctly after append'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 9',
-        'last item rendered correctly after append',
+        'last item rendered correctly after append'
       );
       assert.equal(
         scrollContainer.scrollTop,
         0,
-        'scrollTop is correct after append',
+        'scrollTop is correct after append'
       );
       assert.equal(
         paddingBefore(scrollContainer),
         0,
-        'b height is correct after append',
+        'b height is correct after append'
       );
       assert.equal(
         paddingAfter(scrollContainer),
         2200,
-        'padding after is correct before prepend',
+        'padding after is correct before prepend'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -168,17 +171,17 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly before prepend',
+        'first item rendered correctly before prepend'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 9',
-        'last item rendered correctly before prepend',
+        'last item rendered correctly before prepend'
       );
       assert.equal(
         scrollContainer.scrollTop,
         0,
-        'scrollTop is correct before prepend',
+        'scrollTop is correct before prepend'
       );
 
       await prepend(this, getNumbers(-5, 5));
@@ -186,19 +189,19 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '-5 0',
-        'first item rendered correctly after prepend',
+        'first item rendered correctly after prepend'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 14',
-        'last item rendered correctly after prepend',
+        'last item rendered correctly after prepend'
       );
       assert.equal(
         scrollContainer.scrollTop,
         100,
-        'scrollTop is correct after prepend',
+        'scrollTop is correct after prepend'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -214,17 +217,17 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly before append',
+        'first item rendered correctly before append'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '4 4',
-        'last item rendered correctly before append',
+        'last item rendered correctly before append'
       );
       assert.equal(
         scrollContainer.scrollTop,
         0,
-        'scrollTop is correct before append',
+        'scrollTop is correct before append'
       );
 
       await append(this, getNumbers(5, 5));
@@ -232,19 +235,19 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly after append',
+        'first item rendered correctly after append'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 9',
-        'last item rendered correctly after append',
+        'last item rendered correctly after append'
       );
       assert.equal(
         scrollContainer.scrollTop,
         0,
-        'scrollTop is correct after append',
+        'scrollTop is correct after append'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -258,17 +261,17 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         10,
-        'correct number of VCs rendered before reset',
+        'correct number of VCs rendered before reset'
       );
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly before reset',
+        'first item rendered correctly before reset'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 9',
-        'last item rendered correctly before reset',
+        'last item rendered correctly before reset'
       );
 
       await replaceArray(this, getNumbers(0, 5));
@@ -276,19 +279,19 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         5,
-        'correct number of VCs rendered after reset',
+        'correct number of VCs rendered after reset'
       );
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly after reset',
+        'first item rendered correctly after reset'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '4 4',
-        'last item rendered correctly after reset',
+        'last item rendered correctly after reset'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -304,17 +307,17 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         10,
-        'correct number of VCs rendered before reset',
+        'correct number of VCs rendered before reset'
       );
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '10 10',
-        'first item rendered correctly before reset',
+        'first item rendered correctly before reset'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '19 19',
-        'last item rendered correctly before reset',
+        'last item rendered correctly before reset'
       );
 
       await replaceArray(this, getNumbers(0, 5));
@@ -322,19 +325,19 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         5,
-        'correct number of VCs rendered after reset',
+        'correct number of VCs rendered after reset'
       );
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly before reset',
+        'first item rendered correctly before reset'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '4 4',
-        'last item rendered correctly before reset',
+        'last item rendered correctly before reset'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -348,17 +351,17 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         10,
-        'correct number of VCs rendered before reset',
+        'correct number of VCs rendered before reset'
       );
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly before reset',
+        'first item rendered correctly before reset'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 9',
-        'last item rendered correctly before reset',
+        'last item rendered correctly before reset'
       );
 
       await emptyArray(this);
@@ -366,9 +369,9 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         0,
-        'correct number of VCs rendered after reset',
+        'correct number of VCs rendered after reset'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -384,17 +387,17 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         10,
-        'correct number of VCs rendered before reset',
+        'correct number of VCs rendered before reset'
       );
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '10 10',
-        'first item rendered correctly before reset',
+        'first item rendered correctly before reset'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '19 19',
-        'last item rendered correctly before reset',
+        'last item rendered correctly before reset'
       );
 
       await emptyArray(this);
@@ -402,9 +405,9 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         0,
-        'correct number of VCs rendered after reset',
+        'correct number of VCs rendered after reset'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -418,12 +421,12 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly before append',
+        'first item rendered correctly before append'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 9',
-        'last item rendered correctly before append',
+        'last item rendered correctly before append'
       );
 
       await replaceArray(this, getNumbers(10, 10));
@@ -431,14 +434,14 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '10 0',
-        'first item rendered correctly after reset',
+        'first item rendered correctly after reset'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '19 9',
-        'last item rendered correctly after reset',
+        'last item rendered correctly after reset'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -457,12 +460,12 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '1 1',
-        'first item rendered correctly after initial scroll set',
+        'first item rendered correctly after initial scroll set'
       );
       assert.equal(
         paddingBefore(itemContainer),
         40,
-        'itemContainer padding correct before same items set',
+        'itemContainer padding correct before same items set'
       );
 
       await replaceArray(this, this.items.slice());
@@ -470,14 +473,14 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '1 1',
-        'first item rendered correctly after same items set',
+        'first item rendered correctly after same items set'
       );
       assert.equal(
         paddingBefore(itemContainer),
         40,
-        'itemContainer padding correct after same items set',
+        'itemContainer padding correct after same items set'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -491,22 +494,22 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly before move',
+        'first item rendered correctly before move'
       );
       assert.equal(
         find('.vertical-item:nth-of-type(2)').textContent.trim(),
         '1 1',
-        'second item starts in second',
+        'second item starts in second'
       );
       assert.equal(
         find('.vertical-item:nth-of-type(4)').textContent.trim(),
         '3 3',
-        'foruth item starts in fourth',
+        'foruth item starts in fourth'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '4 4',
-        'last item rendered correctly before move',
+        'last item rendered correctly before move'
       );
 
       // move second object to the second last position
@@ -515,23 +518,23 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'first item rendered correctly after move',
+        'first item rendered correctly after move'
       );
       assert.equal(
         find('.vertical-item:nth-of-type(2)').textContent.trim(),
         '2 1',
-        'third item drops to second',
+        'third item drops to second'
       );
       assert.equal(
         find('.vertical-item:nth-of-type(4)').textContent.trim(),
         '1 3',
-        'second item is now in fourth position',
+        'second item is now in fourth position'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '4 4',
-        'last item rendered correctly before move',
+        'last item rendered correctly before move'
       );
-    },
+    }
   );
 });

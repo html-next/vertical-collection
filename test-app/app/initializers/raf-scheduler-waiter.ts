@@ -1,3 +1,4 @@
+// @ts-expect-error ???
 import registerWaiter from 'ember-raf-scheduler/test-support/register-waiter';
 import config from 'test-app/config/environment';
 
@@ -12,6 +13,7 @@ export function initialize() {
   }
 
   if ((config as { environment?: string }).environment === 'test') {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     registerWaiter();
     didRegister = true;
   }

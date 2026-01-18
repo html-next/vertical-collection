@@ -23,9 +23,9 @@ module('vertical-collection', 'Integration | A11y Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         20,
-        'correct number of items rendered',
+        'correct number of items rendered'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -37,7 +37,7 @@ module('vertical-collection', 'Integration | A11y Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         10,
-        'correct number of items rendered before',
+        'correct number of items rendered before'
       );
 
       this.set('renderAll', true);
@@ -46,9 +46,9 @@ module('vertical-collection', 'Integration | A11y Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         20,
-        'correct number of items rendered before',
+        'correct number of items rendered before'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -63,12 +63,12 @@ module('vertical-collection', 'Integration | A11y Tests', function (hooks) {
       assert.equal(
         occludedBefore.textContent.trim(),
         '',
-        'occluded before text correct when no items before',
+        'occluded before text correct when no items before'
       );
       assert.equal(
         occludedAfter.textContent.trim(),
         'And 10 items after',
-        'occluded after text correct when some items after',
+        'occluded after text correct when some items after'
       );
 
       await scrollTo('.scrollable', 0, 20);
@@ -76,12 +76,12 @@ module('vertical-collection', 'Integration | A11y Tests', function (hooks) {
       assert.equal(
         occludedBefore.textContent.trim(),
         'And 1 item before',
-        'occluded before text correct when one item before',
+        'occluded before text correct when one item before'
       );
       assert.equal(
         occludedAfter.textContent.trim(),
         'And 9 items after',
-        'occluded after text correct when some items after',
+        'occluded after text correct when some items after'
       );
 
       await scrollTo('.scrollable', 0, 180);
@@ -89,12 +89,12 @@ module('vertical-collection', 'Integration | A11y Tests', function (hooks) {
       assert.equal(
         occludedBefore.textContent.trim(),
         'And 9 items before',
-        'occluded before text correct when some items before',
+        'occluded before text correct when some items before'
       );
       assert.equal(
         occludedAfter.textContent.trim(),
         'And 1 item after',
-        'occluded after text correct when one item after',
+        'occluded after text correct when one item after'
       );
 
       await scrollTo('.scrollable', 0, 200);
@@ -102,14 +102,14 @@ module('vertical-collection', 'Integration | A11y Tests', function (hooks) {
       assert.equal(
         occludedBefore.textContent.trim(),
         'And 10 items before',
-        'occluded before text correct when some items before',
+        'occluded before text correct when some items before'
       );
       assert.equal(
         occludedAfter.textContent.trim(),
         '',
-        'occluded after text correct when no items after',
+        'occluded after text correct when no items after'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -124,12 +124,12 @@ module('vertical-collection', 'Integration | A11y Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'correct first item rendered',
+        'correct first item rendered'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 9',
-        'correct last item rendered',
+        'correct last item rendered'
       );
 
       await click(occludedAfter);
@@ -137,12 +137,12 @@ module('vertical-collection', 'Integration | A11y Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '10 10',
-        'correct first item rendered',
+        'correct first item rendered'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '19 19',
-        'correct last item rendered',
+        'correct last item rendered'
       );
 
       await click(occludedBefore);
@@ -150,13 +150,13 @@ module('vertical-collection', 'Integration | A11y Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'correct first item rendered',
+        'correct first item rendered'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 9',
-        'correct last item rendered',
+        'correct last item rendered'
       );
-    },
+    }
   );
 });

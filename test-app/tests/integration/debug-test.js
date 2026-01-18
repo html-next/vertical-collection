@@ -21,12 +21,12 @@ module('vertical-collection', 'Integration | Debug Tests', function (hooks) {
     async function (assert) {
       assert.ok(
         document.querySelector('.vertical-collection-visual-debugger'),
-        'visualization renders',
+        'visualization renders'
       );
       assert.equal(
         document.querySelectorAll('.vc_visualization-virtual-component').length,
         20,
-        'correct number of visualization items rendered',
+        'correct number of visualization items rendered'
       );
 
       await scrollTo('.scrollable', 0, 400);
@@ -34,7 +34,7 @@ module('vertical-collection', 'Integration | Debug Tests', function (hooks) {
       assert.equal(
         document.querySelectorAll('.vc_visualization-virtual-component').length,
         30,
-        'correct number of visualization items rendered',
+        'correct number of visualization items rendered'
       );
 
       await scrollTo('.scrollable', 0, 10000);
@@ -42,8 +42,8 @@ module('vertical-collection', 'Integration | Debug Tests', function (hooks) {
       assert.equal(
         document.querySelectorAll('.vc_visualization-virtual-component').length,
         20,
-        'correct number of visualization items rendered',
+        'correct number of visualization items rendered'
       );
-    },
+    }
   );
 });

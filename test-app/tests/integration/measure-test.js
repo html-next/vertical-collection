@@ -7,7 +7,10 @@ import scrollTo from '../helpers/scroll-to';
 
 import getNumbers from 'test-app/lib/get-numbers';
 
-import { paddingBefore, paddingAfter } from 'test-app/tests/helpers/measurement';
+import {
+  paddingBefore,
+  paddingAfter,
+} from 'test-app/tests/helpers/measurement';
 import { prepend, replaceArray } from 'test-app/tests/helpers/array';
 
 import {
@@ -31,7 +34,7 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         paddingBefore(itemContainer),
         0,
-        'itemContainer padding is correct on initial render',
+        'itemContainer padding is correct on initial render'
       );
 
       find('.vertical-item:first-of-type').style.height = '50px';
@@ -41,9 +44,9 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         paddingBefore(itemContainer),
         50,
-        'itemContainer padding is the height of the modified first element',
+        'itemContainer padding is the height of the modified first element'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -59,7 +62,7 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         paddingAfter(itemContainer),
         200,
-        'itemContainer padding is correct on initial render',
+        'itemContainer padding is correct on initial render'
       );
 
       await scrollTo('.scrollable', 0, 20);
@@ -67,7 +70,7 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         paddingAfter(itemContainer),
         180,
-        'itemContainer padding is correct after scrolling down',
+        'itemContainer padding is correct after scrolling down'
       );
 
       find('.vertical-item:last-of-type').style.height = '50px';
@@ -76,9 +79,9 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         paddingAfter(itemContainer),
         230,
-        'itemContainer padding has the height of the modified last element',
+        'itemContainer padding has the height of the modified last element'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -99,14 +102,14 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         Math.round(paddingBefore(itemContainer)),
         205,
-        'Occluded content has the correct height before',
+        'Occluded content has the correct height before'
       );
       assert.equal(
         paddingAfter(itemContainer),
         0,
-        'Occluded content has the correct height after',
+        'Occluded content has the correct height after'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -125,9 +128,9 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         find('.scrollable').scrollTop,
         210,
-        'scrollTop set to correct value',
+        'scrollTop set to correct value'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -143,21 +146,21 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         find('.scrollable').scrollTop,
         400,
-        'scrollTop set to correct value',
+        'scrollTop set to correct value'
       );
 
       const itemContainer = find('.scrollable');
       assert.equal(
         paddingBefore(itemContainer),
         400,
-        'Occluded content has the correct height before',
+        'Occluded content has the correct height before'
       );
       assert.equal(
         paddingAfter(itemContainer),
         400,
-        'Occluded content has the correct height after',
+        'Occluded content has the correct height after'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -173,17 +176,17 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         find('.scrollable').scrollTop,
         400,
-        'scrollTop set to correct value',
+        'scrollTop set to correct value'
       );
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '10 10',
-        'the first rendered item is correct',
+        'the first rendered item is correct'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '19 19',
-        'the last rendered item is correct',
+        'the last rendered item is correct'
       );
 
       // Trigger measurements
@@ -195,19 +198,19 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         find('.scrollable').scrollTop,
         400,
-        'scrollTop set to correct value',
+        'scrollTop set to correct value'
       );
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '30 10',
-        'the first rendered item is correct',
+        'the first rendered item is correct'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '34 14',
-        'the last rendered item is correct',
+        'the last rendered item is correct'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -236,9 +239,9 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         paddingBefore(find('.scrollable')),
         150,
-        'Rendered correct number of items',
+        'Rendered correct number of items'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -256,14 +259,14 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         1,
-        'scrollTop set to correct value',
+        'scrollTop set to correct value'
       );
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'the last rendered item is correct',
+        'the last rendered item is correct'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -278,18 +281,18 @@ module('vertical-collection', 'Integration | Measure Tests', function (hooks) {
       assert.equal(
         findAll('.vertical-item').length,
         10,
-        'scrollTop set to correct value',
+        'scrollTop set to correct value'
       );
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'the first rendered item is correct',
+        'the first rendered item is correct'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 9',
-        'the last rendered item is correct',
+        'the last rendered item is correct'
       );
-    },
+    }
   );
 });

@@ -28,9 +28,9 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '49 49',
-        'the last item in the list should be rendered',
+        'the last item in the list should be rendered'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -45,9 +45,9 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       assert.equal(
         find('.scrollable').scrollTop,
         500,
-        'the scroll container offset is correct',
+        'the scroll container offset is correct'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -63,9 +63,9 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       assert.equal(
         find('.scrollable').scrollTop,
         320,
-        'the scroll container offset is correct',
+        'the scroll container offset is correct'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -89,7 +89,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
           assert.equal(
             index,
             10,
-            'after scroll the first visible item is correct',
+            'after scroll the first visible item is correct'
           );
         }
         count++;
@@ -97,7 +97,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       });
 
       await settled();
-    },
+    }
   );
 
   testScenarios(
@@ -121,7 +121,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
           assert.equal(
             index,
             19,
-            'after scroll the last visible change is correct',
+            'after scroll the last visible change is correct'
           );
         }
         count++;
@@ -129,7 +129,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       });
 
       await settled();
-    },
+    }
   );
 
   testScenarios(
@@ -148,7 +148,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       });
 
       await settled();
-    },
+    }
   );
 
   testScenarios(
@@ -168,7 +168,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
         assert.equal(index, 49, 'the lastReached item is correct');
         called();
       });
-    },
+    }
   );
 
   testScenarios(
@@ -186,7 +186,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
         prepend(this, getNumbers(number - 3, 5));
         called();
       });
-    },
+    }
   );
 
   testScenarios(
@@ -206,7 +206,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       });
 
       await settled();
-    },
+    }
   );
 
   testScenarios(
@@ -227,7 +227,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       this.set('firstReached', () => {
         called();
       });
-    },
+    }
   );
 
   testScenarios(
@@ -249,7 +249,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       this.set('lastReached', () => {
         called();
       });
-    },
+    }
   );
 
   testScenarios(
@@ -273,13 +273,13 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
           assert.equal(
             index,
             10,
-            'after scroll the first visible item is correct',
+            'after scroll the first visible item is correct'
           );
         }
         count++;
         called();
       });
-    },
+    }
   );
 
   testScenarios(
@@ -303,13 +303,13 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
           assert.equal(
             index,
             19,
-            'after scroll the last visible change is correct',
+            'after scroll the last visible change is correct'
           );
         }
         count++;
         called();
       });
-    },
+    }
   );
 
   testScenarios(
@@ -328,7 +328,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       });
 
       await settled();
-    },
+    }
   );
 
   testScenarios(
@@ -350,7 +350,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       });
 
       await settled();
-    },
+    }
   );
 
   testScenarios(
@@ -368,7 +368,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
         prepend(this, getNumbers(number - 3, 5));
         called();
       });
-    },
+    }
   );
 
   testScenarios(
@@ -388,7 +388,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       });
 
       await settled();
-    },
+    }
   );
 
   testScenarios(
@@ -409,7 +409,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       this.set('firstReached', () => {
         called();
       });
-    },
+    }
   );
 
   testScenarios(
@@ -431,7 +431,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       this.set('lastReached', () => {
         called();
       });
-    },
+    }
   );
 
   testScenarios(
@@ -473,14 +473,14 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       assert.equal(
         row.textContent.replace(/\s/g, ''),
         '11',
-        'correct first row is rendered',
+        'correct first row is rendered'
       );
       assert.equal(
         paddingBefore(find('tbody')),
         37,
-        'first row offset is correct',
+        'first row offset is correct'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -511,14 +511,14 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '10 10',
-        'correct first item rendered',
+        'correct first item rendered'
       );
       assert.equal(
         findAll('.vertical-item').length,
         10,
-        'correct number of items rendered',
+        'correct number of items rendered'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -546,7 +546,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '20 20',
-        'the first item in the list should be the scroll to item',
+        'the first item in the list should be the scroll to item'
       );
     },
     false,
@@ -555,7 +555,7 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
         this.set('collection', collection);
       };
       this.set('registerAPI', registerAPI);
-    },
+    }
   );
 
   testScenarios(
@@ -571,9 +571,9 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '49 49',
-        'the last item in the list should be rendered',
+        'the last item in the list should be rendered'
       );
-    },
+    }
   );
 
   testScenarios(
@@ -593,13 +593,13 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       assert.equal(
         find('.vertical-item:first-of-type').textContent.trim(),
         '0 0',
-        'Rendered correct number of items',
+        'Rendered correct number of items'
       );
       assert.equal(
         find('.vertical-item:last-of-type').textContent.trim(),
         '9 9',
-        'Rendered correct number of items',
+        'Rendered correct number of items'
       );
-    },
+    }
   );
 });

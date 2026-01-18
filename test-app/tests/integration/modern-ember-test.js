@@ -27,8 +27,8 @@ module(
 
       assert.notStrictEqual(
         find('.scrollable').textContent.indexOf('Foobar'),
-        -1,
+        -1
       );
     });
-  },
+  }
 );
