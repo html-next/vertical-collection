@@ -12,7 +12,7 @@ export default class extends Controller {
     let first = this.model.data.first;
     let numbers = getNumbers(first - 20, 20);
     let model = this.model.data.numbers;
-    model.unshiftObjects(numbers);
+    model.unshift(...numbers);
     this.model.data = {
       ...this.model.data,
       first: first - 20,
@@ -24,7 +24,7 @@ export default class extends Controller {
     let last = this.model.data.last;
     let numbers = getNumbers(last, 20);
     let model = this.model.data.numbers;
-    model.pushObjects(numbers);
+    model.push(...numbers);
     this.model.data = {
       ...this.model.data,
       last: last + 20,

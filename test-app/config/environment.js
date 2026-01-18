@@ -12,7 +12,7 @@ module.exports = function (environment) {
     locationType: 'hash',
     EmberENV: {
       EXTEND_PROTOTYPES: {
-        Array: true,
+        Array: false,
       },
       FEATURES: {
         // Here you can enable experimental features on an ember canary build

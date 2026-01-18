@@ -7,8 +7,10 @@ export function prepend(context, itemsToPrepend) {
 
   run(() => {
     if (items.unshiftObjects) {
+      // Ember Array / ArrayProxy
       items.unshiftObjects(itemsToPrepend);
     } else {
+      // Standard arrays
       context.set('items', itemsToPrepend.concat(items));
     }
   });
@@ -21,8 +23,10 @@ export function append(context, itemsToAppend) {
 
   run(() => {
     if (items.pushObjects) {
+      // Ember Array / ArrayProxy
       items.pushObjects(itemsToAppend);
     } else {
+      // Standard arrays
       context.set('items', items.concat(itemsToAppend));
     }
   });
@@ -64,22 +68,21 @@ export function move(context, sourceItemIdx, destItemIdx) {
 
   run(() => {
     if (items.objectAt && items.removeObject && items.insertAt) {
-      // Ember Array
+      // Ember Array / ArrayProxy
       destItem = items.objectAt(destItemIdx);
       sourceItem = items.objectAt(sourceItemIdx);
       items.removeObject(sourceItem);
       destItemIdx = items.indexOf(destItem) + 1;
       items.insertAt(destItemIdx, sourceItem);
     } else {
-      // native array
-      destItem = items[destItemIdx];
-      sourceItem = items[sourceItemIdx];
-      items.splice(sourceItemIdx, 1);
-      destItemIdx = items.indexOf(destItem) + 1;
-      items.splice(destItemIdx, 0, sourceItem);
-      // if we are not using Ember Arrays we need to set `items` to a new array
-      // instance to trigger a recompute on `virtualComponents`
-      context.set('items', [].concat(items));
+      // Standard arrays
+      const next = items.slice();
+      destItem = next[destItemIdx];
+      sourceItem = next[sourceItemIdx];
+      next.splice(sourceItemIdx, 1);
+      destItemIdx = next.indexOf(destItem) + 1;
+      next.splice(destItemIdx, 0, sourceItem);
+      context.set('items', next);
     }
   });
 
