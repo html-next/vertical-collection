@@ -1,5 +1,7 @@
 import Route from '@ember/routing/route';
-import { service } from '@ember/service';
+import * as s from '@ember/service';
+
+const service = s.service ?? s.inject;
 
 export default class extends Route {
   @service() store;

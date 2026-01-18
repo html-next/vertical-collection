@@ -1,7 +1,9 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
-import { service } from '@ember/service';
+import * as s from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+
+const service = s.service ?? s.inject;
 
 /* eslint-disable ember/no-computed-properties-in-native-classes */
 import { or } from '@ember/object/computed';
