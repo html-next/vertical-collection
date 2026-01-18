@@ -219,7 +219,7 @@ module('vertical-collection', 'Integration | Basic Tests', function (hooks) {
     },
   );
 
-  // eslint-disable-next-line qunit/require-expect
+   
   test('The collection renders the initialRenderCount correctly', async function (assert) {
     assert.expect(5);
     this.set('items', getNumbers(0, 10));
@@ -273,7 +273,7 @@ module('vertical-collection', 'Integration | Basic Tests', function (hooks) {
     );
   });
 
-  // eslint-disable-next-line qunit/require-expect
+   
   test('The collection renders the initialRenderCount correctly if idForFirstItem is set', async function (assert) {
     assert.expect(5);
     this.set('items', getNumbers(0, 100));
@@ -329,7 +329,7 @@ module('vertical-collection', 'Integration | Basic Tests', function (hooks) {
     );
   });
 
-  // eslint-disable-next-line qunit/require-expect
+   
   test('The collection renders the initialRenderCount correctly if the count is more than the number of items', async function (assert) {
     assert.expect(4);
     this.set('items', getNumbers(0, 1));

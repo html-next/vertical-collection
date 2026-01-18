@@ -1,5 +1,5 @@
 import { computed } from '@ember/object';
-import Model, { attr } from '@ember-data/model';
+import Model, { attr } from '@warp-drive/legacy/model';
 
 export default Model.extend({
   number: attr('number'),

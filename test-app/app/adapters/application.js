@@ -1,4 +1,4 @@
-import JSONAPIAdapter from '@ember-data/adapter/json-api';
+import JSONAPIAdapter from '@warp-drive/legacy/model';
 
 const NUMBERS = {
   data: [],
