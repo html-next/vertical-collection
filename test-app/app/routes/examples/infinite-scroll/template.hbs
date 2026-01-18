@@ -9,8 +9,8 @@
           @estimateHeight={{90}}
           @staticHeight={{true}}
           @bufferSize={{5}}
-          @firstReached={{action "loadAbove"}}
-          @lastReached={{action "loadBelow"}}
+          @firstReached={{this.loadAbove}}
+          @lastReached={{this.loadBelow}}
           as |item index|
         >
           <NumberSlide @item={{item}} @index={{index}} />

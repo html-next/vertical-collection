@@ -13,7 +13,10 @@ export default class extends Controller {
     let numbers = getNumbers(first - 20, 20);
     let model = this.model.data.numbers;
     model.unshiftObjects(numbers);
-    this.model.set('data.first', first - 20);
+    this.model.data = {
+      ...this.model.data,
+      first: first - 20,
+    };
   }
 
   @action
@@ -22,6 +25,9 @@ export default class extends Controller {
     let numbers = getNumbers(last, 20);
     let model = this.model.data.numbers;
     model.pushObjects(numbers);
-    this.model.set('data.last', last + 20);
+    this.model.data = {
+      ...this.model.data,
+      last: last + 20,
+    };
   }
 }

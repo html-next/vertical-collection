@@ -9,14 +9,20 @@ export default class extends Controller {
 
   @action
   filter() {
-    let model = this.model.numbers;
+    let numbers = this.model.data.numbers;
     this.isFiltered = !this.isFiltered;
 
     if (!this.isFiltered) {
-      this.model.set('filtered', model);
+      this.model.data = {
+        ...this.model.data,
+        filtered: numbers,
+      };
     } else {
-      let filtered = model.filter((item) => item.number < 25);
-      this.model.set('filtered', filtered);
+      let filtered = numbers.filter((item) => item.number < 25);
+      this.model.data = {
+        ...this.model.data,
+        filtered,
+      };
     }
   }
 }

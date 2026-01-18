@@ -1,5 +1,7 @@
 import '@warp-drive/ember/install';
 
+import 'bootstrap/dist/css/bootstrap.css';
+
 import Application from '@ember/application';
 import compatModules from '@embroider/virtual/compat-modules';
 import Resolver from 'ember-resolver';
