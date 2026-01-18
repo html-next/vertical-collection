@@ -1,0 +1,15 @@
+<td class="dbname">
+  {{this.db.id}}
+</td>
+<td class="query-count">
+  <span class="{{this.countClassName}}">
+    {{this.queries.length}}
+  </span>
+</td>
+{{#each this.topFiveQueries key="@index" as |query|}}
+  <td>{{query.elapsed}}</td>
+  <div class="popover bottom">
+    <div class="popover-content">{{query.query}}</div>
+    <div class="arrow"></div>
+  </div>
+{{/each}}
