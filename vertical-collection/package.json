@@ -58,7 +58,7 @@
   "dependencies": {
     "ember-auto-import": "^2.6.3",
     "ember-cli-babel": "^8.0.0",
-    "ember-cli-htmlbars": "^6.3.0",
+    "ember-cli-htmlbars": "^7.0.0",
     "ember-cli-version-checker": "^5.1.2",
     "ember-raf-scheduler": "^0.3.0",
     "ember-template-imports": "^4.0.0"
@@ -93,7 +93,7 @@
     "ember-source": "~5.2.0",
     "ember-source-channel-url": "^3.0.0",
     "ember-template-lint": "^5.11.2",
-    "ember-try": "^3.0.0",
+    "ember-try": "^4.0.0",
     "eslint": "^8.47.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-ember": "^11.10.0",
@@ -104,7 +104,7 @@
     "prettier": "^3.0.2",
     "prettier-plugin-ember-template-tag": "^2.0.6",
     "qunit": "^2.19.4",
-    "qunit-dom": "^2.0.0",
+    "qunit-dom": "^3.5.0",
     "stylelint": "^15.10.3",
     "stylelint-config-standard": "^34.0.0",
     "stylelint-prettier": "^4.0.2",
