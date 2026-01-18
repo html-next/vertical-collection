@@ -149,6 +149,7 @@ export default ts.config(
       'ember/require-tagless-components': 'off',
       'qunit/require-expect': 'off',
       'warp-drive/no-legacy-request-patterns': 'off',
+      'warp-drive/no-legacy-imports': 'off',
     },
   },
 );

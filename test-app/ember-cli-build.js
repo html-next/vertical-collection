@@ -16,7 +16,7 @@ module.exports = async function (defaults) {
     // which all deprecations have been fully resolved
     // and should be updated when that changes
     deprecations: {
-      DEPRECATE_STORE_EXTENDS_EMBER_OBJECT: false,
+      DEPRECATE_STORE_EXTENDS_EMBER_OBJECT: true,
     },
   });
 

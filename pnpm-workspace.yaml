@@ -17,3 +17,5 @@ syncInjectedDepsAfterScripts:
 - build
 - sync 
 
+# Extra isolation for dependencies, even in spite of dep injection
+sharedWorkspaceLockfile: false

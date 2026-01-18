@@ -1,4 +1,4 @@
-import JSONAPISerializer from '@warp-drive/legacy/model';
+import JSONAPISerializer from '@ember-data/serializer/json-api';
 
 export default JSONAPISerializer.extend({
   normalizeResponse(_, __, payload) {

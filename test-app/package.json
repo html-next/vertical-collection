@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@html-next/vertical-collection": "workspace:*",
-    "ember-raf-scheduler": "^0.5.0"
+    "ember-raf-scheduler": "0.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.28.4",
