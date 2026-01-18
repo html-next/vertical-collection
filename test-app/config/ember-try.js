@@ -13,6 +13,7 @@ module.exports = async function () {
           devDependencies: {
             'ember-cli': '~4.12.0',
             'ember-source': '~3.28.0',
+            'ember-cached-decorator-polyfill': '^1.0.0',
             'babel-plugin-ember-polyfill-get-and-set-owner-from-ember-owner':
               '^1.0.0',
             'babel-plugin-undeprecate-inject-from-at-ember-service': '^1.0.0',
