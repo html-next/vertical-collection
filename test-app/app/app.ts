@@ -1,3 +1,7 @@
+import '@warp-drive/ember/install';
+
+import 'bootstrap/dist/css/bootstrap.css';
+
 import Application from '@ember/application';
 import compatModules from '@embroider/virtual/compat-modules';
 import Resolver from 'ember-resolver';
@@ -42,6 +46,33 @@ export default class App extends Application {
   podModulePrefix = config.podModulePrefix;
   Resolver = Resolver.withModules(compatModules);
   inspector = setupInspector(this);
+  customEvents = {
+    touchstart: null,
+    touchmove: null,
+    touchend: null,
+    touchcancel: null,
+    keydown: null,
+    keyup: null,
+    keypress: null,
+    mousedown: null,
+    mouseup: null,
+    contextmenu: null,
+    dblclick: null,
+    mousemove: null,
+    focusin: null,
+    focusout: null,
+    mouseenter: null,
+    mouseleave: null,
+    submit: null,
+    change: null,
+    dragstart: null,
+    drag: null,
+    dragenter: null,
+    dragleave: null,
+    dragover: null,
+    drop: null,
+    dragend: null,
+  };
 }
 
 loadInitializers(App, config.modulePrefix, compatModules);
