@@ -1,3 +1,11 @@
 export default {
-  plugins: [],
+  plugins: [
+    [
+      'module:babel-plugin-ember-template-compilation',
+      {
+        targetFormat: 'hbs',
+        transforms: [],
+      },
+    ],
+  ],
 };
