@@ -1,7 +1,7 @@
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
-import roundTo from './utils/round-to';
+import roundTo from './utils/round-to.js';
 
 /*
  * `SkipList` is a data structure designed with two main uses in mind:

@@ -1,7 +1,7 @@
 import { get } from '@ember/object';
 import { assert } from '@ember/debug';
 
-import identity from './identity';
+import identity from './identity.js';
 
 export default function keyForItem(item, keyPath, index) {
   let key;

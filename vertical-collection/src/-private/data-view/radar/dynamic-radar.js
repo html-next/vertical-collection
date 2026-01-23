@@ -1,9 +1,9 @@
 import { DEBUG } from '@glimmer/env';
 
-import Radar from './radar';
-import SkipList from '../skip-list';
-import roundTo from '../utils/round-to';
-import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
+import Radar from './radar.js';
+import SkipList from '../skip-list.js';
+import roundTo from '../utils/round-to.js';
+import getScaledClientRect from '../../utils/element/get-scaled-client-rect.js';
 
 export default class DynamicRadar extends Radar {
   constructor(parentToken, options) {

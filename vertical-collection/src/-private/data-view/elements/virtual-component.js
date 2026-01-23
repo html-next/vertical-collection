@@ -2,7 +2,7 @@ import { set } from '@ember/object';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
-import document from '../../utils/document-shim';
+import document from '../../utils/document-shim.js';
 
 let VC_IDENTITY = 0;
 
