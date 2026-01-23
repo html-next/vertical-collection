@@ -27,20 +27,7 @@ const esmParserOptions = {
 };
 
 export default defineConfig([
-  globalIgnores([
-    'dist/',
-    'dist-*/',
-    'declarations/',
-    'coverage/',
-    '!**/.*',
-
-    // REMOVE IN THE V2 ADDON PR
-    // (these files won't exist)
-    'ember-cli-build.js',
-    'index.js',
-    'testem.js',
-    'tests/**/*',
-  ]),
+  globalIgnores(['dist/', 'dist-*/', 'declarations/', 'coverage/', '!**/.*']),
   js.configs.recommended,
   prettier,
   ember.configs.base,
@@ -119,20 +106,6 @@ export default defineConfig([
       globals: {
         ...globals.node,
       },
-    },
-  },
-  // REMOVE IN THE V2 ADDON PR
-  // (these files moved to src)
-  {
-    files: ['addon/**/*'],
-    rules: {
-      'ember/closure-actions': 'off',
-      'ember/no-get': 'off',
-      'ember/no-classic-components': 'off',
-      'ember/require-tagless-components': 'off',
-      'ember/no-classic-classes': 'off',
-      'ember/no-actions-hash': 'off',
-      'ember/no-runloop': 'off',
     },
   },
 ]);
