@@ -134,4 +134,22 @@ export default ts.config(
       },
     },
   },
+  /**
+   * Tech debt to solve later (acquired during v2 addonification)
+   * (mostly due to upgrades bringing new lints)
+   */
+  {
+    files: ['**/*.{gjs,gts,js,ts}'],
+    rules: {
+      'ember/no-runloop': 'off',
+      'ember/no-classic-classes': 'off',
+      'ember/no-actions-hash': 'off',
+      'ember/no-test-support-import': 'off',
+      'ember/no-classic-components': 'off',
+      'ember/require-tagless-components': 'off',
+      'qunit/require-expect': 'off',
+      'warp-drive/no-legacy-request-patterns': 'off',
+      'warp-drive/no-legacy-imports': 'off',
+    },
+  },
 );
