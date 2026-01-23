@@ -225,7 +225,7 @@ importers:
         specifier: ^5.1.2
         version: 5.1.2
       ember-raf-scheduler:
-        specifier: ~0.3.0
+        specifier: 0.3.0
         version: 0.3.0
       ember-template-imports:
         specifier: ^4.0.0
