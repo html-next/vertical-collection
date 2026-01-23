@@ -23,6 +23,14 @@
     "name": "Chris Thoburn (@runspired)",
     "url": "https://runspired.com"
   },
+  "exports": {
+    ".": {
+      "default": "./dist/index.js"
+    },
+    "./-private/index": {
+      "default": "./dist/-private/index.js"
+    }
+  },
   "contributors": [
     {
       "name": "Chris Garrett (@pzuraq)",
@@ -35,66 +43,40 @@
       "url": "https://github.com/rwwagner90"
     }
   ],
-  "directories": {
-    "doc": "doc",
-    "test": "tests"
-  },
+  "files": [
+    "src",
+    "dist",
+    "addon-shim.cjs"
+  ],
   "scripts": {
-    "build": "node ./scripts/write-snipets.mjs && ember build --environment=production",
+    "build": "rollup --config",
+    "prepack": "rollup --config",
     "format": "prettier . --cache --write",
-    "lint": "concurrently \"npm:lint:*(!fix)\" --names \"lint:\"",
+    "lint": "concurrently \"pnpm:lint:*(!fix)\" --names \"lint:\"",
     "lint:css": "stylelint \"**/*.css\"",
-    "lint:css:fix": "concurrently \"npm:lint:css -- --fix\"",
-    "lint:fix": "concurrently \"npm:lint:*:fix\" --names \"fix:\" && pnpm run format",
+    "lint:css:fix": "concurrently \"pnpm:lint:css -- --fix\"",
+    "lint:fix": "concurrently \"pnpm:lint:*:fix\" --names \"fix:\" && pnpm run format",
     "lint:js": "eslint . --cache",
     "lint:format": "prettier . --cache --check",
-    "lint:js:fix": "eslint . --fix",
-    "start": "node ./scripts/write-snippets.mjs && ember serve",
-    "test": "concurrently \"npm:lint\" \"npm:test:*\" --names \"lint,test:\"",
-    "test:ember": "ember test",
-    "test:ci": ". bin/restore-env.sh && CI=true pnpm ember test --path=dist",
-    "test:ember-compatibility": "ember try:each"
+    "lint:js:fix": "eslint . --fix"
   },
   "dependencies": {
-    "ember-auto-import": "^2.6.3",
-    "ember-cli-babel": "^8.0.0",
-    "ember-cli-htmlbars": "^7.0.0",
-    "ember-cli-version-checker": "^5.1.2",
-    "ember-raf-scheduler": "~0.3.0",
-    "ember-template-imports": "^4.0.0"
+    "@embroider/addon-shim": "^1.10.2",
+    "ember-raf-scheduler": "~0.3.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.22.10",
-    "@babel/plugin-proposal-decorators": "^7.22.10",
-    "@ember/optional-features": "^2.0.0",
-    "@ember/string": "^3.1.1",
-    "@ember/test-helpers": "~3.3.1",
     "@ember/test-waiters": "~3.1.0",
-    "@embroider/test-setup": "^3.0.1",
+    "@embroider/addon-dev": "^8.2.0",
     "@eslint/js": "^9.39.2",
-    "@glimmer/component": "^1.0.0",
-    "@glimmer/tracking": "^1.0.0",
-    "@warp-drive/build-config": "4.13.0-alpha.8",
-    "bootstrap": "~3.3.5",
-    "broccoli-asset-rev": "^3.0.0",
+    "@rollup/plugin-babel": "^6.1.0",
+    "babel-plugin-ember-template-compilation": "^4.0.0",
     "concurrently": "^8.2.0",
-    "ember-cli": "~5.2.0",
-    "ember-cli-clean-css": "^3.0.0",
-    "ember-cli-dependency-checker": "^3.3.2",
-    "ember-cli-github-pages": "^0.2.2",
-    "ember-cli-inject-live-reload": "^2.1.0",
-    "ember-cli-sri": "^2.1.1",
-    "ember-cli-terser": "^4.0.2",
-    "ember-data": "~4.13.0-alpha.8",
     "ember-inflector": "^6.0.0",
-    "ember-load-initializers": "^2.1.2",
     "ember-perf-timeline": "^2.0.0",
     "ember-qunit": "^7.0.0",
-    "ember-resolver": "^11.0.1",
     "ember-source": "~5.2.0",
-    "ember-source-channel-url": "^3.0.0",
     "ember-template-lint": "^5.11.2",
-    "ember-try": "^4.0.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-ember": "^12.7.5",
@@ -103,15 +85,12 @@
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-qunit": "^8.0.0",
     "globals": "^16.5.0",
-    "loader.js": "^4.7.0",
-    "prettier": "^3.8.1",
+    "prettier": "^3.0.2",
     "prettier-plugin-ember-template-tag": "^2.0.6",
-    "qunit": "^2.19.4",
-    "qunit-dom": "^3.5.0",
+    "rollup": "^4.56.0",
     "stylelint": "^17.0.0",
     "stylelint-config-standard": "^40.0.0",
-    "stylelint-prettier": "^5.0.3",
-    "webpack": "^5.88.2"
+    "stylelint-prettier": "^5.0.3"
   },
   "engines": {
     "node": ">= 18"
@@ -127,6 +106,9 @@
     "edition": "octane"
   },
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "version": 2,
+    "type": "addon",
+    "main": "addon-main.cjs",
+    "app-js": {}
   }
 }

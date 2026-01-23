@@ -6,23 +6,26 @@ import { DEBUG } from '@glimmer/env';
 
 import { Token, scheduler } from 'ember-raf-scheduler';
 
-import VirtualComponent from '../elements/virtual-component';
-import OccludedContent from '../elements/occluded-content';
-import insertRangeBefore from '../utils/insert-range-before';
-import objectAt from '../utils/object-at';
-import roundTo from '../utils/round-to';
-import { isPrepend, isAppend } from '../utils/mutation-checkers';
+import VirtualComponent from '../elements/virtual-component.js';
+import OccludedContent from '../elements/occluded-content.js';
+import insertRangeBefore from '../utils/insert-range-before.js';
+import objectAt from '../utils/object-at.js';
+import roundTo from '../utils/round-to.js';
+import { isPrepend, isAppend } from '../utils/mutation-checkers.js';
 
-import { addScrollHandler, removeScrollHandler } from '../utils/scroll-handler';
+import {
+  addScrollHandler,
+  removeScrollHandler,
+} from '../utils/scroll-handler.js';
 
-import ViewportContainer from '../viewport-container';
+import ViewportContainer from '../viewport-container.js';
 
-import closestElement from '../../utils/element/closest';
-import estimateElementHeight from '../../utils/element/estimate-element-height';
-import getScaledClientRect from '../../utils/element/get-scaled-client-rect';
-import keyForItem from '../../ember-internals/key-for-item';
+import closestElement from '../../utils/element/closest.js';
+import estimateElementHeight from '../../utils/element/estimate-element-height.js';
+import getScaledClientRect from '../../utils/element/get-scaled-client-rect.js';
+import keyForItem from '../../ember-internals/key-for-item.js';
 
-import document from '../../utils/document-shim';
+import document from '../../utils/document-shim.js';
 
 export default class Radar {
   constructor(

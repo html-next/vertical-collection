@@ -1,6 +1,6 @@
 import { DEBUG } from '@glimmer/env';
 
-import Radar from './radar';
+import Radar from './radar.js';
 
 export default class StaticRadar extends Radar {
   constructor(parentToken, options) {

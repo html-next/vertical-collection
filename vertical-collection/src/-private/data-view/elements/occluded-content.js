@@ -1,7 +1,7 @@
 import { set } from '@ember/object';
 import { DEBUG } from '@glimmer/env';
 
-import document from '../../utils/document-shim';
+import document from '../../utils/document-shim.js';
 
 let OC_IDENTITY = 0;
 
