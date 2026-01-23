@@ -216,7 +216,7 @@ importers:
         specifier: ^1.10.2
         version: 1.10.2
       ember-raf-scheduler:
-        specifier: 0.3.0
+        specifier: ~0.3.0
         version: 0.3.0
     devDependencies:
       '@babel/eslint-parser':

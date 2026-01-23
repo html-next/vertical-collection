@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@embroider/addon-shim": "^1.10.2",
-    "ember-raf-scheduler": "0.3.0"
+    "ember-raf-scheduler": "~0.3.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.22.10",
