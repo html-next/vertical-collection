@@ -36,7 +36,8 @@
     }
   ],
   "files": [
-    "src"
+    "src",
+    "addon-shim.cjs"
   ],
   "scripts": {
     "format": "prettier . --cache --write",
@@ -49,6 +50,7 @@
     "lint:js:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@embroider/addon-shim": "^1.10.2",
     "ember-raf-scheduler": "~0.3.0"
   },
   "devDependencies": {
@@ -91,6 +93,7 @@
   "ember-addon": {
     "version": 2,
     "type": "addon",
+    "main": "addon-main.cjs",
     "app-js": {}
   }
 }
