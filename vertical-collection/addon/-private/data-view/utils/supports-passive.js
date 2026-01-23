@@ -9,7 +9,7 @@ try {
   });
 
   window.addEventListener('test', null, opts);
-} catch (e) {
+} catch {
   // do nothing
 }
 

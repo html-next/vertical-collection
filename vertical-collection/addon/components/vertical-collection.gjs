@@ -429,7 +429,7 @@ class VerticalCollection extends Component.extend({
 
     if (DEBUG) {
       if (this.__visualization) {
-        console.info('destroying visualization'); // eslint-disable-line no-console
+        console.info('destroying visualization');
         this.__visualization.destroy();
         this.__visualization = null;
       }
@@ -555,7 +555,7 @@ class VerticalCollection extends Component.extend({
         //
         if (this.debugVis !== true) {
           if (this.__visualization !== null) {
-            console.info('tearing down existing visualization'); // eslint-disable-line no-console
+            console.info('tearing down existing visualization');
             this.__visualization.destroy();
             this.__visualization = null;
           }

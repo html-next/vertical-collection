@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = {
+export default {
   extends: ['stylelint-config-standard', 'stylelint-prettier/recommended'],
   rules: {
     'selector-class-pattern': null,

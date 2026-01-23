@@ -130,7 +130,7 @@ export default class Radar {
 
     // In older versions of Ember/IE, binding anything on an object in the template
     // adds observers which creates __ember_meta__
-    this.__ember_meta__ = null; // eslint-disable-line camelcase
+    this.__ember_meta__ = null;
 
     if (DEBUG) {
       this._debugDidUpdate = null;
