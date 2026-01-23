@@ -18,6 +18,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
+      - run: pnpm build
+        working-directory: vertical-collection
       - run: pnpm lint
 
   test:
@@ -28,6 +30,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
+      - run: pnpm build
+        working-directory: vertical-collection
       - run: pnpm test
         working-directory: test-app
 
@@ -41,6 +45,8 @@ jobs:
       - uses: wyvox/action-setup-pnpm@v3
         with:
           args: --no-lockfile
+      - run: pnpm build
+        working-directory: vertical-collection
       - run: pnpm test
         working-directory: test-app
 
@@ -65,6 +71,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
+      - run: pnpm build
+        working-directory: vertical-collection
       - name: Ember-Try Setup
         run: node_modules/.bin/ember try:one ${{ matrix.try-scenario }} --skip-cleanup --- pnpm test
         working-directory: test-app
