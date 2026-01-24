@@ -2,6 +2,19 @@
 
 ## Release (2026-01-24)
 
+
+
+#### :bug: Bug Fix
+* [#514](https://github.com/html-next/vertical-collection/pull/514) Fix publish by fixing pnpm settings ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+
+#### :house: Internal
+* [#513](https://github.com/html-next/vertical-collection/pull/513) Update release-plan ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+
+#### Committers: 1
+- [@NullVoxPopuli](https://github.com/NullVoxPopuli)
+
+## Release (2026-01-24)
+
 * @html-next/vertical-collection 5.0.0 (major)
 
 #### :boom: Breaking Change
