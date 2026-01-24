@@ -1,0 +1,26 @@
+{
+  "solution": {
+    "@html-next/vertical-collection": {
+      "impact": "major",
+      "oldVersion": "4.0.2",
+      "newVersion": "5.0.0",
+      "tagName": "latest",
+      "constraints": [
+        {
+          "impact": "major",
+          "reason": "Appears in changelog section :boom: Breaking Change"
+        },
+        {
+          "impact": "patch",
+          "reason": "Appears in changelog section :bug: Bug Fix"
+        },
+        {
+          "impact": "patch",
+          "reason": "Appears in changelog section :house: Internal"
+        }
+      ],
+      "pkgJSONPath": "./vertical-collection/package.json"
+    }
+  },
+  "description": "## Release (2026-01-24)\n\n* @html-next/vertical-collection 5.0.0 (major)\n\n#### :boom: Breaking Change\n* `@html-next/vertical-collection`\n  * [#511](https://github.com/html-next/vertical-collection/pull/511) V2 Addon Conversion ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#444](https://github.com/html-next/vertical-collection/pull/444) Use co-located components instead of pods ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n* Other\n  * [#402](https://github.com/html-next/vertical-collection/pull/402) Ember v3.28.0...v5.2.0 ([@mixonic](https://github.com/mixonic))\n\n#### :bug: Bug Fix\n* `@html-next/vertical-collection`\n  * [#479](https://github.com/html-next/vertical-collection/pull/479) Fix for #296: Insert the virtual component bound back to DOM also for the case `shouldRecycle=false` ([@johanrd](https://github.com/johanrd))\n  * [#491](https://github.com/html-next/vertical-collection/pull/491) Fix occluded-content height inflation from inherited line-height ([@johanrd](https://github.com/johanrd))\n  * [#482](https://github.com/html-next/vertical-collection/pull/482) Add defensive checks for cases where maxHeight is empty string ([@johanrd](https://github.com/johanrd))\n  * [#466](https://github.com/html-next/vertical-collection/pull/466) Fix incorrect polling start ([@monovertex](https://github.com/monovertex))\n  * [#443](https://github.com/html-next/vertical-collection/pull/443) Remove unneeded peer declaration ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n\n#### :house: Internal\n* `@html-next/vertical-collection`\n  * [#512](https://github.com/html-next/vertical-collection/pull/512) Migrate and fix all ESLint issues. All lint configs are ESM now ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#490](https://github.com/html-next/vertical-collection/pull/490) Move tests to test-app ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#510](https://github.com/html-next/vertical-collection/pull/510) Upgrade some internal deps ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#475](https://github.com/html-next/vertical-collection/pull/475) Convert to gjs ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#459](https://github.com/html-next/vertical-collection/pull/459) Remove V1 Add complexity in the index.js ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#452](https://github.com/html-next/vertical-collection/pull/452) Setup Release plan ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#451](https://github.com/html-next/vertical-collection/pull/451) Configure the prettier commands in package.json ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#441](https://github.com/html-next/vertical-collection/pull/441) Convert to monorepo ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n* Other\n  * [#489](https://github.com/html-next/vertical-collection/pull/489) test-app boilerplate ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#438](https://github.com/html-next/vertical-collection/pull/438) Move to pnpm ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#414](https://github.com/html-next/vertical-collection/pull/414) Vertical collection tests compatible with Ember 6 ([@mixonic](https://github.com/mixonic))\n  * [#408](https://github.com/html-next/vertical-collection/pull/408) Bump dev Node to v18, reroll lockfile ([@mixonic](https://github.com/mixonic))\n  * [#407](https://github.com/html-next/vertical-collection/pull/407) Add dependabot ([@mixonic](https://github.com/mixonic))\n  * [#402](https://github.com/html-next/vertical-collection/pull/402) Ember v3.28.0...v5.2.0 ([@mixonic](https://github.com/mixonic))\n\n#### Committers: 4\n- Cosmin Stamate ([@monovertex](https://github.com/monovertex))\n- Matthew Beale ([@mixonic](https://github.com/mixonic))\n- [@NullVoxPopuli](https://github.com/NullVoxPopuli)\n- [@johanrd](https://github.com/johanrd)\n"
+}
