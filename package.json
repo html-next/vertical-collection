@@ -1,8 +1,4 @@
 {
-/**
- * @param {string} name
- * @param {string} [subTitle]
- */
   "name": "root",
   "version": "0.0.0",
   "private": true,
