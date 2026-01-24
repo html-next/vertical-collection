@@ -1,4 +1,8 @@
 {
+/**
+ * @param {string} name
+ * @param {string} [subTitle]
+ */
   "name": "root",
   "version": "0.0.0",
   "private": true,
@@ -19,6 +23,6 @@
   "packageManager": "pnpm@10.28.1",
   "volta": {
     "node": "24.11.0",
-    "pnpm": "10.20.1"
+    "pnpm": "10.28.1"
   }
 }
