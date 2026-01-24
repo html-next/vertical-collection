@@ -1,6 +1,7 @@
 {
   "solution": {
     "@html-next/vertical-collection": {
+      "newVersion": "5.0.1",
       "oldVersion": "5.0.0"
     }
   },
