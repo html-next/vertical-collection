@@ -2,6 +2,24 @@
 
 ## Release (2026-01-24)
 
+* @html-next/vertical-collection 5.0.1 (patch)
+
+#### :bug: Bug Fix
+* `@html-next/vertical-collection`
+  * [#516](https://github.com/html-next/vertical-collection/pull/516) Force release ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+* Other
+  * [#514](https://github.com/html-next/vertical-collection/pull/514) Fix publish by fixing pnpm settings ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+
+#### :house: Internal
+* [#515](https://github.com/html-next/vertical-collection/pull/515) Prepare Release vnull ([@github-actions[bot]](https://github.com/apps/github-actions))
+* [#513](https://github.com/html-next/vertical-collection/pull/513) Update release-plan ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+
+#### Committers: 2
+- GitHub Actions [Bot] ([@github-actions](https://github.com/apps/github-actions))
+- [@NullVoxPopuli](https://github.com/NullVoxPopuli)
+
+## Release (2026-01-24)
+
 
 
 #### :bug: Bug Fix
