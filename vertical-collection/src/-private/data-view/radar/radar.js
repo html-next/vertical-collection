@@ -588,38 +588,33 @@ export default class Radar {
 
     // If there are any items remaining in the pool, remove them
     if (_componentPool.length > 0) {
-      if (shouldRecycle === true) {
-        // Grab the DOM of the remaining components and move it to temporary node disconnected from
-        // the body if the item can be reused later otherwise delete the component to avoid virtual re-rendering of the
-        // deleted item. If we end up using these components again, we'll grab their DOM and put it back
-        for (let i = _componentPool.length - 1; i >= 0; i--) {
-          const component = _componentPool[i];
-          const item = objectAt(items, component.index);
-          if (item) {
-            insertRangeBefore(
-              this._domPool,
-              null,
-              component.realUpperBound,
-              component.realLowerBound,
-            );
-          } else {
-            // Insert the virtual component bound back to make sure Glimmer is
-            // not confused about the state of the DOM.
-            insertRangeBefore(
-              this._itemContainer,
-              null,
-              component.realUpperBound,
-              component.realLowerBound,
-            );
-            run(() => {
-              virtualComponents.removeObject(component);
-            });
-            _componentPool.splice(i, 1);
-          }
+      // Grab the DOM of the remaining components and move it to temporary node disconnected from
+      // the body if the item can be reused later otherwise delete the component to avoid virtual re-rendering of the
+      // deleted item. If we end up using these components again, we'll grab their DOM and put it back
+      for (let i = _componentPool.length - 1; i >= 0; i--) {
+        const component = _componentPool[i];
+        const item = objectAt(items, component.index);
+        if (shouldRecycle === true && item) {
+          insertRangeBefore(
+            this._domPool,
+            null,
+            component.realUpperBound,
+            component.realLowerBound,
+          );
+        } else {
+          // Insert the virtual component bound back to make sure Glimmer is
+          // not confused about the state of the DOM.
+          insertRangeBefore(
+            this._itemContainer,
+            null,
+            component.realUpperBound,
+            component.realLowerBound,
+          );
+          run(() => {
+            virtualComponents.removeObject(component);
+          });
+          _componentPool.splice(i, 1);
         }
-      } else {
-        virtualComponents.removeObjects(_componentPool);
-        _componentPool.length = 0;
       }
     }
 
