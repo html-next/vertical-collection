@@ -46,7 +46,7 @@
   "files": [
     "src",
     "dist",
-    "addon-shim.cjs"
+    "addon-main.cjs"
   ],
   "scripts": {
     "build": "rollup --config",
