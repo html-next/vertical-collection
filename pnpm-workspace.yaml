@@ -2,17 +2,17 @@ packages:
   - vertical-collection
   - test-app
 
-ignoreScripts: true
+ignoreScripts: false
+ignoreDepScripts: true
 peersSuffixMaxLength: 40
-
 
 autoInstallPeers: false
 strictPeerDependents: true
 dedupeInjectedDeps: true
-dedupePeerDependents: true 
+dedupePeerDependents: true
 resolvePeersFromWorkspaceRoot: false
 
 injectWorkspacePackages: true
 syncInjectedDepsAfterScripts:
-- build
-- sync 
+  - build
+  - sync

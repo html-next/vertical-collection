@@ -7,18 +7,18 @@
     "url": "git@github.com:html-next/vertical-collection.git"
   },
   "scripts": {
-    "update:snippets": "node ./scripts/write-snippets.mjs",
     "build": "pnpm --filter '*' build",
     "lint": "pnpm --filter '*' lint",
     "lint:fix": "pnpm --filter '*' lint:fix",
-    "test:ci": "ls -la ; pnpm --filter '*' test:ci"
+    "test:ci": "ls -la ; pnpm --filter '*' test:ci",
+    "update:snippets": "node ./scripts/write-snippets.mjs"
   },
   "devDependencies": {
-    "release-plan": "^0.16.0"
+    "release-plan": "^0.17.4"
   },
-  "packageManager": "pnpm@10.10.0",
+  "packageManager": "pnpm@10.28.1",
   "volta": {
     "node": "24.11.0",
-    "pnpm": "10.10.0"
+    "pnpm": "10.28.1"
   }
 }
