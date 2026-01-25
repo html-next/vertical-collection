@@ -2,8 +2,8 @@
   "solution": {
     "@html-next/vertical-collection": {
       "impact": "patch",
-      "oldVersion": "5.0.0",
-      "newVersion": "5.0.1",
+      "oldVersion": "5.0.1",
+      "newVersion": "5.0.2",
       "tagName": "latest",
       "constraints": [
         {
@@ -14,5 +14,5 @@
       "pkgJSONPath": "./vertical-collection/package.json"
     }
   },
-  "description": "## Release (2026-01-24)\n\n* @html-next/vertical-collection 5.0.1 (patch)\n\n#### :bug: Bug Fix\n* `@html-next/vertical-collection`\n  * [#516](https://github.com/html-next/vertical-collection/pull/516) Force release ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n* Other\n  * [#514](https://github.com/html-next/vertical-collection/pull/514) Fix publish by fixing pnpm settings ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n\n#### :house: Internal\n* [#515](https://github.com/html-next/vertical-collection/pull/515) Prepare Release vnull ([@github-actions[bot]](https://github.com/apps/github-actions))\n* [#513](https://github.com/html-next/vertical-collection/pull/513) Update release-plan ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n\n#### Committers: 2\n- GitHub Actions [Bot] ([@github-actions](https://github.com/apps/github-actions))\n- [@NullVoxPopuli](https://github.com/NullVoxPopuli)\n"
+  "description": "## Release (2026-01-25)\n\n* @html-next/vertical-collection 5.0.2 (patch)\n\n#### :bug: Bug Fix\n* `@html-next/vertical-collection`\n  * [#518](https://github.com/html-next/vertical-collection/pull/518) fix for '@html-next/vertical-collection is missing its addon main file' ([@johanrd](https://github.com/johanrd))\n\n#### :memo: Documentation\n* [#519](https://github.com/html-next/vertical-collection/pull/519) update readme with import example for strict mode templates ([@johanrd](https://github.com/johanrd))\n\n#### Committers: 1\n- [@johanrd](https://github.com/johanrd)\n"
 }
