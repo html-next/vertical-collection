@@ -35,8 +35,11 @@ ember install @html-next/vertical-collection
 
 ## Usage
 
-```htmlbars
-<VerticalCollection
+```glimmer-ts
+import { VerticalCollection } from '@html-next/vertical-collection'
+
+<template>
+  <VerticalCollection
     @items={{items}}
     @tagName="ul"
     @estimateHeight={{50}}
@@ -53,7 +56,8 @@ ember install @html-next/vertical-collection
     <li>
       {{item.number}} {{i}}
     </li>
-</VerticalCollection>
+  </VerticalCollection>
+</template>
 ```
 
 ### Actions
