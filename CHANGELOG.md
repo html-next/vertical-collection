@@ -1,5 +1,19 @@
 # Changelog
 
+## Release (2026-01-25)
+
+* @html-next/vertical-collection 5.0.2 (patch)
+
+#### :bug: Bug Fix
+* `@html-next/vertical-collection`
+  * [#518](https://github.com/html-next/vertical-collection/pull/518) fix for '@html-next/vertical-collection is missing its addon main file' ([@johanrd](https://github.com/johanrd))
+
+#### :memo: Documentation
+* [#519](https://github.com/html-next/vertical-collection/pull/519) update readme with import example for strict mode templates ([@johanrd](https://github.com/johanrd))
+
+#### Committers: 1
+- [@johanrd](https://github.com/johanrd)
+
 ## Release (2026-01-24)
 
 * @html-next/vertical-collection 5.0.1 (patch)
