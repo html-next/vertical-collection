@@ -61,11 +61,11 @@
     "lint:js:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@ember/test-waiters": "^3.1.1 || >= 4.1.1",
     "@embroider/addon-shim": "^1.10.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.22.10",
-    "@ember/test-waiters": "~3.1.0",
     "@embroider/addon-dev": "^8.2.0",
     "@eslint/js": "^9.39.2",
     "@rollup/plugin-babel": "^6.1.0",
