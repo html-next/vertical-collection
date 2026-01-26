@@ -29,8 +29,7 @@
     "./*": "./app/*"
   },
   "dependencies": {
-    "@html-next/vertical-collection": "workspace:*",
-    "ember-raf-scheduler": "0.3.0"
+    "@html-next/vertical-collection": "workspace:*"
   },
   "devDependencies": {
     "@babel/core": "^7.28.4",
