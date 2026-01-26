@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { ScrollHandler } from '@html-next/vertical-collection/-private/index';
 
-import { scheduler } from 'ember-raf-scheduler';
+import { scheduler } from '@html-next/vertical-collection/-private/index';
 
 const dom = document;
 

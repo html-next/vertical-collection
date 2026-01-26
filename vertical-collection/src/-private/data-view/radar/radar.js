@@ -4,7 +4,7 @@ import { assert } from '@ember/debug';
 import { run } from '@ember/runloop';
 import { DEBUG } from '@glimmer/env';
 
-import { Token, scheduler } from 'ember-raf-scheduler';
+import { Token, scheduler } from '../../utils/raf-scheduler.js';
 
 import VirtualComponent from '../elements/virtual-component.js';
 import OccludedContent from '../elements/occluded-content.js';
