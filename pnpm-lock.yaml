@@ -209,6 +209,9 @@ importers:
 
   vertical-collection:
     dependencies:
+      '@ember/test-waiters':
+        specifier: ^3.1.1 || >= 4.1.1
+        version: 4.1.1(@glint/template@1.7.3)
       '@embroider/addon-shim':
         specifier: ^1.10.2
         version: 1.10.2
@@ -216,9 +219,6 @@ importers:
       '@babel/eslint-parser':
         specifier: ^7.22.10
         version: 7.28.6(3d8a38e36d20fc2289a1d884d2c56070)
-      '@ember/test-waiters':
-        specifier: ~3.1.0
-        version: 3.1.0
       '@embroider/addon-dev':
         specifier: ^8.2.0
         version: 8.2.0(@glint/template@1.7.3)(rollup@4.56.0)
@@ -991,10 +991,6 @@ packages:
 
   '@ember/test-helpers@5.4.1':
     resolution: {integrity: sha512-BUdT91ra+QibEWAUwtZmvTGFoDHJCxDU+fkQENA8Zs0FR3pZiICxxP/fgdlNExCjjdm1letut7ENoueBuDdixQ==}
-
-  '@ember/test-waiters@3.1.0':
-    resolution: {integrity: sha512-bb9h95ktG2wKY9+ja1sdsFBdOms2lB19VWs8wmNpzgHv1NCetonBoV5jHBV4DHt0uS1tg9z66cZqhUVlYs96KQ==}
-    engines: {node: 10.* || 12.* || >= 14.*}
 
   '@ember/test-waiters@4.1.1':
     resolution: {integrity: sha512-HbK70JYCDJcGI0CrwcbjeL2QHAn0HLwa3oGep7mr6l/yO95U7JYA8VN+/9VTsWJTmKueLtWayUqEmGS3a3mVOg==}
@@ -8409,15 +8405,6 @@ snapshots:
     transitivePeerDependencies:
       - '@babel/core'
       - '@glint/template'
-      - supports-color
-
-  '@ember/test-waiters@3.1.0':
-    dependencies:
-      calculate-cache-key-for-tree: 2.0.0
-      ember-cli-babel: 7.26.11
-      ember-cli-version-checker: 5.1.2
-      semver: 7.7.3
-    transitivePeerDependencies:
       - supports-color
 
   '@ember/test-waiters@4.1.1(@glint/template@1.7.3)':
