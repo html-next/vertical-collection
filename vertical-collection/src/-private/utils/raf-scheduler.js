@@ -1,4 +1,4 @@
-import { macroCondition, isDevelopingApp } from '@embroider/macros';
+import { DEBUG } from '@glimmer/env';
 import { begin, end } from '@ember/runloop';
 import { assert } from '@ember/debug';
 import { buildWaiter } from '@ember/test-waiters';
@@ -10,7 +10,7 @@ export class Token {
     this._parent = parent;
     this._cancelled = false;
 
-    if (macroCondition(isDevelopingApp())) {
+    if (DEBUG) {
       Object.seal(this);
     }
   }
@@ -48,7 +48,7 @@ export class Scheduler {
     this._nextFlush = null;
     this.ticks = 0;
 
-    if (macroCondition(isDevelopingApp())) {
+    if (DEBUG) {
       Object.seal(this);
     }
   }
