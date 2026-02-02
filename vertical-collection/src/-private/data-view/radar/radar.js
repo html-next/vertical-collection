@@ -20,7 +20,6 @@ import {
 
 import ViewportContainer from '../viewport-container.js';
 
-import closestElement from '../../utils/element/closest.js';
 import estimateElementHeight from '../../utils/element/estimate-element-height.js';
 import getScaledClientRect from '../../utils/element/get-scaled-client-rect.js';
 import keyForItem from '../../ember-internals/key-for-item.js';
@@ -131,10 +130,6 @@ export default class Radar {
 
     this._updateVirtualComponents();
 
-    // In older versions of Ember/IE, binding anything on an object in the template
-    // adds observers which creates __ember_meta__
-    this.__ember_meta__ = null;
-
     if (DEBUG) {
       this._debugDidUpdate = null;
     }
@@ -185,7 +180,7 @@ export default class Radar {
     this._scrollContainer =
       containerSelector === 'body'
         ? ViewportContainer
-        : closestElement(this._itemContainer, containerSelector);
+        : this._itemContainer.closest(containerSelector);
 
     this._updateConstants();
 
