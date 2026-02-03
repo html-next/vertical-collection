@@ -7,11 +7,11 @@ export default function estimateElementHeight(element, fallbackHeight) {
   );
   assert(`You called estimateElementHeight without an element`, element);
 
-  if (fallbackHeight.indexOf('%') !== -1) {
+  if (fallbackHeight.includes('%')) {
     return getPercentageHeight(element, fallbackHeight);
   }
 
-  if (fallbackHeight.indexOf('em') !== -1) {
+  if (fallbackHeight.includes('em')) {
     return getEmHeight(element, fallbackHeight);
   }
 
@@ -28,8 +28,9 @@ function getPercentageHeight(element, fallbackHeight) {
 }
 
 function getEmHeight(element, fallbackHeight) {
-  const fontSizeElement =
-    fallbackHeight.indexOf('rem') !== -1 ? document.documentElement : element;
+  const fontSizeElement = fallbackHeight.includes('rem')
+    ? document.documentElement
+    : element;
   const fontSize = window
     .getComputedStyle(fontSizeElement)
     .getPropertyValue('font-size');

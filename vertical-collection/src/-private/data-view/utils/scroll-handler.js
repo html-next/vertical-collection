@@ -1,8 +1,5 @@
 import { begin, end } from '@ember/runloop';
-import { scheduler } from 'ember-raf-scheduler';
-import SUPPORTS_PASSIVE from './supports-passive.js';
 const DEFAULT_ARRAY_SIZE = 10;
-const UNDEFINED_VALUE = Object.create(null);
 
 export class ScrollHandler {
   constructor() {
@@ -10,8 +7,6 @@ export class ScrollHandler {
     this.maxLength = DEFAULT_ARRAY_SIZE;
     this.length = 0;
     this.handlers = new Array(DEFAULT_ARRAY_SIZE);
-    this.isPolling = false;
-    this.isUsingPassive = SUPPORTS_PASSIVE;
   }
 
   addScrollHandler(element, handler) {
@@ -34,41 +29,28 @@ export class ScrollHandler {
         top: element.scrollTop,
         left: element.scrollLeft,
         handlers,
-      };
-      // TODO add explicit test
-      if (SUPPORTS_PASSIVE) {
-        cache.passiveHandler = function () {
+        passiveHandler() {
           ScrollHandler.triggerElementHandlers(element, cache);
-        };
-      } else {
-        cache.passiveHandler = UNDEFINED_VALUE;
-      }
+        },
+      };
     } else {
       cache = this.handlers[index];
       handlers = cache.handlers;
       handlers.push(handler);
     }
 
-    // TODO add explicit test
-    if (this.isUsingPassive) {
-      // Only add the event listener once, if more handlers are present.
-      if (handlers.length === 1) {
-        element.addEventListener('scroll', cache.passiveHandler, {
-          capture: true,
-          passive: true,
-        });
-      }
-
-      // TODO add explicit test
-    } else if (!this.isPolling) {
-      this.poll();
+    if (handlers.length === 1) {
+      element.addEventListener('scroll', cache.passiveHandler, {
+        capture: true,
+        passive: true,
+      });
     }
   }
 
   removeScrollHandler(element, handler) {
     let index = this.elements.indexOf(element);
     let elementCache = this.handlers[index];
-    // TODO add explicit test
+
     if (elementCache && elementCache.handlers) {
       let index = elementCache.handlers.indexOf(handler);
 
@@ -78,8 +60,6 @@ export class ScrollHandler {
 
       elementCache.handlers.splice(index, 1);
 
-      // cleanup element entirely if needed
-      // TODO add explicit test
       if (!elementCache.handlers.length) {
         index = this.elements.indexOf(element);
         this.handlers.splice(index, 1);
@@ -88,17 +68,10 @@ export class ScrollHandler {
         this.length--;
         this.maxLength--;
 
-        if (this.length === 0) {
-          this.isPolling = false;
-        }
-
-        // TODO add explicit test
-        if (this.isUsingPassive) {
-          element.removeEventListener('scroll', elementCache.passiveHandler, {
-            capture: true,
-            passive: true,
-          });
-        }
+        element.removeEventListener('scroll', elementCache.passiveHandler, {
+          capture: true,
+          passive: true,
+        });
       }
     } else {
       throw new Error(
@@ -118,7 +91,6 @@ export class ScrollHandler {
 
     let event = { top: cachedTop, left: cachedLeft };
 
-    // TODO add explicit test
     if (topChanged || leftChanged) {
       begin();
       for (let j = 0; j < meta.handlers.length; j++) {
@@ -126,30 +98,6 @@ export class ScrollHandler {
       }
       end();
     }
-  }
-
-  poll() {
-    this.isPolling = true;
-
-    scheduler.schedule('sync', () => {
-      // TODO add explicit test
-      if (!this.isPolling) {
-        return;
-      }
-
-      for (let i = 0; i < this.length; i++) {
-        let element = this.elements[i];
-        let info = this.handlers[i];
-
-        ScrollHandler.triggerElementHandlers(element, info);
-      }
-
-      this.isPolling = this.length > 0;
-      // TODO add explicit test
-      if (this.isPolling) {
-        this.poll();
-      }
-    });
   }
 }
 

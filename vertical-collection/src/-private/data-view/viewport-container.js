@@ -1,44 +1,24 @@
 /*
- * There are significant differences between browsers
- * in how they implement "scroll" on document.body
- *
- * The only cross-browser listener for scroll on body
- * is to listen on window with capture.
- *
- * They also implement different standards for how to
- * access the scroll position.
- *
- * This singleton class provides a cross-browser way
- * to access and set the scrollTop and scrollLeft properties.
- *
+ * This singleton class provides a way to treat the document viewport
+ * like a scrollable element, proxying scroll position access and
+ * event listeners to the appropriate browser APIs.
  */
 export function ViewportContainer() {
-  // A bug occurs in Chrome when we reload the browser at a lower
-  // scrollTop, window.scrollY becomes stuck on a single value.
   Object.defineProperty(this, 'scrollTop', {
     get() {
-      return document.body.scrollTop || document.documentElement.scrollTop;
+      return window.scrollY;
     },
     set(v) {
-      document.body.scrollTop = document.documentElement.scrollTop = v;
+      window.scrollTo(window.scrollX, v);
     },
   });
 
   Object.defineProperty(this, 'scrollLeft', {
     get() {
-      return (
-        window.scrollX ||
-        window.pageXOffset ||
-        document.body.scrollLeft ||
-        document.documentElement.scrollLeft
-      );
+      return window.scrollX;
     },
     set(v) {
-      window.scrollX =
-        window.pageXOffset =
-        document.body.scrollLeft =
-        document.documentElement.scrollLeft =
-          v;
+      window.scrollTo(v, window.scrollY);
     },
   });
 
