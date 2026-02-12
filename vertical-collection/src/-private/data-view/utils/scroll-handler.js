@@ -1,5 +1,5 @@
 import { begin, end } from '@ember/runloop';
-import { scheduler } from 'ember-raf-scheduler';
+import { scheduler } from '../../utils/raf-scheduler.js';
 import SUPPORTS_PASSIVE from './supports-passive.js';
 const DEFAULT_ARRAY_SIZE = 10;
 const UNDEFINED_VALUE = Object.create(null);
