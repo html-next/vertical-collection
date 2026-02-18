@@ -1,5 +1,10 @@
 # Changelog
 
+
+
+
+
+
 ## Release (2026-01-25)
 
 * @html-next/vertical-collection 5.0.2 (patch)
