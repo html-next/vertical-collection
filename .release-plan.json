@@ -2,17 +2,21 @@
   "solution": {
     "@html-next/vertical-collection": {
       "impact": "patch",
-      "oldVersion": "5.0.1",
-      "newVersion": "5.0.2",
+      "oldVersion": "5.0.2",
+      "newVersion": "5.0.3",
       "tagName": "latest",
       "constraints": [
         {
           "impact": "patch",
           "reason": "Appears in changelog section :bug: Bug Fix"
+        },
+        {
+          "impact": "patch",
+          "reason": "Appears in changelog section :house: Internal"
         }
       ],
       "pkgJSONPath": "./vertical-collection/package.json"
     }
   },
-  "description": "## Release (2026-01-25)\n\n* @html-next/vertical-collection 5.0.2 (patch)\n\n#### :bug: Bug Fix\n* `@html-next/vertical-collection`\n  * [#518](https://github.com/html-next/vertical-collection/pull/518) fix for '@html-next/vertical-collection is missing its addon main file' ([@johanrd](https://github.com/johanrd))\n\n#### :memo: Documentation\n* [#519](https://github.com/html-next/vertical-collection/pull/519) update readme with import example for strict mode templates ([@johanrd](https://github.com/johanrd))\n\n#### Committers: 1\n- [@johanrd](https://github.com/johanrd)\n"
+  "description": "## Release (2026-02-27)\n\n* @html-next/vertical-collection 5.0.3 (patch)\n\n#### :bug: Bug Fix\n* `@html-next/vertical-collection`\n  * [#527](https://github.com/html-next/vertical-collection/pull/527) fix debugger removeEventListener prototype misasignment? ([@johanrd](https://github.com/johanrd))\n\n#### :house: Internal\n* `@html-next/vertical-collection`\n  * [#526](https://github.com/html-next/vertical-collection/pull/526) Baseline 2018 ([@johanrd](https://github.com/johanrd))\n\n#### Committers: 1\n- [@johanrd](https://github.com/johanrd)\n"
 }
