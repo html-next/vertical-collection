@@ -37,7 +37,7 @@ ViewportContainer.prototype.addEventListener = function addEventListener(
   return window.addEventListener(event, handler, options);
 };
 
-ViewportContainer.prototype.removeEventListener = function addEventListener(
+ViewportContainer.prototype.removeEventListener = function removeEventListener(
   event,
   handler,
   options,
