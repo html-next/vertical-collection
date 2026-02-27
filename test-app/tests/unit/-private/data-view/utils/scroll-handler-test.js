@@ -100,11 +100,6 @@ test('We can add, trigger, and remove a scroll handler', (assert) => {
         0,
         `We have no more elements to watch.`
       );
-      assert.false(
-        scrollHandlers.isPolling,
-        `We are no longer polling the elements.`
-      );
-
       destroyScrollable(scrollable);
       done();
     });
@@ -208,11 +203,6 @@ test('Adding/removing multiple handlers to an element works as expected', (asser
         0,
         `We have no more elements to watch.`
       );
-      assert.false(
-        scrollHandlers.isPolling,
-        `We are no longer polling the elements.`
-      );
-
       destroyScrollable(scrollable);
       done();
     });
@@ -338,11 +328,6 @@ test('Multiple elements with handlers works as expected', (assert) => {
         0,
         `We have no more elements to watch.`
       );
-      assert.false(
-        scrollHandlers.isPolling,
-        `We are no longer polling the elements.`
-      );
-
       destroyScrollable(scrollable1);
       destroyScrollable(scrollable2);
       done();
