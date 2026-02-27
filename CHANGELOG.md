@@ -1,5 +1,20 @@
 # Changelog
 
+## Release (2026-02-27)
+
+* @html-next/vertical-collection 5.0.3 (patch)
+
+#### :bug: Bug Fix
+* `@html-next/vertical-collection`
+  * [#527](https://github.com/html-next/vertical-collection/pull/527) fix debugger removeEventListener prototype misasignment? ([@johanrd](https://github.com/johanrd))
+
+#### :house: Internal
+* `@html-next/vertical-collection`
+  * [#526](https://github.com/html-next/vertical-collection/pull/526) Baseline 2018 ([@johanrd](https://github.com/johanrd))
+
+#### Committers: 1
+- [@johanrd](https://github.com/johanrd)
+
 ## Release (2026-01-25)
 
 * @html-next/vertical-collection 5.0.2 (patch)
