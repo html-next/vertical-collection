@@ -1,22 +1,8 @@
 {
   "solution": {
     "@html-next/vertical-collection": {
-      "impact": "patch",
-      "oldVersion": "5.0.2",
-      "newVersion": "5.0.3",
-      "tagName": "latest",
-      "constraints": [
-        {
-          "impact": "patch",
-          "reason": "Appears in changelog section :bug: Bug Fix"
-        },
-        {
-          "impact": "patch",
-          "reason": "Appears in changelog section :house: Internal"
-        }
-      ],
-      "pkgJSONPath": "./vertical-collection/package.json"
+      "oldVersion": "5.0.3"
     }
   },
-  "description": "## Release (2026-02-27)\n\n* @html-next/vertical-collection 5.0.3 (patch)\n\n#### :bug: Bug Fix\n* `@html-next/vertical-collection`\n  * [#527](https://github.com/html-next/vertical-collection/pull/527) fix debugger removeEventListener prototype misasignment? ([@johanrd](https://github.com/johanrd))\n\n#### :house: Internal\n* `@html-next/vertical-collection`\n  * [#526](https://github.com/html-next/vertical-collection/pull/526) Baseline 2018 ([@johanrd](https://github.com/johanrd))\n\n#### Committers: 1\n- [@johanrd](https://github.com/johanrd)\n"
+  "description": "\n\n\n\n"
 }
