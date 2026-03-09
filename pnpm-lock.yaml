@@ -145,7 +145,7 @@ importers:
         version: 3.0.1(e3baff5ddaaca4fa248ad547544a0562)
       ember-modifier:
         specifier: ^4.2.2
-        version: 4.2.2(@babel/core@7.28.6)
+        version: 4.3.0(@babel/core@7.28.6)
       ember-qunit:
         specifier: ^9.0.4
         version: 9.0.4(5e118be394018fcd6280028a0e3da359)
@@ -3546,8 +3546,8 @@ packages:
     peerDependencies:
       ember-source: '>= 5'
 
-  ember-modifier@4.2.2:
-    resolution: {integrity: sha512-pPYBAGyczX0hedGWQFQOEiL9s45KS9efKxJxUQkMLjQyh+1Uef1mcmAGsdw2KmvNupITkE/nXxmVO1kZ9tt3ag==}
+  ember-modifier@4.3.0:
+    resolution: {integrity: sha512-O0rirSLQbGg0VJ/NqoQ4uN1bh2iAekZC/Ykma+FkjCM2ofrO38u+d8n3+AK6uVWeMJmogGX2KL+Is5fofoInJg==}
 
   ember-perf-timeline@2.1.0:
     resolution: {integrity: sha512-Y+rd9sI54UgO5cvcQ38oOrRdDJ1fzD8wtQ8N5KD5FCJY3LaD8GVcx7UFzx0NM0/X33pqQZjSS/2VmKRHRPdggg==}
@@ -12349,12 +12349,10 @@ snapshots:
     dependencies:
       ember-source: 6.10.0(@glimmer/component@2.0.0)(rsvp@4.8.5)
 
-  ember-modifier@4.2.2(@babel/core@7.28.6):
+  ember-modifier@4.3.0(@babel/core@7.28.6):
     dependencies:
       '@embroider/addon-shim': 1.10.2
       decorator-transforms: 2.3.1(@babel/core@7.28.6)
-      ember-cli-normalize-entity-name: 1.0.0
-      ember-cli-string-utils: 1.1.0
     transitivePeerDependencies:
       - '@babel/core'
       - supports-color
