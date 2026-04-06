@@ -9,7 +9,9 @@ module.exports = async function (defaults) {
 
   const { setConfig } = await import('@warp-drive/core/build-config');
 
-  let app = new EmberApp(defaults || {}, {});
+  // Provide empty project object if defaults is undefined to prevent
+  // EmberApp from trying to access defaults.project properties
+  let app = new EmberApp(defaults || { project: {} }, {});
 
   setConfig(app, __dirname, {
     // this should be the most recent <major>.<minor> version for
