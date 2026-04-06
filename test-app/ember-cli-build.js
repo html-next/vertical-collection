@@ -9,9 +9,19 @@ module.exports = async function (defaults) {
 
   const { setConfig } = await import('@warp-drive/core/build-config');
 
-  // Provide empty project object if defaults is undefined to prevent
+  // Provide mock project object if defaults is undefined to prevent
   // EmberApp from trying to access defaults.project properties
-  let app = new EmberApp(defaults || { project: {} }, {});
+  const mockProject = {
+    name: () => 'test-app',
+    root: __dirname,
+    config: () => ({}),
+    isEmberCLIProject: () => true,
+    pkg: { name: 'test-app' },
+    bowerDirectory: 'bower_components',
+    env: process.env.EMBER_ENV || 'development',
+    debug: () => {},
+  };
+  let app = new EmberApp(defaults || { project: mockProject }, {});
 
   setConfig(app, __dirname, {
     // this should be the most recent <major>.<minor> version for
