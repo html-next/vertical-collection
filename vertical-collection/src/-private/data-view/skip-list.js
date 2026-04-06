@@ -107,7 +107,12 @@ export default class SkipList {
     let totalBefore = 0;
     let totalAfter = 0;
 
+    if (total <= 0) {
+      return { index: 0, totalBefore: 0, totalAfter: 0 };
+    }
+
     targetValue = Math.min(total - 1, targetValue);
+    targetValue = Math.max(0, targetValue);
 
     assert('targetValue must be a number', typeof targetValue === 'number');
     assert('targetValue must be greater than or equal to 0', targetValue >= 0);
@@ -176,6 +181,7 @@ export default class SkipList {
 
   set(index, value) {
     assert('value must be a number', typeof value === 'number');
+    value = Math.max(0, value);
     assert('value must non-negative', value >= 0);
     assert('index must be a number', typeof index === 'number');
     assert(
