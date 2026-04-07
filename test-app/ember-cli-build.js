@@ -9,7 +9,12 @@ module.exports = async function (defaults = {}) {
 
   const { setConfig } = await import('@warp-drive/core/build-config');
 
-  let app = new EmberApp(defaults, {});
+  let app = new EmberApp(defaults, {
+    vendorFiles: {
+      'ember.js': null,
+      'ember-testing.js': null,
+    },
+  });
 
   setConfig(app, __dirname, {
     // this should be the most recent <major>.<minor> version for
