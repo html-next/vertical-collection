@@ -1,5 +1,16 @@
 # Changelog
 
+## Release (2026-04-07)
+
+* @html-next/vertical-collection 5.0.4 (patch)
+
+#### :bug: Bug Fix
+* `@html-next/vertical-collection`
+  * [#555](https://github.com/html-next/vertical-collection/pull/555) Fix skip-list edge cases with zero totals and negative values ([@lukemelia](https://github.com/lukemelia))
+
+#### Committers: 1
+- Luke Melia ([@lukemelia](https://github.com/lukemelia))
+
 ## Release (2026-02-27)
 
 * @html-next/vertical-collection 5.0.3 (patch)
