@@ -57,12 +57,16 @@ module('Unit | SkipList', function () {
     assert.strictEqual(
       list.total,
       originalTotal - 10,
-      'total is reduced by the original value (clamped to 0)',
+      'total is reduced by the original value (clamped to 0)'
     );
 
     // Verify the stored value is 0, not negative
     let result = list.find(0);
-    assert.strictEqual(result.index, 0, 'list still functions after clamped set');
+    assert.strictEqual(
+      result.index,
+      0,
+      'list still functions after clamped set'
+    );
   });
 
   test('set works normally with valid values', function (assert) {
@@ -70,6 +74,10 @@ module('Unit | SkipList', function () {
 
     list.set(1, 20);
 
-    assert.strictEqual(list.total, 40, 'total updated correctly (10 + 20 + 10)');
+    assert.strictEqual(
+      list.total,
+      40,
+      'total updated correctly (10 + 20 + 10)'
+    );
   });
 });
