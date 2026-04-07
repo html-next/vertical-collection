@@ -2,6 +2,7 @@ export { default as keyForItem } from './ember-internals/key-for-item.js';
 
 export { default as DynamicRadar } from './data-view/radar/dynamic-radar.js';
 export { default as StaticRadar } from './data-view/radar/static-radar.js';
+export { default as SkipList } from './data-view/skip-list.js';
 
 export { default as ViewportContainer } from './data-view/viewport-container.js';
 export { default as objectAt } from './data-view/utils/object-at.js';
