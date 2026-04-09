@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from '../../helpers';
-import { scheduler } from 'ember-raf-scheduler';
+import { scheduler } from '@html-next/vertical-collection/-private/index';
 
 import { click, find, findAll, visit as newVisit } from '@ember/test-helpers';
 import scrollTo from '../../helpers/scroll-to';

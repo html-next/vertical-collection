@@ -16,7 +16,7 @@ import Component from '@ember/component';
 import { get, computed } from '@ember/object';
 import { run } from '@ember/runloop';
 
-import { scheduler, Token } from 'ember-raf-scheduler';
+import { scheduler, Token } from '../-private/utils/raf-scheduler.js';
 
 import {
   keyForItem,
