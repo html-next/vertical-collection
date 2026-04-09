@@ -67,7 +67,14 @@ jobs:
           - ember-release
           - ember-beta
           - ember-canary
+        allow-failure: [false]
+        include:
+          - try-scenario: ember-beta
+            allow-failure: true
+          - try-scenario: ember-canary
+            allow-failure: true
 
+    continue-on-error: ${{ matrix.allow-failure }}
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
