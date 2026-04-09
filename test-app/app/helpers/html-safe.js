@@ -1,17 +1,6 @@
 import { htmlSafe } from '@ember/template';
-import Helper, { helper } from '@ember/component/helper';
-import Ember from 'ember';
+import { helper } from '@ember/component/helper';
 
-let htmlSafeHelper;
-
-if (Helper) {
-  htmlSafeHelper = helper(function (params) {
-    return htmlSafe(params[0]);
-  });
-} else {
-  htmlSafeHelper = Ember.Handlebars.makeBoundHelper(function (...params) {
-    return htmlSafe(params[0]);
-  });
-}
-
-export default htmlSafeHelper;
+export default helper(function (params) {
+  return htmlSafe(params[0]);
+});
