@@ -18,10 +18,10 @@ importers:
     dependencies:
       '@html-next/vertical-collection':
         specifier: workspace:*
-        version: link:../vertical-collection
+        version: file:vertical-collection
       ember-raf-scheduler:
-        specifier: 0.3.0
-        version: 0.3.0
+        specifier: 0.5.1
+        version: 0.5.1(c8332dc3f90c0e60eb130a3a85f980b9)
     devDependencies:
       '@babel/core':
         specifier: ^7.28.4
@@ -216,8 +216,8 @@ importers:
         specifier: ^1.10.2
         version: 1.10.2
       ember-raf-scheduler:
-        specifier: ~0.3.0
-        version: 0.3.0
+        specifier: ~0.5.1
+        version: 0.5.1(c8332dc3f90c0e60eb130a3a85f980b9)
     devDependencies:
       '@babel/eslint-parser':
         specifier: ^7.22.10
@@ -1401,6 +1401,10 @@ packages:
   '@handlebars/parser@2.2.2':
     resolution: {integrity: sha512-n/SZW+12rwikx/f8YcSv9JCi5p9vn1Bnts9ZtVvfErG4h0gbjHI1H1ZMhVUnaOC7yzFc6PtsCKIK8XeTnL90Gw==}
     engines: {node: ^18 || ^20 || ^22 || >=24}
+
+  '@html-next/vertical-collection@file:vertical-collection':
+    resolution: {directory: vertical-collection, type: directory}
+    engines: {node: '>= 18'}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -3370,6 +3374,9 @@ packages:
   ember-raf-scheduler@0.3.0:
     resolution: {integrity: sha512-i8JWQidNCX7n5TOTIKRDR0bnsQN9aJh/GtOJKINz2Wr+I7L7sYVhli6MFqMYNGKC9j9e6iWsznfAIxddheyEow==}
     engines: {node: 12.* || 14.* || >= 16}
+
+  ember-raf-scheduler@0.5.1:
+    resolution: {integrity: sha512-VrTEFl64Txj7XZ95qlDxyhvNDPmOtqixV7OkmhoKhjHSIL+fnvkbYsGDhJHCFf6arLjs2FIZsMcyXUS/BbxFlA==}
 
   ember-resolver@13.2.0:
     resolution: {integrity: sha512-A+BffoSKC0ngiczbgaz/IOY66ovZVRRHHIDDi+d7so5i0By8xuB4nXgZZ6Dv3u/3WwoUyixgUvb0xTUO+MtupA==}
@@ -8585,6 +8592,13 @@ snapshots:
 
   '@handlebars/parser@2.2.2': {}
 
+  '@html-next/vertical-collection@file:vertical-collection':
+    dependencies:
+      '@embroider/addon-shim': 1.10.2
+      ember-raf-scheduler: 0.3.0
+    transitivePeerDependencies:
+      - supports-color
+
   '@humanfs/core@0.19.1': {}
 
   '@humanfs/node@0.16.7':
@@ -10996,6 +11010,16 @@ snapshots:
     dependencies:
       ember-cli-babel: 7.26.11
     transitivePeerDependencies:
+      - supports-color
+
+  ember-raf-scheduler@0.5.1(c8332dc3f90c0e60eb130a3a85f980b9):
+    dependencies:
+      '@ember/test-waiters': 4.1.1(c8332dc3f90c0e60eb130a3a85f980b9)
+      '@embroider/addon-shim': 1.10.2
+      '@embroider/macros': 1.20.2(c8332dc3f90c0e60eb130a3a85f980b9)
+    transitivePeerDependencies:
+      - '@babel/core'
+      - '@glint/template'
       - supports-color
 
   ember-resolver@13.2.0: {}
