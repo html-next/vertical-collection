@@ -46,7 +46,7 @@
     "@ember/string": "^4.0.1",
     "@ember/test-helpers": "^5.3.0",
     "@ember/test-waiters": "^4.1.1",
-    "@embroider/compat": "^4.1.7",
+    "@embroider/compat": "^4.1.17",
     "@embroider/config-meta-loader": "^1.0.0",
     "@embroider/core": "^4.2.4",
     "@embroider/legacy-inspector-support": "^0.1.3",

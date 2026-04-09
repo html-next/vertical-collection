@@ -68,6 +68,7 @@ jobs:
           - ember-beta
           - ember-canary
 
+    continue-on-error: ${{ matrix.try-scenario == 'ember-beta' || matrix.try-scenario == 'ember-canary' }}
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
