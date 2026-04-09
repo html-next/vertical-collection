@@ -46,6 +46,7 @@ export class Scheduler {
     this.affect = [];
     this.jobs = 0;
     this._nextFlush = null;
+    this._flushToken = null;
     this.ticks = 0;
 
     if (DEBUG) {
@@ -80,6 +81,7 @@ export class Scheduler {
       return;
     }
 
+    this._flushToken = waiter.beginAsync();
     this._nextFlush = requestAnimationFrame(() => {
       this.flush();
     });
@@ -128,6 +130,7 @@ export class Scheduler {
     }
 
     this._nextFlush = null;
+    waiter.endAsync(this._flushToken);
     if (this.jobs > 0) {
       this._flush();
     }
