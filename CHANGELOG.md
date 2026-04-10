@@ -1,27 +1,5 @@
 # Changelog
 
-## Release (2026-04-10)
-
-* @html-next/vertical-collection 5.0.5 (patch)
-
-#### :bug: Bug Fix
-* `@html-next/vertical-collection`
-  * [#561](https://github.com/html-next/vertical-collection/pull/561) Upgrade raf scheduler to 0.5.1 ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
-  * [#555](https://github.com/html-next/vertical-collection/pull/555) Fix skip-list edge cases with zero totals and negative values ([@lukemelia](https://github.com/lukemelia))
-
-#### :house: Internal
-* Other
-  * [#559](https://github.com/html-next/vertical-collection/pull/559) Replace ember-lts-6.4 and ember-lts-6.8 scenarios with ember-lts-6.12 ([@NullVoxPopuli-ai-agent](https://github.com/NullVoxPopuli-ai-agent))
-  * [#557](https://github.com/html-next/vertical-collection/pull/557) Update test-app dependencies for ember-source 7 compatibility ([@NullVoxPopuli-ai-agent](https://github.com/NullVoxPopuli-ai-agent))
-* `@html-next/vertical-collection`
-  * [#539](https://github.com/html-next/vertical-collection/pull/539) Prepare Release v5.0.4 ([@github-actions[bot]](https://github.com/apps/github-actions))
-
-#### Committers: 4
-- @NullVoxPopuli's reduced-access machine account for AI usage ([@NullVoxPopuli-ai-agent](https://github.com/NullVoxPopuli-ai-agent))
-- GitHub Actions [Bot] ([@github-actions](https://github.com/apps/github-actions))
-- Luke Melia ([@lukemelia](https://github.com/lukemelia))
-- [@NullVoxPopuli](https://github.com/NullVoxPopuli)
-
 ## Release (2026-04-07)
 
 * @html-next/vertical-collection 5.0.4 (patch)

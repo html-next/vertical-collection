@@ -2,21 +2,17 @@
   "solution": {
     "@html-next/vertical-collection": {
       "impact": "patch",
-      "oldVersion": "5.0.4",
-      "newVersion": "5.0.5",
+      "oldVersion": "5.0.3",
+      "newVersion": "5.0.4",
       "tagName": "latest",
       "constraints": [
         {
           "impact": "patch",
           "reason": "Appears in changelog section :bug: Bug Fix"
-        },
-        {
-          "impact": "patch",
-          "reason": "Appears in changelog section :house: Internal"
         }
       ],
       "pkgJSONPath": "./vertical-collection/package.json"
     }
   },
-  "description": "## Release (2026-04-10)\n\n* @html-next/vertical-collection 5.0.5 (patch)\n\n#### :bug: Bug Fix\n* `@html-next/vertical-collection`\n  * [#561](https://github.com/html-next/vertical-collection/pull/561) Upgrade raf scheduler to 0.5.1 ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#555](https://github.com/html-next/vertical-collection/pull/555) Fix skip-list edge cases with zero totals and negative values ([@lukemelia](https://github.com/lukemelia))\n\n#### :house: Internal\n* Other\n  * [#559](https://github.com/html-next/vertical-collection/pull/559) Replace ember-lts-6.4 and ember-lts-6.8 scenarios with ember-lts-6.12 ([@NullVoxPopuli-ai-agent](https://github.com/NullVoxPopuli-ai-agent))\n  * [#557](https://github.com/html-next/vertical-collection/pull/557) Update test-app dependencies for ember-source 7 compatibility ([@NullVoxPopuli-ai-agent](https://github.com/NullVoxPopuli-ai-agent))\n* `@html-next/vertical-collection`\n  * [#539](https://github.com/html-next/vertical-collection/pull/539) Prepare Release v5.0.4 ([@github-actions[bot]](https://github.com/apps/github-actions))\n\n#### Committers: 4\n- @NullVoxPopuli's reduced-access machine account for AI usage ([@NullVoxPopuli-ai-agent](https://github.com/NullVoxPopuli-ai-agent))\n- GitHub Actions [Bot] ([@github-actions](https://github.com/apps/github-actions))\n- Luke Melia ([@lukemelia](https://github.com/lukemelia))\n- [@NullVoxPopuli](https://github.com/NullVoxPopuli)\n"
+  "description": "## Release (2026-04-07)\n\n* @html-next/vertical-collection 5.0.4 (patch)\n\n#### :bug: Bug Fix\n* `@html-next/vertical-collection`\n  * [#555](https://github.com/html-next/vertical-collection/pull/555) Fix skip-list edge cases with zero totals and negative values ([@lukemelia](https://github.com/lukemelia))\n\n#### Committers: 1\n- Luke Melia ([@lukemelia](https://github.com/lukemelia))\n"
 }
