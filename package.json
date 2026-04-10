@@ -14,7 +14,7 @@
     "update:snippets": "node ./scripts/write-snippets.mjs"
   },
   "devDependencies": {
-    "release-plan": "^0.17.4"
+    "release-plan": "^0.18.0"
   },
   "packageManager": "pnpm@10.28.1",
   "volta": {
