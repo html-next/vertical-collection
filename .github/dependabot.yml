@@ -10,13 +10,35 @@ updates:
     open-pull-requests-limit: 4
     labels:
       - "dependencies"
+    reviewers:
+      - "@Addepar/web-core"
+    groups:
+      typescript-eslint:
+        applies-to: version-updates
+        patterns:
+          - "@typescript-eslint/*"
+      Babel:
+        applies-to: version-updates
+        patterns:
+          - "@babel/*"
+      Embroider:
+        applies-to: version-updates
+        patterns:
+          - "@embroider/*"
+      Eslint:
+        applies-to: version-updates
+        patterns:
+          - "@eslint/*"
+          - "eslint-*"
       
   - package-ecosystem: "github-actions"
     # Workflow files stored in the
     # default location of `.github/workflows`
-    directory: "/.github"
+    directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 2
     labels:
       - "dependencies"
+    reviewers:
+      - "@Addepar/web-core"
