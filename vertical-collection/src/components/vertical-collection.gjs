@@ -400,7 +400,7 @@ class VerticalCollection extends Component.extend({
     const { _radar } = this;
     // Getting the offset height from Radar
     let scrollTop = _radar.getOffsetForIndex(index);
-    _radar._scrollContainer.scrollTop = scrollTop;
+    _radar._scrollContainer.scrollTop = scrollTop + _radar._collectionOffset;
     // To scroll exactly to specified index, we are changing the prevIndex values to specified index
     _radar._prevFirstVisibleIndex = _radar._prevFirstItemIndex = index;
     // Components will be rendered after schedule 'measure' inside 'update' method.
