@@ -242,17 +242,25 @@ class VerticalCollection extends Component.extend({
   staticHeight: false,
 
   /**
-   * Indicates whether or not list items in the Radar should be reused on update of virtual components (e.g. scroll).
-   * This yields performance benefits because it is not necessary to repopulate the component pool of the radar.
-   * Set to false when recycling a component instance has undesirable ramifications including:
-   *  - When using `unbound` in a component or sub-component
-   *  - When using init for instance state that differs between instances of a component or sub-component
-   *      (can move to didInitAttrs to fix this)
-   *  - When templates for individual items vary widely or are based on conditionals that are likely to change
-   *      (i.e. would defeat any benefits of DOM recycling anyway)
+   * Indicates whether the rendered block of an item that scrolls out of the rendered range is
+   * reused for the item that scrolls in. Reuse keeps the `{{#each}}` key of the block stable, so
+   * the components inside it are not torn down and only the yielded item and index change. This
+   * does less work than rendering a block again for every item that scrolls in.
+   *
+   * Reuse is only safe if the block derives everything it renders from the yielded item and index.
+   * A reused block keeps all other state, which then belongs to the item that was rendered there
+   * before, and shows as stale content. Set to false when the block holds:
+   *  - `unbound` values
+   *  - state copied from arguments in a constructor, an init, or a class field
+   *  - state set once from an element modifier or from didInsertElement
+   *  - uncontrolled DOM state, e.g. a nested scroll position, typed input, or a running transition
+   *
+   * Also set to false when the templates for individual items vary widely, or depend on
+   * conditionals that are likely to change, because that defeats the benefit of reuse anyway.
    *
    * @property shouldRecycle
    * @type Boolean
+   * @default true
    */
   shouldRecycle: true,
 
