@@ -1,0 +1,9 @@
+# Unlabeled Changes
+
+* `@html-next/vertical-collection`
+  * [#568](https://github.com/html-next/vertical-collection/pull/568) docs: explain shouldRecycle ([@johanrd](https://github.com/johanrd))
+* Other
+  * [#569](https://github.com/html-next/vertical-collection/pull/569) chore: bump warp-drive and embroider to fix ember 7 CI ([@johanrd](https://github.com/johanrd))
+
+
+*Cannot plan release until the above changes are labeled*.
