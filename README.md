@@ -44,6 +44,7 @@ import { VerticalCollection } from '@html-next/vertical-collection'
     @tagName="ul"
     @estimateHeight={{50}}
     @staticHeight={{false}}
+    @shouldRecycle={{true}}
     @bufferSize={{1}}
     @renderAll={{false}}
     @renderFromLast={{false}}
@@ -69,6 +70,23 @@ import { VerticalCollection } from '@html-next/vertical-collection'
 `firstVisibleChanged` - Triggered when the first element in the viewport changes
 
 `lastVisibleChanged` - Triggered when the last element in the viewport changes
+
+### Recycling
+
+When an item scrolls out of the rendered range, the collection either keeps its rendered block for the item that scrolls in, or throws it away. `shouldRecycle` (default: `true`) picks between the two.
+
+With `@shouldRecycle={{true}}`, the block goes into a pool and is reused. Glimmer sees the same `{{#each}}` key, so the components inside the block stay alive and only the yielded `item` and `index` change. While you scroll, no block is torn down and rendered again, so this path does less work.
+
+With `@shouldRecycle={{false}}`, the block is destroyed, and the item that scrolls in gets a new block with new component instances.
+
+Reuse is only safe if the block derives everything it renders from the yielded `item` and `index`. A reused block keeps all other state, and that state belongs to the item that was rendered there before. It shows stale content when the block holds:
+
+- `{{unbound}}` values;
+- state copied from arguments in a `constructor`, an `init`, or a class field;
+- state set once from an element modifier or from `didInsertElement`;
+- uncontrolled DOM state, such as the scroll position of a nested element, text the user typed into an `<input>`, or a running CSS transition.
+
+The symptom is a row that renders values from a row you scrolled past. Prefer to make the block fully derived, because derived state is the better pattern anyway. Set `@shouldRecycle={{false}}` when you cannot.
 
 ## Support Matrix
 

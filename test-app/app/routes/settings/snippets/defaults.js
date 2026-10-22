@@ -45,7 +45,17 @@ export default /* ! BEGIN-SNIPPET vertical-collection-defaults-example */
   // that will be added, such that:
   //
   // numComponents === Math.ceil(containerHeight / estimateHeight) + (bufferSize * 2) + 1
-  bufferSize: 0,
+  bufferSize: 1,
+
+  // Determines whether the rendered block of an item that
+  // scrolls out of range is reused for the item that
+  // scrolls in. Reuse does less work, but the block must derive
+  // everything it renders from the yielded item and index.
+  // A reused block keeps all other state, which then
+  // belongs to the item rendered there before and shows as
+  // stale content. Set to false when the block cannot be
+  // fully derived.
+  shouldRecycle: true,
 
   // actions
 
