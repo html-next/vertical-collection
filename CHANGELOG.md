@@ -1,5 +1,19 @@
 # Changelog
 
+## Release (2026-10-22)
+
+* @html-next/vertical-collection 5.0.6 (patch)
+
+#### :memo: Documentation
+* `@html-next/vertical-collection`
+  * [#568](https://github.com/html-next/vertical-collection/pull/568) docs: explain shouldRecycle ([@johanrd](https://github.com/johanrd))
+
+#### :house: Internal
+* [#569](https://github.com/html-next/vertical-collection/pull/569) chore: bump warp-drive and embroider to fix ember 7 CI ([@johanrd](https://github.com/johanrd))
+
+#### Committers: 1
+- Johan Røed ([@johanrd](https://github.com/johanrd))
+
 ## Release (2026-04-10)
 
 * @html-next/vertical-collection 5.0.5 (patch)
