@@ -2,8 +2,8 @@ import { DEBUG } from '@glimmer/env';
 import { assert } from '@ember/debug';
 
 import Component from '@glimmer/component';
+import { helper } from '@ember/component/helper';
 import { registerDestructor } from '@ember/destroyable';
-import { createCache, getValue } from '@glimmer/tracking/primitives/cache';
 import { run } from '@ember/runloop';
 
 import { scheduler, Token } from 'ember-raf-scheduler';
@@ -354,33 +354,36 @@ class VerticalCollection extends Component {
     return this.isEmpty;
   }
 
-  #virtualComponents = createCache(() => {
-    const { _radar } = this;
+  /**
+   * The pool of components the template renders. Called from the template with the
+   * inputs it depends on, so it runs again when one of them changes: the items, their
+   * length, which a tracked array reports when it changes in place, and the radar settings.
+   *
+   * Wrapped in `helper()` for Ember 3.28. From Ember 4.5 a plain function can be
+   * called from the template, and the wrapper can go.
+   */
+  virtualComponents = helper(
+    // the second argument is the length of the items, which a tracked array reports
+    ([items, , renderAll, estimateHeight, bufferSize]) => {
+      const { _radar } = this;
 
-    // Reading the length makes this run again when a tracked array changes in place.
-    // With Ember 4.5 as the floor, this cache can become a plain function that the
-    // template calls with this.items, this.items.length and the three radar settings.
-    const items = this.items ?? [];
-    assert(
-      '@items must be an array. ArrayProxy and PromiseArray are not supported.',
-      Array.isArray(items),
-    );
-    items.length;
+      items ??= [];
+      assert(
+        '@items must be an array. ArrayProxy and PromiseArray are not supported.',
+        Array.isArray(items),
+      );
 
-    _radar.items = items;
-    _radar.estimateHeight = this.estimateHeight;
-    _radar.renderAll = this.renderAll;
-    _radar.bufferSize = this.bufferSize;
+      _radar.items = items;
+      _radar.estimateHeight = estimateHeight;
+      _radar.renderAll = renderAll;
+      _radar.bufferSize = bufferSize;
 
-    _radar.scheduleUpdate(true);
-    this._clearScheduledActions();
+      _radar.scheduleUpdate(true);
+      this._clearScheduledActions();
 
-    return _radar.virtualComponents;
-  });
-
-  get virtualComponents() {
-    return getValue(this.#virtualComponents);
-  }
+      return _radar.virtualComponents;
+    },
+  );
 
   schedule(queueName, job) {
     return scheduler.schedule(queueName, job, this.token);
@@ -678,7 +681,17 @@ class VerticalCollection extends Component {
   }
 
   <template>
-    {{#each this.virtualComponents key="id" as |virtualComponent|~}}
+    {{#each
+      (this.virtualComponents
+        this.items
+        this.items.length
+        this.renderAll
+        this.estimateHeight
+        this.bufferSize
+      )
+      key="id"
+      as |virtualComponent|
+    ~}}
       {{~unbound virtualComponent.upperBound~}}
       {{~#if virtualComponent.isOccludedContent~}}
         {{{unbound virtualComponent.element}}}
