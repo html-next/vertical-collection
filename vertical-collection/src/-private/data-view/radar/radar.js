@@ -1,7 +1,6 @@
-import { set, get } from '@ember/object';
+import { run } from '@ember/runloop';
 import { TrackedArray } from 'tracked-built-ins';
 import { assert } from '@ember/debug';
-import { run } from '@ember/runloop';
 import { DEBUG } from '@glimmer/env';
 
 import { Token, scheduler } from 'ember-raf-scheduler';
@@ -58,7 +57,7 @@ export default class Radar {
 
     // defaults to a no-op intentionally, actions will only be sent if they
     // are passed into the component
-    this.sendAction = () => {};
+    this.notify = () => {};
 
     // Calculated constants
     this._itemContainer = null;
@@ -156,7 +155,7 @@ export default class Radar {
     this._occludedContentAfter.destroy();
 
     this.orderedComponents = null;
-    set(this, 'virtualComponents', null);
+    this.virtualComponents = null;
 
     if (this._started) {
       removeScrollHandler(this._scrollContainer, this._scrollHandler);
@@ -606,6 +605,9 @@ export default class Radar {
             component.realUpperBound,
             component.realLowerBound,
           );
+          // Each removal renders in its own runloop. Removing them all in one render made Ember
+          // render the rest of the out of order pool with the wrong content (#358).
+          // eslint-disable-next-line ember/no-runloop
           run(() => {
             virtualComponents.splice(virtualComponents.indexOf(component), 1);
           });
@@ -752,20 +754,20 @@ export default class Radar {
     } = this;
 
     if (_didReset || firstVisibleIndex !== _prevFirstVisibleIndex) {
-      this.sendAction('firstVisibleChanged', firstVisibleIndex);
+      this.notify('firstVisibleChanged', firstVisibleIndex);
     }
 
     if (_didReset || lastVisibleIndex !== _prevLastVisibleIndex) {
-      this.sendAction('lastVisibleChanged', lastVisibleIndex);
+      this.notify('lastVisibleChanged', lastVisibleIndex);
     }
 
     if (_firstReached === false && firstItemIndex === 0) {
-      this.sendAction('firstReached', firstItemIndex);
+      this.notify('firstReached', firstItemIndex);
       this._firstReached = true;
     }
 
     if (_lastReached === false && lastItemIndex === totalItems - 1) {
-      this.sendAction('lastReached', lastItemIndex);
+      this.notify('lastReached', lastItemIndex);
       this._lastReached = true;
     }
   }
@@ -774,9 +776,9 @@ export default class Radar {
     this._prevFirstItemIndex += numPrepended;
     this._prevLastItemIndex += numPrepended;
 
-    this.orderedComponents.forEach((c) =>
-      set(c, 'index', get(c, 'index') + numPrepended),
-    );
+    this.orderedComponents.forEach((c) => {
+      c.index += numPrepended;
+    });
 
     this._firstReached = false;
 

@@ -2,6 +2,7 @@ import { DEBUG } from '@glimmer/env';
 import { assert } from '@ember/debug';
 
 import Component from '@glimmer/component';
+import { registerDestructor } from '@ember/destroyable';
 import { createCache, getValue } from '@glimmer/tracking/primitives/cache';
 import { run } from '@ember/runloop';
 
@@ -356,7 +357,9 @@ class VerticalCollection extends Component {
   #virtualComponents = createCache(() => {
     const { _radar } = this;
 
-    // A tracked array reports its changes when its length is read
+    // Reading the length makes this run again when a tracked array changes in place.
+    // With Ember 4.5 as the floor, this cache can become a plain function that the
+    // template calls with this.items, this.items.length and the three radar settings.
     const items = this.items ?? [];
     assert(
       '@items must be an array. ArrayProxy and PromiseArray are not supported.',
@@ -396,6 +399,7 @@ class VerticalCollection extends Component {
       this._nextSendActions = setTimeout(() => {
         this._nextSendActions = null;
 
+        // eslint-disable-next-line ember/no-runloop
         run(() => {
           const items = this.items;
           const keyPath = this.key;
@@ -432,29 +436,22 @@ class VerticalCollection extends Component {
 
   // –––––––––––––– Setup/Teardown
 
-  willDestroy() {
-    this.token.cancel();
-    this._radar.destroy();
-    let registerAPI = this.args.registerAPI;
-    if (registerAPI) {
-      registerAPI(null);
-    }
-    clearTimeout(this._nextSendActions);
-
-    if (DEBUG) {
-      if (this.__visualization) {
-        console.info('destroying visualization');
-        this.__visualization.destroy();
-        this.__visualization = null;
-      }
-    }
-    super.willDestroy();
-  }
-
   constructor(owner, args) {
     super(owner, args);
 
     this.token = new Token();
+    registerDestructor(this, () => {
+      this.token.cancel();
+      this._radar.destroy();
+      this.args.registerAPI?.(null);
+      clearTimeout(this._nextSendActions);
+
+      if (DEBUG && this.__visualization) {
+        console.info('destroying visualization');
+        this.__visualization.destroy();
+        this.__visualization = null;
+      }
+    });
     const RadarClass = this.staticHeight ? StaticRadar : DynamicRadar;
 
     const items = this.items || [];
@@ -515,7 +512,7 @@ class VerticalCollection extends Component {
         firstVisibleChanged: d,
       };
 
-      this._radar.sendAction = (action, index) => {
+      this._radar.notify = (action, index) => {
         if (this._hasAction[action]) {
           this._scheduleSendAction(action, index);
         }
