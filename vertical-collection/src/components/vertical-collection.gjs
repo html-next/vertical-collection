@@ -14,6 +14,7 @@ import {
   StaticRadar,
   objectAt,
 } from '../-private/index.js';
+import document from '../-private/utils/document-shim.js';
 
 /*
  * BEGIN DEBUG HELPERS
@@ -668,9 +669,12 @@ class VerticalCollection extends Component {
       };
     }
 
-    this.schedule('sync', () => {
-      this._radar.start();
-    });
+    // Fastboot has no requestAnimationFrame, and no DOM for the radar to measure
+    if (document !== undefined) {
+      this.schedule('sync', () => {
+        this._radar.start();
+      });
+    }
   }
 
   <template>
