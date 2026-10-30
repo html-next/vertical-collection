@@ -1,9 +1,18 @@
 import { assert } from '@ember/debug';
 
-import identity from './identity.js';
+import identity from './identity.ts';
 
-export default function keyForItem(item, keyPath, index) {
-  let key;
+/**
+ * `@index`, `@identity`, or a path into the item such as `id` or `owner.id`.
+ */
+export type KeyPath = string;
+
+export default function keyForItem(
+  item: unknown,
+  keyPath: KeyPath,
+  index?: number,
+): unknown {
+  let key: unknown;
 
   assert(
     `keyPath must be a string, received: ${keyPath}`,
@@ -22,7 +31,13 @@ export default function keyForItem(item, keyPath, index) {
       key = identity(item);
       break;
     default:
-      key = keyPath.split('.').reduce((value, part) => value?.[part], item);
+      key = keyPath
+        .split('.')
+        .reduce<unknown>(
+          (value, part) =>
+            (value as Record<string, unknown> | null | undefined)?.[part],
+          item,
+        );
   }
 
   if (typeof key === 'number') {

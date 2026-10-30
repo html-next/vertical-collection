@@ -20,3 +20,7 @@ declare module 'ember-raf-scheduler' {
   export const scheduler: Scheduler;
   export default scheduler;
 }
+
+declare module '@glimmer/env' {
+  export const DEBUG: boolean;
+}

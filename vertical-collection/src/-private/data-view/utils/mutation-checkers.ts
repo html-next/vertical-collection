@@ -1,6 +1,14 @@
-import keyForItem from '../../ember-internals/key-for-item.js';
+import keyForItem, {
+  type KeyPath,
+} from '../../ember-internals/key-for-item.ts';
 
-export function isPrepend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
+export function isPrepend(
+  lenDiff: number,
+  newItems: readonly unknown[],
+  key: KeyPath,
+  oldFirstKey: unknown,
+  oldLastKey: unknown,
+): boolean {
   const newItemsLength = newItems.length;
 
   if (lenDiff <= 0 || lenDiff >= newItemsLength || newItemsLength === 0) {
@@ -17,7 +25,13 @@ export function isPrepend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
   return oldFirstKey === newFirstKey && oldLastKey === newLastKey;
 }
 
-export function isAppend(lenDiff, newItems, key, oldFirstKey, oldLastKey) {
+export function isAppend(
+  lenDiff: number,
+  newItems: readonly unknown[],
+  key: KeyPath,
+  oldFirstKey: unknown,
+  oldLastKey: unknown,
+): boolean {
   const newItemsLength = newItems.length;
 
   if (lenDiff <= 0 || lenDiff >= newItemsLength || newItemsLength === 0) {
