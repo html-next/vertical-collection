@@ -7,6 +7,7 @@ import getNumbers from 'test-app/lib/get-numbers';
 import {
   testScenarios,
   scenariosFor,
+  standardScenariosFor,
   standardTemplate,
 } from 'test-app/tests/helpers/test-scenarios';
 
@@ -43,6 +44,24 @@ module('vertical-collection', 'Integration | Debug Tests', function (hooks) {
         document.querySelectorAll('.vc_visualization-virtual-component').length,
         20,
         'correct number of visualization items rendered'
+      );
+    }
+  );
+
+  testScenarios(
+    'The collection checks the CSS without errors when debugCSS is set',
+    standardScenariosFor(getNumbers(0, 100), {
+      debugVis: true,
+      debugCSS: true,
+    }),
+    standardTemplate,
+
+    async function (assert) {
+      await scrollTo('.scrollable', 0, 400);
+
+      assert.ok(
+        document.querySelector('.vertical-collection-visual-debugger'),
+        'the CSS checks pass for a correctly styled collection'
       );
     }
   );
