@@ -18,7 +18,7 @@ importers:
     dependencies:
       '@html-next/vertical-collection':
         specifier: workspace:*
-        version: file:vertical-collection(41f15cfcddee1b664cece93a788480f7)
+        version: file:vertical-collection(2935cfb77147881c8250be8c1bb7d0d1)
       ember-raf-scheduler:
         specifier: 0.5.1
         version: 0.5.1(c8332dc3f90c0e60eb130a3a85f980b9)
@@ -228,6 +228,15 @@ importers:
       '@babel/eslint-parser':
         specifier: ^7.22.10
         version: 7.28.6(35c79763e2f529503c5fce6757258eb9)
+      '@babel/plugin-transform-typescript':
+        specifier: ^7.28.6
+        version: 7.28.6(@babel/core@7.29.0)
+      '@ember/app-tsconfig':
+        specifier: ^1.0.3
+        version: 1.0.3
+      '@ember/library-tsconfig':
+        specifier: ^1.1.3
+        version: 1.1.3
       '@ember/test-waiters':
         specifier: ~3.1.0
         version: 3.1.0
@@ -237,6 +246,12 @@ importers:
       '@eslint/js':
         specifier: ^9.39.2
         version: 9.39.4
+      '@glint/ember-tsc':
+        specifier: ^1.5.0
+        version: 1.5.0(typescript@5.9.3)
+      '@glint/template':
+        specifier: ^1.7.7
+        version: 1.7.7
       '@rollup/plugin-babel':
         specifier: ^6.1.0
         version: 6.1.0(@babel/core@7.29.0)(rollup@4.60.1)
@@ -303,6 +318,12 @@ importers:
       stylelint-prettier:
         specifier: ^5.0.3
         version: 5.0.3(e8ffc9657eecb702365ff455b481c90a)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.58.1
+        version: 8.58.1(0d62767105e9a39fc494591cb6137847)
 
 packages:
 
@@ -1484,6 +1505,9 @@ packages:
   '@ember/edition-utils@1.2.0':
     resolution: {integrity: sha512-VmVq/8saCaPdesQmftPqbFtxJWrzxNGSQ+e8x8LLe3Hjm36pJ04Q8LeORGZkAeOhldoUX9seLGmSaHeXkIqoog==}
 
+  '@ember/library-tsconfig@1.1.3':
+    resolution: {integrity: sha512-4cKJ38VEcm4mYmontK9BCpQgm5GPLgAeXqd6PqTHD8eKN0GTeegxdX4SsSUN/8emmULq/9H/Oh6fp3vM2mFqkA==}
+
   '@ember/optional-features@2.3.0':
     resolution: {integrity: sha512-+M8CkPledQEaDbfIlwlq6Phgpm5jdT3a6WVDJk7b/zadw5xAJkuQKVK7DgR0SFgHGiWlyn6a8AU5p2mCA706RA==}
     engines: {node: 10.* || 12.* || >= 14}
@@ -1909,7 +1933,6 @@ packages:
     engines: {node: '>= 18'}
     peerDependencies:
       '@glimmer/component': ^1.1.2 || ^2.0.0
-      ember-source: '>= 3.28.0'
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -9259,6 +9282,8 @@ snapshots:
 
   '@ember/edition-utils@1.2.0': {}
 
+  '@ember/library-tsconfig@1.1.3': {}
+
   '@ember/optional-features@2.3.0':
     dependencies:
       chalk: 4.1.2
@@ -9948,13 +9973,12 @@ snapshots:
 
   '@handlebars/parser@2.2.2': {}
 
-  '@html-next/vertical-collection@file:vertical-collection(41f15cfcddee1b664cece93a788480f7)':
+  '@html-next/vertical-collection@file:vertical-collection(2935cfb77147881c8250be8c1bb7d0d1)':
     dependencies:
       '@embroider/addon-shim': 1.10.3
       '@glimmer/component': 2.1.1
       decorator-transforms: 2.3.1(@babel/core@7.29.0)
       ember-raf-scheduler: 0.5.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      ember-source: 6.12.0(@glimmer/component@2.1.1)(rsvp@4.8.5)
       tracked-built-ins: 4.1.2(@babel/core@7.29.0)
     transitivePeerDependencies:
       - '@babel/core'
