@@ -65,6 +65,9 @@
     "ember-raf-scheduler": "~0.5.1",
     "tracked-built-ins": "^4.1.2"
   },
+  "peerDependencies": {
+    "@glimmer/component": "^1.1.2 || ^2.0.0"
+  },
   "devDependencies": {
     "@babel/eslint-parser": "^7.22.10",
     "@ember/test-waiters": "~3.1.0",
