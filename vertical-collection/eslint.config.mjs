@@ -20,10 +20,16 @@ import ember from 'eslint-plugin-ember/recommended';
 import importPlugin from 'eslint-plugin-import';
 import n from 'eslint-plugin-n';
 import globals from 'globals';
+import ts from 'typescript-eslint';
 
 const esmParserOptions = {
   ecmaFeatures: { modules: true },
   ecmaVersion: 'latest',
+};
+
+const tsParserOptions = {
+  projectService: true,
+  tsconfigRootDir: import.meta.dirname,
 };
 
 export default defineConfig([
@@ -32,6 +38,7 @@ export default defineConfig([
   prettier,
   ember.configs.base,
   ember.configs.gjs,
+  ember.configs.gts,
   /**
    * https://eslint.org/docs/latest/use/configure/configuration-files#configuring-linter-options
    */
@@ -54,6 +61,25 @@ export default defineConfig([
         ...globals.browser,
       },
     },
+  },
+  {
+    files: ['**/*.{ts,gts}'],
+    languageOptions: {
+      parser: ember.parser,
+      parserOptions: tsParserOptions,
+      globals: {
+        ...globals.browser,
+      },
+    },
+    extends: [
+      ...ts.configs.recommendedTypeChecked,
+      // https://github.com/ember-cli/ember-addon-blueprint/issues/119
+      {
+        ...ts.configs.eslintRecommended,
+        files: undefined,
+      },
+      ember.configs.gts,
+    ],
   },
   {
     files: ['src/**/*'],

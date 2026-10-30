@@ -1,0 +1,14 @@
+/**
+ * This tsconfig is not used for publishing.
+ * It's only for the local editing experience
+ * (and linting)
+ */
+{
+  "extends": "@ember/library-tsconfig",
+  "include": ["src/**/*", "unpublished-development-types/**/*"],
+  "compilerOptions": {
+    "allowJs": true,
+    "rootDir": ".",
+    "types": ["ember-source/types", "@glint/ember-tsc/types"]
+  }
+}
