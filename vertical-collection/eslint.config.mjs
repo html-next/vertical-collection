@@ -80,6 +80,13 @@ export default defineConfig([
       },
       ember.configs.gts,
     ],
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
+      ],
+      'prefer-const': ['error', { destructuring: 'all' }],
+    },
   },
   {
     files: ['src/**/*'],
