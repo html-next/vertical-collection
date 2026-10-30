@@ -62,6 +62,7 @@
   },
   "dependencies": {
     "@embroider/addon-shim": "^1.10.2",
+    "decorator-transforms": "^2.3.0",
     "ember-raf-scheduler": "~0.5.1",
     "tracked-built-ins": "^4.1.2"
   },
