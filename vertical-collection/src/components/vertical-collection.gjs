@@ -1,5 +1,5 @@
 import { DEBUG } from '@glimmer/env';
-import { assert } from '@ember/debug';
+import { assert, warn } from '@ember/debug';
 
 import Component from '@glimmer/component';
 import { createCache, getValue } from '@glimmer/tracking/primitives/cache';
@@ -359,6 +359,15 @@ class VerticalCollection extends Component {
 
     // A tracked array reports its changes when its length is read
     const items = this.items ?? [];
+    assert(
+      '@items must be an array. ArrayProxy and PromiseArray are not supported.',
+      Array.isArray(items),
+    );
+    warn(
+      '@items is an Ember array. Changes made with its Ember methods, like pushObject, are not seen. Pass a new array or a tracked array.',
+      !('pushObject' in items) || 'pushObject' in Array.prototype,
+      { id: 'vertical-collection.ember-array' },
+    );
     items.length;
 
     _radar.items = items;
