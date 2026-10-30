@@ -10,7 +10,6 @@ import { assert } from '@ember/debug';
  * refactored to a native class (and likely Glimmer component).
  */
 /* eslint-disable ember/no-computed-properties-in-native-classes, ember/no-component-lifecycle-hooks */
-import { empty, readOnly } from '@ember/object/computed';
 
 import Component from '@ember/component';
 import { get, computed } from '@ember/object';
@@ -336,8 +335,13 @@ class VerticalCollection extends Component.extend({
    */
   occlusionTagName: 'occluded-content',
 
-  isEmpty: empty('items'),
-  shouldYieldToInverse: readOnly('isEmpty'),
+  isEmpty: computed('items.length', function () {
+    return !get(this, 'items.length');
+  }),
+  // eslint-disable-next-line ember/require-computed-macros -- Ember 7.5 deprecates the macros
+  shouldYieldToInverse: computed('isEmpty', function () {
+    return this.isEmpty;
+  }).readOnly(),
 
   virtualComponents: computed(
     'items.[]',
