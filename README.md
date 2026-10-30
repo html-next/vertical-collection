@@ -39,27 +39,30 @@ ember install @html-next/vertical-collection
 import { VerticalCollection } from '@html-next/vertical-collection'
 
 <template>
-  <VerticalCollection
-    @items={{items}}
-    @tagName="ul"
-    @estimateHeight={{50}}
-    @staticHeight={{false}}
-    @shouldRecycle={{true}}
-    @bufferSize={{1}}
-    @renderAll={{false}}
-    @renderFromLast={{false}}
-    @idForFirstItem={{idForFirstItem}}
-    @firstReached={{firstReachedCallback}}
-    @lastReached={{lastReachedCallback}}
-    @firstVisibleChanged={{firstVisibleChangedCallback}}
-    @lastVisibleChanged={{lastVisibleChangedCallback}}
-     as |item i|>
-    <li>
-      {{item.number}} {{i}}
-    </li>
-  </VerticalCollection>
+  <ul>
+    <VerticalCollection
+      @items={{items}}
+      @estimateHeight={{50}}
+      @staticHeight={{false}}
+      @shouldRecycle={{true}}
+      @bufferSize={{1}}
+      @renderAll={{false}}
+      @renderFromLast={{false}}
+      @idForFirstItem={{idForFirstItem}}
+      @firstReached={{firstReachedCallback}}
+      @lastReached={{lastReachedCallback}}
+      @firstVisibleChanged={{firstVisibleChangedCallback}}
+      @lastVisibleChanged={{lastVisibleChangedCallback}}
+       as |item i|>
+      <li>
+        {{item.number}} {{i}}
+      </li>
+    </VerticalCollection>
+  </ul>
 </template>
 ```
+
+`@items` is a native array, or a tracked array such as `TrackedArray` from `tracked-built-ins`. To change a native array, pass a new one; a tracked array can be changed in place.
 
 ### Actions
 
