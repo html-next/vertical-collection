@@ -1,5 +1,5 @@
-import { A } from '@ember/array';
 import { set, get } from '@ember/object';
+import { TrackedArray } from 'tracked-built-ins';
 import { assert } from '@ember/debug';
 import { run } from '@ember/runloop';
 import { DEBUG } from '@glimmer/env';
@@ -122,7 +122,7 @@ export default class Radar {
     }
 
     // Initialize virtual components
-    this.virtualComponents = A([
+    this.virtualComponents = new TrackedArray([
       this._occludedContentBefore,
       this._occludedContentAfter,
     ]);
@@ -606,7 +606,7 @@ export default class Radar {
             component.realLowerBound,
           );
           run(() => {
-            virtualComponents.removeObject(component);
+            virtualComponents.splice(virtualComponents.indexOf(component), 1);
           });
           _componentPool.splice(i, 1);
         }
@@ -652,7 +652,7 @@ export default class Radar {
         component.realLowerBound,
       );
     } else {
-      virtualComponents.insertAt(virtualComponents.length - 1, component);
+      virtualComponents.splice(virtualComponents.length - 1, 0, component);
       component.rendered = true;
 
       // shouldRecycle=false breaks UI when scrolling the elements fast.
@@ -703,7 +703,7 @@ export default class Radar {
         component.realLowerBound,
       );
     } else {
-      virtualComponents.insertAt(virtualComponents.length - 1, component);
+      virtualComponents.splice(virtualComponents.length - 1, 0, component);
       component.rendered = true;
 
       // Components that are both new and prepended still need to be rendered at the end because Glimmer.
