@@ -7,7 +7,10 @@ export default class extends Route {
   @service() store;
 
   async model() {
-    await this.store.request({ url: '/number-items' });
+    await this.store.request({
+      url: '/number-items',
+      cacheOptions: { reload: true },
+    });
 
     return this.store.peekAll('number-item');
   }
