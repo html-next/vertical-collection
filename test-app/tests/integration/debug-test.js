@@ -46,4 +46,19 @@ module('vertical-collection', 'Integration | Debug Tests', function (hooks) {
       );
     }
   );
+
+  testScenarios(
+    'The collection checks the CSS without errors when debugCSS is set',
+    scenariosFor(getNumbers(0, 100), { debugVis: true, debugCSS: true }),
+    standardTemplate,
+
+    async function (assert) {
+      await scrollTo('.scrollable', 0, 400);
+
+      assert.ok(
+        document.querySelector('.vertical-collection-visual-debugger'),
+        'the CSS checks pass for a correctly styled collection'
+      );
+    }
+  );
 });

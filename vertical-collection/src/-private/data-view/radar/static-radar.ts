@@ -1,9 +1,14 @@
 import { DEBUG } from '@glimmer/env';
 
-import Radar from './radar.js';
+import { type Token } from 'ember-raf-scheduler';
 
-export default class StaticRadar extends Radar {
-  constructor(parentToken, options) {
+import Radar, { type RadarOptions } from './radar.ts';
+
+export default class StaticRadar<T = unknown> extends Radar<T> {
+  declare _firstItemIndex: number;
+  declare _lastItemIndex: number;
+
+  constructor(parentToken: Token, options: RadarOptions<T>) {
     super(parentToken, options);
 
     this._firstItemIndex = 0;
@@ -14,7 +19,7 @@ export default class StaticRadar extends Radar {
     }
   }
 
-  _updateIndexes() {
+  _updateIndexes(): void {
     const {
       bufferSize,
       totalItems,
@@ -61,37 +66,37 @@ export default class StaticRadar extends Radar {
     this._lastItemIndex = lastItemIndex;
   }
 
-  _didEarthquake(scrollDiff) {
+  _didEarthquake(scrollDiff: number): boolean {
     return scrollDiff > this._calculatedEstimateHeight / 2;
   }
 
-  get total() {
+  get total(): number {
     return this.totalItems * this._calculatedEstimateHeight;
   }
 
-  get totalBefore() {
+  get totalBefore(): number {
     return this.firstItemIndex * this._calculatedEstimateHeight;
   }
 
-  get totalAfter() {
+  get totalAfter(): number {
     return (
       this.total - (this.lastItemIndex + 1) * this._calculatedEstimateHeight
     );
   }
 
-  get firstItemIndex() {
+  get firstItemIndex(): number {
     return this._firstItemIndex;
   }
 
-  get lastItemIndex() {
+  get lastItemIndex(): number {
     return this._lastItemIndex;
   }
 
-  get firstVisibleIndex() {
+  get firstVisibleIndex(): number {
     return Math.ceil(this.visibleTop / this._calculatedEstimateHeight);
   }
 
-  get lastVisibleIndex() {
+  get lastVisibleIndex(): number {
     return (
       Math.min(
         Math.ceil(this.visibleBottom / this._calculatedEstimateHeight),
@@ -103,7 +108,7 @@ export default class StaticRadar extends Radar {
   /*
    * Public API to query for the offset of an item
    */
-  getOffsetForIndex(index) {
+  getOffsetForIndex(index: number): number {
     return index * this._calculatedEstimateHeight + 1;
   }
 }

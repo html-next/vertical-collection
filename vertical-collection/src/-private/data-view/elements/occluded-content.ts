@@ -1,14 +1,20 @@
-import { set } from '@ember/object';
+import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
-import document from '../../utils/document-shim.js';
+import document from '../../utils/document-shim.ts';
 
 let OC_IDENTITY = 0;
 
 export default class OccludedContent {
-  constructor(tagName) {
+  id: string;
+  readonly isOccludedContent = true;
+  element: HTMLElement | null;
+  upperBound: Text | null = null;
+  lowerBound: Text | null = null;
+  rendered: boolean;
+
+  constructor(tagName: string) {
     this.id = `OC-${OC_IDENTITY++}`;
-    this.isOccludedContent = true;
 
     // We check to see if the document exists in Fastboot. Since RAF won't run in
     // Fastboot, we'll never have to use these text nodes for measurements, so they
@@ -23,7 +29,6 @@ export default class OccludedContent {
       this.element = null;
     }
 
-    this.isOccludedContent = true;
     this.rendered = false;
 
     if (DEBUG) {
@@ -31,47 +36,50 @@ export default class OccludedContent {
     }
   }
 
-  getBoundingClientRect() {
-    if (this.element !== null) {
-      return this.element.getBoundingClientRect();
-    }
+  getBoundingClientRect(): DOMRect {
+    assert(
+      'Occluded content is only measured in the DOM',
+      this.element !== null,
+    );
+
+    return this.element.getBoundingClientRect();
   }
 
-  addEventListener(event, listener) {
+  addEventListener(event: string, listener: EventListener): void {
     if (this.element !== null) {
       this.element.addEventListener(event, listener);
     }
   }
 
-  removeEventListener(event, listener) {
+  removeEventListener(event: string, listener: EventListener): void {
     if (this.element !== null) {
       this.element.removeEventListener(event, listener);
     }
   }
 
-  get realUpperBound() {
+  get realUpperBound(): Text | null {
     return this.upperBound;
   }
 
-  get realLowerBound() {
+  get realLowerBound(): Text | null {
     return this.lowerBound;
   }
 
-  get parentNode() {
+  get parentNode(): ParentNode | null {
     return this.element !== null ? this.element.parentNode : null;
   }
 
-  get style() {
+  get style(): CSSStyleDeclaration | Partial<CSSStyleDeclaration> {
     return this.element !== null ? this.element.style : {};
   }
 
-  set innerHTML(value) {
+  set innerHTML(value: string) {
     if (this.element !== null) {
       this.element.innerHTML = value;
     }
   }
 
-  destroy() {
-    set(this, 'element', null);
+  destroy(): void {
+    this.element = null;
   }
 }

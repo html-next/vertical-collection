@@ -25,9 +25,11 @@
   },
   "exports": {
     ".": {
+      "types": "./declarations/index.d.ts",
       "default": "./dist/index.js"
     },
     "./-private/index": {
+      "types": "./declarations/-private/index.d.ts",
       "default": "./dist/-private/index.js"
     }
   },
@@ -44,9 +46,10 @@
     }
   ],
   "files": [
-    "src",
+    "addon-main.cjs",
+    "declarations",
     "dist",
-    "addon-main.cjs"
+    "src"
   ],
   "scripts": {
     "build": "rollup --config",
@@ -56,19 +59,31 @@
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css:fix": "concurrently \"pnpm:lint:css -- --fix\"",
     "lint:fix": "concurrently \"pnpm:lint:*:fix\" --names \"fix:\" && pnpm run format",
-    "lint:js": "eslint . --cache",
     "lint:format": "prettier . --cache --check",
-    "lint:js:fix": "eslint . --fix"
+    "lint:js": "eslint . --cache",
+    "lint:js:fix": "eslint . --fix",
+    "lint:types": "ember-tsc --noEmit"
   },
   "dependencies": {
     "@embroider/addon-shim": "^1.10.2",
-    "ember-raf-scheduler": "~0.5.1"
+    "decorator-transforms": "^2.3.0",
+    "ember-raf-scheduler": "~0.5.1",
+    "tracked-built-ins": "^4.1.2"
+  },
+  "peerDependencies": {
+    "@glimmer/component": "^1.1.2 || ^2.0.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.22.10",
+    "@babel/plugin-transform-typescript": "^7.28.6",
+    "@ember/app-tsconfig": "^1.0.3",
+    "@ember/library-tsconfig": "^1.1.3",
     "@ember/test-waiters": "~3.1.0",
     "@embroider/addon-dev": "^8.2.0",
     "@eslint/js": "^9.39.2",
+    "@glimmer/component": "^2.1.1",
+    "@glint/ember-tsc": "^1.14.3",
+    "@glint/template": "^1.11.1",
     "@rollup/plugin-babel": "^6.1.0",
     "babel-plugin-ember-template-compilation": "^4.0.0",
     "concurrently": "^8.2.0",
@@ -90,7 +105,9 @@
     "rollup": "^4.56.0",
     "stylelint": "^17.0.0",
     "stylelint-config-standard": "^40.0.0",
-    "stylelint-prettier": "^5.0.3"
+    "stylelint-prettier": "^5.0.3",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.58.1"
   },
   "engines": {
     "node": ">= 18"

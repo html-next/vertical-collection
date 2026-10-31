@@ -1,34 +1,134 @@
-import { A } from '@ember/array';
-import { set, get } from '@ember/object';
-import { assert } from '@ember/debug';
 import { run } from '@ember/runloop';
+import { TrackedArray } from 'tracked-built-ins';
+import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
-import { Token, scheduler } from 'ember-raf-scheduler';
+import { Token, scheduler, type QueueName } from 'ember-raf-scheduler';
 
-import VirtualComponent from '../elements/virtual-component.js';
-import OccludedContent from '../elements/occluded-content.js';
-import insertRangeBefore from '../utils/insert-range-before.js';
-import objectAt from '../utils/object-at.js';
-import roundTo from '../utils/round-to.js';
-import { isPrepend, isAppend } from '../utils/mutation-checkers.js';
+import VirtualComponent from '../elements/virtual-component.ts';
+import OccludedContent from '../elements/occluded-content.ts';
+import insertRangeBefore from '../utils/insert-range-before.ts';
+import roundTo from '../utils/round-to.ts';
+import { isPrepend, isAppend } from '../utils/mutation-checkers.ts';
 
 import {
   addScrollHandler,
   removeScrollHandler,
-} from '../utils/scroll-handler.js';
+} from '../utils/scroll-handler.ts';
 
-import ViewportContainer from '../viewport-container.js';
+import ViewportContainer, {
+  type ViewportContainer as Viewport,
+} from '../viewport-container.ts';
 
-import estimateElementHeight from '../../utils/element/estimate-element-height.js';
-import getScaledClientRect from '../../utils/element/get-scaled-client-rect.js';
-import keyForItem from '../../ember-internals/key-for-item.js';
+import estimateElementHeight from '../../utils/element/estimate-element-height.ts';
+import getScaledClientRect from '../../utils/element/get-scaled-client-rect.ts';
+import keyForItem, {
+  type KeyPath,
+} from '../../ember-internals/key-for-item.ts';
 
-import document from '../../utils/document-shim.js';
+import document from '../../utils/document-shim.ts';
 
-export default class Radar {
+export type RadarAction =
+  | 'firstVisibleChanged'
+  | 'lastVisibleChanged'
+  | 'firstReached'
+  | 'lastReached';
+
+export type PoolComponent<T> = VirtualComponent<T> | OccludedContent;
+
+export interface RadarOptions<T> {
+  bufferSize: number;
+  containerSelector: string;
+  estimateHeight: number | string | null;
+  initialRenderCount: number | undefined;
+  items: readonly T[];
+  key: KeyPath;
+  renderAll: boolean;
+  renderFromLast: boolean;
+  shouldRecycle: boolean;
+  startingIndex: number;
+  occlusionTagName: string;
+}
+
+type ScrollContainer = HTMLElement | Viewport;
+
+export default abstract class Radar<T = unknown> {
+  declare token: Token;
+
+  // Public API
+  declare bufferSize: number;
+  declare containerSelector: string;
+  declare estimateHeight: number | string | null;
+  declare initialRenderCount: number | undefined;
+  declare items: readonly T[];
+  declare key: KeyPath;
+  declare renderAll: boolean;
+  declare renderFromLast: boolean;
+  declare shouldRecycle: boolean;
+  declare startingIndex: number;
+  declare notify: (action: RadarAction, index: number) => void;
+
+  // Calculated constants
+  declare _itemContainer: HTMLElement | null;
+  declare _scrollContainer: ScrollContainer | null;
+  declare _prependOffset: number;
+  declare _calculatedEstimateHeight: number;
+  declare _collectionOffset: number;
+  declare _calculatedScrollContainerHeight: number;
+  declare _transformScale: number;
+
+  // Event handlers
+  declare _scrollHandler: (event: { top: number }) => void;
+  declare _resizeHandler: () => void;
+  declare _pageUpHandler: () => void;
+  declare _pageDownHandler: () => void;
+
+  // Run state
+  declare _nextUpdate: Token | null;
+  declare _nextLayout: Token | null;
+  declare _started: boolean;
+  declare _didReset: boolean;
+  declare _didUpdateItems: boolean;
+
+  // Cache state
+  declare _scrollTop: number;
+  declare _prevFirstItemIndex: number;
+  declare _prevLastItemIndex: number;
+  declare _prevFirstVisibleIndex: number;
+  declare _prevLastVisibleIndex: number;
+  declare _firstReached: boolean;
+  declare _lastReached: boolean;
+  declare _prevTotalItems: number;
+  declare _prevFirstKey: unknown;
+  declare _prevLastKey: unknown;
+
+  declare _componentPool: VirtualComponent<T>[];
+  declare _prependComponentPool: VirtualComponent<T>[];
+  declare _appendComponentPool: VirtualComponent<T>[];
+
+  // Boundaries
+  declare _occludedContentBefore: OccludedContent;
+  declare _occludedContentAfter: OccludedContent;
+  declare _domPool: DocumentFragment | undefined;
+
+  declare virtualComponents: PoolComponent<T>[];
+  declare orderedComponents: VirtualComponent<T>[];
+
+  declare _debugDidUpdate: ((radar: Radar<T>) => void) | null | undefined;
+
+  // Provided by the subclasses
+  abstract _updateIndexes(): void;
+  abstract _didEarthquake(scrollDiff: number): boolean;
+  abstract getOffsetForIndex(index: number): number;
+  abstract get total(): number;
+  abstract get totalBefore(): number;
+  abstract get totalAfter(): number;
+  abstract get firstItemIndex(): number;
+  abstract get lastItemIndex(): number;
+  abstract get firstVisibleIndex(): number;
+  abstract get lastVisibleIndex(): number;
   constructor(
-    parentToken,
+    parentToken: Token,
     {
       bufferSize,
       containerSelector,
@@ -41,7 +141,7 @@ export default class Radar {
       shouldRecycle,
       startingIndex,
       occlusionTagName,
-    },
+    }: RadarOptions<T>,
   ) {
     this.token = new Token(parentToken);
 
@@ -59,7 +159,7 @@ export default class Radar {
 
     // defaults to a no-op intentionally, actions will only be sent if they
     // are passed into the component
-    this.sendAction = () => {};
+    this.notify = () => {};
 
     // Calculated constants
     this._itemContainer = null;
@@ -121,25 +221,27 @@ export default class Radar {
       this._domPool = document.createDocumentFragment();
     }
 
-    // Initialize virtual components
-    this.virtualComponents = A([
+    // Initialize virtual components. The radar is made while the collection renders, and a
+    // tracked array cannot change there after it is read, so the first update uses a plain array.
+    this.virtualComponents = [
       this._occludedContentBefore,
       this._occludedContentAfter,
-    ]);
+    ];
     this.orderedComponents = [];
 
     this._updateVirtualComponents();
+    this.virtualComponents = new TrackedArray(this.virtualComponents);
 
     if (DEBUG) {
       this._debugDidUpdate = null;
     }
   }
 
-  destroy() {
+  destroy(): void {
     this.token.cancel();
 
-    for (let i = 0; i < this.orderedComponents.length; i++) {
-      this.orderedComponents[i].destroy();
+    for (const component of this.orderedComponents) {
+      component.destroy();
     }
 
     // Boundaries
@@ -154,33 +256,72 @@ export default class Radar {
     this._occludedContentBefore.destroy();
     this._occludedContentAfter.destroy();
 
-    this.orderedComponents = null;
-    set(this, 'virtualComponents', null);
-
     if (this._started) {
-      removeScrollHandler(this._scrollContainer, this._scrollHandler);
+      removeScrollHandler(this.scrollContainer, this._scrollHandler);
       ViewportContainer.removeEventListener('resize', this._resizeHandler);
     }
   }
 
-  schedule(queueName, job) {
+  schedule(queueName: QueueName, job: () => void): Token {
     return scheduler.schedule(queueName, job, this.token);
+  }
+
+  get itemContainer(): HTMLElement {
+    assert(
+      'itemContainer must be set on Radar before scheduling an update',
+      this._itemContainer !== null,
+    );
+
+    return this._itemContainer;
+  }
+
+  get scrollContainer(): ScrollContainer {
+    assert(
+      'scrollContainer must be set on Radar before scheduling an update',
+      this._scrollContainer !== null,
+    );
+
+    return this._scrollContainer;
+  }
+
+  _itemAt(index: number): T {
+    const item = this.items[index];
+
+    assert(`You cannot set an item's content to undefined`, item);
+
+    return item;
   }
 
   /**
    * Start the Radar. Does initial measurements, adds event handlers,
    * sets up initial scroll state, and
    */
-  start() {
+  start(): void {
     const { startingIndex, containerSelector, _occludedContentBefore } = this;
 
     // Use the occluded content element, which has been inserted into the DOM,
     // to find the item container and the scroll container
-    this._itemContainer = _occludedContentBefore.element.parentNode;
-    this._scrollContainer =
-      containerSelector === 'body'
-        ? ViewportContainer
-        : this._itemContainer.closest(containerSelector);
+    const itemContainer = _occludedContentBefore.element?.parentElement;
+
+    assert(
+      'vertical-collection must be rendered inside an element',
+      itemContainer,
+    );
+
+    let scrollContainer: ScrollContainer = ViewportContainer;
+
+    if (containerSelector !== 'body') {
+      const element = itemContainer.closest(containerSelector);
+
+      assert(
+        `No element matches the containerSelector "${containerSelector}"`,
+        element instanceof HTMLElement,
+      );
+      scrollContainer = element;
+    }
+
+    this._itemContainer = itemContainer;
+    this._scrollContainer = scrollContainer;
 
     this._updateConstants();
 
@@ -206,14 +347,14 @@ export default class Radar {
 
       this._prevFirstVisibleIndex = startingIndex;
     } else {
-      this._scrollTop = this._scrollContainer.scrollTop;
+      this._scrollTop = scrollContainer.scrollTop;
     }
 
     this._started = true;
     this.update();
 
     // Setup event handlers
-    addScrollHandler(this._scrollContainer, this._scrollHandler);
+    addScrollHandler(scrollContainer, this._scrollHandler);
     ViewportContainer.addEventListener('resize', this._resizeHandler);
   }
 
@@ -229,7 +370,7 @@ export default class Radar {
    *
    * @private
    */
-  scheduleUpdate(didUpdateItems, promiseResolve) {
+  scheduleUpdate(didUpdateItems?: boolean, promiseResolve?: () => void): void {
     if (didUpdateItems === true) {
       // Set the update items flag first, in case scheduleUpdate has already been called
       // but the RAF hasn't yet run
@@ -242,13 +383,13 @@ export default class Radar {
 
     this._nextUpdate = this.schedule('sync', () => {
       this._nextUpdate = null;
-      this._scrollTop = this._scrollContainer.scrollTop;
+      this._scrollTop = this.scrollContainer.scrollTop;
 
       this.update(promiseResolve);
     });
   }
 
-  update(promiseResolve) {
+  update(promiseResolve?: () => void): void {
     if (this._didUpdateItems === true) {
       this._determineUpdateType();
       this._didUpdateItems = false;
@@ -266,17 +407,17 @@ export default class Radar {
     });
   }
 
-  afterUpdate() {
+  afterUpdate(): void {
     const { _prevTotalItems: totalItems } = this;
 
     const scrollDiff = this._calculateScrollDiff();
 
     if (scrollDiff !== 0) {
-      this._scrollContainer.scrollTop += scrollDiff;
+      this.scrollContainer.scrollTop += scrollDiff;
     }
 
     // Re-sync scrollTop, since Chrome may have intervened
-    this._scrollTop = this._scrollContainer.scrollTop;
+    this._scrollTop = this.scrollContainer.scrollTop;
 
     // Unset prepend offset, we're done with any prepend changes at this point
     this._prependOffset = 0;
@@ -294,7 +435,7 @@ export default class Radar {
     // Clear the reset flag
     this._didReset = false;
 
-    if (DEBUG && this._debugDidUpdate !== null) {
+    if (DEBUG && this._debugDidUpdate) {
       // Hook to update the visual debugger
       this._debugDidUpdate(this);
     }
@@ -312,13 +453,13 @@ export default class Radar {
    * Subclasses should override this method to provide any difference between expected item size
    * pre-render and actual item size post-render.
    */
-  _calculateScrollDiff() {
+  _calculateScrollDiff(): number {
     return (
-      this._prependOffset + this._scrollTop - this._scrollContainer.scrollTop
+      this._prependOffset + this._scrollTop - this.scrollContainer.scrollTop
     );
   }
 
-  _determineUpdateType() {
+  _determineUpdateType(): void {
     const {
       items,
       key,
@@ -341,8 +482,8 @@ export default class Radar {
       this.reset();
     }
 
-    const firstItem = objectAt(this.items, 0);
-    const lastItem = objectAt(this.items, this.totalItems - 1);
+    const firstItem = this.items[0];
+    const lastItem = this.items[this.totalItems - 1];
 
     this._prevTotalItems = totalItems;
     this._prevFirstKey = totalItems > 0 ? keyForItem(firstItem, key, 0) : 0;
@@ -350,25 +491,14 @@ export default class Radar {
       totalItems > 0 ? keyForItem(lastItem, key, totalItems - 1) : 0;
   }
 
-  _updateConstants() {
-    const {
-      estimateHeight,
-      _occludedContentBefore,
-      _itemContainer,
-      _scrollContainer,
-    } = this;
+  _updateConstants(): void {
+    const { estimateHeight, _occludedContentBefore } = this;
+    const _itemContainer = this.itemContainer;
+    const _scrollContainer = this.scrollContainer;
 
     assert(
       'Must provide a `estimateHeight` value to vertical-collection',
       estimateHeight !== null,
-    );
-    assert(
-      'itemContainer must be set on Radar before scheduling an update',
-      _itemContainer !== null,
-    );
-    assert(
-      'scrollContainer must be set on Radar before scheduling an update',
-      _scrollContainer !== null,
     );
 
     // The scroll container's offsetHeight will reflect the actual height of the element, while
@@ -408,16 +538,23 @@ export default class Radar {
       const maxHeightStyle =
         window.getComputedStyle(_scrollContainer).maxHeight;
 
+      const { parentElement } = _scrollContainer;
+
       if (maxHeightStyle && maxHeightStyle !== 'none') {
+        assert(
+          'scrollContainer with a max-height must have a parent',
+          parentElement,
+        );
+
         scrollContainerMaxHeight = estimateElementHeight(
-          _scrollContainer.parentElement,
+          parentElement,
           maxHeightStyle,
         );
       }
     }
 
     const calculatedEstimateHeight =
-      typeof estimateHeight === 'string' && estimateHeight
+      typeof estimateHeight === 'string'
         ? estimateElementHeight(_itemContainer, estimateHeight)
         : estimateHeight;
 
@@ -460,7 +597,7 @@ export default class Radar {
    *
    * @private
    */
-  _updateVirtualComponents() {
+  _updateVirtualComponents(): void {
     const {
       items,
       orderedComponents,
@@ -491,7 +628,9 @@ export default class Radar {
     } else if (_started === false) {
       // The Radar hasn't been started yet, render the initialRenderCount if it exists
       renderedFirstItemIndex = this.startingIndex;
-      renderedLastItemIndex = this.startingIndex + this.initialRenderCount - 1;
+      // Without an initialRenderCount this is NaN, and nothing renders until the radar starts
+      renderedLastItemIndex =
+        this.startingIndex + (this.initialRenderCount ?? NaN) - 1;
       renderedTotalBefore = 0;
       renderedTotalAfter = 0;
     } else {
@@ -507,57 +646,52 @@ export default class Radar {
     // Add components to be recycled to the pool
     while (
       orderedComponents.length > 0 &&
-      orderedComponents[0].index < renderedFirstItemIndex
+      orderedComponents[0]!.index < renderedFirstItemIndex
     ) {
-      _componentPool.push(orderedComponents.shift());
+      _componentPool.push(orderedComponents.shift()!);
     }
 
     while (
       orderedComponents.length > 0 &&
-      orderedComponents[orderedComponents.length - 1].index >
+      orderedComponents[orderedComponents.length - 1]!.index >
         renderedLastItemIndex
     ) {
-      _componentPool.unshift(orderedComponents.pop());
+      _componentPool.unshift(orderedComponents.pop()!);
     }
 
     if (_didReset) {
       if (shouldRecycle === true) {
-        for (let i = 0; i < orderedComponents.length; i++) {
+        for (const component of orderedComponents) {
           // If the underlying array has changed, the indexes could be the same but
           // the content may have changed, so recycle the remaining components
-          const component = orderedComponents[i];
-          component.recycle(objectAt(items, component.index), component.index);
+          component.recycle(this._itemAt(component.index), component.index);
         }
       } else {
         while (orderedComponents.length > 0) {
           // If recycling is disabled we need to delete all components and clear the array
-          _componentPool.push(orderedComponents.shift());
+          _componentPool.push(orderedComponents.shift()!);
         }
       }
     }
 
     let firstIndexInList =
       orderedComponents.length > 0
-        ? orderedComponents[0].index
+        ? orderedComponents[0]!.index
         : renderedFirstItemIndex;
     let lastIndexInList =
       orderedComponents.length > 0
-        ? orderedComponents[orderedComponents.length - 1].index
+        ? orderedComponents[orderedComponents.length - 1]!.index
         : renderedFirstItemIndex - 1;
 
     // Append as many items as needed to the rendered components
     while (lastIndexInList < renderedLastItemIndex) {
-      let component;
-
-      if (shouldRecycle === true) {
-        component = _componentPool.pop() || new VirtualComponent();
-      } else {
-        component = new VirtualComponent();
-      }
-
       const itemIndex = ++lastIndexInList;
+      const item = this._itemAt(itemIndex);
+      const recycled =
+        shouldRecycle === true ? _componentPool.pop() : undefined;
+      const component = recycled ?? new VirtualComponent(item, itemIndex);
 
-      component.recycle(objectAt(items, itemIndex), itemIndex);
+      recycled?.recycle(item, itemIndex);
       this._appendComponent(component);
 
       orderedComponents.push(component);
@@ -565,17 +699,13 @@ export default class Radar {
 
     // Prepend as many items as needed to the rendered components
     while (firstIndexInList > renderedFirstItemIndex) {
-      let component;
-
-      if (shouldRecycle === true) {
-        component = _componentPool.pop() || new VirtualComponent();
-      } else {
-        component = new VirtualComponent();
-      }
-
       const itemIndex = --firstIndexInList;
+      const item = this._itemAt(itemIndex);
+      const recycled =
+        shouldRecycle === true ? _componentPool.pop() : undefined;
+      const component = recycled ?? new VirtualComponent(item, itemIndex);
 
-      component.recycle(objectAt(items, itemIndex), itemIndex);
+      recycled?.recycle(item, itemIndex);
       this._prependComponent(component);
 
       orderedComponents.unshift(component);
@@ -587,9 +717,10 @@ export default class Radar {
       // the body if the item can be reused later otherwise delete the component to avoid virtual re-rendering of the
       // deleted item. If we end up using these components again, we'll grab their DOM and put it back
       for (let i = _componentPool.length - 1; i >= 0; i--) {
-        const component = _componentPool[i];
-        const item = objectAt(items, component.index);
+        const component = _componentPool[i]!;
+        const item = items[component.index];
         if (shouldRecycle === true && item) {
+          assert('Recycled components are kept in the DOM pool', this._domPool);
           insertRangeBefore(
             this._domPool,
             null,
@@ -600,13 +731,16 @@ export default class Radar {
           // Insert the virtual component bound back to make sure Glimmer is
           // not confused about the state of the DOM.
           insertRangeBefore(
-            this._itemContainer,
+            this.itemContainer,
             null,
             component.realUpperBound,
             component.realLowerBound,
           );
+          // Each removal renders in its own runloop. Removing them all in one render made Ember
+          // render the rest of the out of order pool with the wrong content (#358).
+          // eslint-disable-next-line ember/no-runloop
           run(() => {
-            virtualComponents.removeObject(component);
+            virtualComponents.splice(virtualComponents.indexOf(component), 1);
           });
           _componentPool.splice(i, 1);
         }
@@ -633,26 +767,25 @@ export default class Radar {
         : '';
   }
 
-  _appendComponent(component) {
+  _appendComponent(component: VirtualComponent<T>): void {
     const {
       virtualComponents,
       _occludedContentAfter,
       _appendComponentPool,
       shouldRecycle,
-      _itemContainer,
     } = this;
 
     const relativeNode = _occludedContentAfter.realUpperBound;
 
     if (component.rendered === true) {
       insertRangeBefore(
-        _itemContainer,
+        this.itemContainer,
         relativeNode,
         component.realUpperBound,
         component.realLowerBound,
       );
     } else {
-      virtualComponents.insertAt(virtualComponents.length - 1, component);
+      virtualComponents.splice(virtualComponents.length - 1, 0, component);
       component.rendered = true;
 
       // shouldRecycle=false breaks UI when scrolling the elements fast.
@@ -667,13 +800,13 @@ export default class Radar {
             this._nextLayout = null;
 
             while (_appendComponentPool.length > 0) {
-              const component = _appendComponentPool.pop();
+              const component = _appendComponentPool.pop()!;
 
               // Changes with each inserted component
               const relativeNode = _occludedContentAfter.realUpperBound;
 
               insertRangeBefore(
-                this._itemContainer,
+                this.itemContainer,
                 relativeNode,
                 component.realUpperBound,
                 component.realLowerBound,
@@ -685,25 +818,22 @@ export default class Radar {
     }
   }
 
-  _prependComponent(component) {
-    const {
-      virtualComponents,
-      _occludedContentBefore,
-      _prependComponentPool,
-      _itemContainer,
-    } = this;
+  _prependComponent(component: VirtualComponent<T>): void {
+    const { virtualComponents, _occludedContentBefore, _prependComponentPool } =
+      this;
 
-    const relativeNode = _occludedContentBefore.realLowerBound.nextSibling;
+    const relativeNode =
+      _occludedContentBefore.realLowerBound?.nextSibling ?? null;
 
     if (component.rendered === true) {
       insertRangeBefore(
-        _itemContainer,
+        this.itemContainer,
         relativeNode,
         component.realUpperBound,
         component.realLowerBound,
       );
     } else {
-      virtualComponents.insertAt(virtualComponents.length - 1, component);
+      virtualComponents.splice(virtualComponents.length - 1, 0, component);
       component.rendered = true;
 
       // Components that are both new and prepended still need to be rendered at the end because Glimmer.
@@ -715,14 +845,14 @@ export default class Radar {
           this._nextLayout = null;
 
           while (_prependComponentPool.length > 0) {
-            const component = _prependComponentPool.pop();
+            const component = _prependComponentPool.pop()!;
 
             // Changes with each inserted component
             const relativeNode =
-              _occludedContentBefore.realLowerBound.nextSibling;
+              _occludedContentBefore.realLowerBound?.nextSibling ?? null;
 
             insertRangeBefore(
-              _itemContainer,
+              this.itemContainer,
               relativeNode,
               component.realUpperBound,
               component.realLowerBound,
@@ -733,7 +863,7 @@ export default class Radar {
     }
   }
 
-  _sendActions() {
+  _sendActions(): void {
     const {
       firstItemIndex,
       lastItemIndex,
@@ -751,48 +881,48 @@ export default class Radar {
     } = this;
 
     if (_didReset || firstVisibleIndex !== _prevFirstVisibleIndex) {
-      this.sendAction('firstVisibleChanged', firstVisibleIndex);
+      this.notify('firstVisibleChanged', firstVisibleIndex);
     }
 
     if (_didReset || lastVisibleIndex !== _prevLastVisibleIndex) {
-      this.sendAction('lastVisibleChanged', lastVisibleIndex);
+      this.notify('lastVisibleChanged', lastVisibleIndex);
     }
 
     if (_firstReached === false && firstItemIndex === 0) {
-      this.sendAction('firstReached', firstItemIndex);
+      this.notify('firstReached', firstItemIndex);
       this._firstReached = true;
     }
 
     if (_lastReached === false && lastItemIndex === totalItems - 1) {
-      this.sendAction('lastReached', lastItemIndex);
+      this.notify('lastReached', lastItemIndex);
       this._lastReached = true;
     }
   }
 
-  prepend(numPrepended) {
+  prepend(numPrepended: number): void {
     this._prevFirstItemIndex += numPrepended;
     this._prevLastItemIndex += numPrepended;
 
-    this.orderedComponents.forEach((c) =>
-      set(c, 'index', get(c, 'index') + numPrepended),
-    );
+    this.orderedComponents.forEach((c) => {
+      c.index = c.index + numPrepended;
+    });
 
     this._firstReached = false;
 
     this._prependOffset = numPrepended * this._calculatedEstimateHeight;
   }
 
-  append() {
+  append(_numAppended?: number): void {
     this._lastReached = false;
   }
 
-  reset() {
+  reset(): void {
     this._firstReached = false;
     this._lastReached = false;
     this._didReset = true;
   }
 
-  pageUp() {
+  pageUp(): void {
     if (this.renderAll) {
       return; // All items rendered, no need to page up
     }
@@ -806,12 +936,12 @@ export default class Radar {
       );
       const offset = this.getOffsetForIndex(newFirstItemIndex);
 
-      this._scrollContainer.scrollTop = offset + this._collectionOffset;
+      this.scrollContainer.scrollTop = offset + this._collectionOffset;
       this.scheduleUpdate();
     }
   }
 
-  pageDown() {
+  pageDown(): void {
     if (this.renderAll) {
       return; // All items rendered, no need to page down
     }
@@ -825,12 +955,12 @@ export default class Radar {
       );
       const offset = this.getOffsetForIndex(newFirstItemIndex);
 
-      this._scrollContainer.scrollTop = offset + this._collectionOffset;
+      this.scrollContainer.scrollTop = offset + this._collectionOffset;
       this.scheduleUpdate();
     }
   }
 
-  get totalComponents() {
+  get totalComponents(): number {
     return Math.min(
       this.totalItems,
       this.lastItemIndex - this.firstItemIndex + 1,
@@ -850,18 +980,18 @@ export default class Radar {
    * when prepending item elements. We seem to avoid this behavior by doing these things in a RAF
    * in this exact order.
    */
-  get visibleTop() {
+  get visibleTop(): number {
     return Math.max(
       this._scrollTop - this._collectionOffset + this._prependOffset,
       0,
     );
   }
 
-  get visibleMiddle() {
+  get visibleMiddle(): number {
     return this.visibleTop + this._calculatedScrollContainerHeight / 2;
   }
 
-  get visibleBottom() {
+  get visibleBottom(): number {
     // There is a case where the container of this vertical collection could have height 0 at
     // initial render step but will be updated later. We want to return visibleBottom to be 0 rather
     // than -1.
@@ -871,7 +1001,7 @@ export default class Radar {
     );
   }
 
-  get totalItems() {
-    return this.items ? get(this.items, 'length') : 0;
+  get totalItems(): number {
+    return this.items ? this.items.length : 0;
   }
 }
