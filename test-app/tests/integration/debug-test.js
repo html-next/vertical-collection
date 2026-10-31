@@ -57,11 +57,23 @@ module('vertical-collection', 'Integration | Debug Tests', function (hooks) {
     standardTemplate,
 
     async function (assert) {
-      await scrollTo('.scrollable', 0, 400);
+      const { getComputedStyle } = window;
+      let checks = 0;
 
-      assert.ok(
-        document.querySelector('.vertical-collection-visual-debugger'),
-        'the CSS checks pass for a correctly styled collection'
+      window.getComputedStyle = (element, ...rest) => {
+        if (element.classList.contains('occluded-content')) checks++;
+        return getComputedStyle.call(window, element, ...rest);
+      };
+
+      try {
+        await scrollTo('.scrollable', 0, 400);
+      } finally {
+        window.getComputedStyle = getComputedStyle;
+      }
+
+      assert.true(
+        checks > 0,
+        'the CSS of the first element in the item container is checked'
       );
     }
   );
