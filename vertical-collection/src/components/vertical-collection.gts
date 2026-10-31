@@ -55,7 +55,7 @@ export interface VerticalCollectionSignature<T> {
   };
   Blocks: {
     default: [item: T, index: number];
-    inverse: [];
+    else: [];
   };
 }
 
@@ -778,7 +778,7 @@ class VerticalCollection<T = unknown> extends Component<
     {{~/each}}
 
     {{#if this.shouldYieldToInverse}}
-      {{yield to="inverse"}}
+      {{yield to="else"}}
     {{/if}}
   </template>
 }
