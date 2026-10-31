@@ -6,16 +6,16 @@ import document from '../../utils/document-shim.ts';
 
 let VC_IDENTITY = 0;
 
-export default class VirtualComponent {
+export default class VirtualComponent<T = unknown> {
   id: string;
-  @tracked content: unknown;
-  @tracked index: number | null;
+  @tracked content: T;
+  @tracked index: number;
   upperBound: Text | null;
   lowerBound: Text | null;
   rendered: boolean;
   readonly isOccludedContent = false;
 
-  constructor(content: unknown = null, index: number | null = null) {
+  constructor(content: T, index: number) {
     this.id = `VC-${VC_IDENTITY++}`;
 
     this.content = content;
@@ -83,9 +83,7 @@ export default class VirtualComponent {
     return { top, bottom, height };
   }
 
-  recycle(newContent: unknown, newIndex: number): void {
-    assert(`You cannot set an item's content to undefined`, newContent);
-
+  recycle(newContent: T, newIndex: number): void {
     // Assigned without comparing: the first pool is built while the collection renders,
     // and a tracked value cannot be read and then changed in the same render.
     this.index = newIndex;
@@ -95,7 +93,5 @@ export default class VirtualComponent {
   destroy(): void {
     this.upperBound = null;
     this.lowerBound = null;
-    this.content = null;
-    this.index = null;
   }
 }

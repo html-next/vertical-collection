@@ -5,10 +5,10 @@ export interface VerticalRect {
 }
 
 export default function getScaledClientRect(
-  element: { getBoundingClientRect(): VerticalRect | undefined },
+  element: { getBoundingClientRect(): VerticalRect },
   scale: number,
 ): VerticalRect {
-  const rect = element.getBoundingClientRect()!;
+  const rect = element.getBoundingClientRect();
 
   if (scale === 1) {
     return rect;

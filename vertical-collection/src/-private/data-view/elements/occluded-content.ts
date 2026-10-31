@@ -1,3 +1,4 @@
+import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
 import document from '../../utils/document-shim.ts';
@@ -35,10 +36,13 @@ export default class OccludedContent {
     }
   }
 
-  getBoundingClientRect(): DOMRect | undefined {
-    if (this.element !== null) {
-      return this.element.getBoundingClientRect();
-    }
+  getBoundingClientRect(): DOMRect {
+    assert(
+      'Occluded content is only measured in the DOM',
+      this.element !== null,
+    );
+
+    return this.element.getBoundingClientRect();
   }
 
   addEventListener(event: string, listener: EventListener): void {

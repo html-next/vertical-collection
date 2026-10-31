@@ -4,11 +4,11 @@ import { type Token } from 'ember-raf-scheduler';
 
 import Radar, { type RadarOptions } from './radar.ts';
 
-export default class StaticRadar extends Radar {
+export default class StaticRadar<T = unknown> extends Radar<T> {
   declare _firstItemIndex: number;
   declare _lastItemIndex: number;
 
-  constructor(parentToken: Token, options: RadarOptions) {
+  constructor(parentToken: Token, options: RadarOptions<T>) {
     super(parentToken, options);
 
     this._firstItemIndex = 0;

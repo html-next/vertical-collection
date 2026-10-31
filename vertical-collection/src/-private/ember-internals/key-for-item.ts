@@ -35,7 +35,9 @@ export default function keyForItem(
         .split('.')
         .reduce<unknown>(
           (value, part) =>
-            (value as Record<string, unknown> | null | undefined)?.[part],
+            value === null || value === undefined
+              ? undefined
+              : Reflect.get(Object(value), part),
           item,
         );
   }
