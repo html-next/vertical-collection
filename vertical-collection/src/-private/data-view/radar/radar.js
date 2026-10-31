@@ -9,7 +9,6 @@ import { Token, scheduler } from 'ember-raf-scheduler';
 import VirtualComponent from '../elements/virtual-component.js';
 import OccludedContent from '../elements/occluded-content.js';
 import insertRangeBefore from '../utils/insert-range-before.js';
-import objectAt from '../utils/object-at.js';
 import roundTo from '../utils/round-to.js';
 import { isPrepend, isAppend } from '../utils/mutation-checkers.js';
 
@@ -341,8 +340,8 @@ export default class Radar {
       this.reset();
     }
 
-    const firstItem = objectAt(this.items, 0);
-    const lastItem = objectAt(this.items, this.totalItems - 1);
+    const firstItem = this.items[0];
+    const lastItem = this.items[this.totalItems - 1];
 
     this._prevTotalItems = totalItems;
     this._prevFirstKey = totalItems > 0 ? keyForItem(firstItem, key, 0) : 0;
@@ -526,7 +525,7 @@ export default class Radar {
           // If the underlying array has changed, the indexes could be the same but
           // the content may have changed, so recycle the remaining components
           const component = orderedComponents[i];
-          component.recycle(objectAt(items, component.index), component.index);
+          component.recycle(items[component.index], component.index);
         }
       } else {
         while (orderedComponents.length > 0) {
@@ -557,7 +556,7 @@ export default class Radar {
 
       const itemIndex = ++lastIndexInList;
 
-      component.recycle(objectAt(items, itemIndex), itemIndex);
+      component.recycle(items[itemIndex], itemIndex);
       this._appendComponent(component);
 
       orderedComponents.push(component);
@@ -575,7 +574,7 @@ export default class Radar {
 
       const itemIndex = --firstIndexInList;
 
-      component.recycle(objectAt(items, itemIndex), itemIndex);
+      component.recycle(items[itemIndex], itemIndex);
       this._prependComponent(component);
 
       orderedComponents.unshift(component);
@@ -588,7 +587,7 @@ export default class Radar {
       // deleted item. If we end up using these components again, we'll grab their DOM and put it back
       for (let i = _componentPool.length - 1; i >= 0; i--) {
         const component = _componentPool[i];
-        const item = objectAt(items, component.index);
+        const item = items[component.index];
         if (shouldRecycle === true && item) {
           insertRangeBefore(
             this._domPool,
@@ -872,6 +871,6 @@ export default class Radar {
   }
 
   get totalItems() {
-    return this.items ? get(this.items, 'length') : 0;
+    return this.items ? this.items.length : 0;
   }
 }
