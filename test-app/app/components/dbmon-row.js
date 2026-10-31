@@ -1,14 +1,11 @@
-import { alias } from '@ember/object/computed';
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 
 export default Component.extend({
   tagName: 'tr',
 
-  queries: alias('db.queries'),
-
-  topFiveQueries: computed('queries', function () {
-    let queries = this.queries || [];
+  topFiveQueries: computed('db.queries', function () {
+    let queries = this.db.queries || [];
     let topFiveQueries = queries.slice(0, 5);
 
     while (topFiveQueries.length < 5) {
@@ -25,8 +22,8 @@ export default Component.extend({
     });
   }),
 
-  countClassName: computed('queries', function () {
-    let queries = this.queries || [];
+  countClassName: computed('db.queries', function () {
+    let queries = this.db.queries || [];
     let countClassName = 'label';
 
     if (queries.length >= 20) {
