@@ -5,23 +5,26 @@ import { tracked } from '@glimmer/tracking';
 
 const service = s.service ?? s.inject;
 
-/* eslint-disable ember/no-computed-properties-in-native-classes */
-import { or } from '@ember/object/computed';
-
 export default class extends Controller {
   @service store;
   @tracked prefixed = true;
   @tracked vcShown = true;
 
   @tracked partial = undefined;
-  @or('partial', 'model') items;
+
+  get items() {
+    return this.partial || this.model;
+  }
 
   @tracked firstVisibleId = undefined;
 
   @action
   updateItems() {
     this.store.unloadAll('number-item');
-    this.store.query('number-item', { length: 5 });
+    this.store.request({
+      url: '/number-items?length=5',
+      cacheOptions: { reload: true },
+    });
   }
 
   @action
