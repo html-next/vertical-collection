@@ -1,3 +1,4 @@
+import { assert } from '@ember/debug';
 import { begin, end } from '@ember/runloop';
 const DEFAULT_ARRAY_SIZE = 10;
 
@@ -69,7 +70,10 @@ export class ScrollHandler {
         },
       };
     } else {
-      cache = this.handlers[index]!;
+      const existing = this.handlers[index];
+
+      assert('A known element has handlers', existing);
+      cache = existing;
       handlers = cache.handlers;
       handlers.push(handler);
     }

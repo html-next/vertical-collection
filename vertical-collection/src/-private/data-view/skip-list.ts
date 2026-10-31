@@ -61,7 +61,7 @@ export default class SkipList {
       layer: Float32Array,
       prevLayer: Float32Array,
       left: number,
-      right: number;
+      right: number | undefined;
 
     prevLayer = layer = values;
     length = values.length;
@@ -89,7 +89,7 @@ export default class SkipList {
       } else {
         for (i = 0; i < length; i++) {
           left = prevLayer[i * 2]!;
-          right = prevLayer[i * 2 + 1]!;
+          right = prevLayer[i * 2 + 1];
           layer[i] = right ? left + right : left;
         }
       }
@@ -98,12 +98,7 @@ export default class SkipList {
       prevLayer = layer;
     }
 
-    this.total =
-      layer.length > 0
-        ? layer.length > 1
-          ? layer[0]! + layer[1]!
-          : layer[0]!
-        : 0;
+    this.total = (layer[0] ?? 0) + (layer[1] ?? 0);
 
     assert('total must be a number', typeof this.total === 'number');
 
