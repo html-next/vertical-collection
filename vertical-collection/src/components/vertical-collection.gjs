@@ -2,7 +2,6 @@ import { DEBUG } from '@glimmer/env';
 import { assert } from '@ember/debug';
 
 import Component from '@glimmer/component';
-import { helper } from '@ember/component/helper';
 import { registerDestructor } from '@ember/destroyable';
 import { run } from '@ember/runloop';
 
@@ -358,32 +357,32 @@ class VerticalCollection extends Component {
    * The pool of components the template renders. Called from the template with the
    * inputs it depends on, so it runs again when one of them changes: the items, their
    * length, which a tracked array reports when it changes in place, and the radar settings.
-   *
-   * Wrapped in `helper()` for Ember 3.28. From Ember 4.5 a plain function can be
-   * called from the template, and the wrapper can go.
    */
-  virtualComponents = helper(
-    // the second argument is the length of the items, which a tracked array reports
-    ([items, , renderAll, estimateHeight, bufferSize]) => {
-      const { _radar } = this;
+  virtualComponents = (
+    items,
+    itemsLength,
+    renderAll,
+    estimateHeight,
+    bufferSize,
+  ) => {
+    const { _radar } = this;
 
-      items ??= [];
-      assert(
-        '@items must be an array. ArrayProxy and PromiseArray are not supported.',
-        Array.isArray(items),
-      );
+    items ??= [];
+    assert(
+      '@items must be an array. ArrayProxy and PromiseArray are not supported.',
+      Array.isArray(items),
+    );
 
-      _radar.items = items;
-      _radar.estimateHeight = estimateHeight;
-      _radar.renderAll = renderAll;
-      _radar.bufferSize = bufferSize;
+    _radar.items = items;
+    _radar.estimateHeight = estimateHeight;
+    _radar.renderAll = renderAll;
+    _radar.bufferSize = bufferSize;
 
-      _radar.scheduleUpdate(true);
-      this._clearScheduledActions();
+    _radar.scheduleUpdate(true);
+    this._clearScheduledActions();
 
-      return _radar.virtualComponents;
-    },
-  );
+    return _radar.virtualComponents;
+  };
 
   schedule(queueName, job) {
     return scheduler.schedule(queueName, job, this.token);
