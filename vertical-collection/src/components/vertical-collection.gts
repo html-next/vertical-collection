@@ -31,7 +31,7 @@ export type VerticalCollectionAction<T> = (
 export interface VerticalCollectionSignature<T> {
   Args: {
     items?: readonly T[] | null;
-    estimateHeight?: number | string;
+    estimateHeight: number | string;
     key?: string;
     staticHeight?: boolean;
     shouldRecycle?: boolean;
