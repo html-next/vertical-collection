@@ -134,6 +134,16 @@ export default ts.config(
       },
     },
   },
+  {
+    files: ['**/*.{gjs,gts,js,ts}'],
+    rules: {
+      // the Record Array tests need a store array that changes in place
+      'warp-drive/no-legacy-request-patterns': [
+        'error',
+        { allowPeekAll: true },
+      ],
+    },
+  },
   /**
    * Tech debt to solve later (acquired during v2 addonification)
    * (mostly due to upgrades bringing new lints)
@@ -148,8 +158,6 @@ export default ts.config(
       'ember/no-classic-components': 'off',
       'ember/require-tagless-components': 'off',
       'qunit/require-expect': 'off',
-      'warp-drive/no-legacy-request-patterns': 'off',
-      'warp-drive/no-legacy-imports': 'off',
     },
   },
 );

@@ -11,8 +11,16 @@ const NUMBERS = Array.from({ length: 100 }, (_, i) => ({
 
 // Serves `/number-items`, and the first `length` numbers for `/number-items?length=`
 const NumbersHandler = {
-  request({ request }) {
-    const { searchParams } = new URL(request.url, window.location.origin);
+  request(context, next) {
+    const { pathname, searchParams } = new URL(
+      context.request.url,
+      window.location.origin
+    );
+
+    if (pathname !== '/number-items') {
+      return next(context.request);
+    }
+
     const length = Number(searchParams.get('length') ?? NUMBERS.length);
 
     return Promise.resolve({ data: NUMBERS.slice(0, length) });
