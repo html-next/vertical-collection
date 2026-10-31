@@ -24,13 +24,11 @@ export default Component.extend({
     let item = this.item;
     let isDynamic = this.isDynamic;
 
-    let { height, number } = item;
-
-    let opacity = numberToOpacity(number);
+    let opacity = numberToOpacity(item.number);
     let styleStr = `background: rgba(0,125,255,${opacity});`;
 
     if (isDynamic) {
-      styleStr += `height: ${Math.round(height)}px; box-sizing: content-box;`;
+      styleStr += `height: ${Math.round(item.height)}px; box-sizing: content-box;`;
     }
 
     return htmlSafe(styleStr);

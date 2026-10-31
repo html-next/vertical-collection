@@ -21,7 +21,7 @@ export default class extends Controller {
   @action
   updateItems() {
     this.store.unloadAll('number-item');
-    this.store.query('number-item', { length: 5 });
+    this.store.request({ url: '/number-items?length=5' });
   }
 
   @action
