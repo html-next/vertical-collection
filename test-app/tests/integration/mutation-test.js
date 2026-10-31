@@ -1,6 +1,6 @@
 import { module } from 'qunit';
 import { setupRenderingTest } from '../helpers';
-import { find, findAll } from '@ember/test-helpers';
+import { find, findAll, settled } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
 import getNumbers from 'test-app/lib/get-numbers';
@@ -534,6 +534,33 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
         find('.vertical-item:last-of-type').textContent.trim(),
         '4 4',
         'last item rendered correctly before move'
+      );
+    }
+  );
+
+  // #358: starting at item 50 and scrolling up creates components by prepending, so the
+  // pool is out of order. Shrinking the items below the pool size then removes some of them.
+  testScenarios(
+    'Collection renders the remaining items in order after shrinking an out of order pool',
+    scenariosFor(getNumbers(0, 100), { key: 'number', idForFirstItem: '50' }),
+    standardTemplate,
+
+    async function (assert) {
+      await scrollTo('.scrollable', 0, 900);
+      await scrollTo('.scrollable', 0, 700);
+      await scrollTo('.scrollable', 0, 500);
+
+      if (this.mutateInPlace) {
+        this.items.splice(5);
+        await settled();
+      } else {
+        await replaceArray(this, this.items.slice(0, 5));
+      }
+
+      assert.deepEqual(
+        findAll('.vertical-item').map((item) => item.textContent.trim()),
+        ['0 0', '1 1', '2 2', '3 3', '4 4'],
+        'the remaining items render in order with their own content'
       );
     }
   );
