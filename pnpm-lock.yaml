@@ -218,6 +218,9 @@ importers:
       ember-raf-scheduler:
         specifier: ~0.5.1
         version: 0.5.1(c8332dc3f90c0e60eb130a3a85f980b9)
+      tracked-built-ins:
+        specifier: ^4.1.2
+        version: 4.1.2(@babel/core@7.29.0)
     devDependencies:
       '@babel/eslint-parser':
         specifier: ^7.22.10

@@ -1,5 +1,5 @@
-import { A } from '@ember/array';
 import { set, get } from '@ember/object';
+import { TrackedArray } from 'tracked-built-ins';
 import { assert } from '@ember/debug';
 import { run } from '@ember/runloop';
 import { DEBUG } from '@glimmer/env';
@@ -120,14 +120,16 @@ export default class Radar {
       this._domPool = document.createDocumentFragment();
     }
 
-    // Initialize virtual components
-    this.virtualComponents = A([
+    // Initialize virtual components. The radar is made while the collection renders, and a
+    // tracked array cannot change there after it is read, so the first update uses a plain array.
+    this.virtualComponents = [
       this._occludedContentBefore,
       this._occludedContentAfter,
-    ]);
+    ];
     this.orderedComponents = [];
 
     this._updateVirtualComponents();
+    this.virtualComponents = new TrackedArray(this.virtualComponents);
 
     if (DEBUG) {
       this._debugDidUpdate = null;
@@ -605,7 +607,7 @@ export default class Radar {
             component.realLowerBound,
           );
           run(() => {
-            virtualComponents.removeObject(component);
+            virtualComponents.splice(virtualComponents.indexOf(component), 1);
           });
           _componentPool.splice(i, 1);
         }
@@ -651,7 +653,7 @@ export default class Radar {
         component.realLowerBound,
       );
     } else {
-      virtualComponents.insertAt(virtualComponents.length - 1, component);
+      virtualComponents.splice(virtualComponents.length - 1, 0, component);
       component.rendered = true;
 
       // shouldRecycle=false breaks UI when scrolling the elements fast.
@@ -702,7 +704,7 @@ export default class Radar {
         component.realLowerBound,
       );
     } else {
-      virtualComponents.insertAt(virtualComponents.length - 1, component);
+      virtualComponents.splice(virtualComponents.length - 1, 0, component);
       component.rendered = true;
 
       // Components that are both new and prepended still need to be rendered at the end because Glimmer.

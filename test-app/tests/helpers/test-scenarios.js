@@ -1,4 +1,4 @@
-import { A } from '@ember/array';
+import { TrackedArray } from 'tracked-built-ins';
 import { test } from 'qunit';
 import { hbs } from 'ember-cli-htmlbars';
 import { settled, render } from '@ember/test-helpers';
@@ -44,20 +44,22 @@ export const dynamicSimpleScenarioFor = generateScenario(
   'Dynamic Standard Array',
   {}
 );
-export const dynamicEmberArrayScenarioFor = generateScenario(
-  'Dynamic Ember Array',
-  {},
-  A
+export const dynamicTrackedArrayScenarioFor = generateScenario(
+  'Dynamic TrackedArray',
+  { mutateInPlace: true },
+  (items) => new TrackedArray(items)
 );
+
 export const staticSimpleScenarioFor = generateScenario(
   'Static Standard Array',
   { staticHeight: true }
 );
-export const staticEmberArrayScenarioFor = generateScenario(
-  'Static Ember Array',
-  { staticHeight: true },
-  A
+export const staticTrackedArrayScenarioFor = generateScenario(
+  'Static TrackedArray',
+  { staticHeight: true, mutateInPlace: true },
+  (items) => new TrackedArray(items)
 );
+
 export const simpleScenariosFor = mergeScenarioGenerators(
   dynamicSimpleScenarioFor,
   staticSimpleScenarioFor
@@ -65,19 +67,13 @@ export const simpleScenariosFor = mergeScenarioGenerators(
 
 export const standardScenariosFor = mergeScenarioGenerators(
   dynamicSimpleScenarioFor,
-  dynamicEmberArrayScenarioFor,
+  dynamicTrackedArrayScenarioFor,
 
   staticSimpleScenarioFor,
-  staticEmberArrayScenarioFor
+  staticTrackedArrayScenarioFor
 );
 
-export const scenariosFor = mergeScenarioGenerators(
-  dynamicSimpleScenarioFor,
-  dynamicEmberArrayScenarioFor,
-
-  staticSimpleScenarioFor,
-  staticEmberArrayScenarioFor
-);
+export const scenariosFor = standardScenariosFor;
 
 export const standardTemplate = hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
