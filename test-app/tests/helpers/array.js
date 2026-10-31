@@ -7,7 +7,7 @@ export function prepend(context, itemsToPrepend) {
 
   run(() => {
     if (items.unshiftObjects) {
-      // Ember Array / ArrayProxy
+      // Ember Array
       items.unshiftObjects(itemsToPrepend);
     } else {
       // Standard arrays
@@ -23,7 +23,7 @@ export function append(context, itemsToAppend) {
 
   run(() => {
     if (items.pushObjects) {
-      // Ember Array / ArrayProxy
+      // Ember Array
       items.pushObjects(itemsToAppend);
     } else {
       // Standard arrays
@@ -68,7 +68,7 @@ export function move(context, sourceItemIdx, destItemIdx) {
 
   run(() => {
     if (items.objectAt && items.removeObject && items.insertAt) {
-      // Ember Array / ArrayProxy
+      // Ember Array
       destItem = items.objectAt(destItemIdx);
       sourceItem = items.objectAt(sourceItemIdx);
       items.removeObject(sourceItem);

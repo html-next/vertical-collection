@@ -23,7 +23,6 @@ import {
   ViewportContainer,
   DynamicRadar,
   StaticRadar,
-  objectAt,
 } from '../-private/index.js';
 
 /*
@@ -347,9 +346,14 @@ class VerticalCollection extends Component.extend({
     function () {
       const { _radar } = this;
 
-      const items = this.items;
+      const items = this.items ?? [];
 
-      _radar.items = items === null || items === undefined ? [] : items;
+      assert(
+        '@items must be an array. ArrayProxy and PromiseArray are not supported.',
+        Array.isArray(items),
+      );
+
+      _radar.items = items;
       _radar.estimateHeight = this.estimateHeight;
       _radar.renderAll = this.renderAll;
       _radar.bufferSize = this.bufferSize;
@@ -383,7 +387,7 @@ class VerticalCollection extends Component.extend({
           const keyPath = this.key;
 
           this._scheduledActions.forEach(([action, index]) => {
-            const item = objectAt(items, index);
+            const item = items[index];
             const key = keyForItem(item, keyPath, index);
 
             // this.sendAction will be deprecated in ember 4.0
@@ -685,13 +689,13 @@ class VerticalCollection extends Component.extend({
 }
 
 function calculateStartingIndex(items, idForFirstItem, key, renderFromLast) {
-  const totalItems = get(items, 'length');
+  const totalItems = items.length;
 
   let startingIndex = 0;
 
   if (idForFirstItem !== undefined && idForFirstItem !== null) {
     for (let i = 0; i < totalItems; i++) {
-      if (keyForItem(objectAt(items, i), key, i) === idForFirstItem) {
+      if (keyForItem(items[i], key, i) === idForFirstItem) {
         startingIndex = i;
         break;
       }
