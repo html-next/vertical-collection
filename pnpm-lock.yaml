@@ -18,7 +18,7 @@ importers:
     dependencies:
       '@html-next/vertical-collection':
         specifier: workspace:*
-        version: file:vertical-collection(41f15cfcddee1b664cece93a788480f7)
+        version: file:vertical-collection(2935cfb77147881c8250be8c1bb7d0d1)
       ember-raf-scheduler:
         specifier: 0.5.1
         version: 0.5.1(c8332dc3f90c0e60eb130a3a85f980b9)
@@ -38,15 +38,6 @@ importers:
       '@babel/runtime':
         specifier: ^7.28.4
         version: 7.29.2
-      '@ember-data/adapter':
-        specifier: ^5.9.1
-        version: 5.9.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      '@ember-data/model':
-        specifier: ^5.9.1
-        version: 5.9.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      '@ember-data/serializer':
-        specifier: ^5.9.1
-        version: 5.9.1(c8332dc3f90c0e60eb130a3a85f980b9)
       '@ember/app-tsconfig':
         specifier: ^1.0.3
         version: 1.0.3
@@ -82,7 +73,7 @@ importers:
         version: 3.0.6(262f546f32e3e6aa8edef7a09bd2b72b)
       '@embroider/vite':
         specifier: ^1.7.13
-        version: 1.7.13(1393ec2307890f99f47394f91f53e459)
+        version: 1.7.13(19fb3b00350769886e1f0214d7749d2a)
       '@eslint/js':
         specifier: ^9.37.0
         version: 9.39.4
@@ -116,9 +107,6 @@ importers:
       '@warp-drive/json-api':
         specifier: ^5.9.1
         version: 5.9.1(369e2ff1cff19df0b7d82fa99d04b4ae)
-      '@warp-drive/legacy':
-        specifier: ^5.9.1
-        version: 5.9.1(8db2146b5daa4dd19bc55eafd73e0ea1)
       babel-plugin-ember-template-compilation:
         specifier: ^4.0.0
         version: 4.0.0
@@ -160,7 +148,7 @@ importers:
         version: 7.9.3
       ember-try:
         specifier: ^4.0.0
-        version: 4.0.0(encoding@0.1.13)
+        version: 4.0.0
       eslint:
         specifier: ^9.37.0
         version: 9.39.4(jiti@2.6.1)
@@ -208,7 +196,7 @@ importers:
         version: 8.58.1(0d62767105e9a39fc494591cb6137847)
       vite:
         specifier: ^7.1.9
-        version: 7.3.2(7fea842860654791a3ee14b4b3ced532)
+        version: 7.3.2(b252b119712c99b40fa367de921fe90a)
 
   vertical-collection:
     dependencies:
@@ -1451,17 +1439,8 @@ packages:
     peerDependencies:
       postcss-selector-parser: ^7.1.1
 
-  '@ember-data/adapter@5.9.1':
-    resolution: {integrity: sha512-dEebjDOuRmthFh2sQZvglRqXfnszbwPw1n/0S8/pJEQ78FULW4B+QOj4zAOSgFhI6RNozU3fjekwfukURssSjA==}
-
-  '@ember-data/model@5.9.1':
-    resolution: {integrity: sha512-SbU1zxt1yl+CxYL8edsc2JELEVTi/RbG2tEzXgqXodrTi5oA4+yzo4too9wtrFSggztb5iaxPotsj61R0XDQUQ==}
-
   '@ember-data/rfc395-data@0.0.4':
     resolution: {integrity: sha512-tGRdvgC9/QMQSuSuJV45xoyhI0Pzjm7A9o/MVVA3HakXIImJbbzx/k/6dO9CUEQXIyS2y0fW6C1XaYOG7rY0FQ==}
-
-  '@ember-data/serializer@5.9.1':
-    resolution: {integrity: sha512-SheRw52aPw96hTZ/6/k544jW3MKn3tz5DoVc/dC/uGhvkboySO3TrKrJ3ImnLsawl5euUuLEZtCF5Cri2tg8kA==}
 
   '@ember-tooling/blueprint-blueprint@0.2.1':
     resolution: {integrity: sha512-eZ5qicL3gfFFbmzLaSiEWPSmoRUJGnqg+dQmU0R81vv+0Ni7W/cS7MXx1l4HpN9B7Yg4M9GgdQTkeJnb6abQug==}
@@ -1909,7 +1888,6 @@ packages:
     engines: {node: '>= 18'}
     peerDependencies:
       '@glimmer/component': ^1.1.2 || ^2.0.0
-      ember-source: '>= 3.28.0'
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2101,25 +2079,13 @@ packages:
     resolution: {integrity: sha512-jtEZKczWTueJYHjGpxU3KJQ08Gsrf4r6Q2GjmPp/RGk5leeYAA1eyDADSAF+KVCsQ6EwZd/FMcOFCoMhtqdCtQ==}
     engines: {node: '>=14.18.0'}
 
-  '@manypkg/find-root@3.1.0':
-    resolution: {integrity: sha512-BcSqCyKhBVZ5YkSzOiheMCV41kqAFptW6xGqYSTjkVTl9XQpr+pqHhwgGCOHQtjDCv7Is6EFyA14Sm5GVbVABA==}
-    engines: {node: '>=20.0.0'}
-
   '@manypkg/get-packages@2.2.2':
     resolution: {integrity: sha512-3+Zd8kLZmsyJFmWTBtY0MAuCErI7yKB2cjMBlujvSVKZ2R/BMXi0kjCXu2dtRlSq/ML86t1FkumT0yreQ3n8OQ==}
     engines: {node: '>=14.18.0'}
 
-  '@manypkg/get-packages@3.1.0':
-    resolution: {integrity: sha512-0TbBVyvPrP7xGYBI/cP8UP+yl/z+HtbTttAD7FMAJgn/kXOTwh5/60TsqP9ZYY710forNfyV0N8P/IE/ujGZJg==}
-    engines: {node: '>=20.0.0'}
-
   '@manypkg/tools@1.1.2':
     resolution: {integrity: sha512-3lBouSuF7CqlseLB+FKES0K4FQ02JrbEoRtJhxnsyB1s5v4AP03gsoohN8jp7DcOImhaR9scYdztq3/sLfk/qQ==}
     engines: {node: '>=14.18.0'}
-
-  '@manypkg/tools@2.1.2':
-    resolution: {integrity: sha512-6QEf6yqFbETdwGITKq57aYoPfX/3K8XFNwsAlx0C1M7o8cb79sv1M3w+tWuWvIcSbNqrLF7OD7YpZMVVz335hQ==}
-    engines: {node: '>=20.0.0'}
 
   '@napi-rs/wasm-runtime@1.2.4':
     resolution: {integrity: sha512-AJxoUD2/15ESHbvpcyjU274nsAPLuOtPHCk0vKJM5pj//Fg/B1FXNWjPnXTT9PymCYYiHo4zPj0ZomXBKhoy7g==}
@@ -2719,12 +2685,6 @@ packages:
     peerDependencies:
       '@warp-drive/core': 5.9.1
 
-  '@warp-drive/legacy@5.9.1':
-    resolution: {integrity: sha512-OtQuzBFsMt54Es+xsoWIxgEM6+NN0VW1Ta5/WYcxJ9hpAJIq80L6+Ras02jxAUtDukuEA5OON83dsMhh8FEJYg==}
-    peerDependencies:
-      '@warp-drive/core': 5.9.1
-      '@warp-drive/utilities': 5.9.1
-
   '@warp-drive/utilities@5.9.1':
     resolution: {integrity: sha512-3ECkyc3K6pdfzxBrMUDHHT6zAoS0eTL7mNy9F5FYqL0cfsQI0YR+gV0lvJFLK4zPaxm1OVwGoMohFPGrMHiUaA==}
     peerDependencies:
@@ -2881,9 +2841,6 @@ packages:
   array-includes@3.1.9:
     resolution: {integrity: sha512-FmeCCAenzH0KH381SPT5FZmiA/TmpndpcaShhfgEN9eCVjnFBqq3l1xrI42y8+PPLI6hypzou4GXw00WHmPBLQ==}
     engines: {node: '>= 0.4'}
-
-  array-timsort@1.0.3:
-    resolution: {integrity: sha512-/+3GRL7dDAGEfM6TseQk/U+mi18TU2Ms9I3UlLdUMhz2hbvGNTKdj9xniwXfUqgYhHxRx0+8UnKkvlNwVU+cWQ==}
 
   array-union@2.1.0:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
@@ -3470,10 +3427,6 @@ packages:
   commander@8.3.0:
     resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
     engines: {node: '>= 12'}
-
-  comment-json@5.0.0:
-    resolution: {integrity: sha512-uiqLcOiVDJtBP8WGkZHEP+FZIhTzP1dxvn59EfoYUi9gqupjrBWVQkO2atDrbnKPwLeotFYDsuNb26uBMqB+hw==}
-    engines: {node: '>= 6'}
 
   common-ancestor-path@1.0.1:
     resolution: {integrity: sha512-L3sHRo1pXXEqX8VU28kfgUY+YGsk09hPqZiZmLacNib6XNTCM8ubYeT7ryXQw8asB1sKgcU5lkB7ONug08aB8w==}
@@ -7519,10 +7472,6 @@ packages:
   walker@1.0.8:
     resolution: {integrity: sha512-ts/8E8l5b7kY0vlWLewOkDXMmPdLcVV4GmOQLyxuSswIJsweeFZtAsMF7k1Nszz+TYBQrlYRmzOnr398y1JemQ==}
 
-  warp-drive@0.2.1:
-    resolution: {integrity: sha512-53UOA9HFdyOm6WvT7nt2OTvVvHRRTKBh+svR4jXOdocErUJ+bvfsWia4994D+hqJVdI/B9m5z4wBDBRPd13SmA==}
-    hasBin: true
-
   watch-detector@1.0.2:
     resolution: {integrity: sha512-MrJK9z7kD5Gl3jHBnnBVHvr1saVGAfmkyyrvuNzV/oe0Gr1nwZTy5VSA0Gw2j2Or0Mu8HcjUa44qlBvC2Ofnpg==}
     engines: {node: '>= 8'}
@@ -7682,11 +7631,6 @@ packages:
 
   yaml@2.8.3:
     resolution: {integrity: sha512-AvbaCLOO2Otw/lW5bmh9d/WEdcDFdQp2Z2ZUH3pX9U2ihyUY0nvLv7J6TrWowklRGPYbB/IuIMfYgxaCPg5Bpg==}
-    engines: {node: '>= 14.6'}
-    hasBin: true
-
-  yaml@2.9.1:
-    resolution: {integrity: sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw==}
     engines: {node: '>= 14.6'}
     hasBin: true
 
@@ -9172,43 +9116,7 @@ snapshots:
     dependencies:
       postcss-selector-parser: 7.1.1
 
-  '@ember-data/adapter@5.9.1(c8332dc3f90c0e60eb130a3a85f980b9)':
-    dependencies:
-      '@embroider/macros': 1.21.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      '@warp-drive/core': 5.9.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      '@warp-drive/legacy': 5.9.1(8db2146b5daa4dd19bc55eafd73e0ea1)
-      '@warp-drive/utilities': 5.9.1(369e2ff1cff19df0b7d82fa99d04b4ae)
-      warp-drive: 0.2.1(c8332dc3f90c0e60eb130a3a85f980b9)
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@glint/template'
-      - supports-color
-
-  '@ember-data/model@5.9.1(c8332dc3f90c0e60eb130a3a85f980b9)':
-    dependencies:
-      '@embroider/macros': 1.21.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      '@warp-drive/core': 5.9.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      '@warp-drive/legacy': 5.9.1(8db2146b5daa4dd19bc55eafd73e0ea1)
-      '@warp-drive/utilities': 5.9.1(369e2ff1cff19df0b7d82fa99d04b4ae)
-      warp-drive: 0.2.1(c8332dc3f90c0e60eb130a3a85f980b9)
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@glint/template'
-      - supports-color
-
   '@ember-data/rfc395-data@0.0.4': {}
-
-  '@ember-data/serializer@5.9.1(c8332dc3f90c0e60eb130a3a85f980b9)':
-    dependencies:
-      '@embroider/macros': 1.21.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      '@warp-drive/core': 5.9.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      '@warp-drive/legacy': 5.9.1(8db2146b5daa4dd19bc55eafd73e0ea1)
-      '@warp-drive/utilities': 5.9.1(369e2ff1cff19df0b7d82fa99d04b4ae)
-      warp-drive: 0.2.1(c8332dc3f90c0e60eb130a3a85f980b9)
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@glint/template'
-      - supports-color
 
   '@ember-tooling/blueprint-blueprint@0.2.1': {}
 
@@ -9524,7 +9432,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@embroider/vite@1.7.13(1393ec2307890f99f47394f91f53e459)':
+  '@embroider/vite@1.7.13(19fb3b00350769886e1f0214d7749d2a)':
     dependencies:
       '@babel/core': 7.29.0
       '@embroider/core': 4.6.7(@glint/template@1.7.7)
@@ -9542,7 +9450,7 @@ snapshots:
       send: 1.2.1
       source-map-url: 0.4.1
       terser: 5.51.2
-      vite: 7.3.2(7fea842860654791a3ee14b4b3ced532)
+      vite: 7.3.2(b252b119712c99b40fa367de921fe90a)
     transitivePeerDependencies:
       - '@glint/template'
       - bufferutil
@@ -9948,13 +9856,12 @@ snapshots:
 
   '@handlebars/parser@2.2.2': {}
 
-  '@html-next/vertical-collection@file:vertical-collection(41f15cfcddee1b664cece93a788480f7)':
+  '@html-next/vertical-collection@file:vertical-collection(2935cfb77147881c8250be8c1bb7d0d1)':
     dependencies:
       '@embroider/addon-shim': 1.10.3
       '@glimmer/component': 2.1.1
       decorator-transforms: 2.3.1(@babel/core@7.29.0)
       ember-raf-scheduler: 0.5.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      ember-source: 6.12.0(@glimmer/component@2.1.1)(rsvp@4.8.5)
       tracked-built-ins: 4.1.2(@babel/core@7.29.0)
     transitivePeerDependencies:
       - '@babel/core'
@@ -10146,31 +10053,16 @@ snapshots:
     dependencies:
       '@manypkg/tools': 1.1.2
 
-  '@manypkg/find-root@3.1.0':
-    dependencies:
-      '@manypkg/tools': 2.1.2
-
   '@manypkg/get-packages@2.2.2':
     dependencies:
       '@manypkg/find-root': 2.2.3
       '@manypkg/tools': 1.1.2
-
-  '@manypkg/get-packages@3.1.0':
-    dependencies:
-      '@manypkg/find-root': 3.1.0
-      '@manypkg/tools': 2.1.2
 
   '@manypkg/tools@1.1.2':
     dependencies:
       fast-glob: 3.3.3
       jju: 1.4.0
       js-yaml: 4.1.1
-
-  '@manypkg/tools@2.1.2':
-    dependencies:
-      jju: 1.4.0
-      tinyglobby: 0.2.16
-      yaml: 2.9.1
 
   '@napi-rs/wasm-runtime@1.2.4(8738cc0ffd7f5348356f0f10f02ca7f5)':
     dependencies:
@@ -10752,16 +10644,6 @@ snapshots:
       - '@glint/template'
       - supports-color
 
-  '@warp-drive/legacy@5.9.1(8db2146b5daa4dd19bc55eafd73e0ea1)':
-    dependencies:
-      '@embroider/macros': 1.21.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      '@warp-drive/core': 5.9.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      '@warp-drive/utilities': 5.9.1(369e2ff1cff19df0b7d82fa99d04b4ae)
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@glint/template'
-      - supports-color
-
   '@warp-drive/utilities@5.9.1(369e2ff1cff19df0b7d82fa99d04b4ae)':
     dependencies:
       '@embroider/macros': 1.21.1(c8332dc3f90c0e60eb130a3a85f980b9)
@@ -10906,8 +10788,6 @@ snapshots:
       get-intrinsic: 1.3.0
       is-string: 1.1.1
       math-intrinsics: 1.1.0
-
-  array-timsort@1.0.3: {}
 
   array-union@2.1.0: {}
 
@@ -11721,11 +11601,6 @@ snapshots:
 
   commander@8.3.0: {}
 
-  comment-json@5.0.0:
-    dependencies:
-      array-timsort: 1.0.3
-      esprima: 4.0.1
-
   common-ancestor-path@1.0.1: {}
 
   common-tags@1.8.2: {}
@@ -12497,9 +12372,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  ember-source-channel-url@3.0.0(encoding@0.1.13):
+  ember-source-channel-url@3.0.0:
     dependencies:
-      node-fetch: 2.7.0(encoding@0.1.13)
+      node-fetch: 2.7.0
     transitivePeerDependencies:
       - encoding
 
@@ -12646,9 +12521,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  ember-try-config@4.0.0(encoding@0.1.13):
+  ember-try-config@4.0.0:
     dependencies:
-      ember-source-channel-url: 3.0.0(encoding@0.1.13)
+      ember-source-channel-url: 3.0.0
       lodash: 4.18.1
       package-json: 6.5.0
       remote-git-tags: 3.0.0
@@ -12656,12 +12531,12 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  ember-try@4.0.0(encoding@0.1.13):
+  ember-try@4.0.0:
     dependencies:
       chalk: 4.1.2
       cli-table3: 0.6.5
       debug: 4.4.3
-      ember-try-config: 4.0.0(encoding@0.1.13)
+      ember-try-config: 4.0.0
       es-toolkit: 1.45.1
       execa: 4.1.0
       fs-extra: 6.0.1
@@ -14725,11 +14600,9 @@ snapshots:
       object.entries: 1.1.9
       semver: 6.3.1
 
-  node-fetch@2.7.0(encoding@0.1.13):
+  node-fetch@2.7.0:
     dependencies:
       whatwg-url: 5.0.0
-    optionalDependencies:
-      encoding: 0.1.13
 
   node-int64@0.4.0: {}
 
@@ -16529,7 +16402,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite@7.3.2(7fea842860654791a3ee14b4b3ced532):
+  vite@7.3.2(b252b119712c99b40fa367de921fe90a):
     dependencies:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.4)
@@ -16542,7 +16415,7 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.6.1
       terser: 5.51.2
-      yaml: 2.9.1
+      yaml: 2.8.3
 
   volar-service-html@0.0.70(@volar/language-service@2.4.28):
     dependencies:
@@ -16628,20 +16501,6 @@ snapshots:
   walker@1.0.8:
     dependencies:
       makeerror: 1.0.12
-
-  warp-drive@0.2.1(c8332dc3f90c0e60eb130a3a85f980b9):
-    dependencies:
-      '@embroider/macros': 1.21.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      '@manypkg/get-packages': 3.1.0
-      '@warp-drive/core': 5.9.1(c8332dc3f90c0e60eb130a3a85f980b9)
-      comment-json: 5.0.0
-      debug: 4.4.3
-      inflection: 3.0.2
-      semver: 7.8.5
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@glint/template'
-      - supports-color
 
   watch-detector@1.0.2:
     dependencies:
@@ -16798,8 +16657,6 @@ snapshots:
       yaml: 2.8.3
 
   yaml@2.8.3: {}
-
-  yaml@2.9.1: {}
 
   yargs-parser@20.2.9: {}
 
