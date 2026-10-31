@@ -1,4 +1,3 @@
-import { begin, end } from '@ember/runloop';
 const DEFAULT_ARRAY_SIZE = 10;
 
 export class ScrollHandler {
@@ -92,13 +91,9 @@ export class ScrollHandler {
     let event = { top: cachedTop, left: cachedLeft };
 
     if (topChanged || leftChanged) {
-      // eslint-disable-next-line ember/no-runloop
-      begin();
       for (let j = 0; j < meta.handlers.length; j++) {
         meta.handlers[j](event);
       }
-      // eslint-disable-next-line ember/no-runloop
-      end();
     }
   }
 }

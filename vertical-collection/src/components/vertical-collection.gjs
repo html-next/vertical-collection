@@ -4,7 +4,6 @@ import { assert, warn } from '@ember/debug';
 import Component from '@glimmer/component';
 import { helper } from '@ember/component/helper';
 import { registerDestructor } from '@ember/destroyable';
-import { run } from '@ember/runloop';
 
 import { scheduler, Token } from 'ember-raf-scheduler';
 
@@ -407,19 +406,16 @@ class VerticalCollection extends Component {
       this._nextSendActions = setTimeout(() => {
         this._nextSendActions = null;
 
-        // eslint-disable-next-line ember/no-runloop
-        run(() => {
-          const items = this.items;
-          const keyPath = this.key;
+        const items = this.items;
+        const keyPath = this.key;
 
-          this._scheduledActions.forEach(([action, index]) => {
-            const item = items[index];
-            const key = keyForItem(item, keyPath, index);
+        this._scheduledActions.forEach(([action, index]) => {
+          const item = items[index];
+          const key = keyForItem(item, keyPath, index);
 
-            this.args[action]?.(item, index, key);
-          });
-          this._scheduledActions.length = 0;
+          this.args[action]?.(item, index, key);
         });
+        this._scheduledActions.length = 0;
       });
     }
   }
