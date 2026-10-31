@@ -1,3 +1,4 @@
+import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
 import { type Token } from 'ember-raf-scheduler';
@@ -7,16 +8,16 @@ import SkipList from '../skip-list.ts';
 import roundTo from '../utils/round-to.ts';
 import getScaledClientRect from '../../utils/element/get-scaled-client-rect.ts';
 
-export default class DynamicRadar extends Radar {
+export default class DynamicRadar<T = unknown> extends Radar<T> {
   declare _firstItemIndex: number;
   declare _lastItemIndex: number;
   declare _totalBefore: number;
   declare _totalAfter: number;
   declare _minHeight: number;
   declare _nextIncrementalRender: Token | null;
-  declare skipList: SkipList | null;
+  declare _skipList: SkipList | null;
 
-  constructor(parentToken: Token, options: RadarOptions) {
+  constructor(parentToken: Token, options: RadarOptions<T>) {
     super(parentToken, options);
 
     this._firstItemIndex = 0;
@@ -29,7 +30,7 @@ export default class DynamicRadar extends Radar {
 
     this._nextIncrementalRender = null;
 
-    this.skipList = null;
+    this._skipList = null;
 
     if (DEBUG) {
       Object.preventExtensions(this);
@@ -69,19 +70,28 @@ export default class DynamicRadar extends Radar {
     }
 
     // Create the SkipList only after the estimateHeight has been calculated the first time
-    if (this.skipList === null) {
-      this.skipList = new SkipList(
+    if (this._skipList === null) {
+      this._skipList = new SkipList(
         this.totalItems,
         this._calculatedEstimateHeight,
       );
     } else {
-      this.skipList.defaultValue = this._calculatedEstimateHeight;
+      this._skipList.defaultValue = this._calculatedEstimateHeight;
     }
   }
 
+  get skipList(): SkipList {
+    assert(
+      'The skip list is made on the first measurement, before the first update',
+      this._skipList !== null,
+    );
+
+    return this._skipList;
+  }
+
   _updateIndexes(): void {
-    const skipList = this.skipList!;
     const {
+      skipList,
       bufferSize,
       visibleTop,
       visibleBottom,
@@ -173,9 +183,12 @@ export default class DynamicRadar extends Radar {
   }
 
   _measure(measureLimit: number | null = null): number {
-    const orderedComponents = this.orderedComponents!;
-    const skipList = this.skipList!;
-    const { _occludedContentBefore, _transformScale } = this;
+    const {
+      orderedComponents,
+      skipList,
+      _occludedContentBefore,
+      _transformScale,
+    } = this;
 
     const numToMeasure =
       measureLimit !== null
@@ -187,7 +200,7 @@ export default class DynamicRadar extends Radar {
     for (let i = 0; i < numToMeasure; i++) {
       const currentItem = orderedComponents[i]!;
       const previousItem = orderedComponents[i - 1];
-      const itemIndex = currentItem.index!;
+      const itemIndex = currentItem.index;
 
       const { top: currentItemTop, height: currentItemHeight } =
         getScaledClientRect(currentItem, _transformScale);
@@ -224,7 +237,7 @@ export default class DynamicRadar extends Radar {
   }
 
   get total(): number {
-    return this.skipList!.total;
+    return this.skipList.total;
   }
 
   get totalBefore(): number {
@@ -246,7 +259,7 @@ export default class DynamicRadar extends Radar {
   get firstVisibleIndex(): number {
     const { visibleTop } = this;
 
-    const { index } = this.skipList!.find(visibleTop);
+    const { index } = this.skipList.find(visibleTop);
 
     return index;
   }
@@ -254,7 +267,7 @@ export default class DynamicRadar extends Radar {
   get lastVisibleIndex(): number {
     const { visibleBottom, totalItems } = this;
 
-    const { index } = this.skipList!.find(visibleBottom);
+    const { index } = this.skipList.find(visibleBottom);
 
     return Math.min(index, totalItems - 1);
   }
@@ -262,19 +275,19 @@ export default class DynamicRadar extends Radar {
   prepend(numPrepended: number): void {
     super.prepend(numPrepended);
 
-    this.skipList!.prepend(numPrepended);
+    this.skipList.prepend(numPrepended);
   }
 
   append(numAppended: number): void {
     super.append(numAppended);
 
-    this.skipList!.append(numAppended);
+    this.skipList.append(numAppended);
   }
 
   reset(): void {
     super.reset();
 
-    this.skipList!.reset(this.totalItems);
+    this.skipList.reset(this.totalItems);
   }
 
   /*
@@ -283,6 +296,6 @@ export default class DynamicRadar extends Radar {
   getOffsetForIndex(index: number): number {
     this._measure();
 
-    return this.skipList!.getOffset(index);
+    return this.skipList.getOffset(index);
   }
 }

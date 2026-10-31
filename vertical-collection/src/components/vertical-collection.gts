@@ -14,11 +14,8 @@ import {
   DynamicRadar,
   StaticRadar,
 } from '../-private/index.ts';
-import document from '../-private/utils/document-shim.ts';
 import type Radar from '../-private/data-view/radar/radar.ts';
 import type { RadarAction } from '../-private/data-view/radar/radar.ts';
-import type OccludedContent from '../-private/data-view/elements/occluded-content.ts';
-import type VirtualComponent from '../-private/data-view/elements/virtual-component.ts';
 import type { VerticalRect } from '../-private/utils/element/get-scaled-client-rect.ts';
 
 export interface VerticalCollectionAPI {
@@ -58,9 +55,6 @@ export interface VerticalCollectionSignature<T> {
     else: [];
   };
 }
-
-/** A component in the pool has been recycled, so it has an item and an index */
-type PooledComponent<T> = VirtualComponent & { content: T; index: number };
 
 /*
  * BEGIN DEBUG HELPERS
@@ -106,8 +100,8 @@ function applyVerticalStyles(
   element.style.top = `${geography.top}px`;
 }
 
-class Visualization {
-  radar: Radar;
+class Visualization<T> {
+  radar: Radar<T>;
   satellites: HTMLElement[];
   cache: HTMLElement[];
   wrapper: HTMLElement;
@@ -116,31 +110,31 @@ class Visualization {
   scrollContainer: HTMLElement;
   screen: HTMLElement;
 
-  constructor(radar: Radar) {
+  constructor(radar: Radar<T>) {
     this.radar = radar;
     this.satellites = [];
     this.cache = [];
 
-    this.wrapper = document!.createElement('div');
+    this.wrapper = document.createElement('div');
     this.wrapper.className = 'vertical-collection-visual-debugger';
 
-    this.container = document!.createElement('div');
+    this.container = document.createElement('div');
     this.container.className = 'vc_visualization-container';
     this.wrapper.appendChild(this.container);
 
-    this.itemContainer = document!.createElement('div');
+    this.itemContainer = document.createElement('div');
     this.itemContainer.className = 'vc_visualization-item-container';
     this.container.appendChild(this.itemContainer);
 
-    this.scrollContainer = document!.createElement('div');
+    this.scrollContainer = document.createElement('div');
     this.scrollContainer.className = 'vc_visualization-scroll-container';
     this.container.appendChild(this.scrollContainer);
 
-    this.screen = document!.createElement('div');
+    this.screen = document.createElement('div');
     this.screen.className = 'vc_visualization-screen';
     this.container.appendChild(this.screen);
 
-    document!.body.appendChild(this.wrapper);
+    document.body.appendChild(this.wrapper);
   }
 
   render(): void {
@@ -149,7 +143,7 @@ class Visualization {
   }
 
   styleViewport(): void {
-    const _scrollContainer = this.radar._scrollContainer!;
+    const _scrollContainer = this.radar.scrollContainer;
     this.container.style.height = `${_scrollContainer.getBoundingClientRect().height}px`;
 
     applyVerticalStyles(
@@ -160,12 +154,10 @@ class Visualization {
   }
 
   makeSatellite(): void {
-    let satellite: HTMLElement;
+    let satellite = this.cache.pop();
 
-    if (this.cache.length) {
-      satellite = this.cache.pop()!;
-    } else {
-      satellite = document!.createElement('div');
+    if (satellite === undefined) {
+      satellite = document.createElement('div');
       satellite.className = 'vc_visualization-virtual-component';
     }
 
@@ -197,26 +189,19 @@ class Visualization {
     const isShrinking = sats.length > lengthWithBuffer;
 
     while (sats.length !== lengthWithBuffer) {
-      if (isShrinking) {
-        const satellite = sats.pop()!;
+      const satellite = isShrinking ? sats.pop() : undefined;
 
-        satellite.parentNode!.removeChild(satellite);
+      if (satellite !== undefined) {
+        satellite.remove();
         this.cache.push(satellite);
       } else {
         this.makeSatellite();
       }
     }
 
-    for (
-      let itemIndex = firstVisualizedIndex, i = 0;
-      itemIndex <= lastVisualizedIndex;
-      itemIndex++, i++
-    ) {
-      const element = sats[i]!;
-
-      const itemHeight = itemHeights
-        ? itemHeights[itemIndex]!
-        : _calculatedEstimateHeight;
+    sats.forEach((element, i) => {
+      const itemIndex = firstVisualizedIndex + i;
+      const itemHeight = itemHeights?.[itemIndex] ?? _calculatedEstimateHeight;
 
       element.style.height = `${itemHeight}px`;
       element.setAttribute('index', String(itemIndex));
@@ -231,19 +216,15 @@ class Visualization {
       } else {
         element.classList.remove('culled');
       }
-    }
+    });
 
     this.itemContainer.style.paddingTop = `${totalBefore}px`;
     this.itemContainer.style.paddingBottom = `${totalAfter}px`;
   }
 
   destroy(): void {
-    this.wrapper.parentNode!.removeChild(this.wrapper);
-    this.satellites.forEach((satellite) => {
-      if (satellite.parentNode) {
-        satellite.parentNode.removeChild(satellite);
-      }
-    });
+    this.wrapper.remove();
+    this.satellites.forEach((satellite) => satellite.remove());
     this.satellites = [];
     this.cache = [];
   }
@@ -256,11 +237,10 @@ class VerticalCollection<T = unknown> extends Component<
   VerticalCollectionSignature<T>
 > {
   private token: Token;
-  private _radar: Radar;
+  private _radar: Radar<T>;
   private _scheduledActions: [RadarAction, number][];
   private _nextSendActions: ReturnType<typeof setTimeout> | null;
-  private _hasAction: Record<RadarAction, boolean> | null;
-  private __visualization: Visualization | null = null;
+  private __visualization: Visualization<T> | null = null;
 
   /**
    * Property name used for storing references to each item in items. Accessing this attribute for each item
@@ -458,10 +438,7 @@ class VerticalCollection<T = unknown> extends Component<
     _radar.scheduleUpdate(true);
     this._clearScheduledActions();
 
-    return _radar.virtualComponents as (
-      | OccludedContent
-      | PooledComponent<T>
-    )[];
+    return _radar.virtualComponents;
   };
 
   private schedule(queueName: QueueName, job: () => void): Token {
@@ -483,14 +460,19 @@ class VerticalCollection<T = unknown> extends Component<
 
         // eslint-disable-next-line ember/no-runloop
         run(() => {
-          const items = this.items!;
+          const items = this.items ?? [];
           const keyPath = this.key;
 
           this._scheduledActions.forEach(([action, index]) => {
-            const item = items[index] as T;
-            const key = keyForItem(item, keyPath, index);
+            const item = items[index];
 
-            this.args[action]?.(item, index, key);
+            if (item !== undefined) {
+              this.args[action]?.(
+                item,
+                index,
+                keyForItem(item, keyPath, index),
+              );
+            }
           });
           this._scheduledActions.length = 0;
         });
@@ -506,7 +488,7 @@ class VerticalCollection<T = unknown> extends Component<
     const { _radar } = this;
     // Getting the offset height from Radar
     const scrollTop = _radar.getOffsetForIndex(index);
-    _radar._scrollContainer!.scrollTop = scrollTop;
+    _radar.scrollContainer.scrollTop = scrollTop;
     // To scroll exactly to specified index, we are changing the prevIndex values to specified index
     _radar._prevFirstVisibleIndex = _radar._prevFirstItemIndex = index;
     // Components will be rendered after schedule 'measure' inside 'update' method.
@@ -558,7 +540,7 @@ class VerticalCollection<T = unknown> extends Component<
       renderFromLast,
     );
 
-    this._radar = new RadarClass(this.token, {
+    this._radar = new RadarClass<T>(this.token, {
       bufferSize,
       containerSelector,
       estimateHeight,
@@ -572,7 +554,6 @@ class VerticalCollection<T = unknown> extends Component<
       occlusionTagName,
     });
 
-    this._hasAction = null;
     this._scheduledActions = [];
     this._nextSendActions = null;
 
@@ -583,7 +564,7 @@ class VerticalCollection<T = unknown> extends Component<
     const any = a || b || c || d;
 
     if (any) {
-      this._hasAction = {
+      const hasAction: Record<RadarAction, boolean> = {
         lastReached: a,
         firstReached: b,
         lastVisibleChanged: c,
@@ -591,7 +572,7 @@ class VerticalCollection<T = unknown> extends Component<
       };
 
       this._radar.notify = (action, index) => {
-        if (this._hasAction![action]) {
+        if (hasAction[action]) {
           this._scheduleSendAction(action, index);
         }
       };
@@ -666,16 +647,14 @@ class VerticalCollection<T = unknown> extends Component<
           return;
         }
 
-        const scrollContainer = this._radar._scrollContainer!;
-        const itemContainer = this._radar._itemContainer!;
-        let styles: CSSStyleDeclaration;
+        const { scrollContainer, itemContainer } = this._radar;
 
         // check telescope
-        if (scrollContainer !== ViewportContainer) {
-          styles = window.getComputedStyle(scrollContainer as HTMLElement);
-        } else {
-          styles = window.getComputedStyle(document!.body);
-        }
+        let styles = window.getComputedStyle(
+          scrollContainer instanceof HTMLElement
+            ? scrollContainer
+            : document.body,
+        );
 
         assert(
           `scrollContainer cannot be inline.`,
@@ -725,10 +704,12 @@ class VerticalCollection<T = unknown> extends Component<
         // check item defaults
         assert(
           `You must supply at least one item to the collection to debug it's CSS.`,
-          this.items!.length,
+          this.items?.length,
         );
 
-        const element = itemContainer.firstElementChild!;
+        const element = itemContainer.firstElementChild;
+
+        assert('itemContainer has no element to check', element);
 
         styles = window.getComputedStyle(element);
 
@@ -749,7 +730,7 @@ class VerticalCollection<T = unknown> extends Component<
     }
 
     // Fastboot has no requestAnimationFrame, and no DOM for the radar to measure
-    if (document !== undefined) {
+    if (typeof document !== 'undefined') {
       this.schedule('sync', () => {
         this._radar.start();
       });
