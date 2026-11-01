@@ -691,13 +691,13 @@ class VerticalCollection extends Component {
       key="id"
       as |virtualComponent|
     ~}}
-      {{~unbound virtualComponent.upperBound~}}
+      {{~virtualComponent.upperBound~}}
       {{~#if virtualComponent.isOccludedContent~}}
-        {{{unbound virtualComponent.element}}}
+        {{virtualComponent.element}}
       {{~else~}}
         {{~yield virtualComponent.content virtualComponent.index~}}
       {{~/if~}}
-      {{~unbound virtualComponent.lowerBound~}}
+      {{~virtualComponent.lowerBound~}}
     {{~/each}}
 
     {{#if this.shouldYieldToInverse}}
