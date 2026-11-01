@@ -7,5 +7,9 @@ export default {
         transforms: [],
       },
     ],
+    [
+      'module:decorator-transforms',
+      { runtime: { import: 'decorator-transforms/runtime-esm' } },
+    ],
   ],
 };

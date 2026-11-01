@@ -1,4 +1,3 @@
-import { set } from '@ember/object';
 import { DEBUG } from '@glimmer/env';
 
 import document from '../../utils/document-shim.js';
@@ -72,6 +71,6 @@ export default class OccludedContent {
   }
 
   destroy() {
-    set(this, 'element', null);
+    this.element = null;
   }
 }
