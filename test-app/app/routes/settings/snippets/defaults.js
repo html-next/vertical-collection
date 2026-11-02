@@ -2,14 +2,9 @@ export default /* ! BEGIN-SNIPPET vertical-collection-defaults-example */
 {
   // required
 
-  // Positional parameter, e.g.
+  // The items to render, e.g.
   //
   // `<VerticalCollection @items={{items}} as |item|>`
-  //
-  // Note: An alias for this property named `content`
-  // exists solely for Ember 1.11 support. The alias
-  // should not be used with any more recent version
-  // of Ember and will be removed in future versions.
   items: null,
 
   // Can be an integer, but also attempts to work
@@ -54,13 +49,23 @@ export default /* ! BEGIN-SNIPPET vertical-collection-defaults-example */
   // fully derived.
   shouldRecycle: true,
 
+  // Renders all items instead of only the visible ones.
+  // This gives up the performance benefit, but screen
+  // readers, server rendering and find in page see every
+  // item.
+  renderAll: false,
+
   // actions
 
-  // Each action has the signature (item, index) => {}
+  // Each action has the signature (item, index, key) => {}
   firstReached: null,
   lastReached: null,
   firstVisibleChanged: null,
   lastVisibleChanged: null,
+
+  // Called with an object that has `scrollToItem(index)`,
+  // and with null when the collection is destroyed.
+  registerAPI: null,
 
   // initial state
 
@@ -72,6 +77,10 @@ export default /* ! BEGIN-SNIPPET vertical-collection-defaults-example */
   // Tells the collection to render from the last item.
   renderFromLast: false,
 
+  // The number of items in the first render, before the
+  // collection starts to measure.
+  initialRenderCount: undefined,
+
   // scroll setup
 
   // Selector for the scrollContainer. The collection
@@ -79,5 +88,20 @@ export default /* ! BEGIN-SNIPPET vertical-collection-defaults-example */
   // that matches the selector. Defaults to '*', which
   // will match the immediate parent of the collection.
   containerSelector: '*',
+
+  // markup
+
+  // The tag name of the elements before and after the
+  // rendered items, e.g. `tr` inside a table.
+  occlusionTagName: 'occluded-content',
+
+  // debugging
+
+  // Development builds only. Shows a debug visualization.
+  debugVis: false,
+
+  // Development builds only, and needs `debugVis`. Fails an
+  // assertion if the CSS of the container or items cannot work.
+  debugCSS: false,
 };
 /* ! END-SNIPPET vertical-collection-defaults-example */
