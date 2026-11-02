@@ -1,8 +1,5 @@
 export default /* ! BEGIN-SNIPPET vertical-collection-defaults-example */
 {
-  // basics
-  tagName: '',
-
   // required
 
   // Positional parameter, e.g.
