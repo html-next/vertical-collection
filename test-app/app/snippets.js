@@ -9,19 +9,19 @@ export default {
     source:
       '/home/nvp/Development/OpenSource/vertical-collection/test-app/app/routes/examples/flexible-layout/template.hbs',
     content:
-      '      <div class="table-wrapper dark">\n        <VerticalCollection\n          @items={{@model.data.numbers}}\n          @estimateHeight={{270}}\n          @firstReached={{this.loadAbove}}\n          @lastReached={{this.loadBelow}}\n          @bufferSize={{0}}\n          as |item index|\n        >\n          <NumberSlide @isDynamic={{true}} @item={{item}} @index={{index}} />\n        </VerticalCollection>\n      </div>',
+      '      <div class="table-wrapper dark">\n        <VerticalCollection\n          @items={{@model.data.numbers}}\n          @estimateHeight={{270}}\n          @firstReached={{this.loadAbove}}\n          @lastReached={{this.loadBelow}}\n          @bufferSize={{0}}\n          as |item index|\n        >\n          <NumberSlide @isDynamic={{true}} @item={{item}} @itemIndex={{index}} />\n        </VerticalCollection>\n      </div>',
   },
   'infinite-scroll-example': {
     source:
       '/home/nvp/Development/OpenSource/vertical-collection/test-app/app/routes/examples/infinite-scroll/template.hbs',
     content:
-      '      <div class="table-wrapper dark">\n        <VerticalCollection\n          @items={{@model.data.numbers}}\n          @estimateHeight={{90}}\n          @staticHeight={{true}}\n          @bufferSize={{5}}\n          @firstReached={{this.loadAbove}}\n          @lastReached={{this.loadBelow}}\n          as |item index|\n        >\n          <NumberSlide @item={{item}} @index={{index}} />\n        </VerticalCollection>\n      </div>',
+      '      <div class="table-wrapper dark">\n        <VerticalCollection\n          @items={{@model.data.numbers}}\n          @estimateHeight={{90}}\n          @staticHeight={{true}}\n          @bufferSize={{5}}\n          @firstReached={{this.loadAbove}}\n          @lastReached={{this.loadBelow}}\n          as |item index|\n        >\n          <NumberSlide @item={{item}} @itemIndex={{index}} />\n        </VerticalCollection>\n      </div>',
   },
   'scrollable-body-example': {
     source:
       '/home/nvp/Development/OpenSource/vertical-collection/test-app/app/routes/examples/scrollable-body/template.hbs',
     content:
-      '      <VerticalCollection\n        @items={{@model.data.numbers}}\n        @estimateHeight={{40}}\n        @containerSelector="body"\n        as |item index|\n      >\n        <NumberSlide @isDynamic={{true}} @item={{item}} @index={{index}} />\n      </VerticalCollection>',
+      '      <VerticalCollection\n        @items={{@model.data.numbers}}\n        @estimateHeight={{40}}\n        @containerSelector="body"\n        as |item index|\n      >\n        <NumberSlide @isDynamic={{true}} @item={{item}} @itemIndex={{index}} />\n      </VerticalCollection>',
   },
   'vertical-collection-defaults-example': {
     source:
