@@ -6,7 +6,12 @@ const service = s.service ?? s.inject;
 export default class extends Route {
   @service() store;
 
-  model() {
-    return this.store.findAll('number-item');
+  async model() {
+    await this.store.request({
+      url: '/number-items',
+      cacheOptions: { reload: true },
+    });
+
+    return this.store.peekAll('number-item');
   }
 }
