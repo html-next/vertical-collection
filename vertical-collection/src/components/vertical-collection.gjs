@@ -590,12 +590,13 @@ class VerticalCollection extends Component {
           return;
         }
 
-        let radar = this._radar;
+        const scrollContainer = this._radar._scrollContainer;
+        const itemContainer = this._radar._itemContainer;
         let styles;
 
         // check telescope
-        if (radar.scrollContainer !== ViewportContainer) {
-          styles = window.getComputedStyle(radar.scrollContainer);
+        if (scrollContainer !== ViewportContainer) {
+          styles = window.getComputedStyle(scrollContainer);
         } else {
           styles = window.getComputedStyle(document.body);
         }
@@ -620,7 +621,7 @@ class VerticalCollection extends Component {
         );
 
         // conditional perf check for non-body scrolling
-        if (radar.scrollContainer !== ViewportContainer) {
+        if (scrollContainer !== ViewportContainer) {
           assert(
             `scrollContainer must define overflow-y`,
             hasStyleValue(styles, 'overflow-y', 'scroll') ||
@@ -629,7 +630,7 @@ class VerticalCollection extends Component {
         }
 
         // check itemContainer
-        styles = window.getComputedStyle(radar.itemContainer);
+        styles = window.getComputedStyle(itemContainer);
 
         assert(
           `itemContainer cannot be inline.`,
@@ -651,7 +652,7 @@ class VerticalCollection extends Component {
           this.items.length,
         );
 
-        let element = radar._itemContainer.firstElementChild;
+        let element = itemContainer.firstElementChild;
 
         styles = window.getComputedStyle(element);
 
