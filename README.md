@@ -13,7 +13,7 @@ component for performant lists and `svelte renders` to match a core belief:
 
 ## Compatibility
 
-* Ember.js v3.28.0 or above
+* Ember.js v3.28.0 or above. Below v4.5, the app needs [ember-functions-as-helper-polyfill](https://github.com/ember-polyfills/ember-functions-as-helper-polyfill).
 * Ember CLI v4.4 or above
 * Node.js v16 or above
 
@@ -39,27 +39,30 @@ ember install @html-next/vertical-collection
 import { VerticalCollection } from '@html-next/vertical-collection'
 
 <template>
-  <VerticalCollection
-    @items={{items}}
-    @tagName="ul"
-    @estimateHeight={{50}}
-    @staticHeight={{false}}
-    @shouldRecycle={{true}}
-    @bufferSize={{1}}
-    @renderAll={{false}}
-    @renderFromLast={{false}}
-    @idForFirstItem={{idForFirstItem}}
-    @firstReached={{firstReachedCallback}}
-    @lastReached={{lastReachedCallback}}
-    @firstVisibleChanged={{firstVisibleChangedCallback}}
-    @lastVisibleChanged={{lastVisibleChangedCallback}}
-     as |item i|>
-    <li>
-      {{item.number}} {{i}}
-    </li>
-  </VerticalCollection>
+  <ul>
+    <VerticalCollection
+      @items={{items}}
+      @estimateHeight={{50}}
+      @staticHeight={{false}}
+      @shouldRecycle={{true}}
+      @bufferSize={{1}}
+      @renderAll={{false}}
+      @renderFromLast={{false}}
+      @idForFirstItem={{idForFirstItem}}
+      @firstReached={{firstReachedCallback}}
+      @lastReached={{lastReachedCallback}}
+      @firstVisibleChanged={{firstVisibleChangedCallback}}
+      @lastVisibleChanged={{lastVisibleChangedCallback}}
+       as |item i|>
+      <li>
+        {{item.number}} {{i}}
+      </li>
+    </VerticalCollection>
+  </ul>
 </template>
 ```
+
+`@items` is a native array, or a tracked array such as `TrackedArray` from `tracked-built-ins`. To change a native array, pass a new one; a tracked array can be changed in place.
 
 ### Actions
 

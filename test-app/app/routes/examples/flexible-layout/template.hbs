@@ -12,7 +12,11 @@
           @bufferSize={{0}}
           as |item index|
         >
-          <NumberSlide @isDynamic={{true}} @item={{item}} @index={{index}} />
+          <NumberSlide
+            @isDynamic={{true}}
+            @item={{item}}
+            @itemIndex={{index}}
+          />
         </VerticalCollection>
       </div>
       {{! END-SNIPPET }}

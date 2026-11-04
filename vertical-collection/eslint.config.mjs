@@ -63,14 +63,6 @@ export default defineConfig([
     rules: {
       // require relative imports use full extensions
       'import/extensions': ['error', 'always', { ignorePackages: true }],
-
-      'ember/closure-actions': 'off',
-      'ember/no-get': 'off',
-      'ember/no-classic-components': 'off',
-      'ember/require-tagless-components': 'off',
-      'ember/no-classic-classes': 'off',
-      'ember/no-actions-hash': 'off',
-      'ember/no-runloop': 'off',
     },
   },
   /**
