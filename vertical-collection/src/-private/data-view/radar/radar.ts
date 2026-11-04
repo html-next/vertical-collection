@@ -907,13 +907,26 @@ export default abstract class Radar<T = unknown> {
       c.index = c.index + numPrepended;
     });
 
+    this._updateRenderedContent();
     this._firstReached = false;
 
     this._prependOffset = numPrepended * this._calculatedEstimateHeight;
   }
 
   append(_numAppended?: number): void {
+    this._updateRenderedContent();
     this._lastReached = false;
+  }
+
+  // New items can keep the keys of the old ones, so rendered rows can hold old objects.
+  _updateRenderedContent(): void {
+    for (const component of this.orderedComponents) {
+      const item = this._itemAt(component.index);
+
+      if (component.content !== item) {
+        component.content = item;
+      }
+    }
   }
 
   reset(): void {

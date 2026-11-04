@@ -627,4 +627,40 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       'correct last item rendered'
     );
   });
+
+  test('Collection updates rendered items on a prepend when a key is given', async function (assert) {
+    const row = (id, value) => ({ id, value });
+
+    this.set('items', [row('a', 'a1'), row('b', 'b1'), row('c', 'c1')]);
+
+    await render(hbs`
+      <div style="height: 500px; width: 500px;" class="scrollable">
+        <VerticalCollection
+          @items={{this.items}}
+          @key="id"
+          @estimateHeight={{50}}
+          @bufferSize={{5}}
+          as |item i|
+        >
+          <vertical-item style="height: 50px">{{i}} {{item.value}}</vertical-item>
+        </VerticalCollection>
+      </div>
+    `);
+
+    this.set('items', [
+      row('z', 'z2'),
+      row('a', 'a2'),
+      row('b', 'b2'),
+      row('c', 'c2'),
+    ]);
+
+    await settled();
+
+    assert.deepEqual(
+      findAll('vertical-item')
+        .map((item) => item.textContent.trim())
+        .sort(),
+      ['0 z2', '1 a2', '2 b2', '3 c2']
+    );
+  });
 });
