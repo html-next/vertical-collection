@@ -1,4 +1,3 @@
-import { get } from '@ember/object';
 import { assert } from '@ember/debug';
 
 import identity from './identity.js';
@@ -23,7 +22,7 @@ export default function keyForItem(item, keyPath, index) {
       key = identity(item);
       break;
     default:
-      key = get(item, keyPath);
+      key = keyPath.split('.').reduce((value, part) => value?.[part], item);
   }
 
   if (typeof key === 'number') {

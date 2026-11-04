@@ -1,12 +1,7 @@
-import { A } from '@ember/array';
-import ArrayProxy from '@ember/array/proxy';
-import PromiseProxyMixin from '@ember/object/promise-proxy-mixin';
-import { Promise } from 'rsvp';
+import { TrackedArray } from 'tracked-built-ins';
 import { test } from 'qunit';
 import { hbs } from 'ember-cli-htmlbars';
 import { settled, render } from '@ember/test-helpers';
-
-const PromiseArray = ArrayProxy.extend(PromiseProxyMixin);
 
 export function testScenarios(
   description,
@@ -49,40 +44,20 @@ export const dynamicSimpleScenarioFor = generateScenario(
   'Dynamic Standard Array',
   {}
 );
-export const dynamicEmberArrayScenarioFor = generateScenario(
-  'Dynamic Ember Array',
-  {},
-  A
-);
-export const dynamicArrayProxyScenarioFor = generateScenario(
-  'Dynamic ArrayProxy',
-  {},
-  createArrayProxy
-);
-export const dynamicPromiseArrayScenarioFor = generateScenario(
-  'Dynamic PromiseArray',
-  {},
-  createPromiseArrayFunction
+export const dynamicTrackedArrayScenarioFor = generateScenario(
+  'Dynamic TrackedArray',
+  { mutateInPlace: true },
+  (items) => new TrackedArray(items)
 );
 
 export const staticSimpleScenarioFor = generateScenario(
   'Static Standard Array',
   { staticHeight: true }
 );
-export const staticEmberArrayScenarioFor = generateScenario(
-  'Static Standard Array',
-  { staticHeight: true },
-  A
-);
-export const staticArrayProxyScenarioFor = generateScenario(
-  'Static ArrayProxy',
-  { staticHeight: true },
-  createArrayProxy
-);
-export const staticPromiseArrayScenarioFor = generateScenario(
-  'Static PromiseArray',
-  { staticHeight: true },
-  createPromiseArrayFunction
+export const staticTrackedArrayScenarioFor = generateScenario(
+  'Static TrackedArray',
+  { staticHeight: true, mutateInPlace: true },
+  (items) => new TrackedArray(items)
 );
 
 export const simpleScenariosFor = mergeScenarioGenerators(
@@ -92,25 +67,13 @@ export const simpleScenariosFor = mergeScenarioGenerators(
 
 export const standardScenariosFor = mergeScenarioGenerators(
   dynamicSimpleScenarioFor,
-  dynamicEmberArrayScenarioFor,
-  dynamicArrayProxyScenarioFor,
+  dynamicTrackedArrayScenarioFor,
 
   staticSimpleScenarioFor,
-  staticEmberArrayScenarioFor,
-  staticArrayProxyScenarioFor
+  staticTrackedArrayScenarioFor
 );
 
-export const scenariosFor = mergeScenarioGenerators(
-  dynamicSimpleScenarioFor,
-  dynamicEmberArrayScenarioFor,
-  dynamicArrayProxyScenarioFor,
-  dynamicPromiseArrayScenarioFor,
-
-  staticSimpleScenarioFor,
-  staticEmberArrayScenarioFor,
-  staticArrayProxyScenarioFor,
-  staticPromiseArrayScenarioFor
-);
+export const scenariosFor = standardScenariosFor;
 
 export const standardTemplate = hbs`
   <div style="height: 200px; width: 100px;" class="scrollable">
@@ -142,20 +105,6 @@ export const standardTemplate = hbs`
     </VerticalCollection>
   </div>
 `;
-
-function createArrayProxy(items) {
-  return ArrayProxy.create({ content: A(items) });
-}
-
-function createPromiseArrayFunction(items) {
-  return function () {
-    const promise = new Promise((resolve) =>
-      setTimeout(() => resolve(A(items.slice())), 10)
-    );
-
-    return PromiseArray.create({ promise });
-  };
-}
 
 function generateScenario(name, defaultOptions, initializer) {
   return function (baseItems, options) {

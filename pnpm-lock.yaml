@@ -18,7 +18,7 @@ importers:
     dependencies:
       '@html-next/vertical-collection':
         specifier: workspace:*
-        version: file:vertical-collection(c8332dc3f90c0e60eb130a3a85f980b9)
+        version: file:vertical-collection(41f15cfcddee1b664cece93a788480f7)
       ember-raf-scheduler:
         specifier: 0.5.1
         version: 0.5.1(c8332dc3f90c0e60eb130a3a85f980b9)
@@ -215,9 +215,15 @@ importers:
       '@embroider/addon-shim':
         specifier: ^1.10.2
         version: 1.10.2
+      decorator-transforms:
+        specifier: ^2.3.0
+        version: 2.3.1(@babel/core@7.29.0)
       ember-raf-scheduler:
         specifier: ~0.5.1
         version: 0.5.1(c8332dc3f90c0e60eb130a3a85f980b9)
+      tracked-built-ins:
+        specifier: ^4.1.2
+        version: 4.1.2(@babel/core@7.29.0)
     devDependencies:
       '@babel/eslint-parser':
         specifier: ^7.22.10
@@ -1901,6 +1907,9 @@ packages:
   '@html-next/vertical-collection@file:vertical-collection':
     resolution: {directory: vertical-collection, type: directory}
     engines: {node: '>= 18'}
+    peerDependencies:
+      '@glimmer/component': ^1.1.2 || ^2.0.0
+      ember-source: '>= 3.28.0'
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -9939,10 +9948,14 @@ snapshots:
 
   '@handlebars/parser@2.2.2': {}
 
-  '@html-next/vertical-collection@file:vertical-collection(c8332dc3f90c0e60eb130a3a85f980b9)':
+  '@html-next/vertical-collection@file:vertical-collection(41f15cfcddee1b664cece93a788480f7)':
     dependencies:
       '@embroider/addon-shim': 1.10.3
+      '@glimmer/component': 2.1.1
+      decorator-transforms: 2.3.1(@babel/core@7.29.0)
       ember-raf-scheduler: 0.5.1(c8332dc3f90c0e60eb130a3a85f980b9)
+      ember-source: 6.12.0(@glimmer/component@2.1.1)(rsvp@4.8.5)
+      tracked-built-ins: 4.1.2(@babel/core@7.29.0)
     transitivePeerDependencies:
       - '@babel/core'
       - '@glint/template'
