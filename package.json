@@ -14,6 +14,7 @@
     "update:snippets": "node ./scripts/write-snippets.mjs"
   },
   "devDependencies": {
+    "@glimmer/component": "^2.1.1",
     "release-plan": "^0.18.0"
   },
   "packageManager": "pnpm@10.28.1",

@@ -1,7 +1,7 @@
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
-import roundTo from './utils/round-to.js';
+import roundTo from './utils/round-to.ts';
 
 /*
  * `SkipList` is a data structure designed with two main uses in mind:
@@ -27,8 +27,20 @@ import roundTo from './utils/round-to.js';
  * traverse to get the total value before and after the final index.
  */
 
+export interface SkipListFindResult {
+  index: number;
+  totalBefore: number;
+  totalAfter: number;
+}
+
 export default class SkipList {
-  constructor(length, defaultValue) {
+  declare length: number;
+  declare defaultValue: number;
+  declare total: number;
+  declare layers: Float32Array[];
+  declare values: Float32Array;
+
+  constructor(length: number, defaultValue: number) {
     const values = new Float32Array(new ArrayBuffer(length * 4));
     values.fill(defaultValue);
 
@@ -42,9 +54,14 @@ export default class SkipList {
     }
   }
 
-  _initializeLayers(values, defaultValue) {
+  _initializeLayers(values: Float32Array, defaultValue?: number): void {
     const layers = [values];
-    let i, length, layer, prevLayer, left, right;
+    let i: number,
+      length: number,
+      layer: Float32Array,
+      prevLayer: Float32Array,
+      left: number,
+      right: number | undefined;
 
     prevLayer = layer = values;
     length = values.length;
@@ -71,7 +88,7 @@ export default class SkipList {
         layer[length - 1] = left + right;
       } else {
         for (i = 0; i < length; i++) {
-          left = prevLayer[i * 2];
+          left = prevLayer[i * 2]!;
           right = prevLayer[i * 2 + 1];
           layer[i] = right ? left + right : left;
         }
@@ -81,12 +98,7 @@ export default class SkipList {
       prevLayer = layer;
     }
 
-    this.total =
-      layer.length > 0
-        ? layer.length > 1
-          ? layer[0] + layer[1]
-          : layer[0]
-        : 0;
+    this.total = (layer[0] ?? 0) + (layer[1] ?? 0);
 
     assert('total must be a number', typeof this.total === 'number');
 
@@ -94,7 +106,7 @@ export default class SkipList {
     this.values = values;
   }
 
-  find(targetValue) {
+  find(targetValue: number): SkipListFindResult {
     const { layers, total, length, values } = this;
     const numLayers = layers.length;
 
@@ -102,7 +114,11 @@ export default class SkipList {
       return { index: 0, totalBefore: 0, totalAfter: 0 };
     }
 
-    let i, layer, left, leftIndex, rightIndex;
+    let i: number,
+      layer: Float32Array,
+      left: number,
+      leftIndex: number,
+      rightIndex: number;
     let index = 0;
     let totalBefore = 0;
     let totalAfter = 0;
@@ -119,12 +135,12 @@ export default class SkipList {
     assert('targetValue must be no more than total', targetValue < total);
 
     for (i = 0; i < numLayers; i++) {
-      layer = layers[i];
+      layer = layers[i]!;
 
       leftIndex = index;
       rightIndex = index + 1;
 
-      left = layer[leftIndex];
+      left = layer[leftIndex]!;
 
       if (targetValue >= totalBefore + left) {
         totalBefore = totalBefore + left;
@@ -142,12 +158,12 @@ export default class SkipList {
       index >= 0 && index < this.values.length,
     );
 
-    totalAfter = total - (totalBefore + values[index]);
+    totalAfter = total - (totalBefore + values[index]!);
 
     return { index, totalBefore, totalAfter };
   }
 
-  getOffset(targetIndex) {
+  getOffset(targetIndex: number): number {
     const { layers, length, values } = this;
     const numLayers = layers.length;
 
@@ -159,13 +175,13 @@ export default class SkipList {
     let offset = 0;
 
     for (let i = 0; i < numLayers - 1; i++) {
-      const layer = layers[i];
+      const layer = layers[i]!;
 
       const leftIndex = index;
       const rightIndex = index + 1;
 
       if (targetIndex >= rightIndex * Math.pow(2, numLayers - i - 1)) {
-        offset = offset + layer[leftIndex];
+        offset = offset + layer[leftIndex]!;
         index = rightIndex * 2;
       } else {
         index = leftIndex * 2;
@@ -173,13 +189,13 @@ export default class SkipList {
     }
 
     if (index + 1 === targetIndex) {
-      offset += values[index];
+      offset += values[index]!;
     }
 
     return offset;
   }
 
-  set(index, value) {
+  set(index: number, value: number): number {
     assert('value must be a number', typeof value === 'number');
     value = Math.max(0, value);
     assert('value must non-negative', value >= 0);
@@ -190,19 +206,19 @@ export default class SkipList {
     );
 
     const { layers } = this;
-    const oldValue = layers[layers.length - 1][index];
+    const oldValue = layers[layers.length - 1]![index]!;
     const delta = roundTo(value - oldValue);
 
     if (delta === 0) {
       return delta;
     }
 
-    let i, layer;
+    let i: number, layer: Float32Array;
 
     for (i = layers.length - 1; i >= 0; i--) {
-      layer = layers[i];
+      layer = layers[i]!;
 
-      layer[index] += delta;
+      layer[index]! += delta;
 
       index = Math.floor(index / 2);
     }
@@ -212,7 +228,7 @@ export default class SkipList {
     return delta;
   }
 
-  prepend(numPrepended) {
+  prepend(numPrepended: number): void {
     const { values: oldValues, length: oldLength, defaultValue } = this;
 
     const newLength = numPrepended + oldLength;
@@ -226,7 +242,7 @@ export default class SkipList {
     this._initializeLayers(newValues);
   }
 
-  append(numAppended) {
+  append(numAppended: number): void {
     const { values: oldValues, length: oldLength, defaultValue } = this;
 
     const newLength = numAppended + oldLength;
@@ -240,7 +256,7 @@ export default class SkipList {
     this._initializeLayers(newValues);
   }
 
-  reset(newLength) {
+  reset(newLength: number): void {
     const { values: oldValues, length: oldLength, defaultValue } = this;
 
     if (oldLength === newLength) {

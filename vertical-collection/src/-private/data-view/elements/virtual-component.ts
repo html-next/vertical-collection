@@ -2,15 +2,20 @@ import { tracked } from '@glimmer/tracking';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
-import document from '../../utils/document-shim.js';
+import document from '../../utils/document-shim.ts';
 
 let VC_IDENTITY = 0;
 
-export default class VirtualComponent {
-  @tracked content;
-  @tracked index;
+export default class VirtualComponent<T = unknown> {
+  id: string;
+  @tracked content: T;
+  @tracked index: number;
+  upperBound: Text | null;
+  lowerBound: Text | null;
+  rendered: boolean;
+  readonly isOccludedContent = false;
 
-  constructor(content = null, index = null) {
+  constructor(content: T, index: number) {
     this.id = `VC-${VC_IDENTITY++}`;
 
     this.content = content;
@@ -31,21 +36,22 @@ export default class VirtualComponent {
     }
   }
 
-  get realUpperBound() {
+  get realUpperBound(): Text | null {
     return this.upperBound;
   }
 
-  get realLowerBound() {
+  get realLowerBound(): Text | null {
     return this.lowerBound;
   }
 
-  getBoundingClientRect() {
-    let { upperBound, lowerBound } = this;
+  getBoundingClientRect(): { top: number; bottom: number; height: number } {
+    let upperBound: Node | null = this.upperBound;
+    const { lowerBound } = this;
 
     let top = Infinity;
     let bottom = -Infinity;
 
-    while (upperBound !== lowerBound) {
+    while (upperBound !== null && upperBound !== lowerBound) {
       upperBound = upperBound.nextSibling;
 
       if (upperBound instanceof Element) {
@@ -58,11 +64,11 @@ export default class VirtualComponent {
           continue;
         }
 
-        const text = upperBound.textContent;
+        const text = upperBound?.textContent ?? '';
 
         assert(
           `All content inside of vertical-collection must be wrapped in an element. Detected a text node with content: ${text}`,
-          text === '' || text.match(/^\s+$/),
+          text === '' || /^\s+$/.test(text),
         );
       }
     }
@@ -77,19 +83,15 @@ export default class VirtualComponent {
     return { top, bottom, height };
   }
 
-  recycle(newContent, newIndex) {
-    assert(`You cannot set an item's content to undefined`, newContent);
-
+  recycle(newContent: T, newIndex: number): void {
     // Assigned without comparing: the first pool is built while the collection renders,
     // and a tracked value cannot be read and then changed in the same render.
     this.index = newIndex;
     this.content = newContent;
   }
 
-  destroy() {
+  destroy(): void {
     this.upperBound = null;
     this.lowerBound = null;
-    this.content = null;
-    this.index = null;
   }
 }
