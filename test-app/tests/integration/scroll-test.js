@@ -1,7 +1,7 @@
-import { module } from 'qunit';
+import { module, test } from 'qunit';
 import { setupRenderingTest } from '../helpers';
 import { hbs } from 'ember-cli-htmlbars';
-import { find, findAll, settled } from '@ember/test-helpers';
+import { find, findAll, render, settled } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
 
 import getNumbers from 'test-app/lib/get-numbers';
@@ -602,4 +602,43 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       );
     }
   );
+
+  for (const staticHeight of [true, false]) {
+    test(`lastVisibleChanged accounts for content above the collection, staticHeight ${staticHeight}`, async function (assert) {
+      let lastVisibleIndex;
+
+      this.set('items', getNumbers(0, 100));
+      this.set('staticHeight', staticHeight);
+      this.set('lastVisibleChanged', (item, index) => {
+        lastVisibleIndex = index;
+      });
+
+      await render(hbs`
+        <div style="height: 300px; width: 200px;" class="scrollable">
+          <div style="height: 200px;">Header</div>
+          <VerticalCollection
+            @items={{this.items}}
+            @estimateHeight={{20}}
+            @staticHeight={{this.staticHeight}}
+            @lastVisibleChanged={{this.lastVisibleChanged}}
+            as |item i|
+          >
+            <div class="vertical-item" style="height: 20px;">
+              {{item.number}} {{i}}
+            </div>
+          </VerticalCollection>
+        </div>
+      `);
+
+      assert.strictEqual(lastVisibleIndex, 4, 'five rows fit below the header');
+
+      await scrollTo('.scrollable', 0, 200);
+
+      assert.strictEqual(
+        lastVisibleIndex,
+        14,
+        'fifteen rows fit when the header is out of view'
+      );
+    });
+  }
 });

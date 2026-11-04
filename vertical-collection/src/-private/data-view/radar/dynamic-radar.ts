@@ -265,9 +265,9 @@ export default class DynamicRadar<T = unknown> extends Radar<T> {
   }
 
   get lastVisibleIndex(): number {
-    const { visibleBottom, totalItems } = this;
+    const { lastVisibleBottom, totalItems } = this;
 
-    const { index } = this.skipList.find(visibleBottom);
+    const { index } = this.skipList.find(lastVisibleBottom);
 
     return Math.min(index, totalItems - 1);
   }
