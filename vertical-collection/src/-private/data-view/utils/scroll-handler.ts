@@ -144,7 +144,7 @@ export class ScrollHandler {
   }
 }
 
-const instance = new ScrollHandler();
+const instance: ScrollHandler = new ScrollHandler();
 
 export function addScrollHandler(
   element: ScrollElement,

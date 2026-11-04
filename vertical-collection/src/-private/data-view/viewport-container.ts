@@ -58,4 +58,6 @@ export class ViewportContainer {
   }
 }
 
-export default new ViewportContainer();
+const viewportContainer: ViewportContainer = new ViewportContainer();
+
+export default viewportContainer;

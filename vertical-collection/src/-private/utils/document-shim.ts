@@ -1,1 +1,3 @@
-export default window ? window.document : undefined;
+const doc: Document | undefined = window ? window.document : undefined;
+
+export default doc;
