@@ -29,10 +29,7 @@ import keyForItem, {
 import document from '../../utils/document-shim.ts';
 
 export type RadarAction =
-  | 'firstVisibleChanged'
-  | 'lastVisibleChanged'
-  | 'firstReached'
-  | 'lastReached';
+  'firstVisibleChanged' | 'lastVisibleChanged' | 'firstReached' | 'lastReached';
 
 export type PoolComponent<T> = VirtualComponent<T> | OccludedContent;
 
