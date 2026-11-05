@@ -210,8 +210,8 @@ importers:
         specifier: ~0.5.1
         version: 0.5.1(a59fa715e714877bc75ff20dc797b421)
       ember-reactive-collections-polyfill:
-        specifier: ^0.0.1
-        version: 0.0.1(73d42070d7900188e8a13c670612d0c3)
+        specifier: ^0.0.2
+        version: 0.0.2(a59fa715e714877bc75ff20dc797b421)
       ember-tracked-as-function-polyfill:
         specifier: ^0.0.1
         version: 0.0.1(73d42070d7900188e8a13c670612d0c3)
@@ -3671,10 +3671,8 @@ packages:
   ember-raf-scheduler@0.5.1:
     resolution: {integrity: sha512-VrTEFl64Txj7XZ95qlDxyhvNDPmOtqixV7OkmhoKhjHSIL+fnvkbYsGDhJHCFf6arLjs2FIZsMcyXUS/BbxFlA==}
 
-  ember-reactive-collections-polyfill@0.0.1:
-    resolution: {integrity: sha512-Ej3hmqpq0A72VZ8EOW6kXSr6r2afmQfrZOBgTKDdNr/JIxmONfaSZjuCPZgOETYCCVKYsYq7cbn4Rk7jBjV5+Q==}
-    peerDependencies:
-      ember-source: '>= 5.12.0'
+  ember-reactive-collections-polyfill@0.0.2:
+    resolution: {integrity: sha512-REyGKDu1O0c8ohNY6NmWLleUEtI02hlLuaqHuTjX1G1ZagX8F+057DcWMeJL9w1LpmydYYgNmTYERhPt2C+xUg==}
 
   ember-resolver@13.2.0:
     resolution: {integrity: sha512-A+BffoSKC0ngiczbgaz/IOY66ovZVRRHHIDDi+d7so5i0By8xuB4nXgZZ6Dv3u/3WwoUyixgUvb0xTUO+MtupA==}
@@ -8890,7 +8888,7 @@ snapshots:
       '@embroider/addon-shim': 1.11.0
       '@glimmer/component': 2.2.1
       ember-raf-scheduler: 0.5.1(a59fa715e714877bc75ff20dc797b421)
-      ember-reactive-collections-polyfill: 0.0.1(2ed9c0cc3ad6b3c29c50bae5774bcf52)
+      ember-reactive-collections-polyfill: 0.0.2(a59fa715e714877bc75ff20dc797b421)
       ember-tracked-as-function-polyfill: 0.0.1(2ed9c0cc3ad6b3c29c50bae5774bcf52)
     transitivePeerDependencies:
       - '@babel/core'
@@ -11501,21 +11499,10 @@ snapshots:
       - '@glint/template'
       - supports-color
 
-  ember-reactive-collections-polyfill@0.0.1(2ed9c0cc3ad6b3c29c50bae5774bcf52):
+  ember-reactive-collections-polyfill@0.0.2(a59fa715e714877bc75ff20dc797b421):
     dependencies:
       '@embroider/addon-shim': 1.11.0
       '@embroider/macros': 1.21.4(a59fa715e714877bc75ff20dc797b421)
-      ember-source: 6.12.1(@glimmer/component@2.2.1)(rsvp@4.8.5)
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@glint/template'
-      - supports-color
-
-  ember-reactive-collections-polyfill@0.0.1(73d42070d7900188e8a13c670612d0c3):
-    dependencies:
-      '@embroider/addon-shim': 1.11.0
-      '@embroider/macros': 1.21.4(a59fa715e714877bc75ff20dc797b421)
-      ember-source: 7.4.0(@glimmer/component@2.2.1)
     transitivePeerDependencies:
       - '@babel/core'
       - '@glint/template'
