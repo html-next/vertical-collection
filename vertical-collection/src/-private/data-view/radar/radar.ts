@@ -26,8 +26,6 @@ import keyForItem, {
   type KeyPath,
 } from '../../ember-internals/key-for-item.ts';
 
-import document from '../../utils/document-shim.ts';
-
 export type RadarAction =
   'firstVisibleChanged' | 'lastVisibleChanged' | 'firstReached' | 'lastReached';
 
@@ -105,7 +103,6 @@ export default abstract class Radar<T = unknown> {
   // Boundaries
   declare _occludedContentBefore: OccludedContent;
   declare _occludedContentAfter: OccludedContent;
-  declare _domPool: DocumentFragment | undefined;
 
   declare virtualComponents: PoolComponent<T>[];
   declare orderedComponents: VirtualComponent<T>[];
@@ -210,11 +207,6 @@ export default abstract class Radar<T = unknown> {
     this._occludedContentBefore.addEventListener('click', this._pageUpHandler);
     this._pageDownHandler = this.pageDown.bind(this);
     this._occludedContentAfter.addEventListener('click', this._pageDownHandler);
-
-    // Element to hold pooled component DOM when not in use
-    if (document) {
-      this._domPool = document.createDocumentFragment();
-    }
 
     // Initialize virtual components. The radar is made while the collection renders, and a
     // tracked array cannot change there after it is read, so the first update uses a plain array.
@@ -597,7 +589,6 @@ export default abstract class Radar<T = unknown> {
    */
   _updateVirtualComponents(): void {
     const {
-      items,
       orderedComponents,
       virtualComponents,
       _componentPool,
@@ -734,40 +725,25 @@ export default abstract class Radar<T = unknown> {
       }
     }
 
-    // If there are any items remaining in the pool, remove them
-    if (_componentPool.length > 0) {
-      // Grab the DOM of the remaining components and move it to temporary node disconnected from
-      // the body if the item can be reused later otherwise delete the component to avoid virtual re-rendering of the
-      // deleted item. If we end up using these components again, we'll grab their DOM and put it back
-      for (let i = _componentPool.length - 1; i >= 0; i--) {
-        const component = _componentPool[i]!;
-        const item = items[component.index];
-        if (item) {
-          assert('Recycled components are kept in the DOM pool', this._domPool);
-          insertRangeBefore(
-            this._domPool,
-            null,
-            component.realUpperBound,
-            component.realLowerBound,
-          );
-        } else {
-          // Insert the virtual component bound back to make sure Glimmer is
-          // not confused about the state of the DOM.
-          insertRangeBefore(
-            this.itemContainer,
-            null,
-            component.realUpperBound,
-            component.realLowerBound,
-          );
-          // Each removal renders in its own runloop. Removing them all in one render made Ember
-          // render the rest of the out of order pool with the wrong content (#358).
-          // eslint-disable-next-line ember/no-runloop
-          run(() => {
-            virtualComponents.splice(virtualComponents.indexOf(component), 1);
-          });
-          _componentPool.splice(i, 1);
-        }
-      }
+    // Remove the components that are left in the pool. Glimmer keeps updating all components in the
+    // list, so a component that stays there, out of the DOM, still runs its modifiers (#354).
+    for (let i = _componentPool.length - 1; i >= 0; i--) {
+      const component = _componentPool[i]!;
+      // Insert the virtual component bound back to make sure Glimmer is
+      // not confused about the state of the DOM.
+      insertRangeBefore(
+        this.itemContainer,
+        null,
+        component.realUpperBound,
+        component.realLowerBound,
+      );
+      // Each removal renders in its own runloop. Removing them all in one render made Ember
+      // render the rest of the out of order pool with the wrong content (#358).
+      // eslint-disable-next-line ember/no-runloop
+      run(() => {
+        virtualComponents.splice(virtualComponents.indexOf(component), 1);
+      });
+      _componentPool.splice(i, 1);
     }
 
     const totalItemsBefore = renderedFirstItemIndex;
