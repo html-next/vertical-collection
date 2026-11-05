@@ -641,4 +641,44 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
       );
     });
   }
+
+  test('rows cover the container when they are smaller than estimated, below content above the collection', async function (assert) {
+    this.set('items', getNumbers(0, 100));
+
+    await render(hbs`
+      <div style="height: 300px; width: 200px;" class="scrollable">
+        <div style="height: 200px;">Header</div>
+        <VerticalCollection
+          @items={{this.items}}
+          @estimateHeight={{100}}
+          @bufferSize={{0}}
+          as |item i|
+        >
+          <div class="vertical-item" style="height: 20px;">
+            {{item.number}} {{i}}
+          </div>
+        </VerticalCollection>
+      </div>
+    `);
+
+    const scrollable = find('.scrollable');
+    const gapsAt = [];
+
+    for (let top = 0; top <= 400; top += 25) {
+      await scrollTo('.scrollable', 0, top);
+
+      const items = findAll('.vertical-item');
+      const lastBottom = items[items.length - 1].getBoundingClientRect().bottom;
+
+      if (lastBottom < scrollable.getBoundingClientRect().bottom) {
+        gapsAt.push(top);
+      }
+    }
+
+    assert.deepEqual(
+      gapsAt,
+      [],
+      'rendered rows reach the bottom of the container'
+    );
+  });
 });
