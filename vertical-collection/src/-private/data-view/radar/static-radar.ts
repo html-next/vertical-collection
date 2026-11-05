@@ -99,7 +99,7 @@ export default class StaticRadar<T = unknown> extends Radar<T> {
   get lastVisibleIndex(): number {
     return (
       Math.min(
-        Math.ceil(this.visibleBottom / this._calculatedEstimateHeight),
+        Math.ceil(this.lastVisibleBottom / this._calculatedEstimateHeight),
         this.totalItems,
       ) - 1
     );

@@ -994,6 +994,19 @@ export default abstract class Radar<T = unknown> {
     return this.visibleTop + this._calculatedScrollContainerHeight / 2;
   }
 
+  // The render window always covers a full container. This is what the user can see of the
+  // collection, which is less when content above it is in view.
+  get lastVisibleBottom(): number {
+    return Math.max(
+      this._scrollTop -
+        this._collectionOffset +
+        this._prependOffset +
+        this._calculatedScrollContainerHeight -
+        1,
+      0,
+    );
+  }
+
   get visibleBottom(): number {
     // There is a case where the container of this vertical collection could have height 0 at
     // initial render step but will be updated later. We want to return visibleBottom to be 0 rather
