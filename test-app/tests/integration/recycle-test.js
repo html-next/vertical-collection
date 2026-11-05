@@ -1,18 +1,135 @@
 import { module } from 'qunit';
 import { setupRenderingTest } from '../helpers';
 import { hbs } from 'ember-cli-htmlbars';
-import { find, findAll } from '@ember/test-helpers';
+import { find, findAll, settled } from '@ember/test-helpers';
 import scrollTo from '../helpers/scroll-to';
+import { append, prepend, replaceArray } from '../helpers/array';
 
 import getNumbers from 'test-app/lib/get-numbers';
 
 import {
   testScenarios,
   simpleScenariosFor,
+  standardScenariosFor,
 } from 'test-app/tests/helpers/test-scenarios';
+
+// Only the DOM order counts: a wrong row is a row that is out of order, missing, or not in view.
+function assertRowsInOrder(assert, label, firstInView) {
+  const scroller = find('.scrollable');
+  const rows = findAll('vertical-item');
+  const numbers = rows.map((row) => Number(row.dataset.number));
+  const expected = numbers.map((_, i) => numbers[0] + i);
+
+  assert.deepEqual(
+    numbers,
+    expected,
+    `${label}: rows are in order, with no gap`
+  );
+
+  const top = scroller.getBoundingClientRect().top;
+  const inView = rows.find(
+    (row) => row.getBoundingClientRect().bottom > top + 1
+  );
+  assert.equal(
+    Number(inView?.dataset.number),
+    firstInView,
+    `${label}: first row in view`
+  );
+}
+
+const nextFrame = () =>
+  new Promise((resolve) => requestAnimationFrame(resolve));
 
 module('vertical-collection', 'Integration | Recycle Tests', function (hooks) {
   setupRenderingTest(hooks);
+
+  for (const shouldRecycle of [false, true]) {
+    const template = shouldRecycle
+      ? hbs`
+        <div style="height: 200px" class="scrollable">
+          <div>
+            <VerticalCollection @items={{this.items}}
+              @containerSelector=".scrollable"
+              @key="number"
+              @estimateHeight={{20}}
+              @staticHeight={{this.staticHeight}}
+              @shouldRecycle={{true}}
+              @bufferSize={{2}}
+              as |item|>
+              <vertical-item style="height: 20px" data-number={{item.number}}></vertical-item>
+            </VerticalCollection>
+          </div>
+        </div>
+      `
+      : hbs`
+        <div style="height: 200px" class="scrollable">
+          <div>
+            <VerticalCollection @items={{this.items}}
+              @containerSelector=".scrollable"
+              @key="number"
+              @estimateHeight={{20}}
+              @staticHeight={{this.staticHeight}}
+              @shouldRecycle={{false}}
+              @bufferSize={{2}}
+              as |item|>
+              <vertical-item style="height: 20px" data-number={{item.number}}></vertical-item>
+            </VerticalCollection>
+          </div>
+        </div>
+      `;
+
+    testScenarios(
+      `The rows stay in order when scrolling step by step | shouldRecycle=${shouldRecycle}`,
+      standardScenariosFor(getNumbers(0, 500)),
+      template,
+      async function (assert) {
+        for (const y of [100, 700, 720, 3000, 9000, 8980, 4000, 100, 0]) {
+          await scrollTo('.scrollable', 0, y);
+          assertRowsInOrder(assert, `scrollTop ${y}`, y / 20);
+        }
+      }
+    );
+
+    testScenarios(
+      `The rows stay in order when scrolling fast | shouldRecycle=${shouldRecycle}`,
+      standardScenariosFor(getNumbers(0, 500)),
+      template,
+      async function (assert) {
+        const scroller = find('.scrollable');
+
+        for (const step of [130, -130]) {
+          for (let i = 0; i < 40; i++) {
+            scroller.scrollTop += step;
+            await nextFrame();
+          }
+          await settled();
+          assertRowsInOrder(assert, `step ${step}`, scroller.scrollTop / 20);
+        }
+      }
+    );
+
+    testScenarios(
+      `The rows stay in order when the items change during a scroll | shouldRecycle=${shouldRecycle}`,
+      standardScenariosFor(getNumbers(100, 200)),
+      template,
+      async function (assert) {
+        const scroller = find('.scrollable');
+
+        await scrollTo('.scrollable', 0, 2000);
+        scroller.scrollTop += 200;
+        await append(this, getNumbers(300, 50));
+        assertRowsInOrder(assert, 'append', 100 + scroller.scrollTop / 20);
+
+        scroller.scrollTop += 200;
+        await prepend(this, getNumbers(50, 50));
+        assertRowsInOrder(assert, 'prepend', 50 + scroller.scrollTop / 20);
+
+        scroller.scrollTop -= 200;
+        await replaceArray(this, getNumbers(1000, 300));
+        assertRowsInOrder(assert, 'replace', 1000 + scroller.scrollTop / 20);
+      }
+    );
+  }
 
   testScenarios(
     'The collection does not recycle when shouldRecycle is set to false',
