@@ -1,6 +1,7 @@
-import { module } from 'qunit';
+import { module, test } from 'qunit';
 import { setupRenderingTest } from '../helpers';
-import { find, findAll, settled } from '@ember/test-helpers';
+import { find, findAll, render, settled } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import scrollTo from '../helpers/scroll-to';
 
 import getNumbers from 'test-app/lib/get-numbers';
@@ -564,4 +565,102 @@ module('vertical-collection', 'Integration | Mutation Tests', function (hooks) {
       );
     }
   );
+
+  test('Collection updates correctly when a key is given', async function (assert) {
+    assert.expect(5);
+
+    const initialItems = [
+      { id: 'item-1', props: [{ name: 'prop', value: 'v1' }] },
+      { id: 'item-2', props: [{ name: 'prop', value: 'v2' }] },
+    ];
+
+    const updatedItems = [
+      { id: 'item-1', props: [{ name: 'prop', value: 'v1' }] },
+      { id: 'item-2', props: [{ name: 'prop', value: 'v2-updated' }] },
+      { id: 'item-3', props: [{ name: 'prop', value: 'v3-added' }] },
+    ];
+
+    this.set('items', initialItems);
+
+    await render(hbs`
+      <div style="height: 500px; width: 500px;" class="scrollable">
+        <VerticalCollection
+          @items={{this.items}}
+          @key="id"
+          @estimateHeight={{50}}
+          @initialRenderCount={{5}}
+          as |item i|
+        >
+          <vertical-item style="height: 50px">
+            {{#each item.props as |prop|}}
+              {{i}} - {{prop.name}}: {{prop.value}}
+            {{/each}}
+          </vertical-item>
+        </VerticalCollection>
+      </div>
+    `);
+
+    assert.equal(
+      findAll('vertical-item').length,
+      2,
+      'correctly renders initial items'
+    );
+
+    this.set('items', updatedItems);
+
+    await settled();
+
+    assert.equal(findAll('vertical-item').length, 3, 'correctly updates items');
+    assert.equal(
+      find('vertical-item:first-of-type').textContent.trim(),
+      '0 - prop: v1',
+      'correct 1st item rendered'
+    );
+    assert.equal(
+      find('vertical-item:nth-of-type(2)').textContent.trim(),
+      '1 - prop: v2-updated',
+      'correct 2nd item rendered'
+    );
+    assert.equal(
+      find('vertical-item:last-of-type').textContent.trim(),
+      '2 - prop: v3-added',
+      'correct last item rendered'
+    );
+  });
+
+  test('Collection updates rendered items on a prepend when a key is given', async function (assert) {
+    const row = (id, value) => ({ id, value });
+
+    this.set('items', [row('a', 'a1'), row('b', 'b1'), row('c', 'c1')]);
+
+    await render(hbs`
+      <div style="height: 500px; width: 500px;" class="scrollable">
+        <VerticalCollection
+          @items={{this.items}}
+          @key="id"
+          @estimateHeight={{50}}
+          @bufferSize={{5}}
+          as |item i|
+        >
+          <vertical-item style="height: 50px">{{i}} {{item.value}}</vertical-item>
+        </VerticalCollection>
+      </div>
+    `);
+
+    this.set('items', [
+      row('z', 'z2'),
+      row('a', 'a2'),
+      row('b', 'b2'),
+      row('c', 'c2'),
+    ]);
+
+    await settled();
+
+    assert.deepEqual(
+      findAll('vertical-item')
+        .map((item) => item.textContent.trim())
+        .sort(),
+      ['0 z2', '1 a2', '2 b2', '3 c2']
+    );
+  });
 });
