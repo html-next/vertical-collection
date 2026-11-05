@@ -101,7 +101,6 @@ export default abstract class Radar<T = unknown> {
 
   declare _componentPool: VirtualComponent<T>[];
   declare _prependComponentPool: VirtualComponent<T>[];
-  declare _appendComponentPool: VirtualComponent<T>[];
 
   // Boundaries
   declare _occludedContentBefore: OccludedContent;
@@ -202,7 +201,6 @@ export default abstract class Radar<T = unknown> {
 
     this._componentPool = [];
     this._prependComponentPool = [];
-    this._appendComponentPool = []; // https://github.com/html-next/vertical-collection/issues/296
 
     // Boundaries
     this._occludedContentBefore = new OccludedContent(occlusionTagName);
@@ -592,6 +590,9 @@ export default abstract class Radar<T = unknown> {
    * _orderedComponents array. This is possible because all of our operations are relatively simple,
    * popping some number of components off one end and pushing them onto the other.
    *
+   * Without recycling, no component moves to another item, so the list can stay in visual order.
+   * Then one render places all rows, and nothing moves the DOM.
+   *
    * @private
    */
   _updateVirtualComponents(): void {
@@ -689,7 +690,9 @@ export default abstract class Radar<T = unknown> {
       const component = recycled ?? new VirtualComponent(item, itemIndex);
 
       recycled?.recycle(item, itemIndex);
-      this._appendComponent(component);
+      if (shouldRecycle === true) {
+        this._appendComponent(component);
+      }
 
       orderedComponents.push(component);
     }
@@ -703,9 +706,32 @@ export default abstract class Radar<T = unknown> {
       const component = recycled ?? new VirtualComponent(item, itemIndex);
 
       recycled?.recycle(item, itemIndex);
-      this._prependComponent(component);
+      if (shouldRecycle === true) {
+        this._prependComponent(component);
+      }
 
       orderedComponents.unshift(component);
+    }
+
+    if (shouldRecycle !== true) {
+      _componentPool.length = 0;
+
+      if (
+        virtualComponents.length !== orderedComponents.length + 2 ||
+        virtualComponents[1] !==
+          (orderedComponents[0] ?? _occludedContentAfter) ||
+        virtualComponents[virtualComponents.length - 2] !==
+          (orderedComponents[orderedComponents.length - 1] ??
+            _occludedContentBefore)
+      ) {
+        virtualComponents.splice(
+          0,
+          virtualComponents.length,
+          _occludedContentBefore,
+          ...orderedComponents,
+          _occludedContentAfter,
+        );
+      }
     }
 
     // If there are any items remaining in the pool, remove them
@@ -716,7 +742,7 @@ export default abstract class Radar<T = unknown> {
       for (let i = _componentPool.length - 1; i >= 0; i--) {
         const component = _componentPool[i]!;
         const item = items[component.index];
-        if (shouldRecycle === true && item) {
+        if (item) {
           assert('Recycled components are kept in the DOM pool', this._domPool);
           insertRangeBefore(
             this._domPool,
@@ -765,12 +791,7 @@ export default abstract class Radar<T = unknown> {
   }
 
   _appendComponent(component: VirtualComponent<T>): void {
-    const {
-      virtualComponents,
-      _occludedContentAfter,
-      _appendComponentPool,
-      shouldRecycle,
-    } = this;
+    const { virtualComponents, _occludedContentAfter } = this;
 
     const relativeNode = _occludedContentAfter.realUpperBound;
 
@@ -784,34 +805,6 @@ export default abstract class Radar<T = unknown> {
     } else {
       virtualComponents.splice(virtualComponents.length - 1, 0, component);
       component.rendered = true;
-
-      // shouldRecycle=false breaks UI when scrolling the elements fast.
-      // Reference https://github.com/html-next/vertical-collection/issues/296
-      // Components that are both new and appended still need to be rendered at the end because Glimmer.
-      // We have to move them _after_ they render, so we schedule that if they exist
-      if (!shouldRecycle) {
-        _appendComponentPool.unshift(component);
-
-        if (this._nextLayout === null) {
-          this._nextLayout = this.schedule('layout', () => {
-            this._nextLayout = null;
-
-            while (_appendComponentPool.length > 0) {
-              const component = _appendComponentPool.pop()!;
-
-              // Changes with each inserted component
-              const relativeNode = _occludedContentAfter.realUpperBound;
-
-              insertRangeBefore(
-                this.itemContainer,
-                relativeNode,
-                component.realUpperBound,
-                component.realLowerBound,
-              );
-            }
-          });
-        }
-      }
     }
   }
 
