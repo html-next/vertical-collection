@@ -33,6 +33,23 @@
         <button type="button">Open {{item.id}}</button>
       </article>
     </VerticalCollection>
+  {{else if this.isTable}}
+    <VerticalCollection
+      @items={{this.items}}
+      @key="id"
+      @estimateHeight={{44}}
+      @staticHeight={{true}}
+      @bufferSize={{10}}
+      @shouldRecycle={{this.shouldRecycle}}
+      as |item|
+    >
+      <div class="bench-row" data-id={{item.id}} style="height: 44px; display: flex; gap: 8px; overflow: hidden; white-space: nowrap;">
+        <strong>{{item.title}}</strong>
+        {{#each item.cells as |cell|}}
+          <span>{{cell}}</span>
+        {{/each}}
+      </div>
+    </VerticalCollection>
   {{else}}
     <VerticalCollection
       @items={{this.items}}
@@ -72,6 +89,15 @@
         <button type="button">Open {{item.id}}</button>
       </article>
       {{/each}}
+    {{else if this.isTable}}
+      {{#each this.items key="id" as |item|}}
+      <div class="bench-row" data-id={{item.id}} style="height: 44px; display: flex; gap: 8px; overflow: hidden; white-space: nowrap;">
+        <strong>{{item.title}}</strong>
+        {{#each item.cells as |cell|}}
+          <span>{{cell}}</span>
+        {{/each}}
+      </div>
+      {{/each}}
     {{else}}
       {{#each this.items key="id" as |item|}}
       <div class="bench-row" data-id={{item.id}} style="height: 44px; display: flex; gap: 8px; overflow: hidden; white-space: nowrap;">
@@ -89,6 +115,17 @@
       <div style="box-sizing: border-box; height: {{this.windowTotalHeight}}px; padding-top: {{this.windowOffset}}px;">
         {{#each this.windowItems key="id" as |item|}}
       <div class="bench-row" data-id={{item.id}} style="height: 40px;">{{item.title}} {{item.date}}</div>
+        {{/each}}
+      </div>
+  {{else if this.isTable}}
+      <div style="box-sizing: border-box; height: {{this.windowTotalHeight}}px; padding-top: {{this.windowOffset}}px;">
+        {{#each this.windowItems key="id" as |item|}}
+      <div class="bench-row" data-id={{item.id}} style="height: 44px; display: flex; gap: 8px; overflow: hidden; white-space: nowrap;">
+        <strong>{{item.title}}</strong>
+        {{#each item.cells as |cell|}}
+          <span>{{cell}}</span>
+        {{/each}}
+      </div>
         {{/each}}
       </div>
   {{else}}

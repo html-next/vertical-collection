@@ -6,7 +6,7 @@ const params = new URLSearchParams(location.search);
 const kind = params.get('kind') ?? 'medium';
 const impl = params.get('impl') ?? 'vc';
 const deferred = params.has('defer');
-const windowSizes = { light: { height: 40, buffer: 5 }, heavy: { height: 44, buffer: 10 } };
+const windowSizes = { light: { height: 40, buffer: 5 }, table: { height: 44, buffer: 10 }, heavy: { height: 44, buffer: 10 } };
 
 const series = (id) => Array.from({ length: 30 }, (_, i) => ((id * 7 + i * 13) % 97) + Math.sin(i + id) * 10);
 
@@ -17,6 +17,7 @@ export const makeRows = (count) =>
     date: `2026-${String((id % 12) + 1).padStart(2, '0')}-14`,
     note: id % 3 === 0 ? 'Long note. '.repeat((id % 5) + 2) : null,
     tags: Array.from({ length: (id % 5) + 1 }, (_, t) => `tag ${t}`),
+    cells: kind === 'table' ? Array.from({ length: 8 }, (_, i) => `${id * (i + 1)} km`) : [],
     values: kind === 'heavy' ? Array.from({ length: 8 }, (_, i) => id * (i + 1) * 1.37) : [],
     seriesList: kind === 'heavy' ? [series(id), series(id + 1), series(id + 2)] : [],
   }));
@@ -30,6 +31,7 @@ export default class extends Controller {
   shouldRecycle = params.get('recycle') !== 'false';
   isLight = kind === 'light';
   isMedium = kind === 'medium';
+  isTable = kind === 'table';
   isHeavy = kind === 'heavy';
   isVc = impl === 'vc';
   isEach = impl === 'each';

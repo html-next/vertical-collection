@@ -29,6 +29,19 @@ const median = (list) => {
   return (a[Math.floor(i)] + a[Math.ceil(i)]) / 2;
 };
 
+let seed = 1;
+const random = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32;
+const quantile = (list, p) => {
+  const a = [...list].sort((x, y) => x - y);
+  const i = (a.length - 1) * p;
+  const low = Math.floor(i);
+  return a[low] + (a[Math.ceil(i)] - a[low]) * (i - low);
+};
+const interval = (list) => {
+  const medians = Array.from({ length: 10000 }, () => median(list.map(() => list[Math.floor(random() * list.length)])));
+  return [quantile(medians, 0.025), quantile(medians, 0.975)];
+};
+
 if (values.report) {
   report(JSON.parse(readFileSync(values.report, 'utf8')));
   process.exit();
@@ -36,7 +49,7 @@ if (values.report) {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dists = values.dist.map((v) => v.split('='));
-const ROW_HEIGHT = { light: 40, heavy: 44 };
+const ROW_HEIGHT = { light: 40, table: 44, heavy: 44 };
 const CASES = values.cases.split(',').map((c) => {
   const [kind, cpu, step, dir] = c.split(':');
   return { kind, cpu: +cpu, step: +step, dir };
@@ -190,6 +203,18 @@ function report({ variants, runs }) {
   const load = runs.map((r) => r.load1);
   const failed = runs.filter((r) => !r.inOrder || r.topOk === false || r.errors.length > 0);
   console.log(`${runs.length} runs, ${new Set(runs.map((r) => r.round)).size} rounds, 10 000 rows, 300 steps. Load average median ${median(load).toFixed(0)}, max ${Math.max(...load).toFixed(0)}. Runs with wrong rows or errors: ${failed.length}.`);
+  const [offA, onA, offB, onB] = variants;
+  console.log(`\n### All tasks, paired by round, ms (95% bootstrap interval)\n\n| Rows | CPU | Step | Direction | ${offB} vs ${onA} | ${offA} vs ${onA} | ${offB} vs ${offA} | ${onB} vs ${onA} |\n|---|---|---|---|---|---|---|---|`);
+  for (const group of groups) {
+    const inGroup = runs.filter((r) => groupOf(r) === group);
+    const pair = (x, y) => {
+      const diff = inGroup.filter((r) => r.name === x).map((r) => r.taskMs - inGroup.find((o) => o.name === y && o.round === r.round)?.taskMs).filter(Number.isFinite);
+      const [low, high] = interval(diff);
+      const base = median(inGroup.filter((r) => r.name === y).map((r) => r.taskMs));
+      return `${median(diff).toFixed(0)} (${low.toFixed(0)} to ${high.toFixed(0)}), ${((median(diff) / base) * 100).toFixed(0)}%`;
+    };
+    console.log(`| ${group} | ${pair(offB, onA)} | ${pair(offA, onA)} | ${pair(offB, offA)} | ${pair(onB, onA)} |`);
+  }
   for (const [metric, label] of [['taskMs', 'All tasks, ms'], ['frameP95', 'Frame interval p95, ms'], ['long50', 'Frames over 50 ms'], ['wallMs', 'Wall time of the scroll, ms']]) {
     console.log(`\n### ${label}\n\n| Rows | CPU | Step | Direction | ${variants.join(' | ')} |\n|---|---|---|---${'|---'.repeat(variants.length)}|`);
     for (const group of groups) {
