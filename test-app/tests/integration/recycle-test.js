@@ -1,7 +1,8 @@
-import { module } from 'qunit';
+import { module, test } from 'qunit';
 import { setupRenderingTest } from '../helpers';
 import { hbs } from 'ember-cli-htmlbars';
-import { find, findAll, settled } from '@ember/test-helpers';
+import { find, findAll, render, settled } from '@ember/test-helpers';
+import { modifier } from 'ember-modifier';
 import scrollTo from '../helpers/scroll-to';
 import { append, prepend, replaceArray } from '../helpers/array';
 
@@ -42,6 +43,73 @@ const nextFrame = () =>
 
 module('vertical-collection', 'Integration | Recycle Tests', function (hooks) {
   setupRenderingTest(hooks);
+
+  // https://github.com/html-next/vertical-collection/issues/354
+  // Rows taller than the estimate make the collection render fewer rows after it measures them.
+  async function updatesOutsideTheDocument(context, template) {
+    const outside = [];
+    const rows = getNumbers(0, 26);
+    context.set('rows', rows);
+    context.set(
+      'track',
+      // Reads every argument, because ember-modifier only reruns for the arguments that it reads.
+      modifier((element, [item, rows]) => {
+        if (!element.isConnected && rows) outside.push(item.number);
+      })
+    );
+    await render(template);
+    await scrollTo('.scrollable', 0, find('.scrollable').scrollHeight);
+    // The first change leaves rows in the pool, and the second updates them.
+    rows[25] = { number: 125 };
+    context.set('rows', [...rows]);
+    await settled();
+    rows[24] = { number: 124 };
+    context.set('rows', [...rows]);
+    await settled();
+    return outside;
+  }
+
+  test('Rows outside the document do not update | shouldRecycle=true', async function (assert) {
+    const outside = await updatesOutsideTheDocument(
+      this,
+      hbs`
+        <div style="height: 100px" class="scrollable">
+          <VerticalCollection @items={{this.rows}} @containerSelector=".scrollable" @estimateHeight={{16}} @shouldRecycle={{true}} as |item|>
+            <vertical-item style="height: 40px" {{this.track item this.rows}}></vertical-item>
+          </VerticalCollection>
+        </div>
+      `
+    );
+    assert.deepEqual(outside, []);
+  });
+
+  test('Rows outside the document do not update | shouldRecycle=false', async function (assert) {
+    const outside = await updatesOutsideTheDocument(
+      this,
+      hbs`
+        <div style="height: 100px" class="scrollable">
+          <VerticalCollection @items={{this.rows}} @containerSelector=".scrollable" @estimateHeight={{16}} @shouldRecycle={{false}} as |item|>
+            <vertical-item style="height: 40px" {{this.track item this.rows}}></vertical-item>
+          </VerticalCollection>
+        </div>
+      `
+    );
+    assert.deepEqual(outside, []);
+  });
+
+  test('Rows outside the document do not update | default', async function (assert) {
+    const outside = await updatesOutsideTheDocument(
+      this,
+      hbs`
+        <div style="height: 100px" class="scrollable">
+          <VerticalCollection @items={{this.rows}} @containerSelector=".scrollable" @estimateHeight={{16}} as |item|>
+            <vertical-item style="height: 40px" {{this.track item this.rows}}></vertical-item>
+          </VerticalCollection>
+        </div>
+      `
+    );
+    assert.deepEqual(outside, []);
+  });
 
   for (const shouldRecycle of [false, true]) {
     const template = shouldRecycle
