@@ -1,5 +1,46 @@
 # Changelog
 
+## Release (2026-11-05)
+
+* @html-next/vertical-collection 6.0.0 (major)
+
+#### :boom: Breaking Change
+* `@html-next/vertical-collection`
+  * [#573](https://github.com/html-next/vertical-collection/pull/573) Convert VerticalCollection to a Glimmer component ([@johanrd](https://github.com/johanrd))
+
+#### :rocket: Enhancement
+* `@html-next/vertical-collection`
+  * [#574](https://github.com/html-next/vertical-collection/pull/574) Convert the addon to TypeScript ([@johanrd](https://github.com/johanrd))
+
+#### :bug: Bug Fix
+* `@html-next/vertical-collection`
+  * [#587](https://github.com/html-next/vertical-collection/pull/587) Report the last visible index with content above the collection ([@johanrd](https://github.com/johanrd))
+  * [#586](https://github.com/html-next/vertical-collection/pull/586) Account for collection offset in scrollToItem ([@johanrd](https://github.com/johanrd))
+  * [#590](https://github.com/html-next/vertical-collection/pull/590) Render once per update when shouldRecycle is false ([@johanrd](https://github.com/johanrd))
+  * [#585](https://github.com/html-next/vertical-collection/pull/585) Update rendered rows when new items keep their keys ([@johanrd](https://github.com/johanrd))
+  * [#575](https://github.com/html-next/vertical-collection/pull/575) Fix @debugCSS reading containers the radar does not have ([@johanrd](https://github.com/johanrd))
+  * [#582](https://github.com/html-next/vertical-collection/pull/582) Add @glimmer/component to the addon's dev dependencies ([@johanrd](https://github.com/johanrd))
+
+#### :memo: Documentation
+* Other
+  * [#581](https://github.com/html-next/vertical-collection/pull/581) Document all options on the settings page ([@johanrd](https://github.com/johanrd))
+* `@html-next/vertical-collection`
+  * [#568](https://github.com/html-next/vertical-collection/pull/568) docs: explain shouldRecycle ([@johanrd](https://github.com/johanrd))
+
+#### :house: Internal
+* `@html-next/vertical-collection`
+  * [#584](https://github.com/html-next/vertical-collection/pull/584) Regenerate the lockfile ([@NullVoxPopuli-ai-agent](https://github.com/NullVoxPopuli-ai-agent))
+  * [#583](https://github.com/html-next/vertical-collection/pull/583) Build the addon with tsdown and @nullvoxpopuli/ember-rolldown ([@NullVoxPopuli-ai-agent](https://github.com/NullVoxPopuli-ai-agent))
+* Other
+  * [#576](https://github.com/html-next/vertical-collection/pull/576) Use the current WarpDrive store in the test app ([@johanrd](https://github.com/johanrd))
+  * [#579](https://github.com/html-next/vertical-collection/pull/579) Use @ember/test-helpers 5.7 in the test app ([@johanrd](https://github.com/johanrd))
+  * [#580](https://github.com/html-next/vertical-collection/pull/580) Pass the index to the slides in the demos ([@johanrd](https://github.com/johanrd))
+  * [#569](https://github.com/html-next/vertical-collection/pull/569) chore: bump warp-drive and embroider to fix ember 7 CI ([@johanrd](https://github.com/johanrd))
+
+#### Committers: 2
+- @NullVoxPopuli's reduced-access machine account for AI usage ([@NullVoxPopuli-ai-agent](https://github.com/NullVoxPopuli-ai-agent))
+- Johan Røed ([@johanrd](https://github.com/johanrd))
+
 ## Release (2026-04-10)
 
 * @html-next/vertical-collection 5.0.5 (patch)
