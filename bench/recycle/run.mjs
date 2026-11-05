@@ -1,5 +1,7 @@
 // Usage: node bench/recycle/run.mjs [--ember 7.4.0] [--rounds 15] [--steps 300] [--out name] [--chrome <path>]
 // Each group runs recycling on and off back to back, in random order, so a pair shares its load.
+// --baselines also runs plain {{#each}} and a minimal window, for the scroll and for the mount.
+// compare.mjs compares builds of this app.
 import { execSync, spawn } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -15,6 +17,7 @@ const { values } = parseArgs({
     steps: { type: 'string', default: '300' },
     out: { type: 'string', default: 'ember-7.4.0' },
     dist: { type: 'string' },
+    baselines: { type: 'boolean', default: false },
     chrome: { type: 'string', default: process.env.CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' },
   },
 });
@@ -116,6 +119,7 @@ const GROUPS = [
   { kind: 'heavy', cpu: 1, step: 1500 },
   { kind: 'heavy', cpu: 4, step: 1500 },
 ];
+const MOUNT_GROUPS = ['light', 'medium', 'heavy'].flatMap((kind) => [1, 4].map((cpu) => ({ kind, cpu })));
 const shuffle = (list) => list.map((v) => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(([, v]) => v);
 
 const tree = values.dist ? undefined : build();
@@ -124,8 +128,37 @@ const { server, port } = await serve(dist);
 const browser = await startChrome();
 const steps = Number(values.steps);
 
-const one = async (group, recycle, observe) => {
-  const page = await openPage(browser, `http://localhost:${port}/?rows=10000&kind=${group.kind}&recycle=${recycle}#/recycle-benchmark`);
+const VARIANTS = [
+  { impl: 'vc', recycle: true },
+  { impl: 'vc', recycle: false },
+  ...(values.baselines ? [{ impl: 'each', recycle: false }, { impl: 'window', recycle: false }] : []),
+];
+// The minimal window needs a fixed row height, and medium rows do not have one.
+const variantsFor = ({ kind }) => VARIANTS.filter((v) => v.impl !== 'window' || kind !== 'medium');
+const pageUrl = (group, { impl, recycle }, extra = '') => `http://localhost:${port}/?rows=10000&kind=${group.kind}&impl=${impl}&recycle=${recycle}${extra}#/recycle-benchmark`;
+
+const mountOne = async (group, variant) => {
+  const page = await openPage(browser, pageUrl(group, variant, '&defer=1'));
+  await page.call('Emulation.setCPUThrottlingRate', { rate: group.cpu });
+  await page.call('HeapProfiler.collectGarbage');
+  const before = await page.metrics();
+  const result = await page.evaluate('window.__bench.mount()');
+  const after = await page.metrics();
+  await page.call('HeapProfiler.collectGarbage');
+  const collected = await page.metrics();
+  await page.close();
+  const delta = (name) => (after[name] - before[name]) * 1000;
+  return {
+    test: 'mount', ...group, ...variant, ...result,
+    scriptMs: delta('ScriptDuration'), taskMs: delta('TaskDuration'),
+    layoutMs: delta('LayoutDuration'), styleMs: delta('RecalcStyleDuration'),
+    heapMb: (collected.JSHeapUsedSize - before.JSHeapUsedSize) / 2 ** 20,
+    load1: loadavg()[0],
+  };
+};
+
+const one = async (group, variant, observe) => {
+  const page = await openPage(browser, pageUrl(group, variant));
   await page.call('Emulation.setCPUThrottlingRate', { rate: group.cpu });
   const before = await page.metrics();
   const result = await page.evaluate(`window.__bench.scroll(${group.step}, ${steps}, ${observe})`);
@@ -133,7 +166,7 @@ const one = async (group, recycle, observe) => {
   await page.close();
   const delta = (name) => (after[name] - before[name]) * 1000;
   return {
-    ...group, recycle, ...result,
+    test: 'scroll', ...group, ...variant, ...result,
     scriptMs: delta('ScriptDuration'), taskMs: delta('TaskDuration'),
     layoutMs: delta('LayoutDuration'), styleMs: delta('RecalcStyleDuration'),
     load1: loadavg()[0],
@@ -141,26 +174,35 @@ const one = async (group, recycle, observe) => {
 };
 
 const chromeVersion = execSync(`"${values.chrome}" --version`).toString().trim();
-const output = { ember: values.ember, ref, chrome: chromeVersion, rounds: Number(values.rounds), steps, validation: [], runs: [] };
+const output = { ember: values.ember, ref, chrome: chromeVersion, rounds: Number(values.rounds), steps, baselines: values.baselines, validation: [], runs: [] };
 mkdirSync(join(here, 'results'), { recursive: true });
 const save = () => writeFileSync(join(here, 'results', `${values.out}.json`), JSON.stringify(output, null, 1) + '\n');
 
 // The observer costs time, so these runs only show that the flag does what it says, and are not timed.
 for (const group of GROUPS.filter((g) => g.cpu === 1)) {
-  for (const recycle of [true, false]) {
-    const { kind, step, distinctRows, firstRowId, scrollTop } = await one(group, recycle, true);
-    output.validation.push({ kind, step, recycle, distinctRows, firstRowId, scrollTop });
+  for (const variant of variantsFor(group)) {
+    const { kind, step, distinctRows, firstRowId, scrollTop } = await one(group, variant, true);
+    output.validation.push({ kind, step, ...variant, distinctRows, firstRowId, scrollTop });
     console.log(JSON.stringify(output.validation.at(-1)));
   }
 }
 save();
 
 for (let round = 0; round < output.rounds; round++) {
+  if (values.baselines) {
+    for (const group of shuffle(MOUNT_GROUPS)) {
+      for (const variant of shuffle(variantsFor(group))) {
+        const run = { round, ...(await mountOne(group, variant)) };
+        output.runs.push(run);
+        console.log(`${round} mount ${run.kind} x${run.cpu} ${run.impl} ${run.recycle ? 'on ' : 'off'} mount=${run.mountMs.toFixed(0)} script=${run.scriptMs.toFixed(0)} task=${run.taskMs.toFixed(0)} rows=${run.rows} nodes=${run.domNodes} heap=${run.heapMb.toFixed(1)} load=${run.load1.toFixed(0)}`);
+      }
+    }
+  }
   for (const group of shuffle(GROUPS)) {
-    for (const recycle of shuffle([true, false])) {
-      const run = { round, ...(await one(group, recycle, false)) };
+    for (const variant of shuffle(variantsFor(group))) {
+      const run = { round, ...(await one(group, variant, false)) };
       output.runs.push(run);
-      console.log(`${round} ${run.kind} x${run.cpu} step${run.step} ${run.recycle ? 'on ' : 'off'} script=${run.scriptMs.toFixed(0)} task=${run.taskMs.toFixed(0)} p95=${run.frameP95.toFixed(0)} long50=${run.long50} load=${run.load1.toFixed(0)}`);
+      console.log(`${round} ${run.kind} x${run.cpu} step${run.step} ${run.impl} ${run.recycle ? 'on ' : 'off'} script=${run.scriptMs.toFixed(0)} task=${run.taskMs.toFixed(0)} p95=${run.frameP95.toFixed(0)} long50=${run.long50} load=${run.load1.toFixed(0)}`);
     }
   }
   save();

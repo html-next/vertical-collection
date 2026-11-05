@@ -4,6 +4,9 @@ import { tracked } from '@glimmer/tracking';
 const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 const params = new URLSearchParams(location.search);
 const kind = params.get('kind') ?? 'medium';
+const impl = params.get('impl') ?? 'vc';
+const deferred = params.has('defer');
+const windowSizes = { light: { height: 40, buffer: 5 }, heavy: { height: 44, buffer: 10 } };
 
 const series = (id) => Array.from({ length: 30 }, (_, i) => ((id * 7 + i * 13) % 97) + Math.sin(i + id) * 10);
 
@@ -22,18 +25,61 @@ const quantile = (sorted, p) => sorted[Math.min(sorted.length - 1, Math.floor(so
 
 export default class extends Controller {
   @tracked items = [];
+  @tracked mounted = !deferred;
+  @tracked windowStart = 0;
   shouldRecycle = params.get('recycle') !== 'false';
   isLight = kind === 'light';
   isMedium = kind === 'medium';
   isHeavy = kind === 'heavy';
+  isVc = impl === 'vc';
+  isEach = impl === 'each';
+  isWindow = impl === 'window';
+  windowRowHeight = windowSizes[kind]?.height;
+
+  // Same row count as vertical-collection: Math.ceil(containerHeight / height) + bufferSize * 2 + 1
+  get windowItems() {
+    const { height, buffer } = windowSizes[kind];
+    return this.items.slice(this.windowStart, this.windowStart + Math.ceil(600 / height) + buffer * 2 + 1);
+  }
+
+  get windowTotalHeight() {
+    return this.items.length * this.windowRowHeight;
+  }
+
+  get windowOffset() {
+    return this.windowStart * this.windowRowHeight;
+  }
+
+  onScroll = ({ target }) => {
+    if (!this.isWindow) return;
+    this.windowStart = Math.max(0, Math.floor(target.scrollTop / this.windowRowHeight) - windowSizes[kind].buffer);
+  };
 
   constructor() {
     super(...arguments);
     window.__bench = {
       ready: async () => {
-        while (!document.querySelector('.bench-row')) await nextFrame();
+        while (!document.querySelector(deferred ? '#bench-scroller' : '.bench-row')) await nextFrame();
         for (let i = 0; i < 20; i++) await nextFrame();
         return true;
+      },
+      mount: async () => {
+        const started = performance.now();
+        this.mounted = true;
+        let last = 0;
+        let stable = 0;
+        let settledAt;
+        while (stable < 10) {
+          await nextFrame();
+          const rows = document.querySelectorAll('.bench-row').length;
+          if (rows > 0 && rows === last) {
+            if (++stable === 1) settledAt = performance.now();
+          } else {
+            stable = 0;
+            last = rows;
+          }
+        }
+        return { mountMs: settledAt - started, rows: last, domNodes: document.getElementsByTagName('*').length };
       },
       scroll: async (step, count, observe) => {
         const scroller = document.getElementById('bench-scroller');

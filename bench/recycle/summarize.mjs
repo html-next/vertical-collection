@@ -16,6 +16,43 @@ const interval = (list) => {
   const medians = Array.from({ length: 10000 }, () => median(list.map(() => list[Math.floor(random() * list.length)])));
   return [quantile(medians, 0.025), quantile(medians, 0.975)];
 };
+const baselineReport = () => {
+  const name = (r) => (r.impl === 'vc' ? (r.recycle ? 'vc on' : 'vc off') : r.impl);
+  const names = ['each', 'window', 'vc off', 'vc on'];
+  const relative = (test, metric, label, keys, base) => {
+    console.log(`\n### ${label}\n\n| Rows | CPU | ${keys.includes('step') ? 'Step | ' : ''}${names.join(' | ')} | ${names.filter((v) => v !== base).map((v) => `${v} / ${base}`).join(' | ')} |\n|---${'|---'.repeat(names.length * 2 - 1 + keys.length - 1)}|`);
+    const runs = data.runs.filter((r) => r.test === test);
+    for (const key of [...new Set(runs.map((r) => keys.map((k) => r[k]).join('|')))].sort()) {
+      const inGroup = runs.filter((r) => keys.map((k) => r[k]).join('|') === key);
+      const values = (v) => inGroup.filter((r) => name(r) === v);
+      const cell = (v) => (values(v).length ? n(median(values(v).map((r) => r[metric]))) : '–');
+      const ratio = (v) => {
+        const ratios = values(v).map((a) => a[metric] / values(base).find((b) => b.round === a.round)?.[metric]).filter(Number.isFinite);
+        if (!ratios.length) return '–';
+        const [low, high] = interval(ratios);
+        const f = (x) => (x >= 10 ? x.toFixed(0) : x >= 0.1 ? x.toFixed(2) : x.toFixed(3));
+        return `${f(median(ratios))}x (${f(low)} to ${f(high)})`;
+      };
+      const head = key.split('|').map((part, i) => (keys[i] === 'cpu' ? `${part}x` : part)).join(' | ');
+      console.log(`| ${head} | ${names.map(cell).join(' | ')} | ${names.filter((v) => v !== base).map(ratio).join(' | ')} |`);
+    }
+  };
+  console.log(`Ember ${data.ember}, ${data.chrome}, ${data.ref.slice(0, 7)}, ${new Set(data.runs.map((r) => r.round)).size} rounds, 10 000 rows. Load average ${n(median(data.runs.map((r) => r.load1)))}. Ratios are medians of ratios within a round, with 95% bootstrap intervals. All tasks is the metric to compare here: ScriptDuration depends on how the code was entered, and reads about 0 for plain each and the window.`);
+  console.log('\n## Mount');
+  const mountKeys = ['kind', 'cpu'];
+  relative('mount', 'mountMs', 'Time until the rows are painted, ms', mountKeys, 'each');
+  relative('mount', 'taskMs', 'All tasks, ms', mountKeys, 'each');
+  relative('mount', 'domNodes', 'Elements in the document', mountKeys, 'each');
+  relative('mount', 'heapMb', 'JS heap added after GC, MB', mountKeys, 'each');
+  console.log('\n## Scroll');
+  const scrollKeys = ['kind', 'cpu', 'step'];
+  relative('scroll', 'taskMs', 'All tasks, ms', scrollKeys, 'vc off');
+  relative('scroll', 'frameP95', 'Frame interval p95, ms', scrollKeys, 'vc off');
+  relative('scroll', 'long50', 'Frames over 50 ms', scrollKeys, 'vc off');
+  relative('scroll', 'wallMs', 'Wall time of the scroll, ms', scrollKeys, 'vc off');
+  console.log('\n### Flag check: distinct row elements during the scroll\n\n| Rows | Step | Variant | Rows |\n|---|---|---|---|');
+  for (const v of data.validation) console.log(`| ${v.kind} | ${v.step} | ${name(v)} | ${v.distinctRows} |`);
+};
 const groups = [...new Set(data.runs.map((r) => `${r.kind}|${r.cpu}|${r.step}`))].sort();
 const n = (v) => (Math.abs(v) >= 10 ? v.toFixed(0) : v.toFixed(1));
 const sign = (v) => (v > 0 ? '+' : '') + n(v);
@@ -36,6 +73,10 @@ const table = (metric, label) => {
     console.log(`| ${kind} | ${cpu}x | ${step} | ${n(median(pairs.map(([a]) => a)))} | ${n(baseline)} | ${clear ? `**${text}**` : text} | ${change} | ${diff.filter((v) => v < 0).length}/${diff.length} |`);
   }
 };
+if (data.baselines) {
+  baselineReport();
+  process.exit();
+}
 console.log(`Ember ${data.ember}, ${data.chrome}, ${data.ref.slice(0, 7)}, ${new Set(data.runs.map((r) => r.round)).size} rounds, ${data.steps} steps. Load average ${n(median(data.runs.map((r) => r.load1)))}.`);
 console.log(`\n### Flag check: distinct row elements during the scroll\n\n| Rows | Step | On | Off |\n|---|---|---|---|`);
 for (const v of data.validation.filter((x) => x.recycle)) {
