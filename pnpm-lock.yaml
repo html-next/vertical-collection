@@ -213,8 +213,8 @@ importers:
         specifier: ^0.0.1
         version: 0.0.1(73d42070d7900188e8a13c670612d0c3)
       ember-tracked-as-function-polyfill:
-        specifier: github:NullVoxPopuli/ember-tracked-as-function-polyfill#1fdbfeb&path:ember-tracked-as-function-polyfill
-        version: https://codeload.github.com/NullVoxPopuli/ember-tracked-as-function-polyfill/tar.gz/1fdbfeb276d8057bb9e2ecc2363e058df78bf9ac#path:ember-tracked-as-function-polyfill(73d42070d7900188e8a13c670612d0c3)
+        specifier: ^0.0.1
+        version: 0.0.1(73d42070d7900188e8a13c670612d0c3)
     devDependencies:
       '@babel/eslint-parser':
         specifier: ^7.22.10
@@ -3722,9 +3722,8 @@ packages:
     engines: {node: 12.* || 14.* || >= 16.*}
     hasBin: true
 
-  ember-tracked-as-function-polyfill@https://codeload.github.com/NullVoxPopuli/ember-tracked-as-function-polyfill/tar.gz/1fdbfeb276d8057bb9e2ecc2363e058df78bf9ac#path:ember-tracked-as-function-polyfill:
-    resolution: {path: ember-tracked-as-function-polyfill, tarball: https://codeload.github.com/NullVoxPopuli/ember-tracked-as-function-polyfill/tar.gz/1fdbfeb276d8057bb9e2ecc2363e058df78bf9ac}
-    version: 0.0.0
+  ember-tracked-as-function-polyfill@0.0.1:
+    resolution: {integrity: sha512-hbAouvHTd/ssPhqPoEdlGi1MGAmbSrNiaeFsK+8b7ev8a/louZiC8MuHfbWTDM4Q85S+fvdcZnZUVckBujZ/7A==}
     peerDependencies:
       ember-source: '>= 3.28.0'
 
@@ -8892,7 +8891,7 @@ snapshots:
       '@glimmer/component': 2.2.1
       ember-raf-scheduler: 0.5.1(a59fa715e714877bc75ff20dc797b421)
       ember-reactive-collections-polyfill: 0.0.1(2ed9c0cc3ad6b3c29c50bae5774bcf52)
-      ember-tracked-as-function-polyfill: https://codeload.github.com/NullVoxPopuli/ember-tracked-as-function-polyfill/tar.gz/1fdbfeb276d8057bb9e2ecc2363e058df78bf9ac#path:ember-tracked-as-function-polyfill(2ed9c0cc3ad6b3c29c50bae5774bcf52)
+      ember-tracked-as-function-polyfill: 0.0.1(2ed9c0cc3ad6b3c29c50bae5774bcf52)
     transitivePeerDependencies:
       - '@babel/core'
       - '@glint/template'
@@ -11652,22 +11651,20 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  ember-tracked-as-function-polyfill@https://codeload.github.com/NullVoxPopuli/ember-tracked-as-function-polyfill/tar.gz/1fdbfeb276d8057bb9e2ecc2363e058df78bf9ac#path:ember-tracked-as-function-polyfill(2ed9c0cc3ad6b3c29c50bae5774bcf52):
+  ember-tracked-as-function-polyfill@0.0.1(2ed9c0cc3ad6b3c29c50bae5774bcf52):
     dependencies:
       '@embroider/addon-shim': 1.11.0
       '@embroider/macros': 1.21.4(a59fa715e714877bc75ff20dc797b421)
-      decorator-transforms: 2.4.0(@babel/core@7.29.13)
       ember-source: 6.12.1(@glimmer/component@2.2.1)(rsvp@4.8.5)
     transitivePeerDependencies:
       - '@babel/core'
       - '@glint/template'
       - supports-color
 
-  ember-tracked-as-function-polyfill@https://codeload.github.com/NullVoxPopuli/ember-tracked-as-function-polyfill/tar.gz/1fdbfeb276d8057bb9e2ecc2363e058df78bf9ac#path:ember-tracked-as-function-polyfill(73d42070d7900188e8a13c670612d0c3):
+  ember-tracked-as-function-polyfill@0.0.1(73d42070d7900188e8a13c670612d0c3):
     dependencies:
       '@embroider/addon-shim': 1.11.0
       '@embroider/macros': 1.21.4(a59fa715e714877bc75ff20dc797b421)
-      decorator-transforms: 2.4.0(@babel/core@7.29.13)
       ember-source: 7.4.0(@glimmer/component@2.2.1)
     transitivePeerDependencies:
       - '@babel/core'

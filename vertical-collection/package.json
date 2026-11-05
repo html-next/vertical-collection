@@ -67,7 +67,7 @@
     "@embroider/addon-shim": "^1.10.2",
     "ember-raf-scheduler": "~0.5.1",
     "ember-reactive-collections-polyfill": "^0.0.1",
-    "ember-tracked-as-function-polyfill": "github:NullVoxPopuli/ember-tracked-as-function-polyfill#1fdbfeb&path:ember-tracked-as-function-polyfill"
+    "ember-tracked-as-function-polyfill": "^0.0.1"
   },
   "peerDependencies": {
     "@glimmer/component": "^1.1.2 || ^2.0.0"
