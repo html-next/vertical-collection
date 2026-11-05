@@ -559,6 +559,53 @@ module('vertical-collection', 'Integration | Scroll Tests', function (hooks) {
   );
 
   testScenarios(
+    'scrollToItem accounts for content above the collection in the scroll container',
+    dynamicSimpleScenarioFor(getNumbers(0, 50)),
+    hbs`
+      <div style="height: 200px; width: 200px;" class="scrollable">
+        <div style="height: 500px;">Header</div>
+        <VerticalCollection @items={{this.items}}
+          @estimateHeight={{40}}
+          @staticHeight={{true}}
+          @bufferSize={{0}}
+          @registerAPI={{this.registerAPI}}
+          as |item i|>
+          <div class="vertical-item" style="height:40px;">
+            {{item.number}} {{i}}
+          </div>
+        </VerticalCollection>
+      </div>
+    `,
+
+    async function (assert) {
+      assert.expect(2);
+      await this.collection.scrollToItem(20);
+
+      const scrollable = find('.scrollable');
+      const item = findAll('.vertical-item').find(
+        (element) => element.textContent.trim() === '20 20'
+      );
+
+      assert.ok(item, 'the item is rendered');
+      assert.strictEqual(
+        Math.round(
+          item.getBoundingClientRect().top -
+            scrollable.getBoundingClientRect().top
+        ),
+        0,
+        'the item is at the top of the scroll container'
+      );
+    },
+    false,
+    function () {
+      let registerAPI = (collection) => {
+        this.set('collection', collection);
+      };
+      this.set('registerAPI', registerAPI);
+    }
+  );
+
+  testScenarios(
     'Can scroll to last item when actual item sizes are significantly larger than default item size.',
     dynamicSimpleScenarioFor(getNumbers(0, 50), { itemHeight: 100 }),
     standardTemplate,
