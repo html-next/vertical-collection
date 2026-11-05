@@ -1,5 +1,5 @@
 import { run } from '@ember/runloop';
-import { TrackedArray } from 'tracked-built-ins';
+import { trackedArray } from '@ember/reactive/collections';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
@@ -225,7 +225,7 @@ export default abstract class Radar<T = unknown> {
     this.orderedComponents = [];
 
     this._updateVirtualComponents();
-    this.virtualComponents = new TrackedArray(this.virtualComponents);
+    this.virtualComponents = trackedArray(this.virtualComponents);
 
     if (DEBUG) {
       this._debugDidUpdate = null;

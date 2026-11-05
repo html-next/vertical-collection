@@ -65,9 +65,9 @@
   },
   "dependencies": {
     "@embroider/addon-shim": "^1.10.2",
-    "decorator-transforms": "^2.3.0",
     "ember-raf-scheduler": "~0.5.1",
-    "tracked-built-ins": "^4.1.2"
+    "ember-reactive-collections-polyfill": "^0.0.2",
+    "ember-tracked-as-function-polyfill": "^0.0.1"
   },
   "peerDependencies": {
     "@glimmer/component": "^1.1.2 || ^2.0.0"
@@ -89,7 +89,7 @@
     "ember-inflector": "^6.0.0",
     "ember-perf-timeline": "^2.0.0",
     "ember-qunit": "^7.0.0",
-    "ember-source": "~5.2.0",
+    "ember-source": "~7.4.0",
     "ember-template-lint": "^5.11.2",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
