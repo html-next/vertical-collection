@@ -1,5 +1,7 @@
 export default {
   plugins: [
+    'module:ember-tracked-as-function-polyfill/babel-plugin',
+    'module:ember-reactive-collections-polyfill/babel-plugin',
     [
       '@babel/plugin-transform-typescript',
       {
@@ -14,10 +16,6 @@ export default {
         targetFormat: 'hbs',
         transforms: [],
       },
-    ],
-    [
-      'module:decorator-transforms',
-      { runtime: { import: 'decorator-transforms/runtime-esm' } },
     ],
   ],
 };

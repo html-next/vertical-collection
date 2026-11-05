@@ -1,4 +1,4 @@
-import { tracked } from '@glimmer/tracking';
+import { tracked, type TrackedValue } from '@glimmer/tracking';
 import { assert } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
@@ -8,8 +8,8 @@ let VC_IDENTITY = 0;
 
 export default class VirtualComponent<T = unknown> {
   id: string;
-  @tracked content: T;
-  @tracked index: number;
+  #content: TrackedValue<T>;
+  #index: TrackedValue<number>;
   upperBound: Text | null;
   lowerBound: Text | null;
   rendered: boolean;
@@ -18,8 +18,8 @@ export default class VirtualComponent<T = unknown> {
   constructor(content: T, index: number) {
     this.id = `VC-${VC_IDENTITY++}`;
 
-    this.content = content;
-    this.index = index;
+    this.#content = tracked(content);
+    this.#index = tracked(index);
 
     // We check to see if the document exists in Fastboot. Since RAF won't run in
     // Fastboot, we'll never have to use these text nodes for measurements, so they
@@ -34,6 +34,22 @@ export default class VirtualComponent<T = unknown> {
     if (DEBUG) {
       Object.preventExtensions(this);
     }
+  }
+
+  get content(): T {
+    return this.#content.value;
+  }
+
+  set content(value: T) {
+    this.#content.value = value;
+  }
+
+  get index(): number {
+    return this.#index.value;
+  }
+
+  set index(value: number) {
+    this.#index.value = value;
   }
 
   get realUpperBound(): Text | null {

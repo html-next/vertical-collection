@@ -16,3 +16,6 @@ injectWorkspacePackages: true
 syncInjectedDepsAfterScripts:
   - build
   - sync
+
+onlyBuiltDependencies:
+  - ember-tracked-as-function-polyfill
