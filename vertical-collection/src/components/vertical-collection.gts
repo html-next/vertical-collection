@@ -1,5 +1,5 @@
 import { DEBUG } from '@glimmer/env';
-import { assert } from '@ember/debug';
+import { assert, deprecate } from '@ember/debug';
 
 import Component from '@glimmer/component';
 import type Owner from '@ember/owner';
@@ -310,6 +310,8 @@ class VerticalCollection<T = unknown> extends Component<
    * Also set to false when the templates for individual items vary widely, or depend on
    * conditionals that are likely to change, because that defeats the benefit of reuse anyway.
    *
+   * The default changes to false in v7. Until then, leaving it out logs a deprecation.
+   *
    * @property shouldRecycle
    * @type Boolean
    * @default true
@@ -502,6 +504,18 @@ class VerticalCollection<T = unknown> extends Component<
 
   constructor(owner: Owner, args: VerticalCollectionSignature<T>['Args']) {
     super(owner, args);
+
+    deprecate(
+      'The default of `@shouldRecycle` changes from `true` to `false` in v7, because a reused row keeps state that it does not derive from `item` and `index`. Pass `@shouldRecycle={{true}}` to keep reusing rows, or `@shouldRecycle={{false}}` for the new default.',
+      args.shouldRecycle !== undefined,
+      {
+        id: 'vertical-collection.should-recycle-default',
+        until: '7.0.0',
+        for: '@html-next/vertical-collection',
+        since: { available: '6.1.0', enabled: '6.1.0' },
+        url: 'https://github.com/html-next/vertical-collection#recycling',
+      },
+    );
 
     this.token = new Token();
     registerDestructor(this, () => {

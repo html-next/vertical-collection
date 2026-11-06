@@ -91,6 +91,8 @@ Reuse is only safe if the block derives everything it renders from the yielded `
 
 The symptom is a row that renders values from a row you scrolled past. Prefer to make the block fully derived, because derived state is the better pattern anyway. Set `@shouldRecycle={{false}}` when you cannot.
 
+The default changes to `false` in v7. Until then, a collection without `@shouldRecycle` logs the deprecation `vertical-collection.should-recycle-default` in development builds. Pass `@shouldRecycle={{true}}` to keep the current behavior, or `@shouldRecycle={{false}}` to get the new default now.
+
 ## Support Matrix
 
 | `vertical-collection` version | Supported Ember versions | Supported Node versions |
