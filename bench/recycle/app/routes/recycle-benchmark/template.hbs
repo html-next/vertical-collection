@@ -1,0 +1,147 @@
+<div id="bench-scroller" style="height: 600px; overflow: auto; position: relative;" {{on "scroll" this.onScroll}}>
+  {{#if this.mounted}}
+  {{#if this.isVc}}
+  {{#if this.isLight}}
+    <VerticalCollection
+      @items={{this.items}}
+      @key="id"
+      @estimateHeight={{40}}
+      @staticHeight={{true}}
+      @bufferSize={{5}}
+      @shouldRecycle={{this.shouldRecycle}}
+      as |item|
+    >
+      <div class="bench-row" data-id={{item.id}} style="height: 40px;">{{item.title}} {{item.date}}</div>
+    </VerticalCollection>
+  {{else if this.isMedium}}
+    <VerticalCollection
+      @items={{this.items}}
+      @key="id"
+      @estimateHeight={{60}}
+      @bufferSize={{5}}
+      @shouldRecycle={{this.shouldRecycle}}
+      as |item|
+    >
+      <article class="bench-row" data-id={{item.id}}>
+        <header><strong>{{item.title}}</strong> <time>{{item.date}}</time></header>
+        {{#if item.note}}<p>{{item.note}}</p>{{/if}}
+        <ul>
+          {{#each item.tags as |tag|}}
+            <li>{{tag}}</li>
+          {{/each}}
+        </ul>
+        <button type="button">Open {{item.id}}</button>
+      </article>
+    </VerticalCollection>
+  {{else if this.isTable}}
+    <VerticalCollection
+      @items={{this.items}}
+      @key="id"
+      @estimateHeight={{44}}
+      @staticHeight={{true}}
+      @bufferSize={{10}}
+      @shouldRecycle={{this.shouldRecycle}}
+      as |item|
+    >
+      <div class="bench-row" data-id={{item.id}} style="height: 44px; display: flex; gap: 8px; overflow: hidden; white-space: nowrap;">
+        <strong>{{item.title}}</strong>
+        {{#each item.cells as |cell|}}
+          <span>{{cell}}</span>
+        {{/each}}
+      </div>
+    </VerticalCollection>
+  {{else}}
+    <VerticalCollection
+      @items={{this.items}}
+      @key="id"
+      @estimateHeight={{44}}
+      @staticHeight={{true}}
+      @bufferSize={{10}}
+      @shouldRecycle={{this.shouldRecycle}}
+      as |item|
+    >
+      <div class="bench-row" data-id={{item.id}} style="height: 44px; display: flex; gap: 8px; overflow: hidden; white-space: nowrap;">
+        <strong>{{item.title}}</strong>
+        {{#each item.values as |value|}}
+          <BenchCell @value={{value}} />
+        {{/each}}
+        {{#each item.seriesList as |points|}}
+          <BenchSparkline @points={{points}} />
+        {{/each}}
+      </div>
+    </VerticalCollection>
+  {{/if}}
+  {{else if this.isEach}}
+    {{#if this.isLight}}
+      {{#each this.items key="id" as |item|}}
+      <div class="bench-row" data-id={{item.id}} style="height: 40px;">{{item.title}} {{item.date}}</div>
+      {{/each}}
+    {{else if this.isMedium}}
+      {{#each this.items key="id" as |item|}}
+      <article class="bench-row" data-id={{item.id}}>
+        <header><strong>{{item.title}}</strong> <time>{{item.date}}</time></header>
+        {{#if item.note}}<p>{{item.note}}</p>{{/if}}
+        <ul>
+          {{#each item.tags as |tag|}}
+            <li>{{tag}}</li>
+          {{/each}}
+        </ul>
+        <button type="button">Open {{item.id}}</button>
+      </article>
+      {{/each}}
+    {{else if this.isTable}}
+      {{#each this.items key="id" as |item|}}
+      <div class="bench-row" data-id={{item.id}} style="height: 44px; display: flex; gap: 8px; overflow: hidden; white-space: nowrap;">
+        <strong>{{item.title}}</strong>
+        {{#each item.cells as |cell|}}
+          <span>{{cell}}</span>
+        {{/each}}
+      </div>
+      {{/each}}
+    {{else}}
+      {{#each this.items key="id" as |item|}}
+      <div class="bench-row" data-id={{item.id}} style="height: 44px; display: flex; gap: 8px; overflow: hidden; white-space: nowrap;">
+        <strong>{{item.title}}</strong>
+        {{#each item.values as |value|}}
+          <BenchCell @value={{value}} />
+        {{/each}}
+        {{#each item.seriesList as |points|}}
+          <BenchSparkline @points={{points}} />
+        {{/each}}
+      </div>
+      {{/each}}
+    {{/if}}
+  {{else if this.isLight}}
+      <div style="box-sizing: border-box; height: {{this.windowTotalHeight}}px; padding-top: {{this.windowOffset}}px;">
+        {{#each this.windowItems key="id" as |item|}}
+      <div class="bench-row" data-id={{item.id}} style="height: 40px;">{{item.title}} {{item.date}}</div>
+        {{/each}}
+      </div>
+  {{else if this.isTable}}
+      <div style="box-sizing: border-box; height: {{this.windowTotalHeight}}px; padding-top: {{this.windowOffset}}px;">
+        {{#each this.windowItems key="id" as |item|}}
+      <div class="bench-row" data-id={{item.id}} style="height: 44px; display: flex; gap: 8px; overflow: hidden; white-space: nowrap;">
+        <strong>{{item.title}}</strong>
+        {{#each item.cells as |cell|}}
+          <span>{{cell}}</span>
+        {{/each}}
+      </div>
+        {{/each}}
+      </div>
+  {{else}}
+      <div style="box-sizing: border-box; height: {{this.windowTotalHeight}}px; padding-top: {{this.windowOffset}}px;">
+        {{#each this.windowItems key="id" as |item|}}
+      <div class="bench-row" data-id={{item.id}} style="height: 44px; display: flex; gap: 8px; overflow: hidden; white-space: nowrap;">
+        <strong>{{item.title}}</strong>
+        {{#each item.values as |value|}}
+          <BenchCell @value={{value}} />
+        {{/each}}
+        {{#each item.seriesList as |points|}}
+          <BenchSparkline @points={{points}} />
+        {{/each}}
+      </div>
+        {{/each}}
+      </div>
+  {{/if}}
+  {{/if}}
+</div>

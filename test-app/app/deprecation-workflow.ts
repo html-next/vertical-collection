@@ -20,5 +20,10 @@ setupDeprecationWorkflow({
      */
     /* example: */
     /* { handler: 'silence', matchId: 'template-action' }, */
+    // Most tests leave out @shouldRecycle; should-recycle-deprecation-test checks the deprecation.
+    {
+      handler: 'silence',
+      matchId: 'vertical-collection.should-recycle-default',
+    },
   ],
 });
